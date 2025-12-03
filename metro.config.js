@@ -18,4 +18,5 @@ module.exports = withUniwindConfig(withStorybook(config), {
   // (optional) path where we gonna auto-generate typings
   // defaults to project's root
   dtsFile: "./src/uniwind-types.d.ts",
+  extraThemes: ['light', 'dark'],
 });
