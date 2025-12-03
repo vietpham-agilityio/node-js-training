@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ErrorFeedback should render correct snapshot 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "red",
+      "padding": 10,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "white",
+      }
+    }
+  >
+    Test error
+  </Text>
+</View>
+`;
