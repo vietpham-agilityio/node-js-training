@@ -2,19 +2,10 @@
 
 exports[`ErrorFeedback should render correct snapshot 1`] = `
 <View
-  style={
-    {
-      "backgroundColor": "red",
-      "padding": 10,
-    }
-  }
+  className="bg-bg-warning p-2.5 rounded-base"
 >
   <Text
-    style={
-      {
-        "color": "white",
-      }
-    }
+    className="text-white font-montserrat-medium text-3xl"
   >
     Test error
   </Text>

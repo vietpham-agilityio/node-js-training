@@ -7,15 +7,15 @@ import ErrorFeedback from "../components/ErrorFeedback";
 const Home = () => {
   return (
     <SafeAreaProvider>
-      <SafeAreaView className="flex-1 bg-gray-100">
-        <ScrollView className="flex-1">
+      <SafeAreaView>
+        <ScrollView className="w-full h-full bg-dark-blue">
           <View className="flex-1 items-center">
-            <Text className="text-blue-500 text-2xl font-montserrat">
+            <Text className="text-red text-2xl font-montserrat-semibold">
               Montserrat font
             </Text>
           </View>
-        </ScrollView>
         <ErrorFeedback error="Just error testing" />
+        </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
   );

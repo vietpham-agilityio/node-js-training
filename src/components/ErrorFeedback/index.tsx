@@ -1,19 +1,9 @@
-import { View, Text, StyleSheet } from "react-native";
+import { Text, View } from "react-native";
 
 const ErrorFeedback = ({ error }: { error: string }) => (
-  <View style={styles.errorContainer}>
-    <Text style={styles.errorText}>{error}</Text>
+  <View className="bg-bg-warning p-2.5 rounded-base">
+    <Text className="text-white font-montserrat-medium text-3xl">{error}</Text>
   </View>
 );
-
-const styles = StyleSheet.create({
-  errorContainer: {
-    padding: 10,
-    backgroundColor: "red",
-  },
-  errorText: {
-    color: "white",
-  },
-});
 
 export default ErrorFeedback;
