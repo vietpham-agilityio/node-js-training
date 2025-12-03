@@ -19,10 +19,10 @@
     "preset": "jest-expo",
     "collectCoverage": true,
     "collectCoverageFrom": [
-      "**/*.{ts,tsx,js,jsx}",
-      "!**/coverage/**",
-      "!**/node_modules/**",
-      "!**/babel.config.js",
+      "src/utils/**/*.{ts,tsx,js,jsx}",
+      "src/components/**/*.{ts,tsx,js,jsx}",
+      "src/hooks/**/*.{ts,tsx,js,jsx}",
+      "!src/components/**/*.stories.{ts,tsx}",
       "!**/expo-env.d.ts",
       "!**/.expo/**"
     ]
