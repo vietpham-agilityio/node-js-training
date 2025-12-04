@@ -8,11 +8,13 @@
     "android": "expo run:android",
     "clean": "expo prebuild --clean",
     "test": "jest --watchAll",
+    "test:coverage": " NODE_ENV=test jest --coverage --detectOpenHandles",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "format": "prettier --write .",
     "storybook-generate": "sb-rn-get-stories",
-    "storybook": "EXPO_PUBLIC_ENVIRONMENT=storybook expo start",
+    "storybook": "EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start",
     "export:embed:android": "EXPO_ROUTER_APP_ROOT=./src/app pnpm expo export:embed --eager --platform android --dev false"
   },
   "jest": {
