@@ -1,26 +1,25 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 // Router
-import { Stack } from "expo-router";
+import { Stack } from 'expo-router';
 
 // SplashScreen
-import * as SplashScreen from "expo-splash-screen";
+import * as SplashScreen from 'expo-splash-screen';
 
 // Font
 import {
-  useFonts,
-  Montserrat_400Regular,
-  Montserrat_600SemiBold,
-  Montserrat_500Medium,
   Montserrat_300Light,
-} from "@expo-google-fonts/montserrat";
+  Montserrat_400Regular,
+  Montserrat_500Medium,
+  Montserrat_600SemiBold,
+  useFonts,
+} from '@expo-google-fonts/montserrat';
 
 // Style
-import "./../global.css";
-import { View, Text } from "react-native";
+import './../global.css';
 
 SplashScreen.preventAutoHideAsync();
-const isStorybook = process.env.EXPO_PUBLIC_ENVIRONMENT === "storybook";
+const isStorybook = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -41,7 +40,7 @@ export default function RootLayout() {
   }
 
   if (isStorybook && __DEV__) {
-    const StorybookUI = require("../../.rnstorybook").default;
+    const StorybookUI = require('../../.rnstorybook').default;
     return <StorybookUI />;
   }
 
@@ -49,20 +48,20 @@ export default function RootLayout() {
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: "#0b0f2f",
+          backgroundColor: '#0b0f2f',
         },
         headerBackVisible: false,
-        headerTintColor: "#ffffff",
+        headerTintColor: '#ffffff',
         headerTitleStyle: {
-          fontFamily: "Montserrat_600SemiBold",
+          fontFamily: 'Montserrat_600SemiBold',
           fontSize: 20,
         },
         // header: () => <View className="bg-dark-blue h-40 p-10"><Text className="text-white">Header</Text></View>,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Home" }} />
+      <Stack.Screen name="index" options={{ title: 'Home' }} />
       <Stack.Protected guard={__DEV__}>
-        <Stack.Screen name="storybook" options={{ title: "Storybook" }} />
+        <Stack.Screen name="storybook" options={{ title: 'Storybook' }} />
       </Stack.Protected>
     </Stack>
   );
