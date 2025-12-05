@@ -1,3 +1,14 @@
+export enum MovieStatus {
+  NOW_PLAYING = 'now_playing',
+  COMING_SOON = 'coming_soon',
+  ENDED = 'ended',
+}
+
+export enum PromoCodeStatus {
+  PERCENTAGE = 'percentage',
+  FIXED_AMOUNT = 'fixed_amount',
+}
+
 export interface Movie {
   id: string;
   title: string;
@@ -10,7 +21,7 @@ export interface Movie {
   genre: string[];
   castCrew?: any;
   language?: string;
-  status: 'now_playing' | 'coming_soon' | 'ended';
+  status: MovieStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -19,7 +30,7 @@ export interface PromoCode {
   id: string;
   code: string;
   description?: string;
-  discountType: 'percentage' | 'fixed_amount';
+  discountType: PromoCodeStatus;
   discountValue: number;
   minPurchaseAmount: number;
   maxDiscountAmount?: number;
@@ -31,4 +42,3 @@ export interface PromoCode {
   createdAt: string;
   updatedAt: string;
 }
-

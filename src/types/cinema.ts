@@ -1,5 +1,17 @@
 import { Movie } from './movie';
 
+export enum ShowtimeStatus {
+  ACTIVE = 'active',
+  CANCELLED = 'cancelled',
+  COMPLETED = 'completed',
+}
+
+export enum SeatReservationStatus {
+  RESERVED = 'reserved',
+  CONFIRMED = 'confirmed',
+  RELEASED = 'released',
+}
+
 export interface Cinema {
   id: string;
   name: string;
@@ -35,7 +47,7 @@ export interface Showtime {
   endTime: string;
   price: number;
   availableSeats: number;
-  status: 'active' | 'cancelled' | 'completed';
+  status: ShowtimeStatus;
   createdAt: string;
   updatedAt: string;
   cinemaHall?: CinemaHall;
@@ -48,6 +60,6 @@ export interface SeatReservation {
   userId: string;
   seatNumbers: string[];
   reservedUntil: string;
-  status: 'reserved' | 'confirmed' | 'released';
+  status: SeatReservationStatus;
   createdAt: string;
 }

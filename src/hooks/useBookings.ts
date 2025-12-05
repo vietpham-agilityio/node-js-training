@@ -1,10 +1,11 @@
-import { queryKeys } from '@/constants';
+import { API_CONFIG, PAGINATION, queryKeys } from '@/constants';
 import {
   bookingsService,
   CreateBookingData,
   walletService,
 } from '@/services/supabase';
 import { useAuthStore, useBookingStore, useWalletStore } from '@/stores';
+import { BookingStatus } from '@/types';
 import {
   useInfiniteQuery,
   useMutation,
@@ -19,7 +20,7 @@ export const useBookings = (status?: string) => {
     queryKey: queryKeys.bookings.list(user?.id, status),
     queryFn: () => bookingsService.getBookings(user!.id, status),
     enabled: !!user,
-    staleTime: 1 * 60 * 1000,
+    staleTime: API_CONFIG.BOOKING_STALE_TIME,
   });
 };
 
@@ -28,15 +29,15 @@ export const useBookingsInfinite = (status?: string) => {
 
   return useInfiniteQuery({
     queryKey: queryKeys.bookings.infinite(user?.id, status),
-    queryFn: ({ pageParam = 0 }) =>
-      bookingsService.getBookingsPaginated(user!.id, status, pageParam, 10),
+    queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) =>
+      bookingsService.getBookingsPaginated(user!.id, status, pageParam, PAGINATION.PAGE_LIMIT),
     getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.length < 10) return undefined;
+      if (lastPage.length < PAGINATION.PAGE_LIMIT) return undefined;
       return allPages.length;
     },
     initialPageParam: 0,
     enabled: !!user,
-    staleTime: 1 * 60 * 1000,
+    staleTime: API_CONFIG.BOOKING_STALE_TIME,
   });
 };
 
@@ -45,7 +46,7 @@ export const useBooking = (bookingId: string) => {
     queryKey: queryKeys.bookings.detail(bookingId),
     queryFn: () => bookingsService.getBookingById(bookingId),
     enabled: !!bookingId,
-    staleTime: 1 * 60 * 1000,
+    staleTime: API_CONFIG.BOOKING_STALE_TIME,
   });
 };
 
@@ -98,7 +99,7 @@ export const useCreateBooking = () => {
             id: 'temp-' + Date.now(),
             ...newBooking,
             bookingNumber: 'PENDING',
-            bookingStatus: 'active',
+            bookingStatus: BookingStatus.ACTIVE,
             createdAt: new Date().toISOString(),
           };
           return [optimisticBooking, ...old];
@@ -198,7 +199,7 @@ export const useCancelBooking = () => {
           if (!old) return old;
           return old.map((booking: any) =>
             booking.id === bookingId
-              ? { ...booking, bookingStatus: 'cancelled' }
+              ? { ...booking, bookingStatus: BookingStatus.CANCELLED }
               : booking,
           );
         },
@@ -255,12 +256,9 @@ export const useReserveSeats = () => {
       setReservationId(data.id);
 
       // Auto-release after 10 minutes
-      setTimeout(
-        () => {
-          setReservationId(null);
-        },
-        10 * 60 * 1000,
-      );
+      setTimeout(() => {
+        setReservationId(null);
+      }, API_CONFIG.SEAT_RESERVATION_TIMEOUT);
 
       // Update showtime available seats optimistically
       queryClient.setQueryData(
