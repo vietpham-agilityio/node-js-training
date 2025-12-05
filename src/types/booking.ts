@@ -1,5 +1,26 @@
 import { Showtime } from './cinema';
 
+export enum TicketStatus {
+  ACTIVE = 'active',
+  USED = 'used',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
+}
+
+export enum BookingStatus {
+  ACTIVE = 'active',
+  CANCELLED = 'cancelled',
+  EXPIRED = 'expired',
+  USED = 'used',
+}
+
+export enum PaymentStatus {
+  PENDING = 'pending',
+  PAID = 'paid',
+  FAILED = 'failed',
+  REFUNDED = 'refunded',
+}
+
 export interface Ticket {
   id: string;
   bookingId: string;
@@ -7,7 +28,7 @@ export interface Ticket {
   ticketNumber: string;
   qrCodeData: string;
   price: number;
-  status: 'active' | 'used' | 'expired' | 'cancelled';
+  status: TicketStatus;
   scannedAt?: string;
   createdAt: string;
   booking?: Booking;
@@ -25,8 +46,8 @@ export interface Booking {
   totalAmount: number;
   promoCodeId?: string;
   paymentMethod: string;
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
-  bookingStatus: 'active' | 'cancelled' | 'expired' | 'used';
+  paymentStatus: PaymentStatus;
+  bookingStatus: BookingStatus;
   expiresAt: string;
   qrCodeData?: string;
   createdAt: string;

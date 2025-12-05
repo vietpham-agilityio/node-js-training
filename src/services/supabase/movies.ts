@@ -1,4 +1,5 @@
-import { Movie, Showtime } from '@/types';
+import { PAGINATION } from '@/constants';
+import { Movie, MovieStatus, Showtime, ShowtimeStatus } from '@/types';
 import { keysToCamel } from '@/utils';
 import { supabase } from './client';
 
@@ -14,7 +15,7 @@ export class MoviesService {
     return MoviesService.instance;
   }
 
-  async getMovies(status?: 'now_playing' | 'coming_soon'): Promise<Movie[]> {
+  async getMovies(status?: MovieStatus): Promise<Movie[]> {
     let query = supabase
       .from('movies')
       .select('*')
@@ -23,7 +24,10 @@ export class MoviesService {
     if (status) {
       query = query.eq('status', status);
     } else {
-      query = query.in('status', ['now_playing', 'coming_soon']);
+      query = query.in('status', [
+        MovieStatus.NOW_PLAYING,
+        MovieStatus.COMING_SOON,
+      ]);
     }
 
     const { data, error } = await query;
@@ -46,7 +50,7 @@ export class MoviesService {
       .from('movies')
       .select('*')
       .ilike('title', `%${query}%`)
-      .in('status', ['now_playing', 'coming_soon']);
+      .in('status', [MovieStatus.NOW_PLAYING, MovieStatus.COMING_SOON]);
     if (error) throw error;
     return keysToCamel(data) as Movie[];
   }
@@ -56,7 +60,7 @@ export class MoviesService {
       .from('movies')
       .select('*')
       .contains('genre', [genre])
-      .in('status', ['now_playing', 'coming_soon']);
+      .in('status', [MovieStatus.NOW_PLAYING, MovieStatus.COMING_SOON]);
     if (error) throw error;
     return keysToCamel(data) as Movie[];
   }
@@ -67,7 +71,7 @@ export class MoviesService {
       .select('*, cinema_hall:cinema_halls(*, cinema:cinemas(*))')
       .eq('movie_id', movieId)
       .eq('show_date', date)
-      .eq('status', 'active')
+      .eq('status', ShowtimeStatus.ACTIVE)
       .order('show_time', { ascending: true });
     if (error) throw error;
     return keysToCamel(data) as Showtime[];
@@ -86,9 +90,9 @@ export class MoviesService {
   }
 
   async getMoviesPaginated(
-    status?: 'now_playing' | 'coming_soon',
-    page = 0,
-    limit = 10,
+    status?: MovieStatus,
+    page = PAGINATION.PAGE_OFFSET,
+    limit = PAGINATION.PAGE_LIMIT,
   ): Promise<Movie[]> {
     let query = supabase
       .from('movies')
@@ -99,7 +103,10 @@ export class MoviesService {
     if (status) {
       query = query.eq('status', status);
     } else {
-      query = query.in('status', ['now_playing', 'coming_soon']);
+      query = query.in('status', [
+        MovieStatus.NOW_PLAYING,
+        MovieStatus.COMING_SOON,
+      ]);
     }
 
     const { data, error } = await query;

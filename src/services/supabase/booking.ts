@@ -1,6 +1,14 @@
-import { Booking, SeatReservation } from '@/types';
+import {
+  Booking,
+  BookingStatus,
+  PaymentStatus,
+  SeatReservation,
+  SeatReservationStatus,
+  TicketStatus,
+} from '@/types';
 import { keysToCamel } from '@/utils';
 import { supabase } from './client';
+import { PAGINATION } from '@/constants';
 
 export interface CreateBookingData {
   userId: string;
@@ -85,8 +93,8 @@ export class BookingsService {
         discount_amount: data.discountAmount || 0,
         total_amount: data.totalAmount,
         promo_code_id: data.promoCodeId,
-        payment_status: 'paid',
-        booking_status: 'active',
+        payment_status: PaymentStatus.PAID,
+        booking_status: BookingStatus.ACTIVE,
         expires_at: expiresAt.toISOString(),
       })
       .select()
@@ -113,7 +121,7 @@ export class BookingsService {
         ticket_number: ticketNumber,
         qr_code_data: qrData,
         price: data.totalAmount / data.seats.length,
-        status: 'active',
+        status: TicketStatus.ACTIVE,
       });
     });
 
@@ -131,13 +139,13 @@ export class BookingsService {
   async cancelBooking(bookingId: string) {
     const { error } = await supabase
       .from('bookings')
-      .update({ booking_status: 'cancelled' })
+      .update({ booking_status: BookingStatus.CANCELLED })
       .eq('id', bookingId);
     if (error) throw error;
 
     await supabase
       .from('tickets')
-      .update({ status: 'cancelled' })
+      .update({ status: TicketStatus.CANCELLED })
       .eq('booking_id', bookingId);
   }
 
@@ -156,7 +164,7 @@ export class BookingsService {
         user_id: userId,
         seat_numbers: seats,
         reserved_until: reservedUntil.toISOString(),
-        status: 'reserved',
+        status: SeatReservationStatus.RESERVED,
       })
       .select()
       .single();
@@ -168,7 +176,7 @@ export class BookingsService {
   async releaseSeats(reservationId: string) {
     const { error } = await supabase
       .from('seat_reservations')
-      .update({ status: 'released' })
+      .update({ status: SeatReservationStatus.RELEASED })
       .eq('id', reservationId);
     if (error) throw error;
   }
@@ -176,8 +184,8 @@ export class BookingsService {
   async getBookingsPaginated(
     userId: string,
     status?: string,
-    page = 0,
-    limit = 10,
+    page = PAGINATION.PAGE_OFFSET,
+    limit = PAGINATION.PAGE_LIMIT,
   ): Promise<Booking[]> {
     let query = supabase
       .from('bookings')

@@ -1,3 +1,4 @@
+import { API_CONFIG } from '@/constants';
 import { authService } from '@/services/supabase';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -5,7 +6,7 @@ export const useSession = () => {
   return useQuery({
     queryKey: ['session'],
     queryFn: () => authService.getSession(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
 };
 

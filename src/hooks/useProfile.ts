@@ -1,4 +1,4 @@
-import { queryKeys } from '@/constants';
+import { API_CONFIG, queryKeys } from '@/constants';
 import { profileService } from '@/services/supabase';
 import { useAuthStore } from '@/stores';
 import { UpdateProfileData } from '@/types';
@@ -11,7 +11,7 @@ export const useProfile = () => {
     queryKey: queryKeys.profile.detail(user?.id),
     queryFn: () => profileService.getProfile(user!.id),
     enabled: !!user,
-    staleTime: 5 * 60 * 1000,
+    staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
 };
 
