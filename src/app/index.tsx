@@ -1,8 +1,5 @@
-// SDK
-
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import ErrorFeedback from "../components/ErrorFeedback";
 
 const Home = () => {
   return (
@@ -14,7 +11,6 @@ const Home = () => {
               Montserrat font
             </Text>
           </View>
-        <ErrorFeedback error="Just error testing" />
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
