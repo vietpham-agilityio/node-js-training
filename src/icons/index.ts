@@ -1,3 +1,4 @@
+export * from './AppIcon';
 export * from './AddIcon';
 export * from './CancelIcon';
 export * from './FacebookIcon';
