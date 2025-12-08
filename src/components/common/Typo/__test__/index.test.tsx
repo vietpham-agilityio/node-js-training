@@ -2,7 +2,7 @@ import { render } from '@testing-library/react-native';
 import React from 'react';
 
 // Component
-import Typo from '../';
+import { Typo } from '../';
 
 describe('Typo Component', () => {
   describe('Rendering', () => {
@@ -104,7 +104,9 @@ describe('Typo Component', () => {
     });
 
     it('should render with semibold weight', () => {
-      const { getByText } = render(<Typo weight="semibold">SemiBold Weight</Typo>);
+      const { getByText } = render(
+        <Typo weight="semibold">SemiBold Weight</Typo>,
+      );
       const element = getByText('SemiBold Weight');
       expect(element.props.className).toContain('font-montserrat-semibold');
     });
@@ -112,14 +114,18 @@ describe('Typo Component', () => {
 
   describe('Custom ClassName', () => {
     it('should combine multiple classNames', () => {
-      const { getByText } = render(<Typo className="italic text-center">Custom Classes</Typo>);
+      const { getByText } = render(
+        <Typo className="italic text-center">Custom Classes</Typo>,
+      );
       const element = getByText('Custom Classes');
       expect(element.props.className).toContain('italic');
       expect(element.props.className).toContain('text-center');
     });
 
     it('should override text color with className', () => {
-      const { getByText } = render(<Typo className="text-blue-500">Blue Text</Typo>);
+      const { getByText } = render(
+        <Typo className="text-blue-500">Blue Text</Typo>,
+      );
       const element = getByText('Blue Text');
       expect(element.props.className).toContain('text-blue-500');
     });
@@ -141,7 +147,12 @@ describe('Typo Component', () => {
 
     it('should render with all props combined', () => {
       const { getByText, getByTestId } = render(
-        <Typo size="lg" weight="medium" className="text-center" testID="combined-typo">
+        <Typo
+          size="lg"
+          weight="medium"
+          className="text-center"
+          testID="combined-typo"
+        >
           All Props
         </Typo>,
       );
@@ -166,7 +177,8 @@ describe('Typo Component', () => {
     });
 
     it('should render with long text', () => {
-      const longText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+      const longText =
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
       const { getByText } = render(<Typo>{longText}</Typo>);
       expect(getByText(longText)).toBeTruthy();
     });

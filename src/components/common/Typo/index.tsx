@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Text } from 'react-native';
 
 type FontSize = '3xs' | '2xs' | 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
@@ -30,20 +31,22 @@ const FONT_WEIGHT_MAP: Record<FontWeight, string> = {
   semibold: 'font-montserrat-semibold',
 };
 
-const Typo = ({
-  children,
-  size = 'base',
-  weight = 'regular',
-  className = '',
-  testID,
-}: TypoProps) => (
-  <Text
-    accessibilityRole="text"
-    className={`text-white ${FONT_SIZE_MAP[size]} ${FONT_WEIGHT_MAP[weight]} ${className}`}
-    testID={testID}
-  >
-    {children}
-  </Text>
+export const Typo = memo(
+  ({
+    children,
+    size = 'base',
+    weight = 'regular',
+    className = '',
+    testID,
+  }: TypoProps) => (
+    <Text
+      accessibilityRole="text"
+      className={`text-white ${FONT_SIZE_MAP[size]} ${FONT_WEIGHT_MAP[weight]} ${className}`}
+      testID={testID}
+    >
+      {children}
+    </Text>
+  ),
 );
 
-export default Typo;
+Typo.displayName = 'Typo';

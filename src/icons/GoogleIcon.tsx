@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Svg, { G, Defs, Path, SvgProps, ClipPath, Rect } from 'react-native-svg';
+import Svg, { ClipPath, Defs, G, Path, Rect, SvgProps } from 'react-native-svg';
 
-const GoogleIcon = (props: SvgProps) => (
+export const GoogleIcon = (props: SvgProps) => (
   <Svg width={36} height={36} fill="none" {...props}>
     <G clipPath="url(#a)">
       <Path
@@ -40,5 +40,3 @@ const GoogleIcon = (props: SvgProps) => (
     </Defs>
   </Svg>
 );
-
-export default GoogleIcon;

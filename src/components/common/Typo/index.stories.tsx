@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { View } from 'react-native';
 
 // Components
-import Typo from './';
+import { Typo } from './';
 
 const meta = {
   title: 'Common/Typo',
