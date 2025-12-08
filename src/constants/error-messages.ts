@@ -18,8 +18,14 @@ export const ERROR_MESSAGES = {
   PASSWORD_SPECIAL_CHAR: 'Password must contain at least one special character',
   CONFIRM_PASSWORD_REQUIRED: 'Please confirm your password',
   PASSWORD_NOT_MATCH: 'Passwords do not match',
+  TAKE_PICTURE_ERROR: 'Failed to take picture. Please try again.',
 };
 
 export const MESSAGES = {
   TICKET_VALIDATED_SUCCESS: 'Ticket validated successfully',
+  PERMISSION_REQUIRED: 'Permission Required',
+  CAMERA_ROLL_PERMISSION_REQUIRED:
+    'Sorry, we need camera roll permissions to make this work!',
+  CAMERA_PERMISSION_REQUIRED:
+    'Sorry, we need camera permissions to take photos!',
 };

@@ -1,7 +1,7 @@
 import { fireEvent, render } from '@testing-library/react-native';
 
 // Component
-import ThirdPartyButton, { ThirdPartyButtonType } from '../';
+import { ThirdPartyButton, ThirdPartyButtonType } from '../';
 
 jest.mock('react-native-svg', () => {
   const React = require('react');

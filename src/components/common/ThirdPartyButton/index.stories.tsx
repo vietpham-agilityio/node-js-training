@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import ThirdPartyButton, { ThirdPartyButtonType } from './';
+import { ThirdPartyButton, ThirdPartyButtonType } from './';
 
 const meta: Meta<typeof ThirdPartyButton> = {
   title: 'ThirdPartyButton',
