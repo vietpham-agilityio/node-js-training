@@ -4,7 +4,7 @@ import { fireEvent, render } from '@testing-library/react-native';
 import { Size } from '@/constants/enum';
 
 // Component
-import Button from '../';
+import { Button } from '../';
 
 describe('Button Component', () => {
   const mockOnPress = jest.fn();

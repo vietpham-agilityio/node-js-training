@@ -2,12 +2,13 @@ import { fireEvent, render } from '@testing-library/react-native';
 import { Animated } from 'react-native';
 
 // Component
-import Input from '../';
+import { Input } from '../';
 
 describe('Input Component', () => {
   const defaultProps = {
     label: 'Email Address',
     testID: 'test-input',
+    onChangeText: jest.fn(),
   };
 
   beforeEach(() => {

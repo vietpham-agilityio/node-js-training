@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
 
 // Components
-import Button from './';
+import { Button } from './';
 
 // Constants
 import { Size } from '@/constants/enum';
