@@ -2,6 +2,7 @@ import { useMemo, memo } from 'react';
 import {
   Text,
   TouchableOpacity,
+  TouchableOpacityProps,
   View,
   type ViewStyle,
 } from 'react-native';
@@ -9,7 +10,7 @@ import {
 // Constants
 import { Size } from '@/constants/enum';
 
-export interface ButtonProps {
+export interface ButtonProps extends TouchableOpacityProps {
   title: string;
   isPrimary?: boolean;
   size?: Size;
