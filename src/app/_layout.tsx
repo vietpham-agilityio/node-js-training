@@ -1,4 +1,7 @@
-import { useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
+import { Fragment, useEffect } from 'react';
+import { useUniwind } from 'uniwind';
 
 // Router
 import { Stack } from 'expo-router';
@@ -16,12 +19,31 @@ import {
 } from '@expo-google-fonts/montserrat';
 
 // Style
-import './../global.css';
+import { SCREENS } from '@/constants';
 
+// Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
-const isStorybook = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';
 
-export default function RootLayout() {
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 60 * 1000, // 1 minute
+    },
+  },
+});
+
+const StorybookEnabled = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';
+
+export const unstable_settings = {
+  initialRouteName: StorybookEnabled ? SCREENS.STORYBOOK : SCREENS.AUTH.LAYOUT,
+};
+
+const RootLayout = () => {
+  const { theme } = useUniwind();
+
+  const isAuthenticated = false; // Replace with your authentication logic
+
   const [loaded, error] = useFonts({
     Montserrat_300Light,
     Montserrat_400Regular,
@@ -39,30 +61,29 @@ export default function RootLayout() {
     return null;
   }
 
-  if (isStorybook && __DEV__) {
-    const StorybookUI = require('../../.rnstorybook').default;
-    return <StorybookUI />;
-  }
-
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#0b0f2f',
-        },
-        headerBackVisible: false,
-        headerTintColor: '#ffffff',
-        headerTitleStyle: {
-          fontFamily: 'Montserrat_600SemiBold',
-          fontSize: 20,
-        },
-        // header: () => <View className="bg-dark-blue h-40 p-10"><Text className="text-white">Header</Text></View>,
-      }}
-    >
-      <Stack.Screen name="index" options={{ title: 'Home' }} />
-      <Stack.Protected guard={__DEV__}>
-        <Stack.Screen name="storybook" options={{ title: 'Storybook' }} />
-      </Stack.Protected>
-    </Stack>
+    <Fragment>
+      <QueryClientProvider client={queryClient}>
+        <Stack screenOptions={{ headerShown: false }}>
+          {/* Storybook - Only accessible when enabled */}
+          <Stack.Protected guard={StorybookEnabled}>
+            <Stack.Screen name={SCREENS.STORYBOOK} />
+          </Stack.Protected>
+
+          {/* Auth screens - Only accessible when NOT authenticated */}
+          <Stack.Protected guard={!isAuthenticated}>
+            <Stack.Screen name={SCREENS.AUTH.LAYOUT} />
+          </Stack.Protected>
+
+          {/* Protected screens - Only accessible when authenticated */}
+          <Stack.Protected guard={isAuthenticated}>
+            <Stack.Screen name={SCREENS.MAIN.LAYOUT} />
+          </Stack.Protected>
+        </Stack>
+        <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
+      </QueryClientProvider>
+    </Fragment>
   );
-}
+};
+
+export default RootLayout;
