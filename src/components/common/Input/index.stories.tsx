@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { View } from 'react-native';
 
 // Components
-import Input from './';
+import { Input } from './';
 
 const meta = {
   title: 'Common/Input',
@@ -25,6 +25,7 @@ export const Default: Story = {
   args: {
     label: 'Email Address',
     testID: 'email-input',
+    onChangeText: () => {},
   },
 };
 
@@ -34,6 +35,7 @@ export const WithValue: Story = {
     label: 'Email Address',
     value: 'awekadesign@gmail.com',
     testID: 'email-value-input',
+    onChangeText: () => {},
   },
 };
 
@@ -44,6 +46,7 @@ export const ErrorState: Story = {
     value: 'Awekades',
     error: 'Please enter a valid email address',
     testID: 'email-error-input',
+    onChangeText: () => {},
   },
 };
 
@@ -53,6 +56,7 @@ export const PasswordInput: Story = {
     label: 'Password',
     secureTextEntry: true,
     testID: 'password-input',
+    onChangeText: () => {},
   },
 };
 
@@ -63,5 +67,6 @@ export const PasswordWithValue: Story = {
     value: 'MySecurePassword123',
     secureTextEntry: true,
     testID: 'password-value-input',
+    onChangeText: () => {},
   },
 };
