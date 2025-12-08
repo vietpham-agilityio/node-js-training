@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useResolveClassNames } from 'uniwind';
 
 // Components
-import { Typo } from '../../common';
+import { Typo } from '@/components/common';
 
 type AccessLayoutProps = {
   loading?: boolean;
@@ -25,8 +25,8 @@ export const AccessLayout = memo(
 
     const accessibilityLabel = ACCESSIBILITY_LABEL[mode];
 
-    const containerStyles = useResolveClassNames('flex h-full bg-bg-primary');
-    const scrollViewStyles = useResolveClassNames('flex p-4');
+    const containerStyles = useResolveClassNames('flex-1 bg-bg-primary');
+    const contentContainerStyles = useResolveClassNames('flex-1 p-4');
 
     return (
       <SafeAreaView
@@ -35,7 +35,7 @@ export const AccessLayout = memo(
         accessibilityHint={accessibilityLabel}
       >
         <ScrollView
-          style={scrollViewStyles}
+          contentContainerStyle={contentContainerStyles}
           showsVerticalScrollIndicator={false}
         >
           {children}
