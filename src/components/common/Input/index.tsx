@@ -4,7 +4,7 @@ import {
   useCallback,
   useMemo,
   useRef,
-  useState
+  useState,
 } from 'react';
 import {
   Animated,
@@ -157,7 +157,7 @@ export const Input = memo(
 
           {/* Text Input */}
           <TextInput
-            ref={(node) => {
+            ref={node => {
               inputRef.current = node;
               if (typeof ref === 'function') {
                 ref(node);
@@ -165,6 +165,7 @@ export const Input = memo(
                 ref.current = node;
               }
             }}
+            accessible
             accessibilityRole="text"
             accessibilityLabel={`${label} input field`}
             value={value}
