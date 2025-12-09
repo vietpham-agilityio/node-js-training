@@ -65,7 +65,8 @@ export const useUploadAvatar = () => {
   const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: (file: any) => profileService.uploadAvatar(user!.id, file),
+    mutationFn: (file: { uri: string; type?: string; name?: string }) =>
+      profileService.uploadAvatar(user!.id, file),
     onSuccess: avatarUrl => {
       // Update profile with new avatar URL
       queryClient.setQueryData(

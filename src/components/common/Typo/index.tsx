@@ -11,6 +11,9 @@ export interface TypoProps {
   weight?: FontWeight;
   className?: string;
   testID?: string;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  accessibilityRole?: string;
 }
 
 const FONT_SIZE_MAP: Record<FontSize, string> = {

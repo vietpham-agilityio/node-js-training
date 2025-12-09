@@ -1,5 +1,5 @@
 export * from './configs';
-export * from './error-messages';
+export * from './messages';
 export * from './navigation';
 export * from './query-keys';
 export * from './regex';

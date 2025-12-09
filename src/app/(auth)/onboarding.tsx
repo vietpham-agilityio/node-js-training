@@ -21,10 +21,10 @@ const OnboardingScreen = () => {
   return (
     <AccessLayout mode="onboarding">
       <View className="flex-1 items-center justify-center">
-        <View className="mb-13">
+        <View className="mb-13" accessible accessibilityRole="image" accessibilityLabel="App logo">
           <AppIcon />
         </View>
-        <Typo size="2xl" weight="medium">
+        <Typo size="2xl" weight="medium" accessibilityRole="header">
           New Experience
         </Typo>
         <Typo size="lg" weight="light" className="max-w-60 text-center mt-4">
@@ -35,6 +35,10 @@ const OnboardingScreen = () => {
             title="Get Started"
             isPrimary={false}
             onPress={handleNavigateToSignin}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Get started"
+            accessibilityHint="Go to sign in screen"
           />
         </View>
       </View>
