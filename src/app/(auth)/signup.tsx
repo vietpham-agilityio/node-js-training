@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Alert } from 'react-native';
+import { Alert, ScrollView } from 'react-native';
 
 // Constants
 import { ERROR_MESSAGES, MESSAGES, ROUTES } from '@/constants';
@@ -33,7 +33,7 @@ const SignupScreen = () => {
 
         // Navigate to confirmation screen
         router.push({
-          pathname: ROUTES.CONFIRM_PROFILE,
+          pathname: ROUTES.CONFIRM_ACCOUNT,
           params: {
             fullName: data?.fullName,
             avatarUrl: data?.avatarUrl,
@@ -51,7 +51,9 @@ const SignupScreen = () => {
 
   return (
     <AccessLayout mode="signup">
-      <SignUpForm isPending={isSigningUp} onSubmit={handleSubmit} />
+      <ScrollView contentContainerClassName="items-center mt-24 pb-80">
+        <SignUpForm isPending={isSigningUp} onSubmit={handleSubmit} />
+      </ScrollView>
     </AccessLayout>
   );
 };

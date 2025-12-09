@@ -11,7 +11,7 @@ import { AccessLayout } from '@/components/layouts';
 // Hooks
 import { useUploadAvatar } from '@/hooks';
 
-const ConfirmProfileScreen = () => {
+const ConfirmAccountScreen = () => {
   const { fullName, avatarUrl } = useLocalSearchParams();
   const route = useRouter();
   const { mutate: uploadAvatar, isPending: isUploading } = useUploadAvatar();
@@ -41,7 +41,7 @@ const ConfirmProfileScreen = () => {
 
   return (
     <AccessLayout mode="signup">
-      <View className="flex-col items-center">
+      <View className="flex-col items-center mt-24">
         {/* Avatar Display */}
         <View className="mb-8">
           <Avatar
@@ -86,4 +86,4 @@ const ConfirmProfileScreen = () => {
   );
 };
 
-export default ConfirmProfileScreen;
+export default ConfirmAccountScreen;
