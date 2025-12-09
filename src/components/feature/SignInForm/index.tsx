@@ -101,16 +101,19 @@ export const SignInForm = memo(
             )}
           />
         </View>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={onForgotPassword}
-          accessibilityRole="button"
-          accessibilityLabel="Forgot Password"
-        >
-          <Typo size="xs" weight="regular" className="text-right mb-7">
-            Forgot Password?
-          </Typo>
-        </TouchableOpacity>
+        <View className="w-full items-end">
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={onForgotPassword}
+            accessibilityRole="button"
+            accessibilityLabel="Forgot Password"
+            className="w-auto"
+          >
+            <Typo size="xs" weight="regular" className="text-right mb-7">
+              Forgot Password?
+            </Typo>
+          </TouchableOpacity>
+        </View>
 
         {/* Submit Button */}
         <Button

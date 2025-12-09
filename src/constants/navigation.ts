@@ -11,7 +11,7 @@ export const SCREENS = {
     SIGNUP: 'signup',
     ONBOARDING: 'onboarding',
     FORGOT_PASSWORD: 'forgot-password',
-    CONFIRM_PROFILE: 'confirm-profile',
+    CONFIRM_ACCOUNT: 'confirm-account',
   },
 
   // Tab screens
