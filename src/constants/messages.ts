@@ -19,6 +19,13 @@ export const ERROR_MESSAGES = {
   CONFIRM_PASSWORD_REQUIRED: 'Please confirm your password',
   PASSWORD_NOT_MATCH: 'Passwords do not match',
   TAKE_PICTURE_ERROR: 'Failed to take picture. Please try again.',
+  LOGIN_FAILED: 'Login failed. Please try again.',
+  INVALID_EMAIL_PASSWORD: 'Invalid email or password. Please try again.',
+  GOOGLE_SIGN_IN_FAILED: 'Google Sign In Failed',
+  FACEBOOK_SIGN_IN_FAILED: 'Facebook Sign In Failed',
+  SIGNUP_FAILED: 'Sign Up Failed',
+  CREATE_ACCOUNT_FAILED: 'Failed to create account',
+  SIGN_OUT_FAILED: 'Failed to sign out',
 };
 
 export const MESSAGES = {
@@ -28,4 +35,9 @@ export const MESSAGES = {
     'Sorry, we need camera roll permissions to make this work!',
   CAMERA_PERMISSION_REQUIRED:
     'Sorry, we need camera permissions to take photos!',
+  SIGNUP_SUCCESS: 'Sign up successful',
+  ACCOUNT_VERIFICATION_SUCCESS:
+    'Account created successfully! Please check your email to verify your account.',
+  SIGN_OUT: 'Sign Out',
+  SIGN_OUT_MESSAGE: 'Are you sure you want to sign out?',
 };

@@ -44,7 +44,7 @@ export class AuthService {
 
   async signInWithGoogle() {
     const redirectUrl = makeRedirectUri({
-      scheme: 'moviebooking',
+      scheme: 'movieticketbooking',
       path: 'auth/callback',
     });
 
@@ -83,7 +83,7 @@ export class AuthService {
 
   async signInWithFacebook() {
     const redirectUrl = makeRedirectUri({
-      scheme: 'moviebooking',
+      scheme: 'movieticketbooking',
       path: 'auth/callback',
     });
 
@@ -146,7 +146,7 @@ export class AuthService {
   async resetPassword(email: string) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: makeRedirectUri({
-        scheme: 'moviebooking',
+        scheme: 'movieticketbooking',
         path: 'auth/reset-password',
       }),
     });

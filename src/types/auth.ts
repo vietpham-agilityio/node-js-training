@@ -2,6 +2,7 @@ export interface SignUpData {
   email: string;
   password: string;
   fullName?: string;
+  avatarUrl?: string;
 }
 
 export interface SignInData {

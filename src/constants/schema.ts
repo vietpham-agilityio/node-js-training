@@ -1,8 +1,8 @@
 import * as v from 'valibot';
 
 // Constans
-import { ERROR_MESSAGES } from './error-messages';
-import { UPPERCASE_REGEX, LOWERCASE_REGEX, SPECIAL_CHAR_REGEX } from './regex';
+import { ERROR_MESSAGES } from './messages';
+import { LOWERCASE_REGEX, SPECIAL_CHAR_REGEX, UPPERCASE_REGEX } from './regex';
 
 // Custom password validations
 const hasUppercase = (input: string) => UPPERCASE_REGEX.test(input);
@@ -30,6 +30,7 @@ export interface SignUpData {
   email: string;
   password: string;
   confirmPassword: string;
+  avatarUrl?: string;
 }
 
 export const signUpSchema = v.pipe(
@@ -57,6 +58,7 @@ export const signUpSchema = v.pipe(
       v.string(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
       v.nonEmpty(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
     ),
+    avatarUrl: v.optional(v.string()),
   }),
   v.forward(
     v.partialCheck(

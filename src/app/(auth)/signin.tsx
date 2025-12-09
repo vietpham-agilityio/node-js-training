@@ -1,17 +1,73 @@
+import { Link, router } from 'expo-router';
+import { useCallback } from 'react';
+import { Alert, Pressable, View } from 'react-native';
+
+// Constants
+import { ERROR_MESSAGES, ROUTES } from '@/constants';
+
+// Hooks
+import { useSignIn, useSignInWithFacebook, useSignInWithGoogle } from '@/hooks';
+
 // Types
+import { SignInData } from '@/types';
 
 // Components
-import { Typo } from '@/components/common';
+import {
+  ThirdPartyButton,
+  ThirdPartyButtonType,
+  Typo,
+} from '@/components/common';
+import { SignInForm } from '@/components/feature';
 import { AccessLayout } from '@/components/layouts';
-import { ROUTES } from '@/constants';
-import { Link } from 'expo-router';
-import { Pressable, View } from 'react-native';
 
 const LoginScreen = () => {
+  const { mutate: signIn, isPending: isSigningIn } = useSignIn();
+  const { mutate: signInWithGoogle, isPending: isGoogleLoading } =
+    useSignInWithGoogle();
+  const { mutate: signInWithFacebook, isPending: isFacebookLoading } =
+    useSignInWithFacebook();
+
+  const handleSubmit = useCallback(
+    (data: SignInData) => {
+      signIn(data, {
+        onError: (error: Error) => {
+          Alert.alert(
+            ERROR_MESSAGES.LOGIN_FAILED,
+            error.message || ERROR_MESSAGES.INVALID_EMAIL_PASSWORD,
+          );
+        },
+      });
+    },
+    [signIn],
+  );
+
+  const handleGoogleSignIn = useCallback(() => {
+    signInWithGoogle(undefined, {
+      onError: (error: Error) => {
+        Alert.alert(ERROR_MESSAGES.GOOGLE_SIGN_IN_FAILED, error.message);
+      },
+    });
+  }, [signInWithGoogle]);
+
+  const handleFacebookSignIn = useCallback(() => {
+    signInWithFacebook(undefined, {
+      onError: (error: Error) => {
+        Alert.alert(ERROR_MESSAGES.FACEBOOK_SIGN_IN_FAILED, error.message);
+      },
+    });
+  }, [signInWithFacebook]);
+
+  const isLoading = isSigningIn || isGoogleLoading || isFacebookLoading;
+
   return (
-    <AccessLayout mode="signin">
-      {/* Header */}
-      <View className="flex-col items-baseline gap-1 mb-1">
+    <AccessLayout mode="signin" loading={isLoading}>
+      <View
+        className="flex-col gap-1 mt-8 mb-[30]"
+        accessible
+        accessibilityRole="header"
+        accessibilityLabel="Welcome back, Movie Lover!"
+        accessibilityHint="Welcome back, Movie Lover!"
+      >
         <Typo size="2xl" weight="medium">
           Welcome Back,
         </Typo>
@@ -20,9 +76,13 @@ const LoginScreen = () => {
         </Typo>
       </View>
 
-      {/* <LoginForm onSubmit={handleSubmit} loading={isSigningIn} /> */}
+      <SignInForm
+        isPending={isSigningIn}
+        onSubmit={handleSubmit}
+        onForgotPassword={() => router.push(ROUTES.FORGOT_PASSWORD)}
+      />
 
-      <View className="flex-row justify-center items-center gap-1">
+      <View className="flex-row justify-center items-center gap-1 mt-5">
         <Typo weight="regular" size="xs">
           Create new account?
         </Typo>
@@ -37,6 +97,19 @@ const LoginScreen = () => {
             </Typo>
           </Pressable>
         </Link>
+      </View>
+
+      <View className="flex-row justify-center items-center gap-8 mt-7">
+        <ThirdPartyButton
+          type={ThirdPartyButtonType.GOOGLE}
+          onPress={handleGoogleSignIn}
+          isPending={isLoading}
+        />
+        <ThirdPartyButton
+          type={ThirdPartyButtonType.FACEBOOK}
+          onPress={handleFacebookSignIn}
+          isPending={isLoading}
+        />
       </View>
     </AccessLayout>
   );

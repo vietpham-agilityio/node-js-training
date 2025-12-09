@@ -8,7 +8,7 @@ import { useUniwind } from 'uniwind';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Router
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 
 // SplashScreen
 import * as SplashScreen from 'expo-splash-screen';
@@ -22,8 +22,11 @@ import {
   useFonts,
 } from '@expo-google-fonts/montserrat';
 
-// Style
-import { SCREENS } from '@/constants';
+// Constants
+import { ROUTES, SCREENS } from '@/constants';
+
+// Hooks
+import { useAuth } from '@/hooks';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -45,8 +48,9 @@ export const unstable_settings = {
 
 const RootLayout = () => {
   const { theme } = useUniwind();
-
-  const isAuthenticated = false; // Replace with your authentication logic
+  const { isAuthenticated, isLoading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
 
   const [loaded, error] = useFonts({
     Montserrat_300Light,
@@ -56,12 +60,28 @@ const RootLayout = () => {
   });
 
   useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
+    if (error) throw error;
+  }, [error]);
 
-  if (!loaded && !error) {
+  // Handle authentication routing
+  useEffect(() => {
+    if (isLoading || !loaded) return;
+
+    const inAuthGroup = segments[0] === SCREENS.AUTH.LAYOUT;
+
+    if (!isAuthenticated && !inAuthGroup) {
+      // Redirect to login if not authenticated
+      router.replace(ROUTES.ONBOARDING);
+    } else if (isAuthenticated && inAuthGroup) {
+      // Redirect to home if already authenticated
+      router.replace(ROUTES.HOME);
+    }
+
+    // Hide splash screen
+    SplashScreen.hideAsync();
+  }, [isAuthenticated, segments, isLoading, loaded, router]);
+
+  if (!loaded) {
     return null;
   }
 

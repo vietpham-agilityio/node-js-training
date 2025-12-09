@@ -1,10 +1,10 @@
-import { memo, useCallback, useMemo, useRef } from 'react';
-import { TextInput, View } from 'react-native';
-import { Controller, useForm } from 'react-hook-form';
 import { valibotResolver } from '@hookform/resolvers/valibot';
+import { memo, useCallback, useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { TextInput, View } from 'react-native';
 
 // Components
-import { Button, Input } from '@/components/common';
+import { Avatar, Button, Input } from '@/components/common';
 
 // Types
 import { SignUpData } from '@/types';
@@ -26,7 +26,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<SignUpFormData>({
     resolver: valibotResolver(signUpSchema),
     mode: 'onBlur',
@@ -36,12 +36,11 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
       email: '',
       password: '',
       confirmPassword: '',
+      avatarUrl: undefined,
     },
   });
 
-  const isDisabled = useMemo(() => {
-    return !isValid || !isDirty;
-  }, [isDirty, isValid]);
+  const isDisabled = isSubmitting || isPending || !isDirty;
 
   const handleFullNameSubmit = useCallback(() => {
     emailRef.current?.focus();
@@ -61,6 +60,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
         fullName: data.fullName,
         email: data.email,
         password: data.password,
+        avatarUrl: data.avatarUrl,
       };
       onSubmit(signUpData);
     },
@@ -69,6 +69,21 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
 
   return (
     <View className="w-full">
+      <Controller
+        control={control}
+        name="avatarUrl"
+        render={({ field: { value, onChange } }) => (
+          <View className="items-center mb-12">
+            <Avatar
+              variant="picker"
+              source={value}
+              accessibilityLabel="Select avatar"
+              onChangeImage={uri => onChange(uri)}
+            />
+          </View>
+        )}
+      />
+
       {/* Full Name Input */}
       <View className={errors.fullName ? 'mb-4' : 'mb-9'}>
         <Controller
@@ -184,7 +199,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
       {/* Submit Button */}
       <Button
         accessible
-        disabled={isDisabled || isPending}
+        disabled={isDisabled}
         testID="signup-submit-button"
         title="Create"
         accessibilityLabel="Confirm create account"

@@ -1,13 +1,10 @@
-import { memo, useMemo, useRef } from 'react';
-import { TextInput, TouchableOpacity, View } from 'react-native';
-import { Controller, useForm } from 'react-hook-form';
 import { valibotResolver } from '@hookform/resolvers/valibot';
+import { memo, useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { TextInput, TouchableOpacity, View } from 'react-native';
 
 // Components
 import { Button, Input, Typo } from '@/components/common';
-
-// Types
-import { SignInData } from '@/types';
 
 // Constants
 import { SignInFormData, signInSchema } from '@/constants';
@@ -26,7 +23,7 @@ export const SignInForm = memo(
     const {
       control,
       handleSubmit,
-      formState: { errors, isValid, isDirty },
+      formState: { errors, isSubmitting, isDirty },
     } = useForm<SignInFormData>({
       resolver: valibotResolver(signInSchema),
       mode: 'onBlur',
@@ -37,20 +34,14 @@ export const SignInForm = memo(
       },
     });
 
-    const isDisabled = useMemo(() => {
-      return !isValid || !isDirty;
-    }, [isDirty, isValid]);
+    const isDisabled = isSubmitting || isPending || !isDirty;
 
     const handleEmailSubmit = () => {
       passwordRef.current?.focus();
     };
 
     const handleSubmitForm = (data: SignInFormData): void => {
-      const signInData: SignInData = {
-        email: data.email,
-        password: data.password,
-      };
-      onSubmit(signInData);
+      onSubmit(data);
     };
 
     return (
@@ -124,7 +115,7 @@ export const SignInForm = memo(
         {/* Submit Button */}
         <Button
           onPress={handleSubmit(handleSubmitForm)}
-          disabled={isDisabled || isPending}
+          disabled={isDisabled}
           testID="signin-submit-button"
           title="Sign In"
           accessibilityLabel="Login"

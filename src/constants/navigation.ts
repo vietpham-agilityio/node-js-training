@@ -10,6 +10,8 @@ export const SCREENS = {
     SIGNIN: 'signin',
     SIGNUP: 'signup',
     ONBOARDING: 'onboarding',
+    FORGOT_PASSWORD: 'forgot-password',
+    CONFIRM_PROFILE: 'confirm-profile',
   },
 
   // Tab screens
