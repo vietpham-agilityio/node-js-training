@@ -28,6 +28,9 @@ import { ROUTES, SCREENS } from '@/constants';
 // Hooks
 import { useAuth } from '@/hooks';
 
+// Components
+import { Toast } from '@/components/feature';
+
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
@@ -105,6 +108,7 @@ const RootLayout = () => {
           </Stack.Protected>
         </Stack>
         <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
+        <Toast />
       </QueryClientProvider>
     </Fragment>
   );

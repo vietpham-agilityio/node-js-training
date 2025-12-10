@@ -4,3 +4,8 @@ export enum Size {
   MEDIUM = "medium",
   LARGE = "large",
 }
+
+export enum ToastType {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
