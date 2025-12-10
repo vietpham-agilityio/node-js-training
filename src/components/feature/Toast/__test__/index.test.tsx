@@ -16,6 +16,11 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
+jest.mock('uniwind', () => ({
+  useResolveClassNames: (classNames: string) => ({ className: classNames }),
+  withUniwind: (Component: typeof Text) => Component,
+}));
+
 describe('Toast Component', () => {
   const mockHide = jest.fn();
   const mockShowSuccess = jest.fn();

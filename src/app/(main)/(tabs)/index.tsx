@@ -128,6 +128,15 @@ const HomeScreen = () => {
           onPress={handleSignOut}
           className="bg-error rounded-xl p-4"
         />
+
+        <Tabs
+          tabs={FILTER_CATEGORY_TABS}
+          activeTab={activeCategory}
+          onTabChange={setActiveCategory}
+        />
+
+        <MovieBanner movie={movie} />
+        <MovieBanner variant="vertical" movie={movie} />
       </ScrollView>
     </SafeAreaView>
   );

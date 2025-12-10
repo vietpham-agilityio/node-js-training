@@ -5,6 +5,7 @@ import { Tabs } from '..';
 // Mock uniwind
 jest.mock('uniwind', () => ({
   useResolveClassNames: (classNames: string) => ({ className: classNames }),
+  withUniwind: (Component: typeof Text) => Component,
 }));
 
 describe('Tabs Component', () => {

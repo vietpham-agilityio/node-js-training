@@ -4,15 +4,21 @@ import { render } from '@testing-library/react-native';
 import { MainHeader } from '../';
 
 // Type
-import { type ParamListBase } from '@react-navigation/native';
-import { type Layout } from '@react-navigation/elements';
 import { type BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { type Layout } from '@react-navigation/elements';
+import { type ParamListBase } from '@react-navigation/native';
 
 // Mock expo-router
 const mockUsePathname = jest.fn();
 
 jest.mock('expo-router', () => ({
   usePathname: () => mockUsePathname(),
+}));
+
+// Mock uniwind
+jest.mock('uniwind', () => ({
+  useResolveClassNames: (classNames: string) => ({ className: classNames }),
+  withUniwind: (Component: typeof Text) => Component,
 }));
 
 describe('MainHeader', () => {
