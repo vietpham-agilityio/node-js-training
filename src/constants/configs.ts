@@ -22,3 +22,16 @@ export const PAGINATION = {
   PAGE_LIMIT: 10,
   PAGE_LIMIT_MAX: 20,
 };
+
+export const TAB_BAR_THEME = {
+  BACKGROUND_COLOR: '#051138',
+  ACTIVE_COLOR: '#fff',
+  INACTIVE_COLOR: '#42476a',
+  ACTIVE_BORDER_COLOR: '#1dc7f7',
+  LABEL_STYLE: {
+    fontSize: 12,
+    fontWeight: '300',
+    marginTop: 4,
+  },
+  ICON_SIZE: 24,
+} as const;
