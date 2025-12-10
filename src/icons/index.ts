@@ -6,3 +6,4 @@ export * from './FacebookIcon';
 export * from './GoogleIcon';
 export * from './PhotoProfileIcon';
 export * from './UserProfileIcon';
+export * from './StarIcon'

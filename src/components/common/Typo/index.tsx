@@ -1,7 +1,16 @@
 import { memo } from 'react';
 import { Text } from 'react-native';
 
-type FontSize = '3xs' | '2xs' | 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+type FontSize =
+  | '4xs'
+  | '3xs'
+  | '2xs'
+  | 'xs'
+  | 'sm'
+  | 'base'
+  | 'lg'
+  | 'xl'
+  | '2xl';
 
 type FontWeight = 'light' | 'regular' | 'medium' | 'semibold';
 
@@ -17,6 +26,7 @@ export interface TypoProps {
 }
 
 const FONT_SIZE_MAP: Record<FontSize, string> = {
+  '4xs': 'text-4xs',
   '3xs': 'text-3xs',
   '2xs': 'text-2xs',
   xs: 'text-xs',

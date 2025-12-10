@@ -21,6 +21,11 @@ jest.mock('expo-router', () => ({
   usePathname: () => mockUsePathname(),
 }));
 
+// Mock uniwind
+jest.mock('uniwind', () => ({
+  useResolveClassNames: (classNames: string) => ({ className: classNames }),
+}));
+
 describe('ScreenHeader', () => {
   beforeEach(() => {
     jest.clearAllMocks();
