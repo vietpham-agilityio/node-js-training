@@ -1,6 +1,9 @@
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 
+// Uniwind
+import { useResolveClassNames } from 'uniwind';
+
 // Constants
 import { ROUTES } from '@/constants';
 
@@ -18,11 +21,21 @@ const OnboardingScreen = () => {
     navigate.push(ROUTES.LOGIN);
   };
 
+  const appIconColorConfig = useResolveClassNames('text-white bg-secondary');
+
   return (
     <AccessLayout mode="onboarding">
       <View className="flex-1 items-center justify-center">
-        <View className="mb-13" accessible accessibilityRole="image" accessibilityLabel="App logo">
-          <AppIcon />
+        <View
+          className="mb-13"
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel="App logo"
+        >
+          <AppIcon
+            color={appIconColorConfig.color as string}
+            stopColor={appIconColorConfig.backgroundColor as string}
+          />
         </View>
         <Typo size="2xl" weight="medium" accessibilityRole="header">
           New Experience

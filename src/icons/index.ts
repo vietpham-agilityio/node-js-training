@@ -8,3 +8,6 @@ export * from './GoogleIcon';
 export * from './PhotoProfileIcon';
 export * from './UserProfileIcon';
 export * from './StarIcon'
+export * from './HomeIcon';
+export * from './WalletIcon';
+export * from './TicketIcon';

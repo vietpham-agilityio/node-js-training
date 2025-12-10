@@ -1,6 +1,9 @@
 import { Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// Unwind
+import { useResolveClassNames } from 'uniwind';
+
 // Constants
 import {
   ERROR_MESSAGES,
@@ -23,6 +26,8 @@ const HomeScreen = () => {
     FILTER_CATEGORY_TABS[0].id,
   );
   const [activeTab, setActiveTab] = useState<string>(FILTER_MOVIE_TABS[0].id);
+
+  const containerStyles = useResolveClassNames('flex-1');
 
   const handleSignOut = () => {
     Alert.alert(MESSAGES.SIGN_OUT, MESSAGES.SIGN_OUT_MESSAGE, [
@@ -62,6 +67,7 @@ const HomeScreen = () => {
       edges={['top']}
       accessibilityLabel="Home screen"
       accessibilityHint="Home screen"
+      style={containerStyles}
     >
       <View className="w-full h-full bg-bg-primary">
         <Button

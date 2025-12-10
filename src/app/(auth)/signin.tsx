@@ -11,6 +11,12 @@ import { useSignIn, useSignInWithFacebook, useSignInWithGoogle } from '@/hooks';
 // Types
 import { SignInData } from '@/types';
 
+// Icons
+import { AppIcon } from '@/icons';
+
+// Uniwind
+import { useResolveClassNames } from 'uniwind';
+
 // Components
 import {
   ThirdPartyButton,
@@ -26,6 +32,8 @@ const LoginScreen = () => {
     useSignInWithGoogle();
   const { mutate: signInWithFacebook, isPending: isFacebookLoading } =
     useSignInWithFacebook();
+
+  const appIconColorConfig = useResolveClassNames('text-white bg-secondary');
 
   const handleSubmit = useCallback(
     (data: SignInData) => {
@@ -61,6 +69,14 @@ const LoginScreen = () => {
 
   return (
     <AccessLayout mode="signin" loading={isLoading}>
+      <View className="mt-8">
+      <AppIcon
+        width={88}
+        height={88}
+        color={appIconColorConfig.color}
+        stopColor={appIconColorConfig.backgroundColor}
+      />
+      </View>
       <View
         className="flex-col gap-1 mt-8 mb-[30]"
         accessible
