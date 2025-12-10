@@ -1,6 +1,7 @@
 export * from './AppIcon';
 export * from './AddIcon';
 export * from './ArrowBackIcon';
+export * from './SearchIcon';
 export * from './CancelIcon';
 export * from './FacebookIcon';
 export * from './GoogleIcon';
