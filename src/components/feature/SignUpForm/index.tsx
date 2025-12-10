@@ -201,8 +201,8 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
         accessible
         disabled={isDisabled}
         testID="signup-submit-button"
-        title="Create"
-        accessibilityLabel="Confirm create account"
+        title="Sign Up"
+        accessibilityLabel="Sign Up"
         onPress={handleSubmit(handleSubmitForm)}
       />
     </View>

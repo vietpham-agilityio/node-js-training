@@ -27,7 +27,6 @@ const AuthLayout = () => (
     />
     <Stack.Screen name={SCREENS.AUTH.SIGNUP} />
     <Stack.Screen name={SCREENS.AUTH.FORGOT_PASSWORD} />
-    <Stack.Screen name={SCREENS.AUTH.CONFIRM_ACCOUNT} />
   </Stack>
 );
 

@@ -2,6 +2,7 @@ export const SCREENS = {
   // Main screens
   MAIN: {
     LAYOUT: '(main)',
+    WELCOME: 'welcome',
   },
 
   // Auth screens
@@ -11,7 +12,6 @@ export const SCREENS = {
     SIGNUP: 'signup',
     ONBOARDING: 'onboarding',
     FORGOT_PASSWORD: 'forgot-password',
-    CONFIRM_ACCOUNT: 'confirm-account',
   },
 
   // Tab screens
@@ -33,7 +33,7 @@ export const TABS = {
     TITLE: 'Wallet',
   },
   MY_TICKET: {
-    NAME: 'my_ticket',
+    NAME: 'my-ticket',
     TITLE: 'My Ticket',
   },
 } as const;

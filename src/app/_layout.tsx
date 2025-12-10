@@ -1,5 +1,5 @@
-import { Fragment, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { Fragment, useEffect } from 'react';
 
 // Uniwind
 import { useUniwind } from 'uniwind';
@@ -76,8 +76,15 @@ const RootLayout = () => {
       // Redirect to login if not authenticated
       router.replace(ROUTES.ONBOARDING);
     } else if (isAuthenticated && inAuthGroup) {
-      // Redirect to home if already authenticated
-      router.replace(ROUTES.HOME);
+      const currentScreen = segments[segments.length - 1];
+
+      const isComingFromRegister = currentScreen === SCREENS.AUTH.SIGNUP;
+
+      if (isComingFromRegister) {
+        router.replace(ROUTES.WELCOME);
+      } else {
+        router.replace(ROUTES.HOME);
+      }
     }
 
     // Hide splash screen

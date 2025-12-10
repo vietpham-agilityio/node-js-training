@@ -1,7 +1,7 @@
 import { API_CONFIG, queryKeys } from '@/constants';
 import { profileService } from '@/services/supabase';
 import { useAuthStore } from '@/stores';
-import { UpdateProfileData } from '@/types';
+import { UpdateProfileData, UserProfile } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useProfile = () => {
@@ -68,16 +68,13 @@ export const useUploadAvatar = () => {
     mutationFn: (file: { uri: string; type?: string; name?: string }) =>
       profileService.uploadAvatar(user!.id, file),
     onSuccess: avatarUrl => {
-      // Update profile with new avatar URL
       queryClient.setQueryData(
         queryKeys.profile.detail(user?.id),
-        (old: any) => {
+        (old: UserProfile) => {
           if (!old) return old;
           return { ...old, avatarUrl };
         },
       );
-    },
-    onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.profile.detail(user?.id),
       });

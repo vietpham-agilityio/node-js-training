@@ -121,7 +121,7 @@ export const SignInForm = memo(
           disabled={isDisabled}
           testID="signin-submit-button"
           title="Sign In"
-          accessibilityLabel="Login"
+          accessibilityLabel="Sign In"
         />
       </View>
     );
