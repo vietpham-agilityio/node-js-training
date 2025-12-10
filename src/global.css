@@ -1,11 +1,11 @@
-@import "tailwindcss";
-@import "uniwind";
+@import 'tailwindcss';
+@import 'uniwind';
 
 @theme {
-  --font-montserrat-light: "Montserrat_300Light";
-  --font-montserrat-regular: "Montserrat_400Regular";
-  --font-montserrat-medium: "Montserrat_500Medium";
-  --font-montserrat-semibold: "Montserrat_600SemiBold";
+  --font-montserrat-light: 'Montserrat_300Light';
+  --font-montserrat-regular: 'Montserrat_400Regular';
+  --font-montserrat-medium: 'Montserrat_500Medium';
+  --font-montserrat-semibold: 'Montserrat_600SemiBold';
 }
 
 @layer theme {
@@ -74,6 +74,7 @@
       --font-size-xs: 14px;
       --font-size-2xs: 12px;
       --font-size-3xs: 10px;
+      --font-size-4xs: 8px;
 
       /* Border radius */
       --radius-sm: 4px;
@@ -85,7 +86,7 @@
       --radius-full: 100px;
 
       /* Font family */
-      --font-family-montserrat: "Montserrat", sans-serif;
+      --font-family-montserrat: 'Montserrat', sans-serif;
     }
     @variant dark {
       /* Base colors */
@@ -150,6 +151,7 @@
       --font-size-xs: 14px;
       --font-size-2xs: 12px;
       --font-size-3xs: 10px;
+      --font-size-4xs: 8px;
 
       /* Border radius */
       --radius-sm: 4px;
@@ -161,7 +163,7 @@
       --radius-full: 100px;
 
       /* Font family */
-      --font-family-montserrat: "Montserrat", sans-serif;
+      --font-family-montserrat: 'Montserrat', sans-serif;
     }
   }
 }
