@@ -1,28 +1,52 @@
-import { Alert, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Constants
-import {
-  ERROR_MESSAGES,
-  FILTER_CATEGORY_TABS,
-  FILTER_MOVIE_TABS,
-  MESSAGES,
-} from '@/constants';
+import { ERROR_MESSAGES, FILTER_CATEGORY_TABS, MESSAGES } from '@/constants';
 
 // Components
-import { Button, MovieBanner, Tabs } from '@/components/common';
+import { Button, MovieBanner, SearchInput, Tabs } from '@/components/common';
+import { PromotionCard } from '@/components/feature';
 
 // Hooks
 import { useAuth } from '@/hooks';
+
+// Types
 import { Movie, MovieStatus } from '@/types';
-import { useState } from 'react';
 
 const HomeScreen = () => {
   const { signOut } = useAuth();
   const [activeCategory, setActiveCategory] = useState<string>(
     FILTER_CATEGORY_TABS[0].id,
   );
-  const [activeTab, setActiveTab] = useState<string>(FILTER_MOVIE_TABS[0].id);
+
+  const promotions = [
+    {
+      id: '1',
+      title: 'Student Holiday',
+      subtitle: 'Maximal only for two people',
+      discount: '50%',
+    },
+    {
+      id: '2',
+      title: 'Student Holiday',
+      subtitle: 'Maximal only for two people',
+      discount: '50%',
+    },
+    {
+      id: '3',
+      title: 'Student Holiday',
+      subtitle: 'Maximal only for two people',
+      discount: '50%',
+    },
+  ];
+
+  const [searchValue, setSearchValue] = useState('');
+
+  const handleSearch = useCallback((text: string) => {
+    setSearchValue(text);
+  }, []);
 
   const handleSignOut = () => {
     Alert.alert(MESSAGES.SIGN_OUT, MESSAGES.SIGN_OUT_MESSAGE, [
@@ -45,7 +69,8 @@ const HomeScreen = () => {
     id: '1',
     title: 'Wreck It Ralph 2',
     synopsis: 'Ralph and Vanellope venture into the internet...',
-    posterUrl: 'https://example.com/poster.jpg',
+    posterUrl:
+      'https://www.dailysabah.com/arts/reviews/spider-man-across-the-spiderverse-discovers-tangled-web-of-multiverse',
     rating: 4.7,
     durationMinutes: 112,
     genre: ['Animation', 'Comedy', 'Adventure'],
@@ -63,27 +88,41 @@ const HomeScreen = () => {
       accessibilityLabel="Home screen"
       accessibilityHint="Home screen"
     >
-      <View className="w-full h-full bg-bg-primary">
+      <ScrollView
+        className=" h-full bg-dark-blue"
+        contentContainerStyle={{
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="px-6 mt-22">
+          <SearchInput value={searchValue} onChangeText={handleSearch} />
+        </View>
+
+        <View className="h-10 mt-7">
+          <Tabs
+            tabs={FILTER_CATEGORY_TABS}
+            activeTab={activeCategory}
+            onTabChange={setActiveCategory}
+          />
+        </View>
+
+        <View className="mt-7">
+          <MovieBanner movie={movie} />
+        </View>
+
+        <View className="w-full flex-1 gap-4 mt-7">
+          {promotions.map(promotion => (
+            <PromotionCard key={promotion.id} {...promotion} />
+          ))}
+        </View>
         <Button
           title=" Sign Out"
           onPress={handleSignOut}
           className="bg-error rounded-xl p-4"
         />
-        <Tabs
-          tabs={FILTER_CATEGORY_TABS}
-          activeTab={activeCategory}
-          onTabChange={setActiveCategory}
-        />
-
-        <Tabs
-          variant="secondary"
-          tabs={FILTER_MOVIE_TABS}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-
-        <MovieBanner movie={movie} />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
