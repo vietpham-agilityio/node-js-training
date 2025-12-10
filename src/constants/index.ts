@@ -6,3 +6,4 @@ export * from './regex';
 export * from './routes';
 export * from './schema';
 export * from './values';
+export * from './enum';

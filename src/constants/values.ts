@@ -6,3 +6,5 @@ export const HEADER_TITLE_MAP = {
   '/signup': 'Create New Your Account',
   '/confirm-account': 'Confirm New Account',
 } as const;
+
+export const TOAST_DURATION = 3000;
