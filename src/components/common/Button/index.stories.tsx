@@ -8,7 +8,7 @@ import { Button } from './';
 import { Size } from '@/constants/enum';
 
 const meta: Meta<typeof Button> = {
-  title: 'common/Button',
+  title: 'Button',
   component: Button,
   parameters: {
     notes:

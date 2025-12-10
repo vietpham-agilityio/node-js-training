@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { Typo } from './';
 
 const meta = {
-  title: 'Common/Typo',
+  title: 'Typo',
   component: Typo,
   decorators: [
     Story => (

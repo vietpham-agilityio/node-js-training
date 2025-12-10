@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { Input } from './';
 
 const meta = {
-  title: 'Common/Input',
+  title: 'Input',
   component: Input,
   decorators: [
     Story => (
