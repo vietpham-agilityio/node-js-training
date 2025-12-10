@@ -7,4 +7,10 @@ export const HEADER_TITLE_MAP = {
   '/confirm-account': 'Confirm New Account',
 } as const;
 
+export const MAIN_TITLE_MAP = {
+  '/': 'Find Your Best Movie',
+  '/wallet': 'My Wallet',
+  '/my-ticket': 'My Ticket',
+} as const;
+
 export const TOAST_DURATION = 3000;

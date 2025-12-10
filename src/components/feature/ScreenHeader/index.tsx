@@ -81,3 +81,5 @@ export const ScreenHeader = ({
     </View>
   );
 };
+
+ScreenHeader.displayName = 'ScreenHeader';
