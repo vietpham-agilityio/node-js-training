@@ -26,6 +26,7 @@ export const ERROR_MESSAGES = {
   SIGNUP_FAILED: 'Sign Up Failed',
   CREATE_ACCOUNT_FAILED: 'Failed to create account',
   SIGN_OUT_FAILED: 'Failed to sign out',
+  CONFIRM_ACCOUNT_FAILED: 'Failed to confirm account',
 };
 
 export const MESSAGES = {
@@ -40,4 +41,6 @@ export const MESSAGES = {
     'Account created successfully! Please check your email to verify your account.',
   SIGN_OUT: 'Sign Out',
   SIGN_OUT_MESSAGE: 'Are you sure you want to sign out?',
+  CONFIRM_SUCCESS: 'Confirm account successful',
+  CONFIRM_SUCCESS_MESSAGE: 'Your account is ready! Welcome aboard.',
 };

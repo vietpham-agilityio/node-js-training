@@ -5,7 +5,7 @@ import { Alert, ScrollView } from 'react-native';
 import { ERROR_MESSAGES, MESSAGES, ROUTES } from '@/constants';
 
 // Hooks
-import { useSignUp } from '@/hooks';
+import { useSignUp, useUploadAvatar } from '@/hooks';
 
 // Types
 import { SignUpData } from '@/types';
@@ -17,42 +17,67 @@ import { AccessLayout } from '@/components/layouts';
 const SignupScreen = () => {
   const router = useRouter();
   const { mutate: signUp, isPending: isSigningUp } = useSignUp();
+  const { mutate: uploadAvatar, isPending: isUploading } = useUploadAvatar();
 
-  const handleSubmit = (data: SignUpData) => {
-    signUp(data, {
-      onSuccess: () => {
-        Alert.alert(
-          MESSAGES.SIGNUP_SUCCESS,
-          MESSAGES.ACCOUNT_VERIFICATION_SUCCESS,
-          [
-            {
-              text: 'OK',
-            },
-          ],
-        );
+  const isLoading = isSigningUp || isUploading;
 
-        // Navigate to confirmation screen
-        router.push({
-          pathname: ROUTES.CONFIRM_ACCOUNT,
-          params: {
-            fullName: data?.fullName,
-            avatarUrl: data?.avatarUrl,
+  const handleSubmit = async (data: SignUpData) => {
+    try {
+      const { fullName, password, email, avatarUrl } = data;
+      // First, sign up the user with email and password
+      await new Promise<void>((resolve, reject) => {
+        signUp(
+          {
+            fullName,
+            email,
+            password,
           },
-        });
-      },
-      onError: (error: Error) => {
-        Alert.alert(
-          ERROR_MESSAGES.SIGNUP_FAILED,
-          error.message || ERROR_MESSAGES.CREATE_ACCOUNT_FAILED,
+          {
+            onSuccess: () => resolve(),
+            onError: error => reject(error),
+          },
         );
-      },
-    });
+      });
+
+      // Then, upload avatar
+      if (avatarUrl) {
+        await new Promise<void>((resolve, reject) => {
+          uploadAvatar(
+            { uri: avatarUrl },
+            {
+              onSuccess: () => resolve(),
+              onError: error => reject(error),
+            },
+          );
+        });
+      }
+
+      Alert.alert(
+        MESSAGES.SIGNUP_SUCCESS,
+        MESSAGES.ACCOUNT_VERIFICATION_SUCCESS,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              router.replace(ROUTES.WELCOME);
+            },
+          },
+        ],
+      );
+    } catch (error) {
+      Alert.alert(
+        ERROR_MESSAGES.SIGNUP_FAILED,
+        error instanceof Error
+          ? error.message
+          : ERROR_MESSAGES.CREATE_ACCOUNT_FAILED,
+      );
+    }
   };
 
   return (
-    <AccessLayout mode="signup">
+    <AccessLayout mode="signup" loading={isLoading}>
       <ScrollView contentContainerClassName="items-center mt-24 pb-80">
-        <SignUpForm isPending={isSigningUp} onSubmit={handleSubmit} />
+        <SignUpForm isPending={isLoading} onSubmit={handleSubmit} />
       </ScrollView>
     </AccessLayout>
   );

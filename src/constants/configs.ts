@@ -3,6 +3,10 @@ export const STORAGE_KEYS = {
   REFRESH_TOKEN: 'refresh_token',
   USER_SESSION: 'user_session',
   ONBOARDING_COMPLETED: 'onboarding_completed',
+  AUTH_KEYS: 'supabase.auth.token',
+  AUTH_REFRESH_TOKEN: 'supabase.auth.refresh_token',
+  USER_PIN: 'user_pin',
+  BIOMETRIC_KEY: 'biometric_key',
 };
 
 export const API_CONFIG = {
