@@ -7,3 +7,4 @@ export * from './SignInForm';
 export * from './SignUpForm';
 export * from './Toast';
 export * from './MovieTrailer'
+export * from './MovieCard';

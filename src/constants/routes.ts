@@ -4,6 +4,7 @@ export const ROUTES = {
   SIGNUP: '/(auth)/signup',
   ONBOARDING: '/(auth)/onboarding',
   FORGOT_PASSWORD: '/(auth)/forgot-password',
+  CONFIRM_ACCOUNT: '/confirm-account',
 
   // Tab routes
   HOME: '/(main)/(tabs)',

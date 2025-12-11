@@ -2,6 +2,9 @@ import { useCallback, useState } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// Expo
+import { router } from 'expo-router';
+
 // Unwind
 import { useResolveClassNames } from 'uniwind';
 

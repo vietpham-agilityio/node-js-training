@@ -1,3 +1,5 @@
+import { Size } from "./enum";
+
 export const BLUR_HASH = 'LKN]Rv%2Tw=w]~RBVZRi};RPxuwH';
 
 export const VIDEO_SOURCE =
@@ -47,6 +49,12 @@ const MOVIE_TABS = {
     LABEL: 'Choose Seat',
   },
 } as const;
+
+export const IMAGE_SIZE_MAP = {
+  [Size.SMALL]: 'w-21 h-30',
+  [Size.MEDIUM]: 'w-30 h-43',
+  [Size.LARGE]: 'w-40 h-56',
+};
 
 export const FILTER_CATEGORY_TABS = [
   { id: CATEGORY_TABS.ALL.ID, label: CATEGORY_TABS.ALL.LABEL },
