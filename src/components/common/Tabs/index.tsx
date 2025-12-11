@@ -1,7 +1,12 @@
 import { memo } from 'react';
-import { Platform, ScrollView, TouchableOpacity, View } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { useResolveClassNames } from 'uniwind';
+
+// Components
 import { Typo } from '..';
+
+// Utils
+import { isAndroid, isIOS } from '@/utils';
 
 interface Tab {
   id: string;
@@ -55,7 +60,7 @@ export const Tabs = memo(
         accessibilityLabel={`Tab navigation with ${tabs.length} tabs`}
         accessibilityHint={`Currently on ${activeTabLabel} tab, ${activeTabIndex + 1} of ${tabs.length}`}
         accessible
-        {...(Platform.OS === 'android' && {
+        {...(isAndroid() && {
           accessibilityLiveRegion: 'polite',
         })}
       >
@@ -86,10 +91,10 @@ export const Tabs = memo(
                     : `Switch to ${tab.label} tab`
                 }
                 accessible
-                {...(Platform.OS === 'android' && {
+                {...(isAndroid() && {
                   accessibilityLiveRegion: isActive ? 'polite' : 'none',
                 })}
-                {...(Platform.OS === 'ios' && {
+                {...(isIOS() && {
                   accessibilityTraits: isActive
                     ? ['selected', 'button']
                     : ['button'],

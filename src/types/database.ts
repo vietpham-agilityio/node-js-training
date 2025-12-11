@@ -186,7 +186,7 @@ export type Database = {
           status: string | null
           synopsis: string | null
           title: string
-          trailer_url: string | null
+          trailer_url: string[] | null
           updated_at: string | null
         }
         Insert: {
@@ -202,7 +202,7 @@ export type Database = {
           status?: string | null
           synopsis?: string | null
           title: string
-          trailer_url?: string | null
+          trailer_url?: string[] | null
           updated_at?: string | null
         }
         Update: {
@@ -218,7 +218,7 @@ export type Database = {
           status?: string | null
           synopsis?: string | null
           title?: string
-          trailer_url?: string | null
+          trailer_url?: string[] | null
           updated_at?: string | null
         }
         Relationships: []

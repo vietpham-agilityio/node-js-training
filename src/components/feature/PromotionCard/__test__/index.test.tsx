@@ -3,15 +3,15 @@ import { render } from '@testing-library/react-native';
 // Component
 import { PromotionCard } from '../';
 
-jest.mock('uniwind', () => {
-  return {
-    useResolveClassNames: jest.fn(() => ({})),
-  };
-});
-
 // Mock expo-image
 jest.mock('expo-image', () => ({
   ImageBackground: 'ImageBackground',
+}));
+
+// Mock uniwind
+jest.mock('uniwind', () => ({
+  useResolveClassNames: (classNames: string) => ({ className: classNames }),
+  withUniwind: (Component: typeof Text) => Component,
 }));
 
 describe('PromotionCard Component', () => {

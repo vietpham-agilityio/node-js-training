@@ -7,8 +7,8 @@
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "clean": "expo prebuild --clean",
-    "test": "jest --watchAll",
-    "test:coverage": " NODE_ENV=test jest --coverage --detectOpenHandles",
+    "test": "NODE_ENV=test jest --watchAll",
+    "test:coverage": "NODE_ENV=test jest --coverage --detectOpenHandles",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
@@ -16,18 +16,6 @@
     "storybook-generate": "sb-rn-get-stories",
     "storybook": "EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start",
     "export:embed:android": "EXPO_ROUTER_APP_ROOT=./src/app pnpm expo export:embed --eager --platform android --dev false"
-  },
-  "jest": {
-    "preset": "jest-expo",
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "src/utils/**/*.{ts,tsx,js,jsx}",
-      "src/components/**/*.{ts,tsx,js,jsx}",
-      "src/hooks/**/*.{ts,tsx,js,jsx}",
-      "!src/components/**/*.stories.{ts,tsx}",
-      "!**/expo-env.d.ts",
-      "!**/.expo/**"
-    ]
   },
   "dependencies": {
     "@expo-google-fonts/montserrat": "^0.4.2",
@@ -59,6 +47,7 @@
     "expo-symbols": "~1.0.7",
     "expo-system-ui": "~6.0.8",
     "expo-video": "~3.0.14",
+    "expo-video-thumbnails": "~10.0.8",
     "expo-web-browser": "~15.0.9",
     "nativewind": "^4.2.1",
     "prettier-plugin-tailwindcss": "^0.5.14",
@@ -69,6 +58,7 @@
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-reanimated": "~4.1.1",
+    "react-native-reanimated-carousel": "^4.0.3",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-web": "~0.21.0",
