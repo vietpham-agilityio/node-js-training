@@ -9,7 +9,7 @@ import { useResolveClassNames } from 'uniwind';
 import { ERROR_MESSAGES, FILTER_CATEGORY_TABS, MESSAGES } from '@/constants';
 
 // Components
-import { Button, MovieTrailer, SearchInput, Tabs } from '@/components/common';
+import { Button, SearchInput, Tabs } from '@/components/common';
 import {
   MovieBannerCarousel,
   MovieTrailerCarousel,
@@ -123,8 +123,6 @@ const HomeScreen = () => {
           onPress={handleSignOut}
           className="bg-error rounded-xl p-4"
         />
-
-        <MovieTrailer />
       </ScrollView>
     </SafeAreaView>
   );
