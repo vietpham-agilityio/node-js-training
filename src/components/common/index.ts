@@ -7,3 +7,4 @@ export * from './SearchInput';
 export * from './Tabs';
 export * from './ThirdPartyButton';
 export * from './Typo';
+export * from './UserCard';
