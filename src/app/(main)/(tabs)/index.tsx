@@ -9,14 +9,18 @@ import { useResolveClassNames } from 'uniwind';
 import { ERROR_MESSAGES, FILTER_CATEGORY_TABS, MESSAGES } from '@/constants';
 
 // Components
-import { Button, MovieBanner, SearchInput, Tabs } from '@/components/common';
-import { PromotionCard } from '@/components/feature';
+import { Button, MovieTrailer, SearchInput, Tabs } from '@/components/common';
+import {
+  MovieBannerCarousel,
+  MovieTrailerCarousel,
+  PromotionCard,
+} from '@/components/feature';
 
 // Hooks
 import { useAuth } from '@/hooks';
 
 // Types
-import { Movie, MovieStatus } from '@/types';
+import { MOVIES_MOCK } from '@/mocks';
 
 const HomeScreen = () => {
   const { signOut } = useAuth();
@@ -70,23 +74,6 @@ const HomeScreen = () => {
     ]);
   };
 
-  const movie: Movie = {
-    id: '1',
-    title: 'Wreck It Ralph 2',
-    synopsis: 'Ralph and Vanellope venture into the internet...',
-    posterUrl:
-      'https://www.dailysabah.com/arts/reviews/spider-man-across-the-spiderverse-discovers-tangled-web-of-multiverse',
-    rating: 4.7,
-    durationMinutes: 112,
-    genre: ['Animation', 'Comedy', 'Adventure'],
-    language: 'EN',
-    trailerUrl: 'https://example.com/trailer.mp4',
-    releaseDate: '2023-06-15',
-    createdAt: '2023-06-15T12:34:56Z',
-    updatedAt: '2023-06-15T12:34:56Z',
-    status: MovieStatus.NOW_PLAYING,
-  };
-
   return (
     <SafeAreaView
       edges={['top']}
@@ -115,7 +102,15 @@ const HomeScreen = () => {
         </View>
 
         <View className="mt-7">
-          <MovieBanner movie={movie} />
+          <MovieBannerCarousel movies={MOVIES_MOCK} />
+          <MovieBannerCarousel movies={MOVIES_MOCK} variant="vertical" />
+          <MovieTrailerCarousel
+            trailers={[
+              ...MOVIES_MOCK[0].trailerUrl,
+              ...MOVIES_MOCK[1].trailerUrl,
+              ...MOVIES_MOCK[2].trailerUrl,
+            ]}
+          />
         </View>
 
         <View className="w-full flex-1 gap-4 mt-7">
@@ -129,14 +124,7 @@ const HomeScreen = () => {
           className="bg-error rounded-xl p-4"
         />
 
-        <Tabs
-          tabs={FILTER_CATEGORY_TABS}
-          activeTab={activeCategory}
-          onTabChange={setActiveCategory}
-        />
-
-        <MovieBanner movie={movie} />
-        <MovieBanner variant="vertical" movie={movie} />
+        <MovieTrailer />
       </ScrollView>
     </SafeAreaView>
   );

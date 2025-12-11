@@ -1,5 +1,8 @@
 export const BLUR_HASH = 'LKN]Rv%2Tw=w]~RBVZRi};RPxuwH';
 
+export const VIDEO_SOURCE =
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
 export const HEADER_TITLE_MAP = {
   '/onboarding': '',
   '/signin': '',
