@@ -3,6 +3,7 @@ export const SCREENS = {
   MAIN: {
     LAYOUT: '(main)',
     WELCOME: 'welcome',
+    MOVIE: 'movie',
   },
 
   // Auth screens

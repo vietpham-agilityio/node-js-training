@@ -3,6 +3,13 @@ import { render } from '@testing-library/react-native';
 // Component
 import { PromotionCard } from '../';
 
+jest.mock('uniwind', () => {
+  return {
+    withUniwind: jest.fn((Component: any) => Component),
+    useResolveClassNames: jest.fn(() => ({})),
+  };
+});
+
 // Mock expo-image
 jest.mock('expo-image', () => ({
   ImageBackground: 'ImageBackground',
