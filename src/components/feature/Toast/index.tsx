@@ -11,6 +11,9 @@ import { Typo } from '@/components/common';
 // Stores
 import { useToastStore } from '@/stores';
 
+// Utils
+import { cn } from '@/utils';
+
 export const Toast = memo(() => {
   // Store
   const { toast, hide } = useToastStore();
@@ -84,7 +87,10 @@ export const Toast = memo(() => {
         accessibilityLabel={`${toast.type} toast: ${toast.message}`}
       >
         <View
-          className={`${toast.type === 'success' ? 'bg-green-600' : 'bg-bg-danger'} px-4 py-2.5 w-full`}
+          className={cn(
+            'px-4 py-2.5 w-full',
+            toast.type === 'success' ? 'bg-green-600' : 'bg-bg-danger',
+          )}
         >
           <Typo size="2xs" weight="regular" className="text-center">
             {toast.message}

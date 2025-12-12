@@ -1,6 +1,7 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { memo, useState } from 'react';
+import { ComponentType, memo, useState } from 'react';
 import { Alert, Modal, Platform, TouchableOpacity, View } from 'react-native';
+import { SvgProps } from 'react-native-svg';
 
 // SDKs
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
@@ -20,6 +21,7 @@ import {
   PhotoProfileIcon,
   UserProfileIcon,
 } from '@/icons';
+import { cn } from '@/utils';
 
 type Size = 48 | 92 | 132 | 160;
 type Variant = 'default' | 'picker';
@@ -29,6 +31,7 @@ interface AvatarProps {
   variant?: Variant;
   source?: string;
   onChangeImage?: (uri: string) => void;
+  defaultAvatar?: ComponentType<SvgProps>;
   accessibilityLabel?: string;
   accessibilityHint?: string;
 }
@@ -80,6 +83,7 @@ export const Avatar = memo(
     variant = 'default',
     source,
     onChangeImage,
+    defaultAvatar,
     accessibilityLabel,
     accessibilityHint,
   }: AvatarProps) => {
@@ -92,6 +96,9 @@ export const Avatar = memo(
 
     const config = SIZE_MAP[size];
     const isImageSelected = !!imageUri;
+    const DefaultAvatar =
+      defaultAvatar ||
+      (variant === 'default' ? PhotoProfileIcon : UserProfileIcon);
 
     // Accessibility labels
     const defaultAvatarLabel = accessibilityLabel || 'Profile picture';
@@ -235,7 +242,10 @@ export const Avatar = memo(
     const DefaultAvatarIcon = () => (
       <View
         testID="default-avatar-icon"
-        className={`${config.avatar} rounded-full items-center justify-center overflow-hidden`}
+        className={cn(
+          config.avatar,
+          'rounded-full items-center justify-center overflow-hidden',
+        )}
         accessible
         accessibilityLabel={defaultAvatarLabel}
         accessibilityRole="image"
@@ -246,11 +256,7 @@ export const Avatar = memo(
           className="items-center justify-center w-full h-full"
           importantForAccessibility="no-hide-descendants"
         >
-          {variant === 'default' ? (
-            <PhotoProfileIcon width={size} height={size} />
-          ) : (
-            <UserProfileIcon width={size} height={size} />
-          )}
+          <DefaultAvatar width={size} height={size} />
         </View>
       </View>
     );
@@ -261,9 +267,12 @@ export const Avatar = memo(
       return (
         <TouchableOpacity
           onPress={handleButtonPress}
-          className={`${config.button} rounded-full items-center justify-center absolute ${config.buttonPosition} border border-white ${
-            isImageSelected ? 'bg-red' : 'bg-primary'
-          }`}
+          className={cn(
+            'rounded-full items-center justify-center absolute border border-white',
+            config.button,
+            config.buttonPosition,
+            isImageSelected ? 'bg-red' : 'bg-primary',
+          )}
           activeOpacity={0.8}
           accessible={true}
           accessibilityLabel={pickerButtonLabel}
@@ -291,7 +300,7 @@ export const Avatar = memo(
     return (
       <>
         <View
-          className={`${config.container} relative`}
+          className={cn('relative', config.container)}
           accessible={variant === 'default'}
           accessibilityLabel={
             variant === 'default' ? defaultAvatarLabel : undefined

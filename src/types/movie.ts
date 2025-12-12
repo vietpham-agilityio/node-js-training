@@ -32,13 +32,13 @@ export interface PromoCode {
   description?: string;
   discountType: PromoCodeStatus;
   discountValue: number;
-  minPurchaseAmount: number;
+  minPurchaseAmount?: number;
   maxDiscountAmount?: number;
   usageLimit?: number;
-  usageCount: number;
-  validFrom: string;
-  validUntil: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  usageCount?: number;
+  validFrom?: string;
+  validUntil?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }

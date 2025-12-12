@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import { memo } from 'react';
 import { View } from 'react-native';
 
@@ -14,14 +13,23 @@ import { useResolveClassNames } from 'uniwind';
 // Components
 import { Typo } from '@/components/common';
 
+// Types
+import { PromoCodeStatus } from '@/types';
+
 interface PromotionCardProps {
-  title: string;
-  subtitle: string;
-  discount: string;
+  description?: string;
+  discountType?: PromoCodeStatus;
+  code: string;
+  discountValue: number;
 }
 
 export const PromotionCard = memo(
-  ({ title, subtitle, discount }: PromotionCardProps) => {
+  ({
+    code,
+    description,
+    discountValue,
+    discountType = PromoCodeStatus.PERCENTAGE,
+  }: PromotionCardProps) => {
     const imageBackgroundStyles = useResolveClassNames(
       'rounded-xl overflow-hidden',
     );
@@ -37,11 +45,13 @@ export const PromotionCard = memo(
             {/* Left Section - Title and Subtitle */}
             <View className="flex-1">
               <Typo size="sm" weight="regular" className="mb-1">
-                {title}
+                {code}
               </Typo>
-              <Typo size="xs" weight="light" className="text-gradient-white">
-                {subtitle}
-              </Typo>
+              {description && (
+                <Typo size="xs" weight="light" className="text-gradient-white">
+                  {description}
+                </Typo>
+              )}
             </View>
 
             {/* Right Section - Discount */}
@@ -50,7 +60,8 @@ export const PromotionCard = memo(
                 OFF
               </Typo>
               <Typo size="base" weight="semibold">
-                {discount}
+                {discountValue}
+                {discountType === PromoCodeStatus.PERCENTAGE && '%'}
               </Typo>
             </View>
           </View>

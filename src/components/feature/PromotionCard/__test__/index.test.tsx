@@ -1,5 +1,8 @@
 import { render } from '@testing-library/react-native';
 
+// Constants
+import { MOCK_PROMOTIONS } from '@/mocks';
+
 // Component
 import { PromotionCard } from '../';
 
@@ -22,11 +25,7 @@ jest.mock('uniwind', () => ({
 }));
 
 describe('PromotionCard Component', () => {
-  const defaultProps = {
-    title: 'Student Holiday',
-    subtitle: 'Maximal only for two people',
-    discount: '50%',
-  };
+  const defaultProps = MOCK_PROMOTIONS[0];
 
   describe('Rendering', () => {
     it('should render without crashing', () => {
@@ -34,7 +33,7 @@ describe('PromotionCard Component', () => {
       expect(toJSON()).toBeTruthy();
     });
 
-    it('should display the title', () => {
+    it('should display the title', async () => {
       const { getByText } = render(<PromotionCard {...defaultProps} />);
       expect(getByText('Student Holiday')).toBeTruthy();
     });
@@ -59,9 +58,9 @@ describe('PromotionCard Component', () => {
     it('should render with different title', () => {
       const { getByText } = render(
         <PromotionCard
-          title="Summer Sale"
-          subtitle="Special offer"
-          discount="30%"
+          code="Summer Sale"
+          description="Special offer"
+          discountValue={30}
         />,
       );
       expect(getByText('Summer Sale')).toBeTruthy();
@@ -72,9 +71,9 @@ describe('PromotionCard Component', () => {
     it('should render with different subtitle', () => {
       const { getByText } = render(
         <PromotionCard
-          title="Winter Deal"
-          subtitle="Limited time only"
-          discount="25%"
+          code="Winter Deal"
+          description="Limited time only"
+          discountValue={25}
         />,
       );
       expect(getByText('Winter Deal')).toBeTruthy();
@@ -84,9 +83,9 @@ describe('PromotionCard Component', () => {
     it('should render with different discount', () => {
       const { getByText } = render(
         <PromotionCard
-          title="Flash Sale"
-          subtitle="Today only"
-          discount="75%"
+          code="Flash Sale"
+          description="Today only"
+          discountValue={75}
         />,
       );
       expect(getByText('75%')).toBeTruthy();

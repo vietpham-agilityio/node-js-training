@@ -1,21 +1,22 @@
-import { useMemo, memo } from 'react';
+import { memo, useMemo } from 'react';
 import {
   Text,
   TouchableOpacity,
   TouchableOpacityProps,
   View,
-  type ViewStyle,
 } from 'react-native';
 
 // Constants
 import { Size } from '@/constants/enum';
+
+// Utils
+import { cn } from '@/utils';
 
 export interface ButtonProps extends TouchableOpacityProps {
   title: string;
   isPrimary?: boolean;
   size?: Size;
   disabled?: boolean;
-  buttonStyle?: ViewStyle;
   testID?: string;
   onPress: () => void;
 }
@@ -41,7 +42,7 @@ export const Button = memo(
     isPrimary = true,
     size = Size.LARGE,
     disabled,
-    buttonStyle,
+    className,
     onPress,
     ...rest
   }: ButtonProps) => {
@@ -55,12 +56,6 @@ export const Button = memo(
           : `${baseClasses} bg-gradient-to-r from-gradient-blue-start to-gradient-blue-end`;
     }, [size, disabled, isPrimary]);
 
-    const textClassName = useMemo(
-      () =>
-        `font-montserrat-medium text-white text-center ${TEXT_SIZE_CLASSES[size]}`,
-      [size],
-    );
-
     return (
       <TouchableOpacity
         disabled={disabled}
@@ -71,8 +66,14 @@ export const Button = memo(
         accessibilityLabel={title}
         {...rest}
       >
-        <View className={buttonClassName} style={buttonStyle}>
-          <Text className={textClassName} testID={`${testID}-text`}>
+        <View className={cn(buttonClassName, className)}>
+          <Text
+            className={cn(
+              'font-montserrat-medium text-white text-center',
+              TEXT_SIZE_CLASSES[size],
+            )}
+            testID={`${testID}-text`}
+          >
             {title}
           </Text>
         </View>

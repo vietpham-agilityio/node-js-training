@@ -1,4 +1,4 @@
-import { Movie, MovieStatus } from '@/types';
+import { Movie, MovieStatus, PromoCode, PromoCodeStatus } from '@/types';
 
 export const MOVIES_MOCK: Movie[] = [
   {
@@ -85,5 +85,29 @@ export const MOVIES_MOCK: Movie[] = [
     createdAt: '2023-05-12T15:00:00Z',
     updatedAt: '2024-12-02T11:20:00Z',
     status: MovieStatus.COMING_SOON,
+  },
+];
+
+export const MOCK_PROMOTIONS: PromoCode[] = [
+  {
+    id: '1',
+    code: 'Student Holiday',
+    description: 'Maximal only for two people',
+    discountType: PromoCodeStatus.PERCENTAGE,
+    discountValue: 50,
+  },
+  {
+    id: '2',
+    code: 'Student Holiday',
+    description: 'Maximal only for two people',
+    discountType: PromoCodeStatus.PERCENTAGE,
+    discountValue: 50,
+  },
+  {
+    id: '3',
+    code: 'Student Holiday',
+    description: 'Maximal only for two people',
+    discountType: PromoCodeStatus.PERCENTAGE,
+    discountValue: 50,
   },
 ];

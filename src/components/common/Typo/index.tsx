@@ -1,6 +1,9 @@
 import { memo } from 'react';
 import { Text } from 'react-native';
 
+// Utils
+import { cn } from '@/utils';
+
 type FontSize =
   | '4xs'
   | '3xs'
@@ -54,7 +57,12 @@ export const Typo = memo(
   }: TypoProps) => (
     <Text
       accessibilityRole="text"
-      className={`text-white ${FONT_SIZE_MAP[size]} ${FONT_WEIGHT_MAP[weight]} ${className}`}
+      className={cn(
+        'text-white ',
+        `${FONT_SIZE_MAP[size]}`,
+        `${FONT_WEIGHT_MAP[weight]}`,
+        ` ${className}`,
+      )}
       testID={testID}
     >
       {children}
