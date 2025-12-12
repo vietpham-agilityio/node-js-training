@@ -3,6 +3,12 @@ import { Dimensions, View } from 'react-native';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
 
+// Expo
+import { useRouter } from 'expo-router';
+
+// Constants
+import { ROUTES } from '@/constants';
+
 // Types
 import { Movie } from '@/types';
 
@@ -44,6 +50,8 @@ const VARIANTS_MAP: Record<
 
 export const MovieBannerCarousel = memo(
   ({ variant = 'horizontal', movies }: MovieBannerCarouselProps) => {
+    const navigate = useRouter();
+
     const progress = useSharedValue<number>(0);
     const width = Dimensions.get('screen').width;
 
@@ -52,6 +60,10 @@ export const MovieBannerCarousel = memo(
     }
 
     const variantLabel = variant === 'horizontal' ? 'horizontal' : 'vertical';
+
+    const handleMoviePress = (movieId: string) => {
+      navigate.push(`${ROUTES.MOVIE}/${movieId}`);
+    };
 
     return (
       <View
@@ -98,7 +110,11 @@ export const MovieBannerCarousel = memo(
                 accessibilityTraits: ['button'],
               })}
             >
-              <MovieBanner movie={item} variant={variant} />
+              <MovieBanner
+                movie={item}
+                variant={variant}
+                onPress={() => handleMoviePress(item.id)}
+              />
             </Animated.View>
           )}
         />

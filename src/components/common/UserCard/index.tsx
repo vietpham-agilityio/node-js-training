@@ -11,7 +11,7 @@ import { withUniwind } from 'uniwind';
 import { BLUR_HASH } from '@/constants';
 
 // Components
-import { Typo } from '@/components/common';
+import { Typo } from '../Typo';
 
 interface UserCardProps {
   imageUrl?: string;

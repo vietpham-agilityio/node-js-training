@@ -1,4 +1,4 @@
-import { Size } from "./enum";
+import { Size } from './enum';
 
 export const BLUR_HASH = 'LKN]Rv%2Tw=w]~RBVZRi};RPxuwH';
 
@@ -63,7 +63,7 @@ export const FILTER_CATEGORY_TABS = [
   { id: CATEGORY_TABS.HOROR.ID, label: CATEGORY_TABS.HOROR.LABEL },
 ];
 
-export const FILTER_MOVIE_TABS = [
+export const DETAIL_MOVIE_TABS = [
   { id: MOVIE_TABS.ABOUT_MOVIE.ID, label: MOVIE_TABS.ABOUT_MOVIE.LABEL },
   { id: MOVIE_TABS.CHOOSE_SEAT.ID, label: MOVIE_TABS.CHOOSE_SEAT.LABEL },
 ];

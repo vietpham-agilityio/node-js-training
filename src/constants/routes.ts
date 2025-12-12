@@ -1,4 +1,10 @@
+import { Href } from 'expo-router';
+
 export const ROUTES = {
+  // Main routes
+  MOVIE: '/(main)/movies',
+  MOVIE_DETAILS: (id: string): Href => `/(main)/movies/${id}`,
+
   // Auth routes
   LOGIN: '/(auth)/signin',
   SIGNUP: '/(auth)/signup',
