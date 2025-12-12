@@ -138,3 +138,23 @@ export const formatShowtimeDate = (
   }
   return '';
 };
+
+// Clamp rating between 0 and 10
+// Calculate filled percentage for each star (each star represents 2 points)
+export const clampedRatingToStars = (rating: number) => {
+  // Clamp rating between 0 and 10
+  const clampedRating = Math.max(0, Math.min(10, rating));
+
+  // Calculate filled percentage for each star (each star represents 2 points)
+  const stars = Array.from({ length: 5 }, (_, index) => {
+    const starValue = (index + 1) * 2;
+    if (clampedRating >= starValue) {
+      return 1; // Fully filled
+    } else if (clampedRating > index * 2) {
+      return (clampedRating - index * 2) / 2; // Partially filled
+    }
+    return 0; // Empty
+  });
+
+  return stars;
+};

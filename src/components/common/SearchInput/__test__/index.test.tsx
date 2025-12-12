@@ -28,7 +28,7 @@ describe('SearchInput Component', () => {
       const { getByPlaceholderText } = render(
         <SearchInput {...defaultProps} />,
       );
-      expect(getByPlaceholderText('Search movie')).toBeTruthy();
+      expect(getByPlaceholderText('Search movies')).toBeTruthy();
     });
 
     it('should render with custom placeholder', () => {

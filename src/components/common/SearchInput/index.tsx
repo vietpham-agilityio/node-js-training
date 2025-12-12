@@ -14,17 +14,14 @@ export interface SearchInputProps extends Omit<TextInputProps, 'placeholder'> {
   testID?: string;
   placeholder?: string;
   containerClassName?: string;
-  inputClassName?: string;
-  onChangeText: (text: string) => void;
 }
 
 export const SearchInput = memo(
   ({
     value = '',
-    placeholder = 'Search movie',
+    placeholder = 'Search movies',
     testID,
-    onChangeText,
-    inputClassName,
+    className,
     containerClassName,
     ...rest
   }: SearchInputProps) => {
@@ -51,11 +48,10 @@ export const SearchInput = memo(
             testID={`${testID}-input`}
             className={cn(
               'w-full h-12 pl-14 pr-4 pb-1 bg-dark-navy text-white text-sm border rounded-xl',
-              inputClassName,
+              className,
             )}
             placeholder={placeholder}
             placeholderTextColor={themes.color}
-            onChangeText={onChangeText}
             {...rest}
           />
         </View>

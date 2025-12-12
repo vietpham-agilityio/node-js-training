@@ -48,7 +48,11 @@ export const MainHeader = ({
           accessibilityLabel={title}
           className={cn('flex-1', isLeftTitle ? 'items-start' : 'items-center')}
         >
-          <Typo size="2xl" weight="semibold" className="leading-7 min-w-[198]">
+          <Typo
+            size="2xl"
+            weight="semibold"
+            className={cn('leading-7', isLeftTitle && 'min-w-[198]')}
+          >
             {title}
           </Typo>
         </View>

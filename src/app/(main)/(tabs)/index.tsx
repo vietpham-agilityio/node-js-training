@@ -1,20 +1,29 @@
-import { Link } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { Link, router } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Unwind
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { FILTER_CATEGORY_TABS, HEADER_HEIGHT, ROUTES } from '@/constants';
+import {
+  FILTER_CATEGORY_TABS,
+  ROUTES,
+  Size,
+  TABS_FOOTER_HEIGHT,
+  TABS_HEADER_HEIGHT,
+} from '@/constants';
 
 // Components
-import { SearchInput, Tabs, Typo } from '@/components/common';
+import { Button, SearchInput, Tabs, Typo } from '@/components/common';
 import { MovieBannerCarousel, PromotionCard } from '@/components/feature';
 
 // Types
-import { MOCK_PROMOTIONS, MOVIES_MOCK } from '@/mocks';
+import { useMoviesInfinite } from '@/hooks';
+import { MOCK_PROMOTIONS } from '@/mocks';
+import { MovieStatus } from '@/types';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
@@ -23,69 +32,229 @@ const HomeScreen = () => {
     FILTER_CATEGORY_TABS[0].id,
   );
 
-  const [searchValue, setSearchValue] = useState('');
+  // Fetch movies with infinite scroll
+  const {
+    data: nowPlayingData,
+    isLoading: isLoadingNowPlaying,
+    isFetchingNextPage: isFetchingNextNowPlaying,
+    hasNextPage: hasNextNowPlaying,
+    fetchNextPage: fetchNextNowPlaying,
+    refetch: refetchNowPlaying,
+    isRefetching: isRefetchingNowPlaying,
+  } = useMoviesInfinite({
+    status: MovieStatus.NOW_PLAYING,
+  });
 
-  const handleSearch = useCallback((text: string) => {
-    setSearchValue(text);
+  const {
+    data: comingSoonData,
+    isLoading: isLoadingComingSoon,
+    isFetchingNextPage: isFetchingNextComingSoon,
+    hasNextPage: hasNextComingSoon,
+    fetchNextPage: fetchNextComingSoon,
+    refetch: refetchComingSoon,
+    isRefetching: isRefetchingComingSoon,
+  } = useMoviesInfinite({
+    status: MovieStatus.COMING_SOON,
+  });
+
+  // Flatten paginated data
+  const nowPlayingMovies = useMemo(() => {
+    if (!nowPlayingData?.pages) return [];
+    return nowPlayingData.pages.flat();
+  }, [nowPlayingData]);
+
+  const comingSoonMovies = useMemo(() => {
+    if (!comingSoonData?.pages) return [];
+    return comingSoonData.pages.flat();
+  }, [comingSoonData]);
+
+  // Filter by category and sort by rating
+  const filteredNowPlayingMovies = useMemo(() => {
+    if (!nowPlayingMovies.length) return [];
+
+    let filtered = nowPlayingMovies;
+
+    // Filter by genre if not 'All'
+    if (activeCategory !== FILTER_CATEGORY_TABS[0].id) {
+      filtered = nowPlayingMovies.filter(movie =>
+        movie.genre?.some(
+          g => g.toLowerCase() === activeCategory.toLowerCase(),
+        ),
+      );
+    }
+
+    // Sort by rating and take top 10
+    return filtered
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .slice(0, 10);
+  }, [nowPlayingMovies, activeCategory]);
+
+  const filteredComingSoonMovies = useMemo(() => {
+    if (!comingSoonMovies.length) return [];
+
+    let filtered = comingSoonMovies;
+
+    if (activeCategory !== FILTER_CATEGORY_TABS[0].id) {
+      filtered = comingSoonMovies.filter(movie =>
+        movie.genre?.some(
+          g => g.toLowerCase() === activeCategory.toLowerCase(),
+        ),
+      );
+    }
+
+    return filtered.slice(0, 10);
+  }, [comingSoonMovies, activeCategory]);
+
+  const isRefreshing = isRefetchingNowPlaying || isRefetchingComingSoon;
+  const isLoading = isLoadingNowPlaying || isLoadingComingSoon;
+
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([refetchNowPlaying(), refetchComingSoon()]);
+  }, [refetchNowPlaying, refetchComingSoon]);
+
+  const handleSearchPress = useCallback(() => {
+    router.push(ROUTES.SEARCH);
   }, []);
+
+  if (isLoading) {
+    return (
+      <StyledSafeAreaView
+        edges={['top', 'bottom']}
+        accessibilityLabel="Loading home screen"
+        className="h-full bg-bg-primary items-center justify-center"
+        style={{ marginTop: TABS_HEADER_HEIGHT }}
+      >
+        <ActivityIndicator size="large" />
+        <Typo className="text-text-secondary mt-4">Loading movies...</Typo>
+      </StyledSafeAreaView>
+    );
+  }
 
   return (
     <StyledSafeAreaView
-      edges={['top']}
+      edges={['top', 'bottom']}
       accessibilityLabel="Home screen"
       accessibilityHint="Home screen"
-      className="flex-1 bg-bg-primary"
-      style={{
-        marginTop: HEADER_HEIGHT,
-      }}
+      className="h-full bg-bg-primary"
+      style={{ marginTop: TABS_HEADER_HEIGHT }}
     >
-      <ScrollView className="h-full mb-6" showsVerticalScrollIndicator={false}>
-        <View className="px-6">
-          <SearchInput
-            value={searchValue}
-            onChangeText={handleSearch}
-            inputClassName="border-0"
+      <FlashList
+        data={MOCK_PROMOTIONS}
+        renderItem={() => null}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={item => item.id}
+        contentContainerStyle={{
+          paddingBottom: TABS_FOOTER_HEIGHT,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            accessibilityLabel="Pull to refresh movies"
           />
-        </View>
+        }
+        ListHeaderComponent={
+          <View>
+            <View className="px-6">
+              <SearchInput className="border-0" onFocus={handleSearchPress} />
+            </View>
 
-        <View className="mt-7">
-          <Tabs
-            tabs={FILTER_CATEGORY_TABS}
-            activeTab={activeCategory}
-            onTabChange={setActiveCategory}
-          />
-        </View>
+            <View className="mt-7">
+              <Tabs
+                tabs={FILTER_CATEGORY_TABS}
+                activeTab={activeCategory}
+                onTabChange={setActiveCategory}
+              />
+            </View>
 
-        <View className="mt-7 gap-2">
-          <Typo size="xl" weight="semibold" className="px-6">
-            Now Playing
-          </Typo>
-          <MovieBannerCarousel movies={MOVIES_MOCK} />
-        </View>
+            <View className="mt-7 gap-2">
+              <View className="px-6 flex-row items-center justify-between">
+                <Typo size="xl" weight="semibold" accessibilityRole="header">
+                  Now Playing
+                </Typo>
+                {isFetchingNextNowPlaying && <ActivityIndicator size="small" />}
+              </View>
 
-        <View className="gap-7">
-          <Typo size="xl" weight="semibold" className="px-6">
-            Coming Soon
-          </Typo>
-          <MovieBannerCarousel movies={MOVIES_MOCK} variant="vertical" />
-        </View>
+              {filteredNowPlayingMovies.length > 0 ? (
+                <MovieBannerCarousel movies={filteredNowPlayingMovies} />
+              ) : (
+                <View className="px-6 py-8 gap-2">
+                  <Typo className="text-text-secondary text-center">
+                    No movies available in this category
+                  </Typo>
+                  {hasNextNowPlaying && (
+                    <Button
+                      size={Size.EXTRA_SMALL}
+                      title="Load more movies"
+                      onPress={() => fetchNextNowPlaying()}
+                      accessibilityRole="button"
+                      accessibilityLabel="Load more movies"
+                    />
+                  )}
+                </View>
+              )}
+            </View>
 
-        <View className="px-6 gap-4 mt-7">
-          <View className="flex-row justify-between items-center">
-            <Typo size="xl" weight="semibold">
-              Promotions
-            </Typo>
-            <Link href={ROUTES.HOME}>
-              <Typo size="sm" weight="medium" className="text-text-currency">
-                See all
-              </Typo>
-            </Link>
+            <View className="gap-7">
+              <View className="px-6 flex-row items-center justify-between">
+                <Typo size="xl" weight="semibold" accessibilityRole="header">
+                  Coming Soon
+                </Typo>
+                {isFetchingNextComingSoon && <ActivityIndicator size="small" />}
+              </View>
+
+              {filteredComingSoonMovies.length > 0 ? (
+                <MovieBannerCarousel
+                  movies={filteredComingSoonMovies}
+                  variant="vertical"
+                />
+              ) : (
+                <View className="px-6 py-8 gap-2">
+                  <Typo className="text-text-secondary text-center">
+                    No upcoming movies in this category
+                  </Typo>
+                  {hasNextComingSoon && (
+                    <Button
+                      size={Size.EXTRA_SMALL}
+                      title="Load more movies"
+                      onPress={() => fetchNextComingSoon()}
+                      accessibilityRole="button"
+                      accessibilityLabel="Load more movies"
+                    />
+                  )}
+                </View>
+              )}
+            </View>
           </View>
-          {MOCK_PROMOTIONS.map(promotion => (
-            <PromotionCard key={promotion.id} {...promotion} />
-          ))}
-        </View>
-      </ScrollView>
+        }
+        ListFooterComponent={
+          <View className="px-6">
+            <View className="gap-4 mt-7 mb-6">
+              <View className="flex-row justify-between items-center">
+                <Typo size="xl" weight="semibold" accessibilityRole="header">
+                  Promotions
+                </Typo>
+                <Link href={ROUTES.HOME} asChild>
+                  <Typo
+                    size="sm"
+                    weight="medium"
+                    className="text-text-currency"
+                    accessibilityRole="link"
+                    accessibilityLabel="See all promotions"
+                  >
+                    See all
+                  </Typo>
+                </Link>
+              </View>
+            </View>
+            <View className="gap-4">
+              {MOCK_PROMOTIONS.map(promotion => (
+                <PromotionCard key={promotion.id} {...promotion} />
+              ))}
+            </View>
+          </View>
+        }
+      />
     </StyledSafeAreaView>
   );
 };

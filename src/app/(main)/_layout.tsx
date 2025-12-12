@@ -31,6 +31,13 @@ const MainLayout = () => (
       }}
     />
     <Stack.Screen name={SCREENS.MAIN.CHECKOUT} />
+    <Stack.Screen
+      name={SCREENS.MAIN.SEARCH}
+      options={{
+        presentation: 'containedModal',
+        animation: 'slide_from_bottom',
+      }}
+    />
   </Stack>
 );
 

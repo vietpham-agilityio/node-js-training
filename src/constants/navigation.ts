@@ -5,6 +5,9 @@ export const SCREENS = {
     WELCOME: 'welcome',
     MOVIES: 'movies/[id]',
     CHECKOUT: 'checkout',
+
+    // Modal screens
+    SEARCH: 'search',
   },
 
   // Auth screens

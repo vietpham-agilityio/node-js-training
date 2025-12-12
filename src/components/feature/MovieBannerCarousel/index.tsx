@@ -62,7 +62,7 @@ export const MovieBannerCarousel = memo(
     const variantLabel = variant === 'horizontal' ? 'horizontal' : 'vertical';
 
     const handleMoviePress = (movieId: string) => {
-      navigate.push(`${ROUTES.MOVIE}/${movieId}`);
+      navigate.push(ROUTES.MOVIE_DETAILS(movieId));
     };
 
     return (
@@ -79,7 +79,7 @@ export const MovieBannerCarousel = memo(
           autoPlayInterval={2000}
           data={movies}
           height={VARIANTS_MAP[variant].height}
-          loop
+          loop={movies.length > 3}
           pagingEnabled
           snapEnabled
           width={VARIANTS_MAP[variant].width}

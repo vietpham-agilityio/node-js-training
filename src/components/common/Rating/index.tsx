@@ -3,27 +3,18 @@ import { memo } from 'react';
 import { View } from 'react-native';
 import { Typo } from '../Typo';
 
+// Utils
+import { clampedRatingToStars } from '@/utils';
+
 interface RatingProps {
-  rating: number; // 0 to 5
+  rating: number; // 0 to 10
   size?: number;
   spacing?: number;
 }
 
 export const Rating = memo(
   ({ rating, size = 12, spacing = 1 }: RatingProps) => {
-    // Clamp rating between 0 and 5
-    const clampedRating = Math.max(0, Math.min(5, rating));
-
-    // Calculate filled percentage for each star
-    const stars = Array.from({ length: 5 }, (_, index) => {
-      const starValue = index + 1;
-      if (clampedRating >= starValue) {
-        return 1; // Fully filled
-      } else if (clampedRating > index) {
-        return clampedRating - index; // Partially filled
-      }
-      return 0; // Empty
-    });
+    const stars = clampedRatingToStars(rating);
 
     return (
       <View
