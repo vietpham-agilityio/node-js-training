@@ -9,6 +9,30 @@ export const formatCurrency = (amount: number, currency = 'IDR'): string => {
   }).format(amount);
 };
 
+/**
+ * Format number to IDR currency format with dot separator
+ * @param amount - The amount to format
+ * @param options - Formatting options
+ * @returns Formatted currency string (e.g., "IDR 200.000")
+ */
+export function formatIDR(
+  amount: number,
+  options?: {
+    showCurrency?: boolean;
+    decimals?: number;
+  },
+): string {
+  const { showCurrency = true, decimals = 0 } = options || {};
+
+  // Format number with dot as thousand separator
+  const formattedNumber = amount.toLocaleString('id-ID', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+
+  return showCurrency ? `IDR ${formattedNumber}` : formattedNumber;
+}
+
 export const formatDate = (date: string | Date, format = 'long'): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
@@ -99,7 +123,10 @@ export const formatMovieDuration = (minutes: number): string => {
   return `${mins}min`;
 };
 
-export const formatShowtimeDate = (showtime?: string, showDate?: string): string => {
+export const formatShowtimeDate = (
+  showtime?: string,
+  showDate?: string,
+): string => {
   if (showtime && showDate) {
     return `${showtime}, ${showDate}`;
   }

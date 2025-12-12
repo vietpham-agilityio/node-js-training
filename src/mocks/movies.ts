@@ -1,10 +1,4 @@
-import {
-  CastMember,
-  Movie,
-  MovieStatus,
-  PromoCode,
-  PromoCodeStatus,
-} from '@/types';
+import { Movie, MovieStatus } from '@/types';
 
 export const MOVIES_MOCK: Movie[] = [
   {
@@ -114,54 +108,20 @@ export const MOVIES_MOCK: Movie[] = [
   },
 ];
 
-export const MOCK_PROMOTIONS: PromoCode[] = [
-  {
-    id: '1',
-    code: 'Student Holiday',
-    description: 'Maximal only for two people',
-    discountType: PromoCodeStatus.PERCENTAGE,
-    discountValue: 50,
-  },
-  {
-    id: '2',
-    code: 'Student Holiday',
-    description: 'Maximal only for two people',
-    discountType: PromoCodeStatus.PERCENTAGE,
-    discountValue: 50,
-  },
-  {
-    id: '3',
-    code: 'Student Holiday',
-    description: 'Maximal only for two people',
-    discountType: PromoCodeStatus.PERCENTAGE,
-    discountValue: 50,
-  },
-];
-
-export const CAST_MOCK: CastMember[] = [
-  {
-    id: '1',
-    name: 'John C. Reill',
-    imageUrl: 'https://image.tmdb.org/t/p/w185/9XBctqXzVnBZH6owcxUMHHdXNco.jpg',
-  },
-  {
-    id: '2',
-    name: 'Sarah Silver',
-    imageUrl: 'https://image.tmdb.org/t/p/w185/4MC1n2bfjvPXB4UGKlT7Scb6aKx.jpg',
-  },
-  {
-    id: '3',
-    name: 'Jack McBray',
-    imageUrl: 'https://image.tmdb.org/t/p/w185/gQfqVBqgNOzYS9fI5NbS1JXPCf9.jpg',
-  },
-  {
-    id: '4',
-    name: 'Taraji P. Hen',
-    imageUrl: 'https://image.tmdb.org/t/p/w185/7Vx8wpH0lY8wDfBjT6m81KqdgEz.jpg',
-  },
-  {
-    id: '5',
-    name: 'Gal Gadot',
-    imageUrl: 'https://image.tmdb.org/t/p/w185/plLfB60M5cJrnog8KvAKhI4UJuk.jpg',
-  },
-];
+export const MOCK_MOVIE: Movie = {
+  id: '1',
+  title: 'Spider Man: No Way Home',
+  synopsis:
+    'Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man.',
+  posterUrl:
+    'https://media.themoviedb.org/t/p/w600_and_h900_face/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
+  rating: 4.7,
+  trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
+  durationMinutes: 112,
+  genre: ['Action', 'Comedy', 'Adventure'],
+  language: 'EN',
+  releaseDate: '2023-06-15',
+  createdAt: '2023-06-15T12:34:56Z',
+  updatedAt: '2023-06-15T12:34:56Z',
+  status: MovieStatus.NOW_PLAYING,
+};

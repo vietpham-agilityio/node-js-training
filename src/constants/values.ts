@@ -10,6 +10,7 @@ export const HEADER_TITLE_MAP = {
   '/signin': '',
   '/signup': 'Create New Your Account',
   '/confirm-account': 'Confirm New Account',
+  '/checkout': 'Checkout Movie',
 } as const;
 
 export const MAIN_TITLE_MAP = {

@@ -10,6 +10,14 @@ jest.mock('uniwind', () => {
   return {
     withUniwind: jest.fn((Component: any) => Component),
     useResolveClassNames: jest.fn(() => ({})),
+    withUniwind: jest.fn((Component: any) => Component),
+  };
+});
+
+jest.mock('uniwind', () => {
+  return {
+    withUniwind: jest.fn((Component: any) => Component),
+    useResolveClassNames: jest.fn(() => ({})),
   };
 });
 

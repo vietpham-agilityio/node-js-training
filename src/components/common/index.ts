@@ -1,5 +1,6 @@
 export * from './Avatar';
 export * from './Button';
+export * from './Divider';
 export * from './Input';
 export * from './MovieBanner';
 export * from './Rating';
@@ -8,3 +9,4 @@ export * from './Tabs';
 export * from './ThirdPartyButton';
 export * from './Typo';
 export * from './UserCard';
+export * from './OrderDetailRow';
