@@ -1,13 +1,24 @@
-import { MOVIES_MOCK } from '@/mocks';
-import { Movie, MovieStatus } from '@/types';
 import { render, screen } from '@testing-library/react-native';
-import React from 'react';
+
+// Mock
+import { MOVIES_MOCK } from '@/mocks';
+
+// Types
+import { Movie, MovieStatus } from '@/types';
+
+// Components
 import { MovieBannerCarousel } from '..';
 
 // Mock dependencies
 jest.mock('react-native-reanimated', () => ({
   ...jest.requireActual('react-native-reanimated/mock'),
   useSharedValue: jest.fn(() => ({ value: 0 })),
+}));
+
+jest.mock('expo-router', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+  }),
 }));
 
 jest.mock('react-native-reanimated-carousel', () => {

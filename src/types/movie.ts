@@ -9,6 +9,12 @@ export enum PromoCodeStatus {
   FIXED_AMOUNT = 'fixed_amount',
 }
 
+export interface CastMember {
+  id: string;
+  name: string;
+  imageUrl?: string;
+}
+
 export interface Movie {
   id: string;
   title: string;
@@ -19,7 +25,7 @@ export interface Movie {
   releaseDate: string;
   rating: number;
   genre: string[];
-  castCrew?: any;
+  castCrew?: CastMember;
   language?: string;
   status: MovieStatus;
   createdAt: string;

@@ -3,9 +3,6 @@ import { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Expo
-import { router } from 'expo-router';
-
 // Unwind
 import { withUniwind } from 'uniwind';
 

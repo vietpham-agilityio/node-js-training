@@ -3,7 +3,7 @@ import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { useResolveClassNames } from 'uniwind';
 
 // Components
-import { Typo } from '..';
+import { Typo } from '../Typo';
 
 // Utils
 import { cn, isAndroid, isIOS } from '@/utils';
