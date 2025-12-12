@@ -43,4 +43,6 @@ export const MESSAGES = {
   SIGN_OUT_MESSAGE: 'Are you sure you want to sign out?',
   CONFIRM_SUCCESS: 'Confirm account successful',
   CONFIRM_SUCCESS_MESSAGE: 'Your account is ready! Welcome aboard.',
+  NO_RESULT_FOUND: 'No results found. Please try a different search.',
+  NETWORK_ERROR: 'We’re having trouble loading movies. Please try again later.',
 };

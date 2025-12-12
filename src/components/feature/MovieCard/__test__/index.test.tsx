@@ -15,34 +15,6 @@ jest.mock('uniwind', () => ({
   useResolveClassNames: jest.fn(() => ({})),
 }));
 
-// Mock format functions
-jest.mock('@/utils/formats', () => ({
-  formatMovieDuration: jest.fn((minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0 && mins > 0) {
-      return `${hours}h ${mins}min`;
-    }
-    if (hours > 0) {
-      return `${hours}h`;
-    }
-    return `${mins}min`;
-  }),
-
-  formatShowtimeDate: jest.fn((showtime?: string, showDate?: string) => {
-    if (showtime && showDate) {
-      return `${showtime}, ${showDate}`;
-    }
-    if (showtime) {
-      return showtime;
-    }
-    if (showDate) {
-      return showDate;
-    }
-    return '';
-  }),
-}));
-
 describe('MovieCard Component', () => {
   const defaultProps = {
     title: 'Test Movie',
@@ -100,11 +72,7 @@ describe('MovieCard Component', () => {
   describe('Booking Info Mode', () => {
     it('should display showtime and date when provided', () => {
       render(
-        <MovieCard
-          {...defaultProps}
-          showtime="16:40"
-          showDate="Sun May 22"
-        />,
+        <MovieCard {...defaultProps} showtime="16:40" showDate="Sun May 22" />,
       );
       expect(screen.getByText('16:40, Sun May 22')).toBeTruthy();
     });
@@ -115,9 +83,7 @@ describe('MovieCard Component', () => {
     });
 
     it('should display cinema location when provided', () => {
-      render(
-        <MovieCard {...defaultProps} cinemaLocation="FX Sudirman XXI" />,
-      );
+      render(<MovieCard {...defaultProps} cinemaLocation="FX Sudirman XXI" />);
       expect(screen.getByText('FX Sudirman XXI')).toBeTruthy();
     });
 
@@ -150,11 +116,7 @@ describe('MovieCard Component', () => {
 
     it('should not display genres and duration when booking info is present', () => {
       render(
-        <MovieCard
-          {...defaultProps}
-          showtime="16:40"
-          showDate="Sun May 22"
-        />,
+        <MovieCard {...defaultProps} showtime="16:40" showDate="Sun May 22" />,
       );
       expect(screen.queryByText('Action, Comedy')).toBeNull();
       expect(screen.queryByText('2h')).toBeNull();

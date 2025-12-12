@@ -13,6 +13,7 @@ import { ArrowBackIcon } from '@/icons';
 
 // Constants
 import { HEADER_TITLE_MAP } from '@/constants';
+import { STATUS_BAR_HEIGHT } from '@/utils';
 
 export interface ScreenHeaderProps extends NativeStackHeaderProps {
   title?: string;
@@ -39,8 +40,13 @@ export const ScreenHeader = ({
   };
 
   return (
-    <View className="absolute top-0 left-0 right-0 z-10 bg-dark-blue">
-      <View className="flex-row items-center justify-between px-4 py-4 min-h-16 pt-6">
+    <View
+      className="absolute left-0 right-0 bg-dark-blue "
+      style={{
+        top: STATUS_BAR_HEIGHT,
+      }}
+    >
+      <View className="flex-row items-center justify-between px-6 py-6">
         {/* Left Section */}
         <View className="flex-1 items-start">
           {leftComponent ||
@@ -49,25 +55,30 @@ export const ScreenHeader = ({
                 accessible
                 accessibilityRole="button"
                 accessibilityLabel="Go back"
-                className="p-2"
                 onPress={handleGoBack}
               >
-                <ArrowBackIcon />
+                <ArrowBackIcon width={20} height={20} />
               </TouchableOpacity>
             ))}
         </View>
 
         {/* Center Section - Title */}
-        <View
-          accessible
-          className="flex-2 items-center mt-12"
-          accessibilityRole="header"
-          accessibilityLabel={headerTitle}
-        >
-          <Typo size="2xl" weight="semibold" className="text-center">
-            {headerTitle}
-          </Typo>
-        </View>
+        {headerTitle && (
+          <View
+            accessible
+            className="flex-2 items-center mt-12"
+            accessibilityRole="header"
+            accessibilityLabel={headerTitle}
+          >
+            <Typo
+              size="2xl"
+              weight="semibold"
+              className="leading-7 text-center"
+            >
+              {headerTitle}
+            </Typo>
+          </View>
+        )}
 
         {/* Right Section */}
         <View

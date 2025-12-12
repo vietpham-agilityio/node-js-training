@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 
 // Expo
 import { Image } from 'expo-image';
@@ -14,9 +14,10 @@ import { BLUR_HASH, IMAGE_SIZE_MAP, Size } from '@/constants';
 import { Rating, Typo } from '@/components/common';
 
 // Utils
+import { cn } from '@/utils';
 import { formatMovieDuration, formatShowtimeDate } from '@/utils/formats';
 
-interface MovieCardProps {
+interface MovieCardProps extends Omit<TouchableOpacityProps, 'children'> {
   title: string;
   posterUrl: string;
   durationMinutes: number;
@@ -45,6 +46,7 @@ export const MovieCard = memo(
     price,
     imageSize = Size.SMALL,
     className = '',
+    ...rest
   }: MovieCardProps) => {
     const imageSizeClassName = useMemo(
       () => IMAGE_SIZE_MAP[imageSize as keyof typeof IMAGE_SIZE_MAP],
@@ -64,10 +66,12 @@ export const MovieCard = memo(
     );
 
     return (
-      <View
-        className={`w-full flex-row rounded-xl pr-4 gap-4 ${className}`}
+      <TouchableOpacity
         testID="movie-card"
         accessibilityLabel={title}
+        accessibilityHint="Double tap to view movie details"
+        className={cn('w-full flex-row rounded-xl pr-4 gap-4', className)}
+        {...rest}
       >
         {/* Left Section - Movie Poster */}
         <View className="relative">
@@ -176,7 +180,7 @@ export const MovieCard = memo(
             </>
           )}
         </View>
-      </View>
+      </TouchableOpacity>
     );
   },
 );

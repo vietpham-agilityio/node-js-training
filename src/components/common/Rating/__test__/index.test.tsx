@@ -46,11 +46,11 @@ describe('Rating Component', () => {
     });
 
     it('should display clamped rating in accessibility label for rating above 5', () => {
-      const { getByTestId } = render(<Rating rating={6} />);
+      const { getByTestId } = render(<Rating rating={11} />);
       const container = getByTestId('rating');
 
       expect(container.props.accessibilityLabel).toBe(
-        'Rating: 6.0 out of 5 stars',
+        'Rating: 11.0 out of 5 stars',
       );
     });
 

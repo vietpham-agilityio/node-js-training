@@ -16,4 +16,7 @@ export const ROUTES = {
   HOME: '/(main)/(tabs)',
 
   WELCOME: '/(main)/welcome',
+
+  // Modal routes
+  SEARCH: '/(main)/search',
 } as const;

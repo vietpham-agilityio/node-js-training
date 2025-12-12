@@ -47,3 +47,7 @@ app-example
 
 # coverage
 coverage/
+
+# fetch movies
+fetch_tmdb_movies.js
+movies_120_insert.sql
