@@ -38,7 +38,7 @@ const VARIANTS_MAP: Record<
     scale: 0.9,
     offset: 35,
     width: 300,
-    height: 200,
+    height: 220,
   },
 };
 

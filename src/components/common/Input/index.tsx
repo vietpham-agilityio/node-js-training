@@ -21,6 +21,9 @@ import {
 import EyeIcon from '@/icons/EyeIcon';
 import EyeOffIcon from '@/icons/EyeOffIcon';
 
+// Utils
+import { cn } from '@/utils';
+
 export interface InputProps extends Omit<TextInputProps, 'placeholder'> {
   label: string;
   error?: string;
@@ -133,11 +136,11 @@ export const Input = memo(
       );
 
       return (
-        <View className={`w-full ${containerClassName}`} testID={testID}>
+        <View className={cn(`w-full`, containerClassName)} testID={testID}>
           <View className="relative">
             {/* Floating Label */}
             <Animated.View
-              className={`bg-dark-blue px-1 z-1 left-4 absolute`}
+              className="bg-dark-blue px-1 z-1 left-4 absolute"
               style={{
                 top: labelTop,
               }}
@@ -155,28 +158,28 @@ export const Input = memo(
               </Animated.Text>
             </Animated.View>
 
-          {/* Text Input */}
-          <TextInput
-            ref={node => {
-              inputRef.current = node;
-              if (typeof ref === 'function') {
-                ref(node);
-              } else if (ref) {
-                ref.current = node;
-              }
-            }}
-            accessible
-            accessibilityRole="text"
-            accessibilityLabel={`${label} input field`}
-            value={value}
-            secureTextEntry={secureTextEntry && !isPasswordVisible}
-            testID={`${testID}-input`}
-            className={`w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base ${borderColor}`}
-            onChangeText={onChangeText}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            {...rest}
-          />
+            {/* Text Input */}
+            <TextInput
+              ref={node => {
+                inputRef.current = node;
+                if (typeof ref === 'function') {
+                  ref(node);
+                } else if (ref) {
+                  ref.current = node;
+                }
+              }}
+              accessible
+              accessibilityRole="text"
+              accessibilityLabel={`${label} input field`}
+              value={value}
+              secureTextEntry={secureTextEntry && !isPasswordVisible}
+              testID={`${testID}-input`}
+              className={`w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base ${borderColor}`}
+              onChangeText={onChangeText}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              {...rest}
+            />
 
             {/* Password Toggle Icon */}
             {secureTextEntry && (

@@ -55,7 +55,7 @@ exports[`Toast Component Rendering should render matching snapshot for error toa
     }
   >
     <View
-      className="bg-bg-danger px-4 py-2.5 w-full"
+      className="px-4 py-2.5 w-full bg-bg-danger"
     >
       <Text
         accessibilityRole="text"
@@ -123,7 +123,7 @@ exports[`Toast Component Rendering should render matching snapshot for success t
     }
   >
     <View
-      className="bg-green-600 px-4 py-2.5 w-full"
+      className="px-4 py-2.5 w-full bg-green-600"
     >
       <Text
         accessibilityRole="text"

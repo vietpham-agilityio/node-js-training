@@ -20,7 +20,7 @@ import { VIDEO_SOURCE } from '@/constants';
 import { PlayIcon } from '@/icons';
 
 // Utils
-import { isAndroid, isIOS } from '@/utils';
+import { cn, isAndroid, isIOS } from '@/utils';
 
 interface MovieTrailerProps extends Omit<ViewProps, 'children'> {
   videoUrl?: string;
@@ -76,7 +76,10 @@ export const MovieTrailer = memo(
     return (
       <View
         testID={testID}
-        className={`relative w-[247] h-[144] overflow-hidden ${props.className}`}
+        className={cn(
+          'relative w-[247] h-[144] overflow-hidden',
+          props.className,
+        )}
         accessibilityRole="none"
         accessibilityLabel="Movie trailer"
         accessible

@@ -13,6 +13,9 @@ import { BLUR_HASH } from '@/constants';
 // Types
 import { Movie } from '@/types';
 
+// Utils
+import { cn } from '@/utils';
+
 // Components
 import { Rating } from '../Rating';
 import { Typo } from '../Typo';
@@ -63,7 +66,11 @@ export const MovieBanner = memo(
           accessibilityLabel || `View details for ${movie.title}`
         }
         accessibilityHint="Double tap to view movie details"
-        className={`${VARIANTS_MAP[variant].size} ${VARIANTS_MAP[variant].rounded} ${className}`}
+        className={cn(
+          VARIANTS_MAP[variant].size,
+          VARIANTS_MAP[variant].rounded,
+          className,
+        )}
         {...rest}
       >
         <View className="relative overflow-hidden">
@@ -76,13 +83,20 @@ export const MovieBanner = memo(
               blurhash: BLUR_HASH,
             }}
             accessibilityIgnoresInvertColors
-            className={`${VARIANTS_MAP[variant].size} ${VARIANTS_MAP[variant].rounded}`}
+            className={cn(
+              VARIANTS_MAP[variant].size,
+              VARIANTS_MAP[variant].rounded,
+            )}
           />
 
           {/* Movie Information */}
           {variant === 'horizontal' && (
             <View
-              className={`absolute ${VARIANTS_MAP[variant].size} ${VARIANTS_MAP[variant].rounded} bottom-0 left-0 right-0 flex justify-end px-2.5 py-4 bg-gradient-to-t from-bg-quaternary/70 to-bg-quaternary/0`}
+              className={cn(
+                'absolute bottom-0 left-0 right-0 flex justify-end px-2.5 py-4 bg-gradient-to-t from-bg-quaternary/70 to-bg-quaternary/0',
+                VARIANTS_MAP[variant].size,
+                VARIANTS_MAP[variant].rounded,
+              )}
             >
               {/* Title */}
               <Typo

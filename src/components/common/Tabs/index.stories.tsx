@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 // Components
-import { Tabs } from './';
+import { Tabs } from '../index';
 
 // Types
 interface Tab {

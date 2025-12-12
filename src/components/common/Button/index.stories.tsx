@@ -125,7 +125,6 @@ export const AllSizes: Story = {
           title="Action"
           isPrimary={false}
           size={Size.EXTRA_SMALL}
-          buttonStyle={{ borderRadius: 10 }}
           onPress={() => console.log('Extra Small pressed')}
         />
       </View>
@@ -133,7 +132,6 @@ export const AllSizes: Story = {
         <Button
           title="Book Ticket"
           isPrimary
-          buttonStyle={{ borderRadius: 14 }}
           size={Size.SMALL}
           onPress={() => console.log('Small pressed')}
         />

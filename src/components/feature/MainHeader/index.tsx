@@ -1,3 +1,4 @@
+import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
 import { useMemo } from 'react';
 import { View } from 'react-native';
 
@@ -11,7 +12,10 @@ import { Avatar, Typo } from '@/components/common';
 import { MAIN_TITLE_MAP } from '@/constants';
 
 // Types
-import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
+import { UserProfileIcon } from '@/icons';
+
+// Utils
+import { cn, STATUS_BAR_HEIGHT } from '@/utils';
 
 export interface MainHeaderProps extends BottomTabHeaderProps {
   isLeftTitle?: boolean;
@@ -29,22 +33,22 @@ export const MainHeader = ({
     [pathname],
   );
 
-  const textPosition = useMemo(
-    () => (isLeftTitle ? 'items-start' : 'items-center'),
-    [isLeftTitle],
-  );
-
   return (
-    <View className="absolute top-0 left-0 right-0 z-10 bg-dark-blue">
-      <View className="flex-row items-center justify-between px-4 py-4 min-h-16 pt-18">
+    <View
+      className="absolute left-0 right-0 bg-bg-primary"
+      style={{
+        top: STATUS_BAR_HEIGHT,
+      }}
+    >
+      <View className="flex-row items-center justify-between px-6 py-6">
         {/* Left Section */}
         <View
           accessible
           accessibilityRole="header"
           accessibilityLabel={title}
-          className={`flex-1 ${textPosition}`}
+          className={cn('flex-1', isLeftTitle ? 'items-start' : 'items-center')}
         >
-          <Typo size="2xl" weight="semibold">
+          <Typo size="2xl" weight="semibold" className="leading-7 min-w-[198]">
             {title}
           </Typo>
         </View>
@@ -59,6 +63,7 @@ export const MainHeader = ({
             <Avatar
               size={48}
               variant="default"
+              defaultAvatar={UserProfileIcon}
               accessibilityLabel="User profile picture"
             />
           </View>

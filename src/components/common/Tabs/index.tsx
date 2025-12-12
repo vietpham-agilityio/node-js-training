@@ -6,7 +6,7 @@ import { useResolveClassNames } from 'uniwind';
 import { Typo } from '..';
 
 // Utils
-import { isAndroid, isIOS } from '@/utils';
+import { cn, isAndroid, isIOS } from '@/utils';
 
 interface Tab {
   id: string;
@@ -55,7 +55,7 @@ export const Tabs = memo(
     return (
       <View
         testID="tabs-container"
-        className={`bg-transparent ${VARIANTS_MAP[variant].container}`}
+        className={cn('bg-transparent', VARIANTS_MAP[variant].container)}
         accessibilityRole="tablist"
         accessibilityLabel={`Tab navigation with ${tabs.length} tabs`}
         accessibilityHint={`Currently on ${activeTabLabel} tab, ${activeTabIndex + 1} of ${tabs.length}`}
@@ -99,12 +99,19 @@ export const Tabs = memo(
                     ? ['selected', 'button']
                     : ['button'],
                 })}
-                className={`${VARIANTS_MAP[variant].tab} ${isActive && VARIANTS_MAP[variant].tabActive} relative`}
+                className={cn(
+                  'relative',
+                  VARIANTS_MAP[variant].tab,
+                  isActive && VARIANTS_MAP[variant].tabActive,
+                )}
                 onPress={() => onTabChange(tab.id)}
               >
                 <Typo
                   testID={`tab-text-${tab.id}`}
-                  className={`${VARIANTS_MAP[variant].text} ${isActive && 'text-white'}`}
+                  className={cn(
+                    VARIANTS_MAP[variant].text,
+                    isActive && 'text-white',
+                  )}
                   accessibilityRole="text"
                 >
                   {tab.label}
