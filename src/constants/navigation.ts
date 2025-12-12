@@ -4,6 +4,7 @@ export const SCREENS = {
     LAYOUT: '(main)',
     WELCOME: 'welcome',
     MOVIES: 'movies/[id]',
+    CHECKOUT: 'checkout',
   },
 
   // Auth screens
