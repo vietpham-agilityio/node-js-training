@@ -10,9 +10,20 @@ export enum PromoCodeStatus {
 }
 
 export interface CastMember {
-  id: string;
+  character?: string;
   name: string;
-  imageUrl?: string;
+  imageUrl: string | null;
+}
+
+export interface CrewMember {
+  name: string;
+}
+
+export interface CastCrew {
+  actors: CastMember[];
+  directors: CrewMember[];
+  producers: CrewMember[];
+  writers: CrewMember[];
 }
 
 export interface Movie {
@@ -25,7 +36,7 @@ export interface Movie {
   releaseDate: string;
   rating: number;
   genre: string[];
-  castCrew?: CastMember;
+  castCrew: CastCrew;
   language?: string;
   status: MovieStatus;
   createdAt: string;

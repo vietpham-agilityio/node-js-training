@@ -1,6 +1,7 @@
 export * from './Avatar';
 export * from './Button';
 export * from './Divider';
+export * from './ExpandableText';
 export * from './Input';
 export * from './MovieBanner';
 export * from './Rating';

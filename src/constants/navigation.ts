@@ -8,6 +8,7 @@ export const SCREENS = {
 
     // Modal screens
     SEARCH: 'search',
+    CINEMA: 'cinema',
   },
 
   // Auth screens

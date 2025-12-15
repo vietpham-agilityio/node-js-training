@@ -4,7 +4,7 @@ import { Text } from 'react-native';
 // Utils
 import { cn } from '@/utils';
 
-type FontSize =
+export type FontSize =
   | '4xs'
   | '3xs'
   | '2xs'
@@ -15,7 +15,7 @@ type FontSize =
   | 'xl'
   | '2xl';
 
-type FontWeight = 'light' | 'regular' | 'medium' | 'semibold';
+export type FontWeight = 'light' | 'regular' | 'medium' | 'semibold';
 
 export interface TypoProps {
   children: React.ReactNode;

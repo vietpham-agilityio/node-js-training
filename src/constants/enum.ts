@@ -9,3 +9,9 @@ export enum ToastType {
   SUCCESS = 'success',
   ERROR = 'error',
 }
+
+export enum ContentType {
+  SYNOPSIS = 'synopsis',
+  CAST_CREW = 'cast_crew',
+  TRAILER = 'trailer',
+}
