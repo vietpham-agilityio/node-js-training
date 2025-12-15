@@ -121,7 +121,7 @@ export const Input = memo(
             ? 'border-red'
             : isFocused
               ? 'border-primary'
-              : 'border-gradient-white',
+              : 'border-overlay-soft',
         [error, isFocused],
       );
 
@@ -131,7 +131,7 @@ export const Input = memo(
             ? 'text-red'
             : isFocused
               ? 'text-primary'
-              : 'text-gradient-white',
+              : 'text-overlay-soft',
         [error, isFocused],
       );
 
