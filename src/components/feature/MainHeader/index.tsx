@@ -20,11 +20,13 @@ import { cn, STATUS_BAR_HEIGHT } from '@/utils';
 export interface MainHeaderProps extends BottomTabHeaderProps {
   isLeftTitle?: boolean;
   isRenderUserProfile?: boolean;
+  topInset?: number;
 }
 
 export const MainHeader = ({
   isLeftTitle,
   isRenderUserProfile = true,
+  topInset = STATUS_BAR_HEIGHT,
 }: MainHeaderProps) => {
   const pathname = usePathname();
 
@@ -35,12 +37,12 @@ export const MainHeader = ({
 
   return (
     <View
-      className="absolute left-0 right-0 bg-bg-primary"
+      className="bg-bg-primary"
       style={{
-        top: STATUS_BAR_HEIGHT,
+        paddingTop: topInset,
       }}
     >
-      <View className="flex-row items-center justify-between px-6 py-6">
+      <View className="flex-row items-center justify-between px-6 py-8">
         {/* Left Section */}
         <View
           accessible

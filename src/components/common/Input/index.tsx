@@ -18,8 +18,7 @@ import {
 } from 'react-native';
 
 // Icons
-import EyeIcon from '@/icons/EyeIcon';
-import EyeOffIcon from '@/icons/EyeOffIcon';
+import { EyeIcon, EyeOffIcon } from '@/icons';
 
 // Utils
 import { cn } from '@/utils';
@@ -127,11 +126,7 @@ export const Input = memo(
 
       const labelColor = useMemo(
         () =>
-          error
-            ? 'text-red'
-            : isFocused
-              ? 'text-primary'
-              : 'text-overlay-soft',
+          error ? 'text-red' : isFocused ? 'text-primary' : 'text-overlay-soft',
         [error, isFocused],
       );
 

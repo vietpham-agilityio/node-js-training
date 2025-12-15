@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { MESSAGES, ROUTES, SCREEN_HEADER_HEIGHT, Size } from '@/constants';
+import { MESSAGES, ROUTES, Size } from '@/constants';
 
 // Hooks
 import { useDebounce, useMoviesInfinite, useSearchMovies } from '@/hooks';
@@ -240,13 +240,10 @@ const SearchScreen = () => {
 
   return (
     <StyledSafeAreaView
-      edges={['top', 'bottom']}
+      edges={['bottom']}
       accessibilityLabel="Search movies screen"
       accessibilityHint="Search screen"
-      className="flex-1 bg-bg-primary"
-      style={{
-        marginTop: SCREEN_HEADER_HEIGHT,
-      }}
+      className="h-full bg-bg-primary"
     >
       <View className="px-6">
         <View className="mb-6">

@@ -66,7 +66,7 @@ const CheckoutScreen = () => {
 
   return (
     <StyledSafeAreaView
-      edges={['top', 'bottom']}
+      edges={['bottom']}
       accessibilityLabel="Checkout screen"
       className="flex-1 bg-dark-blue"
     >

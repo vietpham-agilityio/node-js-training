@@ -59,9 +59,9 @@ export const Typo = memo(
       accessibilityRole="text"
       className={cn(
         'text-white',
-        `${FONT_SIZE_MAP[size]}`,
-        `${FONT_WEIGHT_MAP[weight]}`,
-        ` ${className}`,
+        FONT_SIZE_MAP[size],
+        FONT_WEIGHT_MAP[weight],
+        className,
       )}
       testID={testID}
     >

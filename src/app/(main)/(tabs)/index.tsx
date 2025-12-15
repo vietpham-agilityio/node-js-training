@@ -13,7 +13,6 @@ import {
   ROUTES,
   Size,
   TABS_FOOTER_HEIGHT,
-  TABS_HEADER_HEIGHT,
 } from '@/constants';
 
 // Components
@@ -119,10 +118,9 @@ const HomeScreen = () => {
   if (isLoading) {
     return (
       <StyledSafeAreaView
-        edges={['top', 'bottom']}
+        edges={[]}
         accessibilityLabel="Loading home screen"
         className="h-full bg-bg-primary items-center justify-center"
-        style={{ marginTop: TABS_HEADER_HEIGHT }}
       >
         <ActivityIndicator size="large" />
         <Typo className="text-text-secondary mt-4">Loading movies...</Typo>
@@ -132,11 +130,10 @@ const HomeScreen = () => {
 
   return (
     <StyledSafeAreaView
-      edges={['top', 'bottom']}
+      edges={[]}
       accessibilityLabel="Home screen"
       accessibilityHint="Home screen"
       className="h-full bg-bg-primary"
-      style={{ marginTop: TABS_HEADER_HEIGHT }}
     >
       <FlashList
         data={MOCK_PROMOTIONS}

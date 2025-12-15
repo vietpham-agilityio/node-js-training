@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Fragment, useEffect } from 'react';
 
 // Uniwind
-import { useUniwind } from 'uniwind';
+import { Uniwind, useUniwind } from 'uniwind';
 
 // React Query
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -65,6 +65,10 @@ const RootLayout = () => {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
+
+  useEffect(() => {
+    Uniwind.setTheme('dark');
+  }, []);
 
   // Handle authentication routing
   useEffect(() => {
