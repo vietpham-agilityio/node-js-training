@@ -47,13 +47,22 @@ export const Button = memo(
     ...rest
   }: ButtonProps) => {
     const buttonClassName = useMemo(() => {
-      const baseClasses = `${SIZE_CLASSES[size]} items-center justify-center rounded-xl`;
+      const baseClasses = cn(
+        SIZE_CLASSES[size],
+        'items-center justify-center rounded-xl',
+      );
 
       return disabled
-        ? `${baseClasses} bg-gradient-to-r from-gradient-non-active to-gradient-non-active`
+        ? cn(
+            baseClasses,
+            'bg-gradient-to-r from-bg-none-active to-bg-none-active',
+          )
         : isPrimary
-          ? `${baseClasses} bg-gradient-to-r from-secondary to-primary`
-          : `${baseClasses} bg-gradient-to-r from-gradient-blue-start to-gradient-blue-end`;
+          ? cn(baseClasses, 'bg-gradient-to-r from-secondary to-primary')
+          : cn(
+              baseClasses,
+              'bg-gradient-to-r from-gradient-blue-start to-gradient-blue-end',
+            );
     }, [size, disabled, isPrimary]);
 
     return (

@@ -48,7 +48,7 @@ export const PromotionCard = memo(
                 {code}
               </Typo>
               {description && (
-                <Typo size="xs" weight="light" className="text-gradient-white">
+                <Typo size="xs" weight="light" className="text-text-gradient-dark">
                   {description}
                 </Typo>
               )}

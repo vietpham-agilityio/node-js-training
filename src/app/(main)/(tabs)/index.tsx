@@ -242,7 +242,7 @@ const HomeScreen = () => {
                     accessibilityRole="link"
                     accessibilityLabel="See all promotions"
                   >
-                    See all
+                    View all
                   </Typo>
                 </Link>
               </View>
