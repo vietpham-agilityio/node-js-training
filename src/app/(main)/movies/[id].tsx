@@ -1,180 +1,279 @@
 import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Expo
-import { useLocalSearchParams } from 'expo-router';
+// Shopify
+import { FlashList } from '@shopify/flash-list';
 
 // Expo
 import { Image } from 'expo-image';
+import { router, useLocalSearchParams } from 'expo-router';
 
 // Unwind
 import { withUniwind } from 'uniwind';
 
 // Components
-import { Tabs, Typo, UserCard } from '@/components/common';
+import {
+  Button,
+  ExpandableText,
+  Tabs,
+  Typo,
+  UserCard,
+} from '@/components/common';
 import { MovieCard, MovieTrailerCarousel } from '@/components/feature';
 
-// Types
-import { Movie } from '@/types';
-
 // Constants
-import { BLUR_HASH, DETAIL_MOVIE_TABS, Size } from '@/constants';
+import {
+  BLUR_HASH,
+  ContentType,
+  DETAIL_MOVIE_TABS,
+  ROUTES,
+  Size,
+  TABS_FOOTER_HEIGHT,
+  TABS_HEADER_HEIGHT,
+} from '@/constants';
 
-// Mocks
-import { CAST_MOCK, MOVIES_MOCK } from '@/mocks';
+// Hooks
+import { useMovie } from '@/hooks/useMovies';
+
+type ContentItem =
+  | {
+      type: ContentType.SYNOPSIS;
+      data: string;
+    }
+  | {
+      type: ContentType.CAST_CREW;
+      data: CastAndCrewItem[];
+    }
+  | {
+      type: ContentType.TRAILER;
+      data: string[];
+    };
+
+interface CastAndCrewItem {
+  id: string;
+  name: string;
+  imageUrl: string | null;
+}
 
 const StyledImage = withUniwind(Image);
-const SafeAreaStyles = withUniwind(SafeAreaView);
+const StyledSafeAreaView = withUniwind(SafeAreaView);
 
 const MovieScreen = () => {
   const params = useLocalSearchParams<{ id: string }>();
   const id = params.id || '';
 
   const [activeTab, setActiveTab] = useState<string>(DETAIL_MOVIE_TABS[0].id);
-  const [isSynopsisExpanded, setIsSynopsisExpanded] = useState<boolean>(false);
 
-  // In production, fetch movie by id
-  const movie: Movie = useMemo(() => {
-    return MOVIES_MOCK.find(m => m.id === id) as Movie;
-  }, [id]);
+  const { data: movie, isLoading, refetch: refetchMovie } = useMovie(id);
+
+  const {
+    title = '',
+    posterUrl = '',
+    durationMinutes = 0,
+    genre = [],
+    rating,
+    castCrew,
+    synopsis = '',
+    trailerUrl = [],
+  } = movie || {};
+
+  const castAndCrew: CastAndCrewItem[] = useMemo(
+    () =>
+      castCrew?.actors.map(({ name, imageUrl }) => ({
+        id: name,
+        name: name,
+        imageUrl: imageUrl,
+      })) ?? [],
+    [castCrew],
+  );
+
+  const contentItems = useMemo<ContentItem[]>(() => {
+    if (activeTab === DETAIL_MOVIE_TABS[0].id) {
+      const items: ContentItem[] = [
+        { type: ContentType.SYNOPSIS, data: synopsis },
+      ];
+
+      if (castAndCrew?.length > 0) {
+        items.push({ type: ContentType.CAST_CREW, data: castAndCrew });
+      }
+
+      if (trailerUrl?.length > 0) {
+        items.push({ type: ContentType.TRAILER, data: trailerUrl });
+      }
+
+      return items;
+    }
+    return [];
+  }, [activeTab, synopsis, castAndCrew, trailerUrl]);
 
   const handleTabChange = useCallback((tabId: string) => {
-    if (tabId === 'choose-seat') {
-      // TODO: Navigate to seat selection screen
-    }
     setActiveTab(tabId);
   }, []);
 
-  const handleToggleSynopsis = useCallback(() => {
-    setIsSynopsisExpanded(prev => !prev);
+  const handleNavigateToSelectCinema = useCallback(() => {
+    router.push(ROUTES.CINEMA);
   }, []);
 
-  // Truncate synopsis for "see more" feature
-  const synopsisText = useMemo(() => {
-    const maxLength = 150;
-    if (isSynopsisExpanded || movie?.synopsis.length <= maxLength) {
-      return movie?.synopsis;
-    }
-    return movie?.synopsis.substring(0, maxLength) + '...';
-  }, [movie?.synopsis, isSynopsisExpanded]);
-
-  const shouldShowReadMore = useMemo(() => {
-    return movie?.synopsis.length > 150;
-  }, [movie?.synopsis]);
-
-  return (
-    <SafeAreaStyles edges={['bottom']} className="flex-1 bg-dark-blue">
-      {/* Background Banner Image */}
-      <View
-        className="relative w-full top-0 left-0 right-0"
-        testID="movie-banner-container"
-      >
-        <StyledImage
-          source={{
-            uri: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/a58a7719-0dcf-4e0b-b7bb-d2b725dbbb8e/deu7no3-75f2aea5-d668-4ddd-8d73-9203f8b3004f.png/v1/fill/w_1500,h_500,q_80,strp/spider_man_no_way_home_banner_hd_by_andrewvm_deu7no3-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTAwIiwicGF0aCI6Ii9mL2E1OGE3NzE5LTBkY2YtNGUwYi1iN2JiLWQyYjcyNWRiYmI4ZS9kZXU3bm8zLTc1ZjJhZWE1LWQ2NjgtNGRkZC04ZDczLTkyMDNmOGIzMDA0Zi5wbmciLCJ3aWR0aCI6Ijw9MTUwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.GLJ4oWnOISFMjjY0QcoOv3W9xGZcegwXTIYxX0rhxuM',
-          }}
-          contentFit="cover"
-          transition={200}
-          placeholder={{
-            blurhash: BLUR_HASH,
-          }}
-          accessibilityIgnoresInvertColors
-          className="w-full h-56"
-          testID="movie-banner-image"
-        />
-        <View className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-bg-quaternary to-bg-quaternary/0" />
-      </View>
-
-      {/* Movie Card Section - Overlapping the banner */}
-      <View className="px-6 -mt-20" testID="movie-card-container">
-        <MovieCard
-          title={movie.title}
-          posterUrl={movie.posterUrl}
-          durationMinutes={movie.durationMinutes}
-          genre={movie.genre}
-          rating={movie.rating}
-          imageSize={Size.MEDIUM}
-        />
-      </View>
-
-      {/* Tabs Section */}
-      <View className="px-6 mt-7.5 mb-7">
-        <Tabs
-          tabs={DETAIL_MOVIE_TABS}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          variant="secondary"
-        />
-      </View>
-
-      <ScrollView
-        contentContainerClassName="bg-dark-blue"
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Tab Content */}
-        {activeTab === DETAIL_MOVIE_TABS[0].id && (
-          <>
-            <View className="pl-6">
-              {/* Synopsis Section */}
-              <View className="mb-7">
-                <Typo size="lg" weight="medium" className="mb-4">
-                  Synopsis
-                </Typo>
-                <Typo size="sm" weight="regular" className="text-white/80">
-                  {synopsisText}
-                </Typo>
-                {shouldShowReadMore && (
-                  <TouchableOpacity
-                    onPress={handleToggleSynopsis}
-                    accessible
-                    accessibilityRole="button"
-                    accessibilityLabel={
-                      isSynopsisExpanded ? 'Read less' : 'Read more'
-                    }
-                  >
-                    <Typo
-                      size="sm"
-                      weight="medium"
-                      className="text-light-blue mt-2"
-                    >
-                      {isSynopsisExpanded ? 'Read less' : 'Read more'}
-                    </Typo>
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              {/* Cast & Crew Section */}
-              <View>
-                <Typo size="lg" weight="medium" className="mb-5">
-                  Cast & Crew
-                </Typo>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{
-                    gap: 16,
-                  }}
-                >
-                  {CAST_MOCK.map(({ id, name, imageUrl }) => (
-                    <UserCard key={id} imageUrl={imageUrl} fullName={name} />
-                  ))}
-                </ScrollView>
-              </View>
+  const renderItem = useCallback(
+    ({ item }: { item: ContentItem }) => {
+      switch (item.type) {
+        case ContentType.SYNOPSIS:
+          return (
+            <View className="px-6 mb-7">
+              <Typo size="lg" weight="medium" className="mb-4">
+                Synopsis
+              </Typo>
+              <ExpandableText text={synopsis} />
             </View>
-            {/* Trailer and Song Section */}
+          );
+        case ContentType.CAST_CREW:
+          return (
+            <View className="mb-7">
+              <Typo size="lg" weight="medium" className="mb-5 px-6">
+                Cast & Crew
+              </Typo>
+              <FlashList
+                data={item.data}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                  paddingHorizontal: 24,
+                }}
+                ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
+                renderItem={({
+                  item: cast,
+                }: {
+                  item: {
+                    id: string;
+                    name: string;
+                    imageUrl: string | null;
+                  };
+                }) => (
+                  <UserCard
+                    imageUrl={cast?.imageUrl ?? ''}
+                    fullName={cast?.name ?? ''}
+                  />
+                )}
+                keyExtractor={cast => cast?.id ?? ''}
+              />
+            </View>
+          );
+        case ContentType.TRAILER:
+          return (
             <View className="mb-12">
-              <Typo size="lg" weight="semibold" className="ml-6 mb-5 mt-8">
+              <Typo size="lg" weight="semibold" className="px-6 mb-5">
                 Trailer and song
               </Typo>
-              {movie?.trailerUrl?.length > 0 && (
-                <MovieTrailerCarousel trailers={movie.trailerUrl} />
-              )}
+              <MovieTrailerCarousel trailers={item.data} />
             </View>
-          </>
-        )}
-      </ScrollView>
-    </SafeAreaStyles>
+          );
+        default:
+          return null;
+      }
+    },
+    [synopsis],
+  );
+
+  if (isLoading) {
+    // TODO: Will handle global loading
+    return (
+      <StyledSafeAreaView
+        edges={['top', 'bottom']}
+        accessibilityLabel="Loading home screen"
+        className="h-full bg-bg-primary items-center justify-center"
+        style={{ marginTop: TABS_HEADER_HEIGHT }}
+      >
+        <ActivityIndicator size="large" className="text-primary" />
+        <Typo className="text-text-secondary mt-4">Movie Loading...</Typo>
+      </StyledSafeAreaView>
+    );
+  }
+
+  return (
+    <StyledSafeAreaView
+      edges={['bottom']}
+      accessibilityLabel="Movie screen"
+      accessibilityHint="Movie screen"
+      className="h-full bg-dark-blue"
+    >
+      <>
+        {/* Movie Banner */}
+        <View
+          className="relative w-full top-0 left-0 right-0"
+          testID="movie-banner-container"
+        >
+          <StyledImage
+            contentFit="cover"
+            transition={200}
+            accessibilityLabel={title}
+            accessibilityHint="Movie banner"
+            accessibilityRole="image"
+            className="w-full h-56"
+            source={{
+              uri: posterUrl,
+            }}
+            placeholder={{
+              blurhash: BLUR_HASH,
+            }}
+          />
+          <View className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-bg-quaternary to-bg-quaternary/0" />
+        </View>
+        {/* Movie Card */}
+        <View className="px-6 -mt-20" testID="movie-card-container">
+          <MovieCard
+            title={title}
+            posterUrl={posterUrl}
+            durationMinutes={durationMinutes}
+            genre={genre}
+            rating={rating}
+            imageSize={Size.MEDIUM}
+          />
+        </View>
+        {/* Tabs */}
+        <View className="px-6 mt-7.5 mb-7">
+          <Tabs
+            tabs={DETAIL_MOVIE_TABS}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            variant="secondary"
+          />
+        </View>
+      </>
+      <FlashList
+        data={contentItems}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item, index) => `${item.type}-${index}`}
+        contentContainerStyle={{
+          paddingBottom: TABS_FOOTER_HEIGHT,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refetchMovie}
+            accessibilityLabel="Pull to refresh movie"
+          />
+        }
+        ListEmptyComponent={
+          <View className="flex-1 items-center justify-center py-20">
+            <Typo size="base" weight="medium">
+              This feature will be available soon
+            </Typo>
+          </View>
+        }
+      />
+
+      {/* Floating Button */}
+      <View className="absolute bottom-0 left-0 right-0 px-6 pb-10 pt-4 bg-linear-to-t from-bg-quaternary via-bg-quaternary to-transparent">
+        <Button
+          onPress={handleNavigateToSelectCinema}
+          title="Booking Movie"
+          accessibilityLabel="Booking Movie"
+          accessibilityHint="Navigate to select cinema screen"
+        />
+      </View>
+    </StyledSafeAreaView>
   );
 };
 

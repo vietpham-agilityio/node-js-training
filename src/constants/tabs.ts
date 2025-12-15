@@ -1,27 +1,7 @@
-import { Size } from './enum';
+/**
+ * Tab constants for movie filtering and detail views
+ */
 
-export const BLUR_HASH = 'LKN]Rv%2Tw=w]~RBVZRi};RPxuwH';
-
-export const VIDEO_SOURCE =
-  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
-
-export const HEADER_TITLE_MAP = {
-  '/onboarding': '',
-  '/signin': '',
-  '/signup': 'Create New Your Account',
-  '/confirm-account': 'Confirm New Account',
-  '/checkout': 'Checkout Movie',
-} as const;
-
-export const MAIN_TITLE_MAP = {
-  '/': 'Find Your Best Movie',
-  '/wallet': 'My Wallet',
-  '/my-ticket': 'My Ticket',
-} as const;
-
-export const TOAST_DURATION = 3000;
-
-// Category tabs for filtering news by category
 export const CATEGORY_TABS = {
   ALL: { ID: 'all', LABEL: 'All' },
   ACTION: { ID: 'action', LABEL: 'Action' },
@@ -45,23 +25,26 @@ export const CATEGORY_TABS = {
   WESTERN: { ID: 'western', LABEL: 'Western' },
 } as const;
 
+/**
+ * Internal constant for movie detail page tabs
+ * Used to construct the DETAIL_MOVIE_TABS array
+ */
 const MOVIE_TABS = {
   ABOUT_MOVIE: {
     ID: 'about_movie',
     LABEL: 'About Movie',
   },
-  CHOOSE_SEAT: {
-    ID: 'choose_seat',
-    LABEL: 'Choose Seat',
+  REVIEW: {
+    ID: 'review',
+    LABEL: 'Review',
   },
 } as const;
 
-export const IMAGE_SIZE_MAP = {
-  [Size.SMALL]: 'w-21 h-30',
-  [Size.MEDIUM]: 'w-30 h-43',
-  [Size.LARGE]: 'w-40 h-56',
-};
-
+/**
+ * Array of category tabs formatted for use in filter UI components
+ * Contains all movie genres including "All" option
+ * Used in category filter tabs/switchers
+ */
 export const FILTER_CATEGORY_TABS = [
   { id: CATEGORY_TABS.ALL.ID, label: CATEGORY_TABS.ALL.LABEL },
   { id: CATEGORY_TABS.ACTION.ID, label: CATEGORY_TABS.ACTION.LABEL },
@@ -85,13 +68,12 @@ export const FILTER_CATEGORY_TABS = [
   { id: CATEGORY_TABS.WESTERN.ID, label: CATEGORY_TABS.WESTERN.LABEL },
 ];
 
+/**
+ * Array of tabs for movie detail pages
+ * Used to switch between "About Movie" and "Review" sections
+ * on individual movie detail screens
+ */
 export const DETAIL_MOVIE_TABS = [
   { id: MOVIE_TABS.ABOUT_MOVIE.ID, label: MOVIE_TABS.ABOUT_MOVIE.LABEL },
-  { id: MOVIE_TABS.CHOOSE_SEAT.ID, label: MOVIE_TABS.CHOOSE_SEAT.LABEL },
+  { id: MOVIE_TABS.REVIEW.ID, label: MOVIE_TABS.REVIEW.LABEL },
 ];
-
-// Height + Spacing
-export const TABS_HEADER_HEIGHT = 108;
-export const TABS_FOOTER_HEIGHT = 104;
-export const SCREEN_HEADER_HEIGHT = 62;
-export const SCREEN_HEADER_HEIGHT_WITH_TITLE = 120;

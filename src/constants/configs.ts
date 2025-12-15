@@ -35,3 +35,7 @@ export const TAB_BAR_THEME = {
   },
   ICON_SIZE: 24,
 } as const;
+
+export const TOAST_DURATION = 3000;
+
+export const TEXT_MAX_LENGTH = 150;
