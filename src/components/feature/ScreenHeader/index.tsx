@@ -20,6 +20,7 @@ export interface ScreenHeaderProps extends NativeStackHeaderProps {
   showBackButton?: boolean;
   rightComponent?: ReactNode;
   leftComponent?: ReactNode;
+  topInset?: number;
 }
 
 export const ScreenHeader = ({
@@ -27,6 +28,7 @@ export const ScreenHeader = ({
   showBackButton = true,
   rightComponent,
   leftComponent,
+  topInset = STATUS_BAR_HEIGHT,
 }: ScreenHeaderProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -41,9 +43,9 @@ export const ScreenHeader = ({
 
   return (
     <View
-      className="absolute left-0 right-0 bg-dark-blue "
+      className="bg-bg-primary"
       style={{
-        top: STATUS_BAR_HEIGHT,
+        paddingTop: topInset,
       }}
     >
       <View className="flex-row items-center justify-between px-6 py-6">
