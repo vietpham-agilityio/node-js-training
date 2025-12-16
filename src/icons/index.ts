@@ -1,6 +1,8 @@
 export * from './AddIcon';
 export * from './AppIcon';
 export * from './ArrowBackIcon';
+export * from './ArrowRightIcon';
+export * from './ChevronDownIcon';
 export * from './CancelIcon';
 export * from './EyeIcon';
 export * from './EyeOffIcon';
@@ -18,3 +20,4 @@ export * from './TopUpIcon';
 export * from './UserProfileIcon';
 export * from './WalletIcon';
 export * from './WalletOutlineIcon';
+export * from './LocationIcon';

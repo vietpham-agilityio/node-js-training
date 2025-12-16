@@ -211,10 +211,11 @@
     --color-text-error: var(--error-600); /* #ff5353 */
     --color-text-warning: var(--warning-600); /* #ffaf34 */
     --color-text-success: var(--success-600); /* #3e9d9d */
-    --color-text-gradient-soft: var(--white-alpha-60); /* #ffffff99 */
-    --color-text-gradient-medium: var(--white-alpha-70); /* #ffffffb3 */
-    --color-text-gradient-light: var(--white-alpha-80); /* #ffffffcc */
-    --color-text-gradient-dark: var(--white-alpha-90); /* #ffffffe6 */
+
+    --color-gradient-soft: var(--white-alpha-60); /* #ffffff99 */
+    --color-gradient-medium: var(--white-alpha-70); /* #ffffffb3 */
+    --color-gradient-light: var(--white-alpha-80); /* #ffffffcc */
+    --color-gradient-dark: var(--white-alpha-90); /* #ffffffe6 */
 
     /* ---- Semantic Background Colors ---- */
     --color-bg-primary: var(--blue-900); /* #0b0f2f */
@@ -278,11 +279,11 @@
       --color-text-error: var(--error-600); /* #ff5353 */
       --color-text-warning: var(--warning-600); /* #ffaf34 */
       --color-text-success: var(--success-600); /* #3e9d9d */
-      --color-text-gradient-soft: var(--white-alpha-60); /* #ffffff99 */
-      --color-text-gradient-medium: var(--white-alpha-70); /* #ffffffb3 */
-      --color-text-gradient-light: var(--white-alpha-80); /* #ffffffcc */
-      --color-text-gradient-dark: var(--white-alpha-90); /* #ffffffe6 */
 
+      --color-gradient-soft: var(--white-alpha-60); /* #ffffff99 */
+      --color-gradient-medium: var(--white-alpha-70); /* #ffffffb3 */
+      --color-gradient-light: var(--white-alpha-80); /* #ffffffcc */
+      --color-gradient-dark: var(--white-alpha-90); /* #ffffffe6 */
       /* ---- Semantic Background Colors ---- */
       --color-bg-primary: var(--blue-900); /* #0b0f2f */
       --color-bg-secondary: var(--grey-100); /* #dbdbdb */

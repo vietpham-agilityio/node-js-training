@@ -14,7 +14,7 @@ interface OrderDetailRowProps {
 export const OrderDetailRow = memo(
   ({ label, value, valueClassName = '', testID }: OrderDetailRowProps) => (
     <View className="flex-row justify-between items-center" testID={testID}>
-      <Typo size="base" weight="regular" className="text-gradient-white">
+      <Typo size="base" weight="regular" className="text-gradient-light">
         {label}
       </Typo>
       <Typo

@@ -72,7 +72,7 @@ const CheckoutScreen = () => {
     >
       <StyledScrollView
         className="flex-1 bg-dark-blue"
-        contentContainerClassName="px-6 flex-1 justify-between pt-24 pb-6"
+        contentContainerClassName="px-6 flex-1 justify-between pb-6"
         showsVerticalScrollIndicator={false}
       >
         <View>

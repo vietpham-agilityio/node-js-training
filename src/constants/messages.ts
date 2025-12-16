@@ -31,6 +31,7 @@ export const ERROR_MESSAGES = {
     'We’re having trouble loading movies. Please try again later.',
   TICKET_NETWORK_ERROR:
     'We’re having trouble loading tickets. Please try again later.',
+  LOCATION_PERMISSION_DENIED: 'Permission to access location was denied',
 };
 
 export const MESSAGES = {
