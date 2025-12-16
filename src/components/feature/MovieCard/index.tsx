@@ -20,15 +20,17 @@ import { formatMovieDuration, formatShowtimeDate } from '@/utils/formats';
 interface MovieCardProps extends Omit<TouchableOpacityProps, 'children'> {
   title: string;
   posterUrl: string;
-  durationMinutes: number;
-  genre: string[];
+  durationMinutes?: number;
+  genre?: string[];
   rating?: number;
   cinemaLocation?: string;
+  cinemaName?: string;
   showtime?: string;
   showDate?: string;
   price?: string;
   imageSize?: Size;
   className?: string;
+  justifyContent?: 'center' | 'end';
 }
 
 const StyledImage = withUniwind(Image);
@@ -41,11 +43,13 @@ export const MovieCard = memo(
     rating,
     genre,
     cinemaLocation,
+    cinemaName,
     showtime,
     showDate,
     price,
     imageSize = Size.SMALL,
     className = '',
+    justifyContent = 'end',
     ...rest
   }: MovieCardProps) => {
     const imageSizeClassName = useMemo(
@@ -53,7 +57,7 @@ export const MovieCard = memo(
       [imageSize],
     );
 
-    const genresText = useMemo(() => genre.join(', '), [genre]);
+    const genresText = useMemo(() => genre?.join(', '), [genre]);
 
     const showtimeDateText = useMemo(
       () => formatShowtimeDate(showtime, showDate),
@@ -61,8 +65,8 @@ export const MovieCard = memo(
     );
 
     const hasBookingInfo = useMemo(
-      () => showtimeDateText || price || cinemaLocation,
-      [showtimeDateText, price, cinemaLocation],
+      () => showtimeDateText || price || cinemaLocation || cinemaName,
+      [showtimeDateText, price, cinemaLocation, cinemaName],
     );
 
     return (
@@ -89,7 +93,12 @@ export const MovieCard = memo(
         </View>
 
         {/* Right Section - Movie Details */}
-        <View className="flex-1 justify-end my-1.5 gap-3">
+        <View
+          className={cn(
+            'flex-1 justify-end my-1.5 gap-3',
+            `justify-${justifyContent}`,
+          )}
+        >
           {/* Title */}
           <Typo
             size="base"
@@ -139,6 +148,18 @@ export const MovieCard = memo(
                   {cinemaLocation}
                 </Typo>
               )}
+
+              {/* Cinema Location */}
+              {cinemaName && (
+                <Typo
+                  size="sm"
+                  weight="light"
+                  className="text-white"
+                  testID="movie-card-cinema"
+                >
+                  {cinemaName}
+                </Typo>
+              )}
             </View>
           ) : (
             <>
@@ -150,10 +171,10 @@ export const MovieCard = memo(
               )}
 
               {/* Genres and Duration */}
-              {(genre.length > 0 || durationMinutes) && (
+              {(genresText || durationMinutes) && (
                 <View className="gap-1">
                   {/* Genres */}
-                  {genre.length > 0 && (
+                  {genresText && (
                     <Typo
                       size="xs"
                       weight="light"
@@ -165,7 +186,7 @@ export const MovieCard = memo(
                   )}
 
                   {/* Duration */}
-                  {durationMinutes > 0 && (
+                  {durationMinutes && (
                     <Typo
                       size="xs"
                       weight="light"

@@ -156,7 +156,7 @@ const HomeScreen = () => {
               <SearchInput className="border-0" onFocus={handleSearchPress} />
             </View>
 
-            <View className="mt-7">
+            <View className="pl-6 mt-7">
               <Tabs
                 tabs={FILTER_CATEGORY_TABS}
                 activeTab={activeCategory}

@@ -72,9 +72,9 @@ describe('MovieCard Component', () => {
   describe('Booking Info Mode', () => {
     it('should display showtime and date when provided', () => {
       render(
-        <MovieCard {...defaultProps} showtime="16:40" showDate="Sun May 22" />,
+        <MovieCard {...defaultProps} showtime="16:40" showDate="2025-12-18" />,
       );
-      expect(screen.getByText('16:40, Sun May 22')).toBeTruthy();
+      expect(screen.getByText('16:40, 18 Des 2025')).toBeTruthy();
     });
 
     it('should display price when provided', () => {
@@ -92,12 +92,12 @@ describe('MovieCard Component', () => {
         <MovieCard
           {...defaultProps}
           showtime="16:40"
-          showDate="Sun May 22"
+          showDate="2025-12-18"
           price="150.000"
           cinemaLocation="FX Sudirman XXI"
         />,
       );
-      expect(screen.getByText('16:40, Sun May 22')).toBeTruthy();
+      expect(screen.getByText('16:40, 18 Des 2025')).toBeTruthy();
       expect(screen.getByText('IDR: 150.000')).toBeTruthy();
       expect(screen.getByText('FX Sudirman XXI')).toBeTruthy();
     });
@@ -108,7 +108,7 @@ describe('MovieCard Component', () => {
           {...defaultProps}
           rating={4.5}
           showtime="16:40"
-          showDate="Sun May 22"
+          showDate="2025-12-18"
         />,
       );
       expect(screen.queryByTestId('movie-card-rating')).toBeNull();
@@ -116,7 +116,7 @@ describe('MovieCard Component', () => {
 
     it('should not display genres and duration when booking info is present', () => {
       render(
-        <MovieCard {...defaultProps} showtime="16:40" showDate="Sun May 22" />,
+        <MovieCard {...defaultProps} showtime="16:40" showDate="2025-12-18" />,
       );
       expect(screen.queryByText('Action, Comedy')).toBeNull();
       expect(screen.queryByText('2h')).toBeNull();
@@ -163,8 +163,8 @@ describe('MovieCard Component', () => {
     });
 
     it('should handle date only without showtime', () => {
-      render(<MovieCard {...defaultProps} showDate="Sun May 22" />);
-      expect(screen.getByText('Sun May 22')).toBeTruthy();
+      render(<MovieCard {...defaultProps} showDate="2025-12-18" />);
+      expect(screen.getByText('18 Des 2025')).toBeTruthy();
     });
 
     it('should handle only price without other booking info', () => {

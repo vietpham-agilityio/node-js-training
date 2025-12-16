@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { MESSAGES, ROUTES, Size } from '@/constants';
+import { ERROR_MESSAGES, MESSAGES, ROUTES, Size } from '@/constants';
 
 // Hooks
 import { useDebounce, useMoviesInfinite, useSearchMovies } from '@/hooks';
@@ -168,7 +168,7 @@ const SearchScreen = () => {
           >
             {isSearchActive
               ? MESSAGES.NO_RESULT_FOUND
-              : MESSAGES.NO_RESULT_FOUND}
+              : ERROR_MESSAGES.MOVIE_NETWORK_ERROR}
           </Typo>
           <Typo size="sm" className="text-center">
             {error?.message || 'Please try again'}
