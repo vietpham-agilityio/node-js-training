@@ -50,16 +50,49 @@ export class WalletService {
   async getTransactions(
     userId: string,
     limit = PAGINATION.PAGE_LIMIT_MAX,
-  ): Promise<WalletService[]> {
+  ): Promise<WalletTransaction[]> {
     const wallet = await this.getWallet(userId);
+
     const { data, error } = await supabase
       .from('wallet_transactions')
-      .select('*')
+      .select(
+        `
+        *,
+        booking:bookings!reference_id (
+          id,
+          booking_number,
+          total_seats,
+          seat_numbers,
+          showtime:showtimes (
+            id,
+            show_date,
+            show_time,
+            movie:movies (
+              id,
+              title,
+              poster_url,
+              genre,
+              duration_minutes
+            ),
+            cinema_hall:cinema_halls (
+              id,
+              name,
+              cinema:cinemas (
+                id,
+                name,
+                city
+              )
+            )
+          )
+        )
+      `,
+      )
       .eq('wallet_id', wallet.id)
       .order('created_at', { ascending: false })
       .limit(limit);
+
     if (error) throw error;
-    return keysToCamel(data) as WalletService[];
+    return keysToCamel(data) as WalletTransaction[];
   }
 
   async topUp(walletId: string, amount: number): Promise<WalletTransaction> {
@@ -80,7 +113,7 @@ export class WalletService {
       .from('wallet_transactions')
       .insert({
         wallet_id: walletId,
-        transaction_type: WalletTransactionType.TOP_UP,
+        transaction_type: WalletTransactionType.TOP_UP, // Uses 'top_up'
         amount,
         balance_before: balanceBefore,
         balance_after: balanceAfter,
@@ -132,7 +165,7 @@ export class WalletService {
       .from('wallet_transactions')
       .insert({
         wallet_id: walletId,
-        transaction_type: WalletTransactionType.PURCHASE,
+        transaction_type: WalletTransactionType.PAYMENT, // Uses 'payment'
         amount: -amount, // Negative for deduction
         balance_before: balanceBefore,
         balance_after: balanceAfter,
@@ -178,7 +211,7 @@ export class WalletService {
       .from('wallet_transactions')
       .insert({
         wallet_id: walletId,
-        transaction_type: WalletTransactionType.REFUND,
+        transaction_type: WalletTransactionType.REFUND, // Uses 'refund'
         amount,
         balance_before: balanceBefore,
         balance_after: balanceAfter,
@@ -211,7 +244,38 @@ export class WalletService {
 
     const { data, error } = await supabase
       .from('wallet_transactions')
-      .select('*')
+      .select(
+        `
+        *,
+        booking:bookings!reference_id (
+          id,
+          booking_number,
+          total_seats,
+          seat_numbers,
+          showtime:showtimes (
+            id,
+            show_date,
+            show_time,
+            movie:movies (
+              id,
+              title,
+              poster_url,
+              genre,
+              duration_minutes
+            ),
+            cinema_hall:cinema_halls (
+              id,
+              name,
+              cinema:cinemas (
+                id,
+                name,
+                city
+              )
+            )
+          )
+        )
+      `,
+      )
       .eq('wallet_id', wallet.id)
       .order('created_at', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);

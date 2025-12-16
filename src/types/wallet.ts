@@ -1,6 +1,8 @@
+import { Booking } from './booking';
+
 export enum WalletTransactionType {
   TOP_UP = 'top_up',
-  PURCHASE = 'purchase',
+  PAYMENT = 'payment',
   REFUND = 'refund',
 }
 
@@ -32,4 +34,5 @@ export interface WalletTransaction {
   referenceId?: string;
   status: WalletTransactionStatus;
   createdAt: string;
+  booking?: Booking;
 }

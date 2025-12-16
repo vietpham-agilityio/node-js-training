@@ -1,5 +1,16 @@
 import { PromoCodeStatus } from '@/types';
 
+export const formatCardNumber = (number?: string) => {
+  if (!number) return '•••• •••• •••• ••••';
+
+  // Remove all non-digits
+  const cleaned = number.replace(/\D/g, '');
+
+  // Format as groups of 4
+  const match = cleaned.match(/.{1,4}/g);
+  return match ? match.join(' ') : number;
+};
+
 export const formatCurrency = (amount: number, currency = 'IDR'): string => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',

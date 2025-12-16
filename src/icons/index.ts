@@ -14,6 +14,7 @@ export * from './SearchIcon';
 export * from './StarIcon';
 export * from './TicketIcon';
 export * from './TicketOutlineIcon';
+export * from './TopUpIcon';
 export * from './UserProfileIcon';
 export * from './WalletIcon';
 export * from './WalletOutlineIcon';

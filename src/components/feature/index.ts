@@ -9,3 +9,4 @@ export * from './ScreenHeader';
 export * from './SignInForm';
 export * from './SignUpForm';
 export * from './Toast';
+export * from './WalletCard';
