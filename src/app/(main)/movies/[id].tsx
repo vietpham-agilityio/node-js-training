@@ -36,6 +36,9 @@ import {
 // Hooks
 import { useMovie } from '@/hooks/useMovies';
 
+// Stores
+import { useBookingStore, useHeaderStore } from '@/stores';
+
 type ContentItem =
   | {
       type: ContentType.SYNOPSIS;
@@ -63,9 +66,13 @@ const MovieScreen = () => {
   const params = useLocalSearchParams<{ id: string }>();
   const id = params.id || '';
 
+  const setMovie = useBookingStore(state => state.setMovie);
+
   const [activeTab, setActiveTab] = useState<string>(DETAIL_MOVIE_TABS[0].id);
 
   const { data: movie, isLoading, refetch: refetchMovie } = useMovie(id);
+
+  const setHeaderTitle = useHeaderStore(state => state.setTitle);
 
   const {
     title = '',
@@ -112,8 +119,15 @@ const MovieScreen = () => {
   }, []);
 
   const handleNavigateToSelectCinema = useCallback(() => {
-    router.push(ROUTES.CINEMA);
-  }, []);
+    setMovie(movie!);
+    setHeaderTitle(title);
+    router.push({
+      pathname: ROUTES.CINEMA,
+      params: {
+        movieId: id,
+      },
+    });
+  }, [title, id, movie, setHeaderTitle, setMovie]);
 
   const renderItem = useCallback(
     ({ item }: { item: ContentItem }) => {

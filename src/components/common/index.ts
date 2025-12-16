@@ -11,3 +11,4 @@ export * from './ThirdPartyButton';
 export * from './Typo';
 export * from './UserCard';
 export * from './OrderDetailRow';
+export * from './SelectBox';
