@@ -10,3 +10,4 @@ export * from './SignInForm';
 export * from './SignUpForm';
 export * from './Toast';
 export * from './WalletCard';
+export * from './LocationDropdown';

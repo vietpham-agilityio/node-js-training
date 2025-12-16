@@ -79,7 +79,13 @@
           "faceIDPermission": "Allow $(PRODUCT_NAME) to access your face ID",
           "touchIDPermission": "Allow $(PRODUCT_NAME) to access your touch ID"
         }
-      ]
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
     ],
     "experiments": {
       "typedRoutes": true,
