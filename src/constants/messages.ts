@@ -27,6 +27,10 @@ export const ERROR_MESSAGES = {
   CREATE_ACCOUNT_FAILED: 'Failed to create account',
   SIGN_OUT_FAILED: 'Failed to sign out',
   CONFIRM_ACCOUNT_FAILED: 'Failed to confirm account',
+  MOVIE_NETWORK_ERROR:
+    'We’re having trouble loading movies. Please try again later.',
+  TICKET_NETWORK_ERROR:
+    'We’re having trouble loading tickets. Please try again later.',
 };
 
 export const MESSAGES = {
@@ -44,5 +48,7 @@ export const MESSAGES = {
   CONFIRM_SUCCESS: 'Confirm account successful',
   CONFIRM_SUCCESS_MESSAGE: 'Your account is ready! Welcome aboard.',
   NO_RESULT_FOUND: 'No results found. Please try a different search.',
-  NETWORK_ERROR: 'We’re having trouble loading movies. Please try again later.',
+  NO_TICKETS: 'Start your movie journey by booking a ticket',
+  NO_ACTIVE_TICKETS: 'Book a movie to see your active tickets here',
+  NO_EXPIRED_TICKETS: 'Your expired and used tickets will appear here',
 };

@@ -1,12 +1,246 @@
-import { ScrollView } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { router } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Unwind
 import { withUniwind } from 'uniwind';
 
+// Constants
+import {
+  ERROR_MESSAGES,
+  MESSAGES,
+  ROUTES,
+  Size,
+  TICKET_TABS,
+} from '@/constants';
+
+// Hooks
+import { useTicketsInfinite } from '@/hooks';
+
+// Types
+import { Ticket, TicketStatus } from '@/types';
+
+// Components
+import { Button, Tabs, Typo } from '@/components/common';
+import { MovieCard } from '@/components/feature';
+
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
 const MyTicketScreen = () => {
+  const [activeTab, setActiveTab] = useState(TICKET_TABS[0].id);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+    isRefetching,
+  } = useTicketsInfinite();
+
+  // Flatten paginated data
+  const allTickets = useMemo(() => {
+    if (!data?.pages) return [];
+    return data.pages.flat();
+  }, [data]);
+
+  const isAllTickets = useMemo(
+    () => activeTab === TICKET_TABS[0].id,
+    [activeTab],
+  );
+  const isExpiredTickets = useMemo(
+    () => activeTab === TicketStatus.EXPIRED,
+    [activeTab],
+  );
+  const isActiveTickets = useMemo(
+    () => activeTab === TicketStatus.ACTIVE,
+    [activeTab],
+  );
+
+  // Filter tickets by status
+  const filteredTickets = useMemo(() => {
+    if (isAllTickets) return allTickets;
+
+    if (isActiveTickets) {
+      return allTickets.filter(ticket => ticket.status === TicketStatus.ACTIVE);
+    }
+
+    if (isExpiredTickets) {
+      return allTickets.filter(
+        ticket =>
+          ticket.status === TicketStatus.EXPIRED ||
+          ticket.status === TicketStatus.CANCELLED ||
+          ticket.status === TicketStatus.USED,
+      );
+    }
+
+    return allTickets;
+  }, [isAllTickets, allTickets, isActiveTickets, isExpiredTickets]);
+
+  const handleLoadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const handleBookNow = useCallback(() => {
+    router.push(ROUTES.HOME);
+  }, []);
+
+  const renderTicket = useCallback(({ item }: { item: Ticket }) => {
+    const { booking } = item;
+
+    if (!booking) return null;
+
+    const { showtime } = booking;
+    const { movie, cinemaHall, showTime, showDate } = showtime || {};
+    const { cinema } = cinemaHall || {};
+
+    if (!movie || !cinema) return null;
+
+    return (
+      <MovieCard
+        title={movie.title}
+        posterUrl={movie.posterUrl}
+        showtime={showTime}
+        showDate={showDate}
+        cinemaName={cinema.name}
+        justifyContent="center"
+      />
+    );
+  }, []);
+
+  const keyExtractor = useCallback((item: Ticket) => item.id, []);
+
+  const getItemType = useCallback((item: Ticket) => {
+    return item.status || 'default';
+  }, []);
+
+  const renderFooter = useCallback(() => {
+    if (!isFetchingNextPage) return null;
+
+    return (
+      <View
+        className="py-4 items-center"
+        accessibilityRole="progressbar"
+        accessibilityLabel="Loading more tickets"
+      >
+        <ActivityIndicator size="small" />
+        <Typo size="xs" className="text-text-secondary mt-2">
+          Loading more tickets...
+        </Typo>
+      </View>
+    );
+  }, [isFetchingNextPage]);
+
+  const renderEmpty = useCallback(() => {
+    if (isLoading) return null;
+
+    if (isError) {
+      return (
+        <View
+          className="flex-1 items-center justify-center py-16 px-6 gap-4"
+          accessibilityRole="alert"
+        >
+          <Typo
+            size="base"
+            className="text-text-error text-center"
+            weight="semibold"
+          >
+            {ERROR_MESSAGES.TICKET_NETWORK_ERROR}
+          </Typo>
+          <Typo size="sm" className="text-text-secondary text-center mt-2">
+            {error?.message || 'Please try again'}
+          </Typo>
+          <Button
+            size={Size.EXTRA_SMALL}
+            title="Retry"
+            onPress={refetch}
+            accessibilityRole="button"
+            accessibilityLabel="Retry loading tickets"
+          />
+        </View>
+      );
+    }
+
+    return (
+      <View
+        className="flex-1 items-center justify-center py-16 px-6"
+        accessibilityRole="text"
+      >
+        <Typo
+          size="xl"
+          weight="semibold"
+          className="text-text-secondary text-center mb-2"
+        >
+          {isAllTickets
+            ? 'No tickets yet'
+            : isActiveTickets
+              ? 'No active tickets'
+              : 'No expired tickets'}
+        </Typo>
+        <Typo size="sm" className="text-text-secondary text-center mb-6">
+          {isAllTickets
+            ? MESSAGES.NO_TICKETS
+            : isActiveTickets
+              ? MESSAGES.NO_ACTIVE_TICKETS
+              : MESSAGES.NO_EXPIRED_TICKETS}
+        </Typo>
+        {isAllTickets && (
+          <Button
+            isPrimary={false}
+            size={Size.EXTRA_SMALL}
+            title="Book Now"
+            onPress={handleBookNow}
+            accessibilityRole="button"
+            accessibilityLabel="Book a movie ticket"
+          />
+        )}
+      </View>
+    );
+  }, [
+    isLoading,
+    isError,
+    isAllTickets,
+    isActiveTickets,
+    handleBookNow,
+    error?.message,
+    refetch,
+  ]);
+
+  const ListHeader = useCallback(
+    () => (
+      <View className="gap-6 mb-6">
+        <Tabs
+          variant="tertiary"
+          tabs={TICKET_TABS}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+        <View className="border-b border-white/80" />
+      </View>
+    ),
+    [activeTab],
+  );
+
+  if (isLoading) {
+    return (
+      <StyledSafeAreaView
+        edges={['bottom']}
+        className="flex-1 bg-bg-primary items-center justify-center"
+        accessibilityLabel="Loading tickets"
+      >
+        <ActivityIndicator size="large" />
+        <Typo className="text-text-secondary mt-4">Loading tickets...</Typo>
+      </StyledSafeAreaView>
+    );
+  }
+
   return (
     <StyledSafeAreaView
       edges={['bottom']}
@@ -14,7 +248,28 @@ const MyTicketScreen = () => {
       accessibilityHint="My Ticket screen"
       className="h-full bg-bg-primary"
     >
-      <ScrollView contentContainerClassName=" flex-1 items-center bg-dark-blue"></ScrollView>
+      <FlashList
+        data={filteredTickets}
+        renderItem={renderTicket}
+        keyExtractor={keyExtractor}
+        getItemType={getItemType}
+        contentContainerStyle={{ paddingHorizontal: 24, marginBottom: 24 }}
+        ItemSeparatorComponent={() => <View className="h-6" />}
+        showsVerticalScrollIndicator={false}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListHeaderComponent={ListHeader}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={renderEmpty}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            accessibilityLabel="Pull to refresh tickets"
+          />
+        }
+        accessibilityLabel={`Tickets list showing ${filteredTickets.length} ${activeTab} tickets`}
+      />
     </StyledSafeAreaView>
   );
 };

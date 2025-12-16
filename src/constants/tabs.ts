@@ -2,6 +2,8 @@
  * Tab constants for movie filtering and detail views
  */
 
+import { TicketStatus } from '@/types';
+
 export const CATEGORY_TABS = {
   ALL: { ID: 'all', LABEL: 'All' },
   ACTION: { ID: 'action', LABEL: 'Action' },
@@ -76,4 +78,15 @@ export const FILTER_CATEGORY_TABS = [
 export const DETAIL_MOVIE_TABS = [
   { id: MOVIE_TABS.ABOUT_MOVIE.ID, label: MOVIE_TABS.ABOUT_MOVIE.LABEL },
   { id: MOVIE_TABS.REVIEW.ID, label: MOVIE_TABS.REVIEW.LABEL },
+];
+
+/**
+ * Array of tabs for ticket pages
+ * Used to switch between "All", "Active", and "Expired" tabs
+ * on individual ticket screens
+ */
+export const TICKET_TABS = [
+  { id: 'all', label: 'All' },
+  { id: TicketStatus.ACTIVE, label: 'Active' },
+  { id: TicketStatus.EXPIRED, label: 'Expired' },
 ];

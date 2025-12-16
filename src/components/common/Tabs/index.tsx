@@ -13,7 +13,7 @@ interface Tab {
   label: string;
 }
 
-type Variant = 'primary' | 'secondary';
+type Variant = 'primary' | 'secondary' | 'tertiary';
 
 interface TabsProps {
   tabs: Tab[];
@@ -39,8 +39,14 @@ const VARIANTS_MAP: Record<
   },
   secondary: {
     container: 'justify-center items-center',
-    tab: 'pb-1 flex-1 items-center justify-center ',
+    tab: 'pb-1 flex-1 items-center justify-center',
     text: 'font-montserrat-semibold text-base text-white/70',
+  },
+  tertiary: {
+    container: 'justify-center items-center',
+    tab: 'flex-1 py-2 items-center justify-center rounded-sm opacity-80',
+    tabActive: 'bg-gradient-to-r from-secondary to-primary opacity-100',
+    text: 'font-montserrat-regular text-lg',
   },
 };
 
@@ -49,7 +55,7 @@ export const Tabs = memo(
     const activeTabLabel = tabs.find(tab => tab.id === activeTab)?.label || '';
     const activeTabIndex = tabs.findIndex(tab => tab.id === activeTab);
     const contentContainerStyles = useResolveClassNames(
-      `gap-3 px-6 ${variant === 'secondary' && 'flex-1'}`,
+      `gap-3 ${(variant === 'secondary' || variant === 'tertiary') && 'flex-1'}`,
     );
 
     return (

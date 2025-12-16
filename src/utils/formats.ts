@@ -125,16 +125,16 @@ export const formatMovieDuration = (minutes: number): string => {
 
 export const formatShowtimeDate = (
   showtime?: string,
-  showDate?: string,
+  showDate?: Date | string,
 ): string => {
   if (showtime && showDate) {
-    return `${showtime}, ${showDate}`;
+    return `${formatTime(showtime)}, ${formatDate(showDate, 'short')}`;
   }
   if (showtime) {
-    return showtime;
+    return formatTime(showtime);
   }
   if (showDate) {
-    return showDate;
+    return formatDate(showDate, 'short');
   }
   return '';
 };
