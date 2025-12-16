@@ -30,6 +30,9 @@ const MainLayout = () => (
         headerShown: false,
       }}
     />
+    <Stack.Screen
+      name={SCREENS.MAIN.CINEMA}
+    />
     <Stack.Screen name={SCREENS.MAIN.CHECKOUT} />
     <Stack.Screen
       name={SCREENS.MAIN.SEARCH}

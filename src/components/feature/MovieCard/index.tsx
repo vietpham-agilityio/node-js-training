@@ -190,7 +190,7 @@ export const MovieCard = memo(
                     <Typo
                       size="xs"
                       weight="light"
-                      className="text-gradient-white"
+                      className="text-gradient-light"
                       testID="movie-card-genres"
                     >
                       {genresText}
@@ -202,7 +202,7 @@ export const MovieCard = memo(
                     <Typo
                       size="xs"
                       weight="light"
-                      className="text-gradient-white"
+                      className="text-gradient-light"
                       testID="movie-card-duration"
                     >
                       {formatMovieDuration(durationMinutes)}

@@ -13,7 +13,12 @@ import { ArrowBackIcon } from '@/icons';
 
 // Constants
 import { HEADER_TITLE_MAP } from '@/constants';
-import { STATUS_BAR_HEIGHT } from '@/utils';
+
+// Utils
+import { cn, STATUS_BAR_HEIGHT } from '@/utils';
+
+// Stores
+import { useHeaderStore } from '@/stores';
 
 export interface ScreenHeaderProps extends NativeStackHeaderProps {
   title?: string;
@@ -33,24 +38,23 @@ export const ScreenHeader = ({
   const router = useRouter();
   const pathname = usePathname();
 
-  // Map pathname to header title from HEADER_TITLE_MAP
+  // Dynamic header title from store
+  const headerStoreTitle = useHeaderStore(state => state.title);
+
   const headerTitle =
-    title || HEADER_TITLE_MAP[pathname as keyof typeof HEADER_TITLE_MAP];
+    title ||
+    HEADER_TITLE_MAP[pathname as keyof typeof HEADER_TITLE_MAP] ||
+    headerStoreTitle;
 
   const handleGoBack = () => {
     router.back();
   };
 
   return (
-    <View
-      className="bg-bg-primary"
-      style={{
-        paddingTop: topInset,
-      }}
-    >
-      <View className="flex-row items-center justify-between px-6 py-6">
+    <View className="bg-bg-primary" style={{ paddingTop: topInset }}>
+      <View className="flex-row justify-between px-6 py-6">
         {/* Left Section */}
-        <View className="flex-1 items-start">
+        <View className={cn('flex-1 items-start')}>
           {leftComponent ||
             (showBackButton && router.canGoBack() && (
               <TouchableOpacity
@@ -68,7 +72,7 @@ export const ScreenHeader = ({
         {headerTitle && (
           <View
             accessible
-            className="flex-2 items-center mt-12"
+            className="w-46 items-center"
             accessibilityRole="header"
             accessibilityLabel={headerTitle}
           >
