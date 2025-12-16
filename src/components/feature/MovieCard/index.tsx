@@ -14,6 +14,7 @@ import { BLUR_HASH, IMAGE_SIZE_MAP, Size } from '@/constants';
 import { Rating, Typo } from '@/components/common';
 
 // Utils
+import { WalletTransactionType } from '@/types';
 import { cn } from '@/utils';
 import { formatMovieDuration, formatShowtimeDate } from '@/utils/formats';
 
@@ -30,10 +31,17 @@ interface MovieCardProps extends Omit<TouchableOpacityProps, 'children'> {
   price?: string;
   imageSize?: Size;
   className?: string;
+  transactionType?: WalletTransactionType;
   justifyContent?: 'center' | 'end';
 }
 
 const StyledImage = withUniwind(Image);
+
+const WalletTransactionColor: Record<WalletTransactionType, string> = {
+  [WalletTransactionType.TOP_UP]: 'text-text-success',
+  [WalletTransactionType.PAYMENT]: 'text-text-error',
+  [WalletTransactionType.REFUND]: 'text-text-primary',
+};
 
 export const MovieCard = memo(
   ({
@@ -48,6 +56,7 @@ export const MovieCard = memo(
     showDate,
     price,
     imageSize = Size.SMALL,
+    transactionType,
     className = '',
     justifyContent = 'end',
     ...rest
@@ -118,7 +127,10 @@ export const MovieCard = memo(
                 <Typo
                   size="sm"
                   weight="regular"
-                  className="text-green"
+                  className={cn(
+                    'text-white',
+                    transactionType && WalletTransactionColor[transactionType],
+                  )}
                   testID="movie-card-price"
                 >
                   IDR: {price}
