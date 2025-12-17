@@ -26,6 +26,9 @@ export const ROUTES = {
   MY_TICKET: '/(main)/(tabs)/my-ticket',
   MY_WALLET: '/(main)/(tabs)/wallet',
 
+  // Wallet routes
+  TOP_UP: '/(main)/top-up',
+
   WELCOME: '/(main)/welcome',
 
   // Modal routes

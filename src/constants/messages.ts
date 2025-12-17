@@ -35,6 +35,10 @@ export const ERROR_MESSAGES = {
   INVALID_PHONE_NUMBER: 'Invalid phone number format',
   UPDATE_FAILED: 'Update failed',
   UPDATE_PROFILE_FAILED: 'Failed to update profile',
+  CHECKOUT_FAILED: 'Failed to create your booking',
+  TOP_UP_FAILED: 'Failed to top up wallet. Please try again.',
+  TOP_UP_MIN_AMOUNT: 'Minimum top-up amount is IDR 10.000',
+  TOP_UP_MAX_AMOUNT: 'Maximum top-up amount is IDR 10.000.000',
 };
 
 export const MESSAGES = {

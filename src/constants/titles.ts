@@ -12,6 +12,7 @@ export const HEADER_TITLE_MAP = {
   '/checkout': 'Checkout Movie',
   '/tickets/': 'Ticket Details',
   '/profile/edit': 'Edit Your Profile',
+  '/top-up': 'Top Up',
 } as const;
 
 /**

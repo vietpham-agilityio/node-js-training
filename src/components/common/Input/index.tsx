@@ -2,6 +2,7 @@ import {
   forwardRef,
   memo,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -72,7 +73,7 @@ export const Input = memo(
       const handleLabelPress = useCallback(() => {
         // Focus the input when label is clicked
         inputRef.current?.focus();
-      }, []);
+      }, [inputRef]);
 
       const handleBlur = useCallback(
         (e: NativeSyntheticEvent<TargetedEvent>) => {
@@ -93,6 +94,17 @@ export const Input = memo(
       const togglePasswordVisibility = useCallback(() => {
         setIsPasswordVisible(prev => !prev);
       }, []);
+
+      useEffect(() => {
+        const hasValue = value && value.length > 0;
+        const shouldBeAtTop = hasValue || isFocused;
+       
+        Animated.timing(animatedValue, {
+          toValue: shouldBeAtTop ? 1 : 0,
+          duration: 200,
+          useNativeDriver: false,
+        }).start();
+      }, [value, isFocused, animatedValue]);
 
       // Animated label position and size based on the value
       const labelTop = useMemo(

@@ -48,6 +48,12 @@ export const TOAST_DURATION = 3000;
 
 export const TEXT_MAX_LENGTH = 150;
 
+export const TOP_UP_MIN_AMOUNT = 10000;
+export const TOP_UP_MAX_AMOUNT = 10000000;
+export const TOP_UP_AMOUNTS = [
+  50000, 100000, 150000, 200000, 250000, 500000, 750000, 1000000,
+];
+
 export const SETTING_ITEMS = [
   {
     TITLE: 'Edit',
