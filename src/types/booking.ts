@@ -55,3 +55,8 @@ export interface Booking {
   showtime?: Showtime;
   tickets?: Ticket[];
 }
+
+export interface InfiniteBookingsData {
+  pages: Booking[][];
+  pageParams: number[];
+}

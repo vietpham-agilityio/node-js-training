@@ -23,7 +23,7 @@ export const SettingItem = memo(
         {...props}
       >
         <View className="flex-row justify-start items-center">
-          {Icon && <Icon />}
+          {Icon && <Icon width={24} height={24} />}
           <Typo size="base" weight="regular" className="ml-3">
             {title}
           </Typo>
