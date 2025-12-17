@@ -63,7 +63,7 @@ export const queryKeys = {
   // Profile
   profile: {
     all: ['profile'] as const,
-    detail: (userId?: string) => [...queryKeys.profile.all, userId] as const,
+    detail: (userId: string) => [...queryKeys.profile.all, userId] as const,
   },
 
   // Cinemas

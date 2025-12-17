@@ -7,6 +7,10 @@ export const ROUTES = {
   CINEMA: '/(main)/cinema',
   TICKET_DETAILS: (id: string): Href => `/(main)/tickets/${id}`,
 
+  // Profile routes
+  PROFILE: '/(main)/profile',
+  PROFILE_EDIT: '/(main)/profile/edit',
+
   // Auth routes
   LOGIN: '/(auth)/signin',
   SIGNUP: '/(auth)/signup',

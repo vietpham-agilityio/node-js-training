@@ -1,0 +1,101 @@
+import { useRouter } from 'expo-router';
+import { Alert, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { withUniwind } from 'uniwind';
+
+// Constants
+import { ERROR_MESSAGES, MESSAGES, ROUTES } from '@/constants';
+
+// Hooks
+import { useProfile, useUpdateProfile, useUploadAvatar } from '@/hooks';
+
+// Types
+import { UpdateProfileData } from '@/types';
+
+// Components
+import { EditProfileForm } from '@/components/feature';
+
+const StyledSafeAreaView = withUniwind(SafeAreaView);
+const StyledScrollView = withUniwind(ScrollView);
+
+const EditProfileScreen = () => {
+  const router = useRouter();
+  const { data: profile, isLoading: isProfileLoading } = useProfile();
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+  const { mutate: uploadAvatar, isPending: isUploading } = useUploadAvatar();
+
+  const isLoading = isProfileLoading || isUpdating || isUploading;
+
+  const handleSubmit = async (data: UpdateProfileData) => {
+    try {
+      let avatarUploadUrl: string | undefined = undefined;
+
+      // Only update avatar if it has changed
+      if (data.avatarUrl && data.avatarUrl !== profile?.avatarUrl) {
+        await new Promise<void>((resolve, reject) => {
+          uploadAvatar(
+            { uri: data.avatarUrl! },
+            {
+              onSuccess: uploadedUrl => {
+                avatarUploadUrl = uploadedUrl;
+                resolve();
+              },
+              onError: error => reject(error),
+            },
+          );
+        });
+      }
+
+      // Update profile
+      const updatePayload = {
+        ...data,
+        ...(avatarUploadUrl ? { avatarUrl: avatarUploadUrl } : {}),
+      };
+
+      await new Promise<void>((resolve, reject) => {
+        updateProfile(updatePayload, {
+          onSuccess: () => resolve(),
+          onError: error => reject(error),
+        });
+      });
+
+      Alert.alert(MESSAGES.UPDATE_SUCCESS, MESSAGES.PROFILE_UPDATE_SUCCESS, [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.replace(ROUTES.PROFILE);
+          },
+        },
+      ]);
+    } catch (error) {
+      Alert.alert(
+        ERROR_MESSAGES.UPDATE_FAILED,
+        error instanceof Error
+          ? error.message
+          : ERROR_MESSAGES.UPDATE_PROFILE_FAILED,
+      );
+    }
+  };
+
+  return (
+    <StyledSafeAreaView
+      edges={['bottom']}
+      className="flex-1 bg-bg-primary"
+      accessibilityLabel="Profile screen"
+      accessibilityHint="Profile screen"
+    >
+      <StyledScrollView
+        contentContainerClassName="flex-1 px-6 pb-16"
+        showsVerticalScrollIndicator={false}
+      >
+        <EditProfileForm
+          userInfo={profile}
+          isPending={isLoading}
+          onSubmit={handleSubmit}
+        />
+      </StyledScrollView>
+    </StyledSafeAreaView>
+  );
+};
+
+export default EditProfileScreen;

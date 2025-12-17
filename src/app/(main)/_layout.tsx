@@ -30,9 +30,7 @@ const MainLayout = () => (
         headerShown: false,
       }}
     />
-    <Stack.Screen
-      name={SCREENS.MAIN.CINEMA}
-    />
+    <Stack.Screen name={SCREENS.MAIN.CINEMA} />
     <Stack.Screen name={SCREENS.MAIN.TICKETS} />
     <Stack.Screen name={SCREENS.MAIN.CHECKOUT} />
     <Stack.Screen
@@ -42,6 +40,8 @@ const MainLayout = () => (
         animation: 'slide_from_bottom',
       }}
     />
+    <Stack.Screen name={SCREENS.MAIN.PROFILE} />
+    <Stack.Screen name={SCREENS.MAIN.PROFILE_EDIT} />
   </Stack>
 );
 

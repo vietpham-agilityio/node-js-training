@@ -70,6 +70,41 @@ export const signUpSchema = v.pipe(
   ),
 );
 
+export const editProfileSchema = v.pipe(
+  v.object({
+    fullName: v.pipe(
+      v.string(),
+      v.minLength(1, ERROR_MESSAGES.FULL_NAME_REQUIRED),
+      v.minLength(2, ERROR_MESSAGES.FULL_NAME_MIN_LENGTH(2)),
+      v.maxLength(50, ERROR_MESSAGES.FULL_NAME_MAX_LENGTH(50)),
+    ),
+
+    email: v.pipe(
+      v.string(),
+      v.minLength(1, ERROR_MESSAGES.EMAIL_REQUIRED),
+      v.email(ERROR_MESSAGES.EMAIL_INVALID),
+    ),
+
+    address: v.pipe(
+      v.union([v.string(), v.null()]),
+      v.transform(val => (val ?? '').trim()),
+    ),
+
+    phoneNumber: v.pipe(
+      v.union([v.string(), v.null()]),
+      v.transform(val => val ?? ''),
+      v.check(
+        val => val.length === 0 || /^\+?[1-9]\d{1,14}$/.test(val),
+        ERROR_MESSAGES.INVALID_PHONE_NUMBER,
+      ),
+    ),
+
+    avatarUrl: v.optional(v.string()),
+  }),
+);
+
 export type SignUpFormData = v.InferOutput<typeof signUpSchema>;
 
 export type SignInFormData = v.InferInput<typeof signInSchema>;
+
+export type EditProfileFormData = v.InferInput<typeof editProfileSchema>;

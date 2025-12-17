@@ -1,3 +1,11 @@
+import {
+  ChangeLanguageIcon,
+  EditProfileIcon,
+  HelpCenterIcon,
+  LikeIcon,
+  MyWalletIcon,
+} from '@/icons';
+
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
   REFRESH_TOKEN: 'refresh_token',
@@ -39,3 +47,31 @@ export const TAB_BAR_THEME = {
 export const TOAST_DURATION = 3000;
 
 export const TEXT_MAX_LENGTH = 150;
+
+export const SETTING_ITEMS = [
+  {
+    TITLE: 'Edit',
+    ICON: EditProfileIcon,
+    TEST_ID: 'edit',
+  },
+  {
+    TITLE: 'My Wallet',
+    ICON: MyWalletIcon,
+    TEST_ID: 'my_wallet',
+  },
+  {
+    TITLE: 'Change Language',
+    ICON: ChangeLanguageIcon,
+    TEST_ID: 'change_language',
+  },
+  {
+    TITLE: 'Help Center',
+    ICON: HelpCenterIcon,
+    TEST_ID: 'help_center',
+  },
+  {
+    TITLE: 'Rate Flutix App',
+    ICON: LikeIcon,
+    TEST_ID: 'rate_app',
+  },
+];

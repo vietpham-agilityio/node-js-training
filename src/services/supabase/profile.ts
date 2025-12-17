@@ -114,7 +114,7 @@ export class ProfileService {
       const filePath = `avatars/${urlParts[1]}`;
 
       const { error } = await supabase.storage
-        .from('user-avatars')
+        .from('user-avatar')
         .remove([filePath]);
 
       if (error) throw error;

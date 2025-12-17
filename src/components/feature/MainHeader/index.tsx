@@ -1,18 +1,21 @@
 import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
 import { useMemo } from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 
 // Expo
-import { usePathname } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 
 // Components
 import { Avatar, Typo } from '@/components/common';
 
 // Constants
-import { MAIN_TITLE_MAP } from '@/constants';
+import { MAIN_TITLE_MAP, ROUTES } from '@/constants';
 
 // Types
 import { UserProfileIcon } from '@/icons';
+
+// Hooks
+import { useProfile } from '@/hooks';
 
 // Utils
 import { cn, STATUS_BAR_HEIGHT } from '@/utils';
@@ -29,11 +32,16 @@ export const MainHeader = ({
   topInset = STATUS_BAR_HEIGHT,
 }: MainHeaderProps) => {
   const pathname = usePathname();
+  const { data: user, isLoading } = useProfile();
 
   const title = useMemo(
     () => MAIN_TITLE_MAP[pathname as keyof typeof MAIN_TITLE_MAP],
     [pathname],
   );
+
+  const handleProfilePress = () => {
+    router.push(ROUTES.PROFILE);
+  };
 
   return (
     <View
@@ -60,19 +68,23 @@ export const MainHeader = ({
         </View>
 
         {/* Right Section */}
-        {isRenderUserProfile && (
-          <View
+        {isRenderUserProfile && !isLoading && (
+          <TouchableOpacity
             accessible
-            className="flex-1 items-end"
+            accessibilityRole="button"
+            accessibilityHint="Tap to open user profile"
             accessibilityLabel="Right section"
+            className="flex-1 items-end"
+            onPress={handleProfilePress}
           >
             <Avatar
               size={48}
+              source={user?.avatarUrl}
               variant="default"
               defaultAvatar={UserProfileIcon}
               accessibilityLabel="User profile picture"
             />
-          </View>
+          </TouchableOpacity>
         )}
       </View>
     </View>

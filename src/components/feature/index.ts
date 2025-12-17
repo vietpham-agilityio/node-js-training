@@ -1,3 +1,5 @@
+export * from './EditProfileForm';
+export * from './LocationDropdown';
 export * from './MainHeader';
 export * from './MovieBannerCarousel';
 export * from './MovieCard';
@@ -6,8 +8,8 @@ export * from './MovieTrailerCarousel';
 export * from './NavigationTabBar';
 export * from './PromotionCard';
 export * from './ScreenHeader';
+export * from './SettingItem';
 export * from './SignInForm';
 export * from './SignUpForm';
 export * from './Toast';
 export * from './WalletCard';
-export * from './LocationDropdown';

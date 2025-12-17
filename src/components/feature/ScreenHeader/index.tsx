@@ -14,9 +14,15 @@ import { ArrowBackIcon } from '@/icons';
 // Constants
 
 // Utils
-import { cn, getHeaderTitle, STATUS_BAR_HEIGHT } from '@/utils';
+import {
+  cn,
+  getHeaderTitle,
+  isScreenPathname,
+  STATUS_BAR_HEIGHT,
+} from '@/utils';
 
 // Stores
+import { ROUTES, SCREENS } from '@/constants';
 import { useHeaderStore } from '@/stores';
 
 export interface ScreenHeaderProps extends NativeStackHeaderProps {
@@ -42,8 +48,13 @@ export const ScreenHeader = ({
 
   // Map pathname to header title from HEADER_TITLE_MAP
   const headerTitle = title || getHeaderTitle(pathname) || headerStoreTitle;
+  const isProfileScreen = isScreenPathname(pathname, SCREENS.MAIN.PROFILE);
 
   const handleGoBack = () => {
+    if (isProfileScreen) {
+      return router.replace(ROUTES.HOME);
+    }
+
     router.back();
   };
 

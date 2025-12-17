@@ -10,6 +10,7 @@ export const HEADER_TITLE_MAP = {
   '/confirm-account': 'Confirm New Account',
   '/checkout': 'Checkout Movie',
   '/tickets/': 'Ticket Details',
+  '/profile/edit': 'Edit Your Profile',
 } as const;
 
 /**

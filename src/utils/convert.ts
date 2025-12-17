@@ -57,3 +57,25 @@ export const getHeaderTitle = (pathname: string) => {
     pathname.startsWith(key),
   )?.[1];
 };
+
+const normalizePathname = (pathname: string) => {
+  let p = pathname.replace(/^\/+|\/+$/g, '');
+
+  // Normalize `/profile` → `profile/index`
+  if (!p.includes('/') || !p.endsWith('/index')) {
+    if (!p.includes('/')) {
+      p = `${p}/index`;
+    }
+  }
+
+  return p;
+};
+
+const screenToRegex = (screen: string) =>
+  new RegExp(
+    '^' + normalizePathname(screen).replace(/\[.*?\]/g, '[^/]+') + '$',
+  );
+
+export const isScreenPathname = (pathname: string, screen: string): boolean => {
+  return screenToRegex(screen).test(normalizePathname(pathname));
+};
