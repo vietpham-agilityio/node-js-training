@@ -1,0 +1,325 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfirmationState Component Snapshot should match snapshot with default props 1`] = `
+<View
+  className="items-center justify-center"
+>
+  <View
+    accessibilityLabel="confirmation state icon"
+    accessibilityRole="image"
+    accessible={true}
+    className="mb-18"
+  >
+    <RNSVGSvgView
+      align="xMidYMid"
+      bbHeight={136}
+      bbWidth={176}
+      fill="none"
+      focusable={false}
+      height={136}
+      meetOrSlice={0}
+      minX={0}
+      minY={57}
+      style={
+        [
+          {
+            "backgroundColor": "transparent",
+            "borderWidth": 0,
+          },
+          {
+            "flex": 0,
+            "height": 136,
+            "width": 176,
+          },
+        ]
+      }
+      vbHeight={136}
+      vbWidth={176}
+      width={176}
+    >
+      <RNSVGGroup
+        fill={null}
+        propList={
+          [
+            "fill",
+          ]
+        }
+      >
+        <RNSVGPath
+          clipRule={0}
+          d="M129.387 70.85H35.381c-5.474 0-9.912 4.438-9.912 9.912v29.413a5.454 5.454 0 0 0 4.33 5.337c5.775 1.217 5.775 9.46 0 10.676a5.456 5.456 0 0 0-4.33 5.338v29.413c0 5.474 4.438 9.911 9.912 9.911h128.088c5.474 0 9.912-4.437 9.912-9.911v-29.413a5.456 5.456 0 0 0-4.331-5.338c-5.774-1.216-5.774-9.459 0-10.676a5.454 5.454 0 0 0 4.331-5.337V96.584c-4.761 5.32-11.68 8.668-19.381 8.668-14.359 0-26-11.64-26-26 0-2.94.488-5.766 1.387-8.402Z"
+          fill={
+            {
+              "payload": 4280169847,
+              "type": 0,
+            }
+          }
+          fillRule={0}
+          propList={
+            [
+              "fill",
+              "fillRule",
+            ]
+          }
+        />
+        <RNSVGGroup
+          fill={
+            {
+              "payload": 4278190080,
+              "type": 0,
+            }
+          }
+          filter="a"
+        >
+          <RNSVGCircle
+            cx={154}
+            cy={79.252}
+            fill={
+              {
+                "brushRef": "b",
+                "type": 1,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+            r={22}
+          />
+        </RNSVGGroup>
+        <RNSVGPath
+          d="M152.605 82.652a3.572 3.572 0 0 1-5.225-.002l-1.66-1.781a1.295 1.295 0 0 0-1.895 1.765l2.43 2.608a5.107 5.107 0 0 0 7.473 0l10.452-11.218a1.29 1.29 0 1 0-1.888-1.76l-9.687 10.388Z"
+          fill={
+            {
+              "payload": 4294967295,
+              "type": 0,
+            }
+          }
+          propList={
+            [
+              "fill",
+            ]
+          }
+        />
+        <RNSVGMask
+          fill={
+            {
+              "payload": 4278190080,
+              "type": 0,
+            }
+          }
+          height={101}
+          maskContentUnits={1}
+          maskType={1}
+          maskUnits={1}
+          name="c"
+          width={148}
+          x={0}
+          y={93}
+        >
+          <RNSVGPath
+            clipRule={0}
+            d="M34.059 93.252H9.912C4.438 93.252 0 97.69 0 103.163V132.574a5.455 5.455 0 0 0 4.333 5.339c5.777 1.215 5.777 9.463 0 10.678A5.455 5.455 0 0 0 0 153.93V183.34c0 5.474 4.438 9.912 9.912 9.912h128.176c5.474 0 9.912-4.438 9.912-9.912v-29.41a5.455 5.455 0 0 0-4.333-5.339c-5.778-1.215-5.778-9.463 0-10.678a5.455 5.455 0 0 0 4.333-5.339v-29.411c0-5.474-4.438-9.911-9.912-9.911H34.059Z"
+            fill={
+              {
+                "payload": 4283448989,
+                "type": 0,
+              }
+            }
+            fillRule={0}
+            propList={
+              [
+                "fill",
+                "fillRule",
+              ]
+            }
+          />
+        </RNSVGMask>
+        <RNSVGGroup
+          fill={
+            {
+              "payload": 4278190080,
+              "type": 0,
+            }
+          }
+          mask="c"
+        >
+          <RNSVGPath
+            clipRule={0}
+            d="M34.059 93.252H9.912C4.438 93.252 0 97.69 0 103.163V132.574a5.455 5.455 0 0 0 4.333 5.339c5.777 1.215 5.777 9.463 0 10.678A5.455 5.455 0 0 0 0 153.93V183.34c0 5.474 4.438 9.912 9.912 9.912h128.176c5.474 0 9.912-4.438 9.912-9.912v-29.41a5.455 5.455 0 0 0-4.333-5.339c-5.778-1.215-5.778-9.463 0-10.678a5.455 5.455 0 0 0 4.333-5.339v-29.411c0-5.474-4.438-9.911-9.912-9.911H34.059Z"
+            fill={
+              {
+                "brushRef": "d",
+                "type": 1,
+              }
+            }
+            fillRule={0}
+            propList={
+              [
+                "fill",
+                "fillRule",
+              ]
+            }
+          />
+          <RNSVGPath
+            d="M3.716 143.252h138.711"
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+            propList={
+              [
+                "stroke",
+                "strokeWidth",
+                "strokeDasharray",
+                "strokeLinecap",
+              ]
+            }
+            stroke={
+              {
+                "brushRef": "e",
+                "type": 1,
+              }
+            }
+            strokeDasharray={
+              [
+                "10",
+                "10",
+              ]
+            }
+            strokeLinecap={1}
+            strokeWidth={4}
+          />
+        </RNSVGGroup>
+        <RNSVGCircle
+          cx={73}
+          cy={143.39}
+          fill={
+            {
+              "payload": 4278717512,
+              "type": 0,
+            }
+          }
+          fillOpacity={0.4}
+          propList={
+            [
+              "fill",
+              "fillOpacity",
+            ]
+          }
+          r={22}
+        />
+        <RNSVGGroup
+          fill={
+            {
+              "payload": 4278190080,
+              "type": 0,
+            }
+          }
+          filter="f"
+        >
+          <RNSVGPath
+            d="M91 143.252c0 9.941-8.059 18-18 18s-18-8.059-18-18 8.059-18 18-18 18 8.059 18 18Z"
+            fill={
+              {
+                "brushRef": "g",
+                "type": 1,
+              }
+            }
+            propList={
+              [
+                "fill",
+              ]
+            }
+          />
+        </RNSVGGroup>
+        <RNSVGDefs>
+          <RNSVGLinearGradient
+            gradient={
+              [
+                0.017,
+                -12280065,
+                0.94,
+                -14825481,
+              ]
+            }
+            gradientTransform={null}
+            gradientUnits={1}
+            name="b"
+            x1={132}
+            x2={186.212}
+            y1={60.139}
+            y2={84.931}
+          />
+          <RNSVGLinearGradient
+            gradient={
+              [
+                0,
+                -13610057,
+                1,
+                -14139518,
+              ]
+            }
+            gradientTransform={null}
+            gradientUnits={1}
+            name="d"
+            x1={50.159}
+            x2={142.577}
+            y1={110.127}
+            y2={193.651}
+          />
+          <RNSVGLinearGradient
+            gradient={
+              [
+                0.017,
+                -12280065,
+                0.94,
+                -14825481,
+              ]
+            }
+            gradientTransform={null}
+            gradientUnits={1}
+            name="e"
+            x1={3.716}
+            x2={3.767}
+            y1={143.317}
+            y2={146.574}
+          />
+          <RNSVGLinearGradient
+            gradient={
+              [
+                0.017,
+                -12280065,
+                0.94,
+                -14825481,
+              ]
+            }
+            gradientTransform={null}
+            gradientUnits={1}
+            name="g"
+            x1={55}
+            x2={99.355}
+            y1={127.614}
+            y2={147.899}
+          />
+        </RNSVGDefs>
+      </RNSVGGroup>
+    </RNSVGSvgView>
+  </View>
+  <Text
+    accessibilityRole="text"
+    className="text-white text-2xl font-montserrat-medium"
+  >
+    Test Title
+  </Text>
+  <Text
+    accessibilityRole="text"
+    className="text-white text-base font-montserrat-light max-w-48 text-center mt-4"
+  >
+    Test Description
+  </Text>
+</View>
+`;

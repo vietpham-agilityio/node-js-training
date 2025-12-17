@@ -33,6 +33,20 @@ const MainLayout = () => (
     <Stack.Screen name={SCREENS.MAIN.CINEMA} />
     <Stack.Screen name={SCREENS.MAIN.TICKETS} />
     <Stack.Screen name={SCREENS.MAIN.SEATS} />
+    <Stack.Screen
+      name={SCREENS.MAIN.CHECKOUT_SUCCESS}
+      options={{
+        headerShown: false,
+        gestureEnabled: false,
+      }}
+    />
+    <Stack.Screen
+      name={SCREENS.MAIN.PURCHASE_SUCCESS}
+      options={{
+        headerShown: false,
+        gestureEnabled: false,
+      }}
+    />
     <Stack.Screen name={SCREENS.MAIN.CHECKOUT} />
     <Stack.Screen
       name={SCREENS.MAIN.SEARCH}

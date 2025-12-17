@@ -57,4 +57,8 @@ export const MESSAGES = {
   NO_EXPIRED_TICKETS: 'Your expired and used tickets will appear here',
   UPDATE_SUCCESS: 'Update successful',
   PROFILE_UPDATE_SUCCESS: 'Profile updated successfully',
+  CHECKOUT_SUCCESS_TITLE: 'Happy Watching!',
+  CHECKOUT_SUCCESS_DESCRIPTION: 'You have successfully bought the ticket.',
+  PURCHASE_SUCCESS_TITLE: 'Yummy!',
+  PURCHASE_SUCCESS_DESCRIPTION: 'You have successfully top up the wallet.',
 };

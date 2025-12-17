@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
@@ -10,7 +11,7 @@ import { Button, Divider, OrderDetailRow } from '@/components/common';
 import { MovieCard } from '@/components/feature';
 
 // Constants
-import { Size } from '@/constants';
+import { ROUTES, Size } from '@/constants';
 
 // Utils
 import {
@@ -29,6 +30,8 @@ const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
 
 const CheckoutScreen = () => {
+  const router = useRouter();
+
   const { selectedMovie, selectedShowtime, selectedSeats, reservationId } =
     useBookingStore(
       useShallow(state => ({
@@ -81,7 +84,7 @@ const CheckoutScreen = () => {
   ];
 
   const handleCheckout = () => {
-    // TODO: Replace with actual checkout logic
+    router.replace(ROUTES.PURCHASE_SUCCESS);
   };
 
   return (
