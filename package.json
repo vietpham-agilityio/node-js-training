@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "clean": "expo prebuild --clean",
     "test": "NODE_ENV=test jest --watchAll",
@@ -13,8 +12,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "format": "prettier --write .",
-    "storybook-generate": "sb-rn-get-stories",
-    "storybook": "EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start",
+    "storybook:generate": "sb-rn-get-stories",
+    "storybook:start": "EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start",
     "export:embed:android": "EXPO_ROUTER_APP_ROOT=./src/app pnpm expo export:embed --eager --platform android --dev false"
   },
   "dependencies": {
@@ -60,6 +59,7 @@
     "react-hook-form": "^7.68.0",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
+    "react-native-qrcode-svg": "^6.3.21",
     "react-native-reanimated": "~4.1.1",
     "react-native-reanimated-carousel": "^4.0.3",
     "react-native-safe-area-context": "~5.6.0",

@@ -44,23 +44,22 @@ export function formatIDR(
   return showCurrency ? `IDR ${formattedNumber}` : formattedNumber;
 }
 
-export const formatDate = (date: string | Date, format = 'long'): string => {
+export const formatDate = (date: string | Date): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-  if (format === 'short') {
-    return dateObj.toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  }
-
-  return dateObj.toLocaleDateString('id-ID', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
+  const weekday = dateObj.toLocaleDateString('en-US', {
+    weekday: 'short',
   });
+
+  const month = dateObj.toLocaleDateString('en-US', {
+    month: 'short',
+  });
+
+  const day = dateObj.toLocaleDateString('en-US', {
+    day: '2-digit',
+  });
+
+  return `${weekday} ${month} ${day}`;
 };
 
 export const formatTime = (time: string): string => {
@@ -139,30 +138,30 @@ export const formatShowtimeDate = (
   showDate?: Date | string,
 ): string => {
   if (showtime && showDate) {
-    return `${formatTime(showtime)}, ${formatDate(showDate, 'short')}`;
+    return `${formatTime(showtime)}, ${formatDate(showDate)}`;
   }
   if (showtime) {
     return formatTime(showtime);
   }
   if (showDate) {
-    return formatDate(showDate, 'short');
+    return formatDate(showDate);
   }
   return '';
 };
 
-// Clamp rating between 0 and 10
-// Calculate filled percentage for each star (each star represents 2 points)
+// Clamp rating between 0 and 5
+// Each star represents 1 point (0-5 scale)
 export const clampedRatingToStars = (rating: number) => {
-  // Clamp rating between 0 and 10
-  const clampedRating = Math.max(0, Math.min(10, rating));
+  // Clamp rating between 0 and 5
+  const clampedRating = Math.max(0, Math.min(5, rating));
 
-  // Calculate filled percentage for each star (each star represents 2 points)
+  // Calculate filled percentage for each star (each star represents 1 point)
   const stars = Array.from({ length: 5 }, (_, index) => {
-    const starValue = (index + 1) * 2;
+    const starValue = index + 1;
     if (clampedRating >= starValue) {
       return 1; // Fully filled
-    } else if (clampedRating > index * 2) {
-      return (clampedRating - index * 2) / 2; // Partially filled
+    } else if (clampedRating > index) {
+      return clampedRating - index; // Partially filled
     }
     return 0; // Empty
   });

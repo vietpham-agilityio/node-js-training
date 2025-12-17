@@ -32,8 +32,7 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
-      ],
-      "playStoreUrl": ""
+      ]
     },
     "web": {
       "output": "static",
@@ -85,7 +84,7 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
-      ],
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

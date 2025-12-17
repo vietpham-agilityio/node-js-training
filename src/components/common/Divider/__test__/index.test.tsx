@@ -18,8 +18,8 @@ describe('Divider Component', () => {
     it('should have default styling', () => {
       render(<Divider />);
       const divider = screen.getByTestId('divider');
-      expect(divider.props.className).toContain('h-px');
-      expect(divider.props.className).toContain('bg-grey');
+      expect(divider.props.className).toContain('h-0.5');
+      expect(divider.props.className).toContain('border-grey');
     });
   });
 
@@ -41,8 +41,8 @@ describe('Divider Component', () => {
     it('should merge default and custom className', () => {
       render(<Divider className="my-6" />);
       const divider = screen.getByTestId('divider');
-      expect(divider.props.className).toContain('h-px');
-      expect(divider.props.className).toContain('bg-grey');
+      expect(divider.props.className).toContain('h-0.5');
+      expect(divider.props.className).toContain('border-grey');
       expect(divider.props.className).toContain('my-6');
     });
   });

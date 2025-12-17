@@ -13,6 +13,7 @@ export const SCREENS = {
     LAYOUT: '(main)',
     WELCOME: 'welcome',
     MOVIES: 'movies/[id]',
+    TICKETS: 'tickets/[id]',
     CHECKOUT: 'checkout',
 
     // Modal screens

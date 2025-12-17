@@ -33,6 +33,7 @@ const MainLayout = () => (
     <Stack.Screen
       name={SCREENS.MAIN.CINEMA}
     />
+    <Stack.Screen name={SCREENS.MAIN.TICKETS} />
     <Stack.Screen name={SCREENS.MAIN.CHECKOUT} />
     <Stack.Screen
       name={SCREENS.MAIN.SEARCH}
