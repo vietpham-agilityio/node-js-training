@@ -20,6 +20,7 @@ export const SCREENS = {
 
     CHECKOUT_SUCCESS: 'checkout-success',
     PURCHASE_SUCCESS: 'purchase-success',
+    TOP_UP: 'top-up',
   
     // Modal screens
     SEARCH: 'search',

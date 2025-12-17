@@ -1,6 +1,6 @@
-import { ImageBackground } from 'expo-image';
 import { memo } from 'react';
-import { Dimensions, View } from 'react-native';
+import { ImageBackground } from 'expo-image';
+import { Dimensions, TouchableOpacity, View } from 'react-native';
 
 // Assets
 import Card from '@assets/images/card.webp';
@@ -17,6 +17,7 @@ interface WalletCardProps {
   cardNumber?: string;
   cardName?: string;
   accessibilityLabel?: string;
+  onPress?: () => void;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
@@ -30,21 +31,25 @@ export const WalletCard = memo(
     cardNumber = '6032 1506 4207 2004',
     cardName = 'Arya Wijaya',
     accessibilityLabel,
+    onPress,
   }: WalletCardProps) => {
     const balanceFormatted = formatIDR(balance);
     const cardNumberFormatted = formatCardNumber(cardNumber);
 
+
     return (
-      <View
+      <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={0.9}
         className="w-full justify-center items-center rounded-xl overflow-hidden shadow-lg"
         style={{
           width: CARD_WIDTH,
           height: CARD_HEIGHT,
         }}
-        accessibilityRole="text"
+        accessibilityRole={onPress ? 'button' : 'text'}
         accessibilityLabel={
           accessibilityLabel ||
-          `Wallet balance ${currency} ${formatCurrency(balance)}, Card holder ${cardName}`
+          `Wallet balance ${currency} ${formatCurrency(balance)}, Card holder ${cardName}${onPress ? '. Double tap to top up' : ''}`
         }
       >
         <ImageBackground
@@ -102,7 +107,7 @@ export const WalletCard = memo(
             </Typo>
           </View>
         </ImageBackground>
-      </View>
+      </TouchableOpacity>
     );
   },
 );

@@ -1,4 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
+import { useRouter } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
@@ -12,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { Size } from '@/constants';
+import { ROUTES, Size } from '@/constants';
 
 // Hooks
 import { useProfile, useTransactionsInfinite, useWallet } from '@/hooks';
@@ -28,6 +29,8 @@ import { TopUpIcon } from '@/icons';
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
 const WalletScreen = () => {
+  const router = useRouter();
+
   const {
     data: wallet,
     isLoading: isLoadingWallet,
@@ -68,17 +71,21 @@ const WalletScreen = () => {
 
   const handleTopUp = useCallback(() => {}, []);
 
+  const handleWalletCardPress = useCallback(() => {
+    router.push(ROUTES.TOP_UP);
+  }, [router]);
+
   const renderTransaction = useCallback(
     ({ item }: { item: WalletTransaction }) => {
       const { booking } = item;
 
-    if (!booking) return null;
+      if (!booking) return null;
 
-    const { showtime } = booking;
-    const { movie, cinemaHall, showTime, showDate } = showtime || {};
-    const { cinema } = cinemaHall || {};
+      const { showtime } = booking;
+      const { movie, cinemaHall, showTime, showDate } = showtime || {};
+      const { cinema } = cinemaHall || {};
 
-    if (!movie || !cinema) return null;
+      if (!movie || !cinema) return null;
 
       return (
         <MovieCard
@@ -202,6 +209,7 @@ const WalletScreen = () => {
             cardNumber={wallet.cardNumber}
             cardName={profile?.fullName || 'User'}
             accessibilityLabel={`Wallet balance ${wallet.balance} ${wallet.currency}`}
+            onPress={handleWalletCardPress}
           />
         ) : null}
 
@@ -210,7 +218,13 @@ const WalletScreen = () => {
         </Typo>
       </View>
     ),
-    [isWalletError, refetchWallet, wallet, profile?.fullName],
+    [
+      isWalletError,
+      refetchWallet,
+      wallet,
+      profile?.fullName,
+      handleWalletCardPress,
+    ],
   );
 
   if (isLoadingProfile || isLoadingWallet || isLoadingTransactions) {

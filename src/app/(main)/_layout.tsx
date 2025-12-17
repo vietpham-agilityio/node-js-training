@@ -48,6 +48,7 @@ const MainLayout = () => (
       }}
     />
     <Stack.Screen name={SCREENS.MAIN.CHECKOUT} />
+    <Stack.Screen name={SCREENS.MAIN.TOP_UP} />
     <Stack.Screen
       name={SCREENS.MAIN.SEARCH}
       options={{
