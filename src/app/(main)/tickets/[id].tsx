@@ -53,7 +53,7 @@ const TicketDetailScreen = () => {
       showTime: showTime,
       showDate: showDate,
       qrCode: ticket.qrCodeData,
-      idOrder: ticket.bookingId,
+      idOrder: booking.bookingNumber,
     };
   }, [ticket]);
 

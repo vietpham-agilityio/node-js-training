@@ -11,7 +11,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { ERROR_MESSAGES, MESSAGES, ROUTES, Size } from '@/constants';
+import {
+  ERROR_MESSAGES,
+  MESSAGES,
+  RATING_FILTERS,
+  ROUTES,
+  Size,
+} from '@/constants';
 
 // Hooks
 import { useDebounce, useMoviesInfinite, useSearchMovies } from '@/hooks';
@@ -20,7 +26,7 @@ import { useDebounce, useMoviesInfinite, useSearchMovies } from '@/hooks';
 import { Movie } from '@/types';
 
 // Components
-import { Button, SearchInput, Typo } from '@/components/common';
+import { Button, SearchInput, Tabs, Typo } from '@/components/common';
 import { MovieCard } from '@/components/feature';
 import { CancelIcon } from '@/icons';
 
@@ -30,9 +36,10 @@ const SearchScreen = () => {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRating, setSelectedRating] = useState('all');
   const debouncedQuery = useDebounce(searchQuery, 300);
 
-  // Show all movies by default with infinite scroll
+  // Fetch movies with infinite scroll
   const {
     data: allMoviesData,
     isLoading: isLoadingAllMovies,
@@ -66,8 +73,17 @@ const SearchScreen = () => {
     return allMoviesData.pages.flat();
   }, [allMoviesData]);
 
-  // Use search results or all movies based on search state
-  const displayedMovies = isSearchActive ? searchResults || [] : allMovies;
+  // IMPROVEMENT: Apply rating filter to both search results and all movies
+  const displayedMovies = useMemo(() => {
+    const movies = isSearchActive ? searchResults || [] : allMovies;
+    const minRating =
+      RATING_FILTERS.find(f => f.id === selectedRating)?.minRating || 0;
+
+    if (minRating === 0) return movies;
+
+    return movies.filter(movie => (movie.rating || 0) >= minRating);
+  }, [isSearchActive, searchResults, allMovies, selectedRating]);
+
   const isLoading = isSearchActive ? isSearching : isLoadingAllMovies;
   const isFetching = isSearchActive
     ? isSearchFetching
@@ -122,6 +138,22 @@ const SearchScreen = () => {
   const getItemType = useCallback((item: Movie) => {
     return item.status || 'default';
   }, []);
+
+  const resultsCountContent = useMemo(
+    () =>
+      isSearchActive
+        ? `Found ${displayedMovies.length} movie${displayedMovies.length !== 1 ? 's' : ''} for "${debouncedQuery}"`
+        : `Showing ${displayedMovies.length} movie${displayedMovies.length !== 1 ? 's' : ''}`,
+
+    [debouncedQuery, displayedMovies.length, isSearchActive],
+  );
+  const ratingFilterContent = useMemo(
+    () =>
+      selectedRating !== 'all'
+        ? ` with ${RATING_FILTERS.find(f => f.id === selectedRating)?.label}`
+        : null,
+    [selectedRating],
+  );
 
   const Footer = useCallback(() => {
     if (!isFetching || isSearchActive) return null;
@@ -243,7 +275,7 @@ const SearchScreen = () => {
       edges={['bottom']}
       accessibilityLabel="Search movies screen"
       accessibilityHint="Search screen"
-      className="h-full bg-bg-primary"
+      className="flex-1 bg-bg-primary"
     >
       <View className="px-6">
         <View className="mb-6">
@@ -274,12 +306,24 @@ const SearchScreen = () => {
           </View>
         </View>
 
+        {/* NEW: Rating Filter */}
+        <View className="mb-4">
+          <Typo size="sm" weight="medium" className="mb-2">
+            Filter by Rating
+          </Typo>
+          <Tabs
+            tabs={RATING_FILTERS}
+            activeTab={selectedRating}
+            onTabChange={setSelectedRating}
+          />
+        </View>
+
+        {/* Results Count */}
         {displayedMovies.length > 0 && !isLoading && (
           <View className="py-2 mb-2 bg-success/10 rounded-lg">
             <Typo size="sm" accessibilityRole="text">
-              {isSearchActive
-                ? `Found ${displayedMovies.length} movie${displayedMovies.length !== 1 ? 's' : ''} for "${debouncedQuery}"`
-                : `Showing ${displayedMovies.length} movie${displayedMovies.length !== 1 ? 's' : ''}`}
+              {resultsCountContent}
+              {ratingFilterContent}
             </Typo>
           </View>
         )}

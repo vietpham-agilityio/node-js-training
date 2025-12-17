@@ -1,4 +1,5 @@
 import {
+  ArrowRightIcon,
   ChangeLanguageIcon,
   EditProfileIcon,
   HelpCenterIcon,
@@ -21,7 +22,7 @@ export const API_CONFIG = {
   SEAT_RESERVATION_TIMEOUT: 10 * 60 * 1000,
   TICKET_EXPIRY_TIME: 24 * 60 * 60 * 1000,
   QUERY_STALE_TIME: 5 * 60 * 1000,
-  SEARCH_MOVIE_STALE_TIME: 2 * 60 * 1000,
+  MOVIE_STALE_TIME: 2 * 60 * 1000,
   BOOKING_STALE_TIME: 1 * 60 * 1000,
 };
 
@@ -73,5 +74,10 @@ export const SETTING_ITEMS = [
     TITLE: 'Rate Flutix App',
     ICON: LikeIcon,
     TEST_ID: 'rate_app',
+  },
+  {
+    TITLE: 'Logout',
+    ICON: ArrowRightIcon,
+    TEST_ID: 'logout',
   },
 ];

@@ -90,3 +90,12 @@ export const TICKET_TABS = [
   { id: TicketStatus.ACTIVE, label: 'Active' },
   { id: TicketStatus.EXPIRED, label: 'Expired' },
 ];
+
+// NEW: Rating filter options
+export const RATING_FILTERS = [
+  { id: 'all', label: 'All Ratings', minRating: 0 },
+  { id: '4+', label: '4+', minRating: 4 },
+  { id: '3+', label: '3+', minRating: 3 },
+  { id: '2+', label: '2+', minRating: 2 },
+  { id: '1+', label: '1+', minRating: 1 },
+];

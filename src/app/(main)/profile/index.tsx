@@ -9,7 +9,7 @@ import { withUniwind } from 'uniwind';
 import { ROUTES, SETTING_ITEMS } from '@/constants';
 
 // Hooks
-import { useProfile } from '@/hooks';
+import { useAuth, useProfile } from '@/hooks';
 
 // Components
 import { Avatar, Typo } from '@/components/common';
@@ -26,10 +26,12 @@ enum SettingKey {
   ChangeLanguage = 'change_language',
   HelpCenter = 'help_center',
   RateApp = 'rate_app',
+  Logout = 'logout',
 }
 
 const ProfileScreen = () => {
   const { data: profile, isLoading: isProfileLoading } = useProfile();
+  const { signOut } = useAuth();
 
   const SETTING_ACTIONS: Record<SettingKey, () => void> = useMemo(
     () => ({
@@ -46,8 +48,9 @@ const ProfileScreen = () => {
           },
         ]);
       },
+      [SettingKey.Logout]: () => signOut(),
     }),
-    [],
+    [signOut],
   );
 
   if (isProfileLoading) {

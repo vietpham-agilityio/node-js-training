@@ -5,13 +5,20 @@ import {
   walletService,
 } from '@/services/supabase';
 import { useAuthStore, useBookingStore, useWalletStore } from '@/stores';
-import { BookingStatus } from '@/types';
+import {
+  Booking,
+  BookingStatus,
+  InfiniteBookingsData,
+  Showtime,
+  Wallet,
+} from '@/types';
 import {
   useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useBookings = (status?: string) => {
   const user = useAuthStore(state => state.user);
@@ -21,6 +28,11 @@ export const useBookings = (status?: string) => {
     queryFn: () => bookingsService.getBookings(user!.id, status),
     enabled: !!user,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
+    gcTime: API_CONFIG.QUERY_STALE_TIME,
+    retry: 2,
+
+    // Exponential backoff retry strategy
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
 
@@ -28,16 +40,32 @@ export const useBookingsInfinite = (status?: string) => {
   const user = useAuthStore(state => state.user);
 
   return useInfiniteQuery({
+    // Cache key scoped by user + status
     queryKey: queryKeys.bookings.infinite(user?.id, status),
     queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) =>
-      bookingsService.getBookingsPaginated(user!.id, status, pageParam, PAGINATION.PAGE_LIMIT),
+      bookingsService.getBookingsPaginated(
+        user!.id,
+        status,
+        pageParam,
+        PAGINATION.PAGE_LIMIT,
+      ),
     getNextPageParam: (lastPage, allPages) => {
+      // If last page has fewer items than page size, we've reached the end
       if (lastPage.length < PAGINATION.PAGE_LIMIT) return undefined;
+      // Return next page number
       return allPages.length;
     },
-    initialPageParam: 0,
+
+    initialPageParam: PAGINATION.PAGE_OFFSET,
     enabled: !!user,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
+    gcTime: API_CONFIG.QUERY_STALE_TIME,
+    retry: 2,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+
+    // Mobile optimization
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
   });
 };
 
@@ -47,6 +75,8 @@ export const useBooking = (bookingId: string) => {
     queryFn: () => bookingsService.getBookingById(bookingId),
     enabled: !!bookingId,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
+    gcTime: API_CONFIG.QUERY_STALE_TIME,
+    retry: 2,
   });
 };
 
@@ -58,12 +88,15 @@ export const useCreateBooking = () => {
 
   return useMutation({
     mutationFn: async (data: CreateBookingData) => {
+      // Prevent booking if wallet balance is insufficient
       if (!wallet || wallet.balance < data.totalAmount) {
         throw new Error('Insufficient wallet balance');
       }
 
+      // Create booking
       const booking = await bookingsService.createBooking(data);
 
+      // Deduct wallet balance
       await walletService.processPurchase(
         wallet.id,
         data.totalAmount,
@@ -74,10 +107,13 @@ export const useCreateBooking = () => {
       return booking;
     },
     onMutate: async newBooking => {
-      // Cancel outgoing queries
+      /**
+       * Cancel ongoing queries to avoid race conditions
+       */
       await queryClient.cancelQueries({
         queryKey: queryKeys.bookings.lists(),
       });
+
       await queryClient.cancelQueries({
         queryKey: queryKeys.wallet.detail(user?.id),
       });
@@ -86,30 +122,73 @@ export const useCreateBooking = () => {
       const previousBookings = queryClient.getQueryData(
         queryKeys.bookings.list(user?.id),
       );
+
       const previousWallet = queryClient.getQueryData(
         queryKeys.wallet.detail(user?.id),
       );
 
-      // Optimistically update bookings list
+      /**
+       * Optimistically add booking to normal list
+       */
       queryClient.setQueryData(
         queryKeys.bookings.list(user?.id),
-        (old: any) => {
+        (old: Booking[]) => {
           if (!old) return old;
+
           const optimisticBooking = {
-            id: 'temp-' + Date.now(),
+            id: uuidv4(), // temporary ID
             ...newBooking,
-            bookingNumber: 'PENDING',
+            bookingNumber: uuidv4(),
             bookingStatus: BookingStatus.ACTIVE,
             createdAt: new Date().toISOString(),
           };
+
+          // New bookings appear at top
           return [optimisticBooking, ...old];
         },
       );
 
-      // Optimistically update wallet
+      /**
+       * Optimistically update INFINITE QUERY
+       *
+       * pages structure:
+       * [
+       *   [booking1, booking2], // page 0 (newest)
+       *   [booking3, booking4], // page 1
+       * ]
+       *
+       * We ONLY insert into page 0
+       * slice(1) keeps page 1..n unchanged
+       */
+      queryClient.setQueryData(
+        queryKeys.bookings.infinite(user?.id),
+        (old: InfiniteBookingsData) => {
+          if (!old?.pages) return old;
+
+          const optimisticBooking = {
+            id: uuidv4(),
+            ...newBooking,
+            bookingNumber: uuidv4(),
+            bookingStatus: BookingStatus.ACTIVE,
+            createdAt: new Date().toISOString(),
+          };
+
+          return {
+            ...old,
+            pages: [
+              [optimisticBooking, ...old.pages[0]],
+              ...old.pages.slice(1),
+            ],
+          };
+        },
+      );
+
+      /**
+       * Optimistically deduct wallet balance
+       */
       queryClient.setQueryData(
         queryKeys.wallet.detail(user?.id),
-        (old: any) => {
+        (old: Wallet) => {
           if (!old) return old;
           return {
             ...old,
@@ -118,8 +197,15 @@ export const useCreateBooking = () => {
         },
       );
 
+      /**
+       * Return snapshots for rollback
+       */
       return { previousBookings, previousWallet };
     },
+
+    /**
+     * Rollback optimistic updates on error
+     */
     onError: (err, variables, context) => {
       // Rollback on error
       if (context?.previousBookings) {
@@ -128,17 +214,24 @@ export const useCreateBooking = () => {
           context.previousBookings,
         );
       }
+
       if (context?.previousWallet) {
         queryClient.setQueryData(
           queryKeys.wallet.detail(user?.id),
           context.previousWallet,
         );
       }
+
+      // Ensure infinite query is consistent
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.bookings.infinite(user?.id),
+      });
     },
     onSuccess: data => {
       // Add real booking to cache
       queryClient.setQueryData(queryKeys.bookings.detail(data.id), data);
 
+      // Clear local booking state
       resetBooking();
     },
     onSettled: () => {
@@ -188,16 +281,19 @@ export const useCancelBooking = () => {
       const previousBookings = queryClient.getQueryData(
         queryKeys.bookings.list(user?.id),
       );
+      const previousInfiniteBookings = queryClient.getQueryData(
+        queryKeys.bookings.infinite(user?.id),
+      );
       const previousWallet = queryClient.getQueryData(
         queryKeys.wallet.detail(user?.id),
       );
 
-      // Optimistic updates
+      // Optimistic updates for list
       queryClient.setQueryData(
         queryKeys.bookings.list(user?.id),
-        (old: any) => {
+        (old: Booking[]) => {
           if (!old) return old;
-          return old.map((booking: any) =>
+          return old.map(booking =>
             booking.id === bookingId
               ? { ...booking, bookingStatus: BookingStatus.CANCELLED }
               : booking,
@@ -205,9 +301,28 @@ export const useCancelBooking = () => {
         },
       );
 
+      // Optimistic updates for infinite query
+      queryClient.setQueryData(
+        queryKeys.bookings.infinite(user?.id),
+        (old: InfiniteBookingsData) => {
+          if (!old?.pages) return old;
+          return {
+            ...old,
+            pages: old.pages.map(page =>
+              page.map(booking =>
+                booking.id === bookingId
+                  ? { ...booking, bookingStatus: BookingStatus.CANCELLED }
+                  : booking,
+              ),
+            ),
+          };
+        },
+      );
+
+      // Optimistic wallet update
       queryClient.setQueryData(
         queryKeys.wallet.detail(user?.id),
-        (old: any) => {
+        (old: Wallet) => {
           if (!old) return old;
           return {
             ...old,
@@ -216,15 +331,24 @@ export const useCancelBooking = () => {
         },
       );
 
-      return { previousBookings, previousWallet };
+      return { previousBookings, previousInfiniteBookings, previousWallet };
     },
     onError: (err, variables, context) => {
+      // Rollback all changes
       if (context?.previousBookings) {
         queryClient.setQueryData(
           queryKeys.bookings.list(user?.id),
           context.previousBookings,
         );
       }
+
+      if (context?.previousInfiniteBookings) {
+        queryClient.setQueryData(
+          queryKeys.bookings.infinite(user?.id),
+          context.previousInfiniteBookings,
+        );
+      }
+
       if (context?.previousWallet) {
         queryClient.setQueryData(
           queryKeys.wallet.detail(user?.id),
@@ -232,6 +356,7 @@ export const useCancelBooking = () => {
         );
       }
     },
+
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bookings.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.wallet.all });
@@ -252,24 +377,23 @@ export const useReserveSeats = () => {
       showtimeId: string;
       seats: string[];
     }) => bookingsService.reserveSeats(showtimeId, user!.id, seats),
+
     onSuccess: data => {
+      // Store reservation ID
       setReservationId(data.id);
 
-      // Auto-release after 10 minutes
+      // Auto-release after timeout
       setTimeout(() => {
         setReservationId(null);
       }, API_CONFIG.SEAT_RESERVATION_TIMEOUT);
 
-      // Update showtime available seats optimistically
+      // Optimistically reduce available seats
       queryClient.setQueryData(
         queryKeys.showtimes.detail(data.showtimeId),
-        (old: any) => {
-          if (!old) return old;
-          return {
-            ...old,
-            availableSeats: old.availableSeats - data.seatNumbers.length,
-          };
-        },
+        (old: Showtime) => ({
+          ...old,
+          availableSeats: old.availableSeats - data.seatNumbers.length,
+        }),
       );
     },
   });
@@ -282,9 +406,12 @@ export const useReleaseSeats = () => {
   return useMutation({
     mutationFn: (reservationId: string) =>
       bookingsService.releaseSeats(reservationId),
+
     onSuccess: () => {
       setReservationId(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.showtimes.all });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.showtimes.all,
+      });
     },
   });
 };
