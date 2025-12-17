@@ -1,4 +1,4 @@
-import { PromoCodeStatus } from '@/types';
+import { PromoCodeStatus, Seat } from '@/types';
 
 export const formatCardNumber = (number?: string) => {
   if (!number) return '•••• •••• •••• ••••';
@@ -12,12 +12,15 @@ export const formatCardNumber = (number?: string) => {
 };
 
 export const formatCurrency = (amount: number, currency = 'IDR'): string => {
-  return new Intl.NumberFormat('id-ID', {
+  const formatted = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
+
+  // Add space between currency symbol and amount (e.g., "Rp 150.000" instead of "Rp150.000")
+  return formatted.replace(/([A-Za-z]+)(\d)/, '$1 $2');
 };
 
 /**
@@ -121,6 +124,10 @@ export const calculateDiscount = (
   return Math.min(discount, amount);
 };
 
+export const calculateTotalPrice = (price: number, seats: number): number => {
+  return price * seats;
+};
+
 export const formatMovieDuration = (minutes: number): string => {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
@@ -167,4 +174,15 @@ export const clampedRatingToStars = (rating: number) => {
   });
 
   return stars;
+};
+
+export const groupSeatsByRow = (seats: Seat[]): Record<string, Seat[]> => {
+  const grouped: Record<string, Seat[]> = {};
+  seats.forEach(seat => {
+    if (!grouped[seat.row]) {
+      grouped[seat.row] = [];
+    }
+    grouped[seat.row].push(seat);
+  });
+  return grouped;
 };

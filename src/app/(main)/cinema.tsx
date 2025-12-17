@@ -27,8 +27,12 @@ import {
   generateMockCinemasWithShowtimes,
   MOCK_CINEMAS,
 } from '@/mocks/showtime';
+
+// Stpre
+import { useBookingStore, useHeaderStore } from '@/stores';
+
+// Types
 import { Showtime } from '@/types';
-import { useBookingStore } from '@/stores';
 
 const CinemaScreen = () => {
   const params = useLocalSearchParams<{
@@ -38,6 +42,7 @@ const CinemaScreen = () => {
   const movieId = params.movieId || '';
 
   const setShowtime = useBookingStore(state => state.setShowtime);
+  const clearHeaderTitle = useHeaderStore(state => state.clearTitle);
 
   const [selectedLocation, setSelectedLocation] = useState<string>('');
 
@@ -68,16 +73,9 @@ const CinemaScreen = () => {
   const handleNavigateToSeatSelection = useCallback(() => {
     if (!selectedShowtime) return;
 
-    // TODO: Navigate to seat selection screen with selected showtime
-    router.push({
-      pathname: ROUTES.CHECKOUT,
-      params: {
-        showtimeId: selectedShowtime.showtimeId,
-        cinemaId: selectedShowtime.cinemaId,
-        movieId,
-      },
-    });
-  }, [selectedShowtime, movieId]);
+    clearHeaderTitle();
+    router.push(ROUTES.SEATS);
+  }, [selectedShowtime, clearHeaderTitle]);
 
   const handleDateSelect = useCallback((dateId: string) => {
     setSelectedDate(dateId);

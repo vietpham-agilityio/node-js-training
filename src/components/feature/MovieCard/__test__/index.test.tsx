@@ -74,7 +74,7 @@ describe('MovieCard Component', () => {
       render(
         <MovieCard {...defaultProps} showtime="16:40" showDate="2025-12-18" />,
       );
-      expect(screen.getByText('16:40, 18 Des 2025')).toBeTruthy();
+      expect(screen.getByText('16:40, Thu Dec 18')).toBeTruthy();
     });
 
     it('should display price when provided', () => {
@@ -97,7 +97,7 @@ describe('MovieCard Component', () => {
           cinemaLocation="FX Sudirman XXI"
         />,
       );
-      expect(screen.getByText('16:40, 18 Des 2025')).toBeTruthy();
+      expect(screen.getByText('16:40, Thu Dec 18')).toBeTruthy();
       expect(screen.getByText('IDR: 150.000')).toBeTruthy();
       expect(screen.getByText('FX Sudirman XXI')).toBeTruthy();
     });
@@ -164,7 +164,7 @@ describe('MovieCard Component', () => {
 
     it('should handle date only without showtime', () => {
       render(<MovieCard {...defaultProps} showDate="2025-12-18" />);
-      expect(screen.getByText('18 Des 2025')).toBeTruthy();
+      expect(screen.getByText('Thu Dec 18')).toBeTruthy();
     });
 
     it('should handle only price without other booking info', () => {

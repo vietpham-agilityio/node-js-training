@@ -21,6 +21,7 @@ export const SCREENS = {
     // Modal screens
     SEARCH: 'search',
     CINEMA: 'cinema',
+    SEATS: 'seats',
   },
 
   // Auth screens

@@ -39,7 +39,7 @@ exports[`SelectBox Component Rendering should render matching snapshot 1`] = `
   testID="test-select-box"
 >
   <View
-    className="items-center justify-center rounded-xl bg-secondary"
+    className="items-center justify-center rounded-lg bg-secondary"
   >
     <Text
       accessibilityRole="text"

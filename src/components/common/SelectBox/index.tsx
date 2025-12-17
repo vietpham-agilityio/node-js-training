@@ -26,7 +26,7 @@ export const SelectBox = memo(
     ...rest
   }: SelectBoxProps) => {
     const SelectBoxClassName = useMemo(() => {
-      const baseClasses = 'items-center justify-center rounded-xl';
+      const baseClasses = 'items-center justify-center rounded-lg';
 
       return disabled
         ? `${baseClasses} bg-light-navy`
