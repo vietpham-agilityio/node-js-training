@@ -1,5 +1,6 @@
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useShallow } from 'zustand/react/shallow';
 
 // Unwind
 import { withUniwind } from 'uniwind';
@@ -12,45 +13,64 @@ import { MovieCard } from '@/components/feature';
 import { Size } from '@/constants';
 
 // Utils
-import { formatCurrency, formatIDR } from '@/utils/formats';
+import {
+  calculateTotalPrice,
+  formatCurrency,
+  formatIDR,
+} from '@/utils/formats';
 
 // Mocks
-import { MOCK_MOVIE, MOCK_ORDER_DETAIL, MOCK_WALLET_BALANCE } from '@/mocks';
+import { MOCK_WALLET_BALANCE } from '@/mocks';
+
+// Store
+import { useBookingStore } from '@/stores';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
 
 const CheckoutScreen = () => {
-  // TODO: Replace with actual data from API
-  const totalPrice =
-    MOCK_ORDER_DETAIL.pricePerTicket * MOCK_ORDER_DETAIL.quantity;
+  const { selectedMovie, selectedShowtime, selectedSeats, reservationId } =
+    useBookingStore(
+      useShallow(state => ({
+        selectedMovie: state.selectedMovie,
+        selectedShowtime: state.selectedShowtime,
+        selectedSeats: state.selectedSeats,
+        reservationId: state.reservationId,
+      })),
+    );
+
+  // Calculate total price: price per ticket * number of seats
+  const totalPrice = calculateTotalPrice(
+    selectedShowtime?.price || 0,
+    selectedSeats.length,
+  );
 
   const orderRows = [
     {
       label: 'ID Order',
-      value: MOCK_ORDER_DETAIL.idOrder,
+      value: reservationId || '209993282',
       testID: 'order-id',
     },
     {
       label: 'Cinema',
-      value: MOCK_ORDER_DETAIL.cinema,
+      value: selectedShowtime?.cinemaHall?.cinema?.name || '',
       testID: 'order-cinema',
     },
     {
       label: 'Date & Time',
-      value: MOCK_ORDER_DETAIL.dateTime,
+      value: selectedShowtime?.showDate + ' ' + selectedShowtime?.showTime,
       testID: 'order-datetime',
     },
     {
       label: 'Seat Number',
-      value: MOCK_ORDER_DETAIL.seatNumber,
+      value: selectedSeats.join(', '),
       testID: 'order-seats',
     },
     {
       label: 'Price',
-      value: `Rp ${MOCK_ORDER_DETAIL.pricePerTicket.toLocaleString(
+      value: `Rp ${selectedShowtime?.price.toLocaleString(
         'id-ID',
-      )} x ${MOCK_ORDER_DETAIL.quantity}`,
+      )} x ${selectedSeats.length}`,
       testID: 'order-price',
     },
     {
@@ -78,7 +98,13 @@ const CheckoutScreen = () => {
         <View>
           {/* Movie Details Section */}
           <View className="mb-8">
-            <MovieCard {...MOCK_MOVIE} />
+            <MovieCard
+              title={selectedMovie?.title || ''}
+              posterUrl={selectedMovie?.posterUrl || ''}
+              rating={selectedMovie?.rating}
+              genre={selectedMovie?.genre}
+              durationMinutes={selectedMovie?.durationMinutes}
+            />
           </View>
 
           <Divider />

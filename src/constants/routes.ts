@@ -6,6 +6,7 @@ export const ROUTES = {
   CHECKOUT: '/(main)/checkout',
   CINEMA: '/(main)/cinema',
   TICKET_DETAILS: (id: string): Href => `/(main)/tickets/${id}`,
+  SEATS: '/(main)/seats',
 
   // Profile routes
   PROFILE: '/(main)/profile',

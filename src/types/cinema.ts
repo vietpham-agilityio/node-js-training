@@ -12,6 +12,12 @@ export enum SeatReservationStatus {
   RELEASED = 'released',
 }
 
+export enum SeatStatus {
+  AVAILABLE = 'available',
+  BOOKED = 'booked',
+  SELECTED = 'selected',
+}
+
 export interface Cinema {
   id: string;
   name: string;
@@ -62,4 +68,11 @@ export interface SeatReservation {
   reservedUntil: string;
   status: SeatReservationStatus;
   createdAt: string;
+}
+
+export interface Seat {
+  id: string;
+  row: string;
+  number: number;
+  status: SeatStatus;
 }
