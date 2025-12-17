@@ -32,6 +32,9 @@ export const ERROR_MESSAGES = {
   TICKET_NETWORK_ERROR:
     'We’re having trouble loading tickets. Please try again later.',
   LOCATION_PERMISSION_DENIED: 'Permission to access location was denied',
+  INVALID_PHONE_NUMBER: 'Invalid phone number format',
+  UPDATE_FAILED: 'Update failed',
+  UPDATE_PROFILE_FAILED: 'Failed to update profile',
 };
 
 export const MESSAGES = {
@@ -52,4 +55,6 @@ export const MESSAGES = {
   NO_TICKETS: 'Start your movie journey by booking a ticket',
   NO_ACTIVE_TICKETS: 'Book a movie to see your active tickets here',
   NO_EXPIRED_TICKETS: 'Your expired and used tickets will appear here',
+  UPDATE_SUCCESS: 'Update successful',
+  PROFILE_UPDATE_SUCCESS: 'Profile updated successfully',
 };

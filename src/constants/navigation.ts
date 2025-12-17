@@ -15,6 +15,8 @@ export const SCREENS = {
     MOVIES: 'movies/[id]',
     TICKETS: 'tickets/[id]',
     CHECKOUT: 'checkout',
+    PROFILE: 'profile/index',
+    PROFILE_EDIT: 'profile/edit',
 
     // Modal screens
     SEARCH: 'search',

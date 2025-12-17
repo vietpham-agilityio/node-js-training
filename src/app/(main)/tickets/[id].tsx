@@ -151,7 +151,7 @@ const TicketDetailScreen = () => {
                 >
                   ID Order
                 </Typo>
-                <Typo size="base" weight="regular">
+                <Typo size="base" weight="regular" className="text-center">
                   {ticketDetail?.idOrder}
                 </Typo>
               </View>
