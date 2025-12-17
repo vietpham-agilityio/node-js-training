@@ -18,6 +18,9 @@ export const SCREENS = {
     PROFILE: 'profile/index',
     PROFILE_EDIT: 'profile/edit',
 
+    CHECKOUT_SUCCESS: 'checkout-success',
+    PURCHASE_SUCCESS: 'purchase-success',
+  
     // Modal screens
     SEARCH: 'search',
     CINEMA: 'cinema',

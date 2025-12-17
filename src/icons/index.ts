@@ -27,3 +27,4 @@ export * from './WalletIcon';
 export * from './WalletOutlineIcon';
 export * from './LocationIcon';
 export * from './ScreenIcon';
+export * from './TicketCheckedIcon';
