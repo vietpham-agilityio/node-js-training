@@ -87,11 +87,10 @@ export const NavigationTabBar = memo(
 
     return (
       <View
-        className={cn(`flex-row border-0`, isIOS() && 'shadow-md')}
+        className={cn(`flex-row border-0 bg-deep-blue`, isIOS() && 'shadow-md')}
         accessibilityLabel="Main navigation tabs"
         accessibilityHint="Tap to select a tab"
         style={{
-          backgroundColor: TAB_BAR_THEME.BACKGROUND_COLOR,
           paddingBottom: bottomInset,
         }}
       >

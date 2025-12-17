@@ -92,28 +92,36 @@ const MyTicketScreen = () => {
     router.push(ROUTES.HOME);
   }, []);
 
-  const renderTicket = useCallback(({ item }: { item: Ticket }) => {
-    const { booking } = item;
-
-    if (!booking) return null;
-
-    const { showtime } = booking;
-    const { movie, cinemaHall, showTime, showDate } = showtime || {};
-    const { cinema } = cinemaHall || {};
-
-    if (!movie || !cinema) return null;
-
-    return (
-      <MovieCard
-        title={movie.title}
-        posterUrl={movie.posterUrl}
-        showtime={showTime}
-        showDate={showDate}
-        cinemaName={cinema.name}
-        justifyContent="center"
-      />
-    );
+  const handleTicketDetails = useCallback((ticketId: string) => {
+    router.push(ROUTES.TICKET_DETAILS(ticketId));
   }, []);
+
+  const renderTicket = useCallback(
+    ({ item }: { item: Ticket }) => {
+      const { booking } = item;
+
+      if (!booking) return null;
+
+      const { showtime } = booking;
+      const { movie, cinemaHall, showTime, showDate } = showtime || {};
+      const { cinema } = cinemaHall || {};
+
+      if (!movie || !cinema) return null;
+
+      return (
+        <MovieCard
+          title={movie.title}
+          posterUrl={movie.posterUrl}
+          showtime={showTime}
+          showDate={showDate}
+          cinemaName={cinema.name}
+          justifyContent="center"
+          onPress={() => handleTicketDetails(item.id)}
+        />
+      );
+    },
+    [handleTicketDetails],
+  );
 
   const keyExtractor = useCallback((item: Ticket) => item.id, []);
 

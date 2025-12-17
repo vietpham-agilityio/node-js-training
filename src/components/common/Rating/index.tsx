@@ -7,7 +7,7 @@ import { Typo } from '../Typo';
 import { clampedRatingToStars } from '@/utils';
 
 interface RatingProps {
-  rating: number; // 0 to 10
+  rating: number; // 0 to 5
   size?: number;
   spacing?: number;
 }

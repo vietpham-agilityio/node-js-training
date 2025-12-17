@@ -104,14 +104,15 @@ export const MovieCard = memo(
         {/* Right Section - Movie Details */}
         <View
           className={cn(
-            'flex-1 justify-end my-1.5 gap-3',
+            'flex-1 justify-end gap-3',
             `justify-${justifyContent}`,
           )}
         >
           {/* Title */}
           <Typo
             size="base"
-            weight="semibold"
+            weight={imageSize === Size.SMALL ? 'medium' : 'semibold'}
+            className="leading-5"
             testID="movie-card-title"
             accessibilityRole="text"
             accessibilityLabel={title}

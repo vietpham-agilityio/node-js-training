@@ -1,3 +1,5 @@
+import { HEADER_TITLE_MAP } from '@/constants';
+
 /**
  * Converts a string from snake_case to camelCase.
  * @example
@@ -38,4 +40,20 @@ export const keysToCamel = <T = any>(obj: any): T => {
   }
 
   return obj;
+};
+
+/**
+ * Returns the title for a given pathname from the HEADER_TITLE_MAP.
+ * If the pathname is not found in the map, it will search for the first key that the pathname starts with and return the corresponding title.
+ * @param {string} pathname - The pathname to get the title for.
+ * @returns {string | undefined} The title for the given pathname, or undefined if not found.
+ */
+export const getHeaderTitle = (pathname: string) => {
+  if (pathname in HEADER_TITLE_MAP) {
+    return HEADER_TITLE_MAP[pathname as keyof typeof HEADER_TITLE_MAP];
+  }
+
+  return Object.entries(HEADER_TITLE_MAP).find(([key]) =>
+    pathname.startsWith(key),
+  )?.[1];
 };

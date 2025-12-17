@@ -12,10 +12,9 @@ import { Typo } from '@/components/common';
 import { ArrowBackIcon } from '@/icons';
 
 // Constants
-import { HEADER_TITLE_MAP } from '@/constants';
 
 // Utils
-import { cn, STATUS_BAR_HEIGHT } from '@/utils';
+import { cn, getHeaderTitle, STATUS_BAR_HEIGHT } from '@/utils';
 
 // Stores
 import { useHeaderStore } from '@/stores';
@@ -41,10 +40,8 @@ export const ScreenHeader = ({
   // Dynamic header title from store
   const headerStoreTitle = useHeaderStore(state => state.title);
 
-  const headerTitle =
-    title ||
-    HEADER_TITLE_MAP[pathname as keyof typeof HEADER_TITLE_MAP] ||
-    headerStoreTitle;
+  // Map pathname to header title from HEADER_TITLE_MAP
+  const headerTitle = title || getHeaderTitle(pathname) || headerStoreTitle;
 
   const handleGoBack = () => {
     router.back();
