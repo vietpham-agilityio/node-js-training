@@ -1,5 +1,7 @@
 import { API_CONFIG } from '@/constants';
 import { authService } from '@/services/supabase';
+import { useAuthStore } from '@/stores';
+import { ChangePasswordData } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const useSession = () => {
@@ -16,15 +18,63 @@ export const useRefreshSession = () => {
   });
 };
 
+/**
+ * Hook for requesting password reset email
+ * Sends reset link to user's email
+ */
 export const useResetPassword = () => {
   return useMutation({
-    mutationFn: (email: string) => authService.resetPassword(email),
+    mutationFn: async (email: string) => {
+      try {
+        await authService.resetPassword(email);
+
+        return { success: true };
+      } catch (error) {
+        console.error('Password reset request failed:', error);
+        throw error;
+      }
+    },
+    onError: error => {
+      console.error('useResetPassword error:', error);
+    },
   });
 };
 
+/**
+ * Hook for updating user password with current password verification
+ * Verifies current password before allowing update
+ */
 export const useUpdatePassword = () => {
+  const user = useAuthStore(state => state.user);
+
   return useMutation({
-    mutationFn: (newPassword: string) =>
-      authService.updatePassword(newPassword),
+    mutationFn: async (data: ChangePasswordData) => {
+      if (!user?.email) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Step 1: Verify current password
+      try {
+        await authService.verifyCurrentPassword(
+          user.email,
+          data.currentPassword,
+        );
+      } catch (error) {
+        console.error('Current password verification failed:', error);
+        throw new Error('Current password is incorrect');
+      }
+
+      // Step 2: Update to new password
+      try {
+        await authService.updatePassword(data.newPassword);
+        return { success: true };
+      } catch (error) {
+        console.error('Password update failed:', error);
+        throw error;
+      }
+    },
+    onError: error => {
+      console.error('useUpdatePassword error:', error);
+    },
   });
 };

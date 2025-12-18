@@ -17,8 +17,15 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "This app needs access to your camera",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library",
-        "NSFaceIDUsageDescription": "This app needs access to your face ID"
-      }
+        "NSFaceIDUsageDescription": "This app needs access to your face ID",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": ["movieticketbooking"],
+            "CFBundleURLName": "com.anonymous.movieticketbooking"
+          }
+        ]
+      },
+      "associatedDomains": ["applinks:movie-ticket-booking.expo.app"]
     },
     "android": {
       "adaptiveIcon": {
@@ -32,6 +39,24 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "movieticketbooking",
+              "host": "*"
+            },
+            {
+              "scheme": "https",
+              "host": "*.movie-ticket-booking.expo.app",
+              "pathPrefix": "/auth"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ]
     },
     "web": {

@@ -38,7 +38,7 @@ const ForgotPasswordScreen = () => {
   };
 
   return (
-    <AccessLayout mode="signin" loading={isPending}>
+    <AccessLayout mode="signup" loading={isPending}>
       <View className="gap-1 mt-8 mb-[30]">
         <Typo size="2xl" weight="medium" accessibilityRole="header">
           Forgot Password?

@@ -2,6 +2,7 @@ import {
   ArrowRightIcon,
   ChangeLanguageIcon,
   EditProfileIcon,
+  EyeIcon,
   HelpCenterIcon,
   LikeIcon,
   MyWalletIcon,
@@ -17,6 +18,23 @@ export const STORAGE_KEYS = {
   USER_PIN: 'user_pin',
   BIOMETRIC_KEY: 'biometric_key',
 };
+
+export const SECURE_STORE_SIZE_LIMIT = 2048; // bytes (iOS limit)
+
+// Session data field classification
+export const SENSITIVE_SESSION_FIELDS = [
+  'access_token',
+  'refresh_token',
+  'provider_token',
+  'provider_refresh_token',
+];
+
+export const NON_SENSITIVE_SESSION_FIELDS = [
+  'user',
+  'expires_at',
+  'expires_in',
+  'token_type',
+];
 
 export const API_CONFIG = {
   SEAT_RESERVATION_TIMEOUT: 10 * 60 * 1000,
@@ -80,6 +98,11 @@ export const SETTING_ITEMS = [
     TITLE: 'Rate Flutix App',
     ICON: LikeIcon,
     TEST_ID: 'rate_app',
+  },
+  {
+    TITLE: 'Change Password',
+    ICON: EyeIcon,
+    TEST_ID: 'change_password',
   },
   {
     TITLE: 'Logout',
