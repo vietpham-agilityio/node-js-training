@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { useRouter } from 'expo-router';
+import { Href, useRouter } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
@@ -72,7 +72,7 @@ const WalletScreen = () => {
   const handleTopUp = useCallback(() => {}, []);
 
   const handleWalletCardPress = useCallback(() => {
-    router.push(ROUTES.TOP_UP);
+    router.push(ROUTES.TOP_UP as Href);
   }, [router]);
 
   const renderTransaction = useCallback(

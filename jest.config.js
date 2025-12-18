@@ -13,4 +13,7 @@ module.exports = {
     '!**/expo-env.d.ts',
     '!**/.expo/**',
   ],
+  transformIgnorePatterns: [
+    'node_modules/(?!(uuid|@react-native|react-native|@react-navigation|expo|@expo|@tanstack)/)',
+  ],
 };

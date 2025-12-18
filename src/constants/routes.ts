@@ -3,18 +3,17 @@ import { Href } from 'expo-router';
 export const ROUTES = {
   // Main routes
   MOVIE_DETAILS: (id: string): Href => `/(main)/movies/${id}`,
-  CHECKOUT: '/(main)/checkout',
-  CINEMA: '/(main)/cinema',
+  CHECKOUT: '/(main)/booking/checkout',
+  CINEMA: '/(main)/booking/cinema',
   TICKET_DETAILS: (id: string): Href => `/(main)/tickets/${id}`,
-  SEATS: '/(main)/seats',
-  CHECKOUT_SUCCESS: '/(main)/checkout-success',
-  PURCHASE_SUCCESS: '/(main)/purchase-success',
-
+  SEATS: '/(main)/booking/seats',
+  CHECKOUT_SUCCESS: '/(main)/booking/checkout-success',
+  
   // Profile routes
   PROFILE: '/(main)/profile',
   PROFILE_EDIT: '/(main)/profile/edit',
   PROFILE_CHANGE_PASSWORD: '/(main)/profile/change-password',
-
+  
   // Auth routes
   LOGIN: '/(auth)/signin',
   SIGNUP: '/(auth)/signup',
@@ -22,14 +21,15 @@ export const ROUTES = {
   FORGOT_PASSWORD: '/(auth)/forgot-password',
   RESET_PASSWORD: '/(auth)/reset-password',
   CONFIRM_ACCOUNT: '/confirm-account',
-
+  
   // Tab routes
   HOME: '/(main)/(tabs)',
   MY_TICKET: '/(main)/(tabs)/my-ticket',
   MY_WALLET: '/(main)/(tabs)/wallet',
-
-  // Wallet routes
-  TOP_UP: '/(main)/top-up',
+  
+  // Purchase routes
+  PURCHASE_SUCCESS: '/(main)/purchase/purchase-success',
+  TOP_UP: '/(main)/purchase/top-up',
 
   WELCOME: '/(main)/welcome',
 

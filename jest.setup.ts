@@ -60,3 +60,8 @@ jest.mock('expo-video-thumbnails', () => ({
 jest.mock('expo-image', () => ({
   Image: jest.fn(() => 'Image'),
 }));
+
+// Mock uuid package (ES module)
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'mock-uuid-v4'),
+}));
