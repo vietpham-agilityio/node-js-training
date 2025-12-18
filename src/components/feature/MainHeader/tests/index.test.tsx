@@ -13,6 +13,9 @@ const mockUsePathname = jest.fn();
 
 jest.mock('expo-router', () => ({
   usePathname: () => mockUsePathname(),
+  router: {
+    push: jest.fn(),
+  },
 }));
 
 // Mock uniwind
@@ -21,10 +24,21 @@ jest.mock('uniwind', () => ({
   withUniwind: (Component: typeof Text) => Component,
 }));
 
+// Mock useProfile hook
+const mockUseProfile = jest.fn();
+
+jest.mock('@/hooks', () => ({
+  useProfile: () => mockUseProfile(),
+}));
+
 describe('MainHeader', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUsePathname.mockReturnValue('/');
+    mockUseProfile.mockReturnValue({
+      data: { id: 'test-user-id', avatarUrl: null },
+      isLoading: false,
+    });
   });
 
   const headerProps = {

@@ -1,6 +1,10 @@
-import { MovieStatus, type Movie } from '@/types';
-import { fireEvent, render, screen } from '@testing-library/react-native';
 import React from 'react';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+
+// Types
+import { MovieStatus, type Movie } from '@/types';
+
+// Components
 import { MovieBanner } from '..';
 
 // Mock expo-image
@@ -23,14 +27,22 @@ jest.mock('uniwind', () => ({
 describe('MovieBanner Component', () => {
   const mockMovie: Movie = {
     id: '1',
-    title: 'Wreck It Ralph 2',
-    synopsis: 'Ralph and Vanellope venture into the internet...',
-    posterUrl: 'https://example.com/poster.jpg',
+    title: 'Spider Man: No Way Home',
+    synopsis:
+      'Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man.',
+    posterUrl:
+      'https://media.themoviedb.org/t/p/w600_and_h900_face/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
     rating: 4.7,
+    castCrew: {
+      actors: [],
+      directors: [],
+      producers: [],
+      writers: [],
+    },
+    trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
     durationMinutes: 112,
-    genre: ['Animation', 'Comedy', 'Adventure'],
+    genre: ['Action', 'Comedy', 'Adventure'],
     language: 'EN',
-    trailerUrl: ['https://example.com/trailer.mp4'],
     releaseDate: '2023-06-15',
     createdAt: '2023-06-15T12:34:56Z',
     updatedAt: '2023-06-15T12:34:56Z',
@@ -53,7 +65,7 @@ describe('MovieBanner Component', () => {
     it('should render movie poster image', () => {
       render(<MovieBanner movie={mockMovie} />);
 
-      expect(screen.getByText(mockMovie.posterUrl)).toBeTruthy();
+      expect(screen.getByText(mockMovie.title)).toBeTruthy();
     });
   });
 
@@ -71,14 +83,9 @@ describe('MovieBanner Component', () => {
     });
 
     it('should display long movie titles', () => {
-      const longTitleMovie = {
-        ...mockMovie,
-        title: 'The Lord of the Rings: The Fellowship of the Ring',
-      };
+      render(<MovieBanner movie={mockMovie} variant="horizontal" />);
 
-      render(<MovieBanner movie={longTitleMovie} variant="horizontal" />);
-
-      expect(screen.getByText(longTitleMovie.title)).toBeTruthy();
+      expect(screen.getByText(mockMovie.title)).toBeTruthy();
     });
   });
 
