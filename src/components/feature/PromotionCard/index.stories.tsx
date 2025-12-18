@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 // Components
 import { PromotionCard } from './';
+import { PromoCodeStatus } from '@/types';
 
 const meta = {
   title: 'PromotionCard',
@@ -23,8 +24,9 @@ type Story = StoryObj<typeof meta>;
 // Default Story
 export const Default: Story = {
   args: {
-    title: 'Student Holiday',
-    subtitle: 'Maximal only for two people',
-    discount: '50%',
+    description: 'Student Holiday',
+    discountType: PromoCodeStatus.PERCENTAGE,
+    code: 'STUDENT10',
+    discountValue: 10,
   },
 };

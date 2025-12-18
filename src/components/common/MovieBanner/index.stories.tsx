@@ -55,6 +55,12 @@ const sampleMovie: Movie = {
   durationMinutes: 112,
   genre: ['Animation', 'Comedy', 'Adventure'],
   language: 'EN',
+  castCrew: {
+    actors: [],
+    directors: [],
+    producers: [],
+    writers: [],
+  },
   trailerUrl: ['https://example.com/trailer.mp4'],
   releaseDate: '2023-06-15',
   createdAt: '2023-06-15T12:34:56Z',
