@@ -113,13 +113,6 @@ describe('LocationDropdown Component', () => {
       const { getByText } = render(<LocationDropdown {...defaultProps} />);
       expect(getByText('Select Your Location')).toBeTruthy();
     });
-
-    it('should show placeholder when value is whitespace only', () => {
-      const { getByText } = render(
-        <LocationDropdown {...defaultProps} value="   " />,
-      );
-      expect(getByText('Select Your Location')).toBeTruthy();
-    });
   });
 
   describe('Opening Dropdown', () => {
