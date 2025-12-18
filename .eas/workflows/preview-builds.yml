@@ -1,0 +1,72 @@
+name: Preview Build Workflow with Repack
+
+on:
+  pull_request:
+    branches: [staging]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # 1) Fingerprint
+  fingerprint:
+    name: Detect Native Changes
+    type: fingerprint
+
+  # 2) ANDROID — GET EXISTING BUILD
+  android_get_build:
+    name: Check Existing Android Build
+    needs: [fingerprint]
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+      platform: android
+
+  # 3) ANDROID — REPACK if fingerprint unchanged
+  android_repack:
+    name: Repack Android (if fingerprint unchanged)
+    needs: [android_get_build]
+    if: ${{ needs.android_get_build.outputs.build_id }}
+    type: repack
+    params:
+      build_id: ${{ needs.android_get_build.outputs.build_id }}
+
+  # 4) ANDROID — BUILD if fingerprint changed
+  android_build:
+    name: Full Android Build (if fingerprint changed)
+    needs: [android_get_build]
+    if: ${{ !needs.android_get_build.outputs.build_id }}
+    type: build
+    params:
+      platform: android
+      profile: preview
+    env:
+      EAS_NO_VCS_CHECK: '1'
+
+  # 5) IOS — GET EXISTING BUILD
+  ios_get_build:
+    name: Check Existing iOS Build
+    needs: [fingerprint]
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
+      platform: ios
+
+  # 6) IOS — REPACK
+  ios_repack:
+    name: Repack iOS (if fingerprint unchanged)
+    needs: [ios_get_build]
+    if: ${{ needs.ios_get_build.outputs.build_id }}
+    type: repack
+    params:
+      build_id: ${{ needs.ios_get_build.outputs.build_id }}
+
+  # 7) IOS — BUILD if fingerprint changed
+  ios_build:
+    name: Full iOS Build (if fingerprint changed)
+    needs: [ios_get_build]
+    if: ${{ !needs.ios_get_build.outputs.build_id }}
+    type: build
+    params:
+      platform: ios
+      profile: preview
+    env:
+      EAS_NO_VCS_CHECK: '1'
