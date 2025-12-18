@@ -29,6 +29,7 @@ import { ROUTES, SCREENS } from '@/constants';
 import { useAuth } from '@/hooks';
 
 // Components
+import { Loading } from '@/components/common';
 import { Toast } from '@/components/feature';
 
 // Prevent the splash screen from auto-hiding
@@ -120,6 +121,7 @@ const RootLayout = () => {
         </Stack>
         <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
         <Toast />
+        <Loading />
       </QueryClientProvider>
     </Fragment>
   );
