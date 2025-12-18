@@ -76,3 +76,9 @@ export interface Seat {
   number: number;
   status: SeatStatus;
 }
+
+export interface CinemaWithShowtimes {
+  cinema: Cinema;
+  cinemaHall: CinemaHall;
+  showtimes: Showtime[];
+}

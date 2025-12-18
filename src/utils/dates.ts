@@ -1,4 +1,4 @@
-import { Showtime, ShowtimeStatus } from '@/types';
+import { Cinema, CinemaHall, CinemaWithShowtimes, Showtime } from '@/types';
 
 /**
  * Get the labels for the next 7 days of the week
@@ -28,10 +28,10 @@ export const getDayOfWeekLabels = () => {
 };
 
 /**
- * Generate showtimes starting from the current time, rounded up to the next 30-minute interval
- * Generates times in 30-minute intervals until 21:00 (9 PM)
+ * Get the minimum showtime (current time rounded up to next 30-minute interval)
+ * Returns null if current time is past 21:00
  */
-export const generateShowtimeTimes = (): string[] => {
+export const getMinimumShowtime = (): string | null => {
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
@@ -49,71 +49,102 @@ export const generateShowtimeTimes = (): string[] => {
     startMinute = 0;
   }
 
-  // If current time is already past 21:00, return empty array
+  // If current time is already past 21:00, return null
   if (startHour > 21 || (startHour === 21 && startMinute > 0)) {
+    return null;
+  }
+
+  return `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+};
+
+/**
+ * Filter showtimes based on time constraints:
+ * - Showtimes must be >= current time (rounded up to next 30-minute interval)
+ * - Showtimes must be <= 21:00
+ * - Only applies if showDate is today
+ */
+export const filterShowtimesByTime = (
+  showtimes: Showtime[],
+  showDate: string,
+): Showtime[] => {
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+
+  // Only filter if the show date is today
+  if (showDate !== today) {
+    return showtimes;
+  }
+
+  const minimumTime = getMinimumShowtime();
+  if (!minimumTime) {
+    // If past 21:00, return empty array
     return [];
   }
 
-  const showtimes: string[] = [];
-  let hour = startHour;
-  let minute = startMinute;
+  return showtimes.filter(showtime => {
+    // Handle both HH:MM and HH:MM:SS formats
+    const timeParts = showtime.showTime.split(':');
+    const timeHours = Number(timeParts[0]);
+    const timeMinutes = Number(timeParts[1] || 0);
 
-  // Generate showtimes until 21:00
-  while (hour < 21 || (hour === 21 && minute === 0)) {
-    const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-    showtimes.push(timeString);
+    const [minHours, minMinutes] = minimumTime.split(':').map(Number);
 
-    // Move to next 30-minute interval
-    minute += 30;
-    if (minute >= 60) {
-      minute = 0;
-      hour += 1;
-    }
-  }
+    // Convert to minutes for comparison
+    const timeInMinutes = timeHours * 60 + timeMinutes;
+    const minInMinutes = minHours * 60 + minMinutes;
+    const maxInMinutes = 21 * 60; // 21:00
 
-  return showtimes;
-};
-
-/**
- * Helper function to calculate end time from show time
- * Assumes movie duration of 120 minutes (2 hours)
- */
-const calculateEndTime = (showTime: string): string => {
-  const [hours, minutes] = showTime.split(':').map(Number);
-  const startDate = new Date();
-  startDate.setHours(hours, minutes, 0, 0);
-  const endDate = new Date(startDate.getTime() + 120 * 60 * 1000); // Add 120 minutes
-  return `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
-};
-
-/**
- * Generate Showtime objects for a cinema
- */
-export const generateShowtimesForCinema = (
-  cinemaId: string,
-  cinemaHallId: string,
-  movieId: string,
-  showDate: string,
-  baseId: number,
-): Showtime[] => {
-  const now = new Date().toISOString();
-  const showtimeTimes = generateShowtimeTimes();
-
-  return showtimeTimes.map((showTime, index) => {
-    const id = (baseId + index).toString();
-
-    return {
-      id,
-      movieId,
-      cinemaHallId,
-      showDate,
-      showTime,
-      endTime: calculateEndTime(showTime),
-      price: 50000, // Default price in IDR
-      availableSeats: 100, // Default available seats
-      status: ShowtimeStatus.ACTIVE,
-      createdAt: now,
-      updatedAt: now,
-    };
+    // Showtime must be >= minimum time and <= 21:00
+    return timeInMinutes >= minInMinutes && timeInMinutes <= maxInMinutes;
   });
+};
+
+export const formatShowtimes = (
+  showtimes: Showtime[],
+  showDate: string,
+): CinemaWithShowtimes[] => {
+  const filteredShowtimes = filterShowtimesByTime(showtimes, showDate);
+  
+  // Create a Map to group showtimes by cinema ID
+  // Map is used here because:
+  // 1. It allows efficient lookup by cinema ID (O(1) complexity)
+  // 2. It prevents duplicate cinema entries
+  // 3. It maintains insertion order for consistent results
+  // Key: cinema.id (string), Value: { cinema, cinemaHall, showtimes[] }
+  const cinemaMap = new Map<
+    string,
+    { cinema: Cinema; cinemaHall: CinemaHall; showtimes: Showtime[] }
+  >();
+
+  filteredShowtimes.forEach(showtime => {
+    if (!showtime.cinemaHall?.cinema || !showtime.cinemaHall) return;
+
+    const cinema = showtime.cinemaHall.cinema;
+    const cinemaHall = showtime.cinemaHall;
+
+    // Check if this cinema already exists in the map
+    // has() method: returns true if the key exists, false otherwise
+    if (!cinemaMap.has(cinema.id)) {
+      // If cinema doesn't exist, create a new entry
+      // set() method: adds or updates a key-value pair in the map
+      cinemaMap.set(cinema.id, {
+        cinema,
+        cinemaHall,
+        showtimes: [],
+      });
+    }
+
+    cinemaMap.get(cinema.id)!.showtimes.push(showtime);
+  });
+
+  // Convert map to array and sort showtimes by showTime
+  return Array.from(cinemaMap.values())
+    .map(item => ({
+      ...item,
+      // Sort showtimes within each cinema by time (ascending)
+      showtimes: item.showtimes.sort((a, b) =>
+        a.showTime.localeCompare(b.showTime),
+      ),
+    }))
+    // Sort cinemas alphabetically by name
+    .sort((a, b) => a.cinema.name.localeCompare(b.cinema.name));
 };

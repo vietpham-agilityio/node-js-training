@@ -1,6 +1,11 @@
 import { FlashList } from '@shopify/flash-list';
-import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 // Expo
 import { router, useLocalSearchParams } from 'expo-router';
@@ -13,26 +18,22 @@ import { SelectBox, Typo } from '@/components/common';
 import { LocationDropdown } from '@/components/feature';
 
 // Constants
-import { ROUTES } from '@/constants';
+import { ERROR_MESSAGES, ROUTES } from '@/constants';
+
+// Hooks
+import { useShowtimes } from '@/hooks';
 
 // Icons
 import { ArrowRightIcon } from '@/icons';
 
 // Utils
-import { getDayOfWeekLabels } from '@/utils';
+import { formatShowtimes, formatTime, getDayOfWeekLabels } from '@/utils';
 
-// Mock data
-import {
-  CinemaWithShowtimes,
-  generateMockCinemasWithShowtimes,
-  MOCK_CINEMAS,
-} from '@/mocks/showtime';
-
-// Stpre
-import { useBookingStore, useHeaderStore } from '@/stores';
+// Store
+import { useBookingStore, useHeaderStore, useToastStore } from '@/stores';
 
 // Types
-import { Showtime } from '@/types';
+import { CinemaWithShowtimes, Showtime } from '@/types';
 
 const CinemaScreen = () => {
   const params = useLocalSearchParams<{
@@ -41,16 +42,16 @@ const CinemaScreen = () => {
   }>();
   const movieId = params.movieId || '';
 
-  const setShowtime = useBookingStore(state => state.setShowtime);
-  const clearHeaderTitle = useHeaderStore(state => state.clearTitle);
-
   const [selectedLocation, setSelectedLocation] = useState<string>('');
-
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedShowtime, setSelectedShowtime] = useState<{
     cinemaId: string;
     showtimeId: string;
   } | null>(null);
+
+  const showToast = useToastStore(state => state.showError);
+  const setShowtime = useBookingStore(state => state.setShowtime);
+  const clearHeaderTitle = useHeaderStore(state => state.clearTitle);
 
   const iconColorConfig = useResolveClassNames('text-white');
 
@@ -59,16 +60,29 @@ const CinemaScreen = () => {
   // Use selected date or default to today's date
   const showDate = selectedDate || DATE_LABELS[0]?.id || '';
 
-  // TODO: Will replace will data from API
-  const CINEMA_WITH_SHOWTIME_MOCK =
-    showDate && movieId
-      ? generateMockCinemasWithShowtimes(movieId, showDate)
-      : MOCK_CINEMAS;
+  const {
+    data: showtimesData,
+    isLoading,
+    isError,
+    error: showtimesError,
+  } = useShowtimes(movieId, showDate);
+
+  const cinemasWithShowtimes = useMemo(() => {
+    if (!showtimesData || showtimesData.length === 0) return [];
+
+    return formatShowtimes(showtimesData, showDate);
+  }, [showtimesData, showDate]);
 
   const isDisabled = useMemo(
     () => selectedShowtime && selectedDate,
     [selectedDate, selectedShowtime],
   );
+
+  useEffect(() => {
+    if (isError) {
+      showToast(showtimesError?.message || ERROR_MESSAGES.SOMETHING_WENT_WRONG);
+    }
+  }, [showtimesError, showToast, isError]);
 
   const handleNavigateToSeatSelection = useCallback(() => {
     if (!selectedShowtime) return;
@@ -84,16 +98,16 @@ const CinemaScreen = () => {
 
   const handleShowtimeSelect = useCallback(
     (cinemaId: string, showtimeId: string) => {
-      const showtime = CINEMA_WITH_SHOWTIME_MOCK.find(
-        cinema => cinema.cinema.id === cinemaId,
-      )?.showtimes.find(showtime => showtime.id === showtimeId);
+      const showtime = cinemasWithShowtimes
+        .find(cinema => cinema.cinema.id === cinemaId)
+        ?.showtimes.find(showtime => showtime.id === showtimeId);
       setSelectedShowtime({ cinemaId, showtimeId });
 
       if (showtime) {
         setShowtime(showtime);
       }
     },
-    [CINEMA_WITH_SHOWTIME_MOCK, setShowtime],
+    [cinemasWithShowtimes, setShowtime],
   );
 
   const handleLocationChange = useCallback((value: string) => {
@@ -177,11 +191,13 @@ const CinemaScreen = () => {
         selectedShowtime?.cinemaId === cinemaId &&
         selectedShowtime?.showtimeId === showtime.id;
 
+      const formattedTime = formatTime(showtime.showTime);
+
       return (
         <SelectBox
-          value={showtime.showTime}
+          value={formattedTime}
           isPrimary={isSelected}
-          accessibilityLabel={`Select showtime ${showtime.showTime} at ${cinemaName}`}
+          accessibilityLabel={`Select showtime ${formattedTime} at ${cinemaName}`}
           className="py-3 px-4.5"
           onPress={() => handleShowtimeSelect(cinemaId, showtime.id)}
         />
@@ -220,33 +236,74 @@ const CinemaScreen = () => {
     [renderShowtime, keyShowtimeExtractor, HorizontalItemSeparator],
   );
 
+  const renderEmpty = useCallback(() => {
+    if (isLoading) {
+      return (
+        <View
+          className="flex-1 items-center justify-center py-16"
+          accessibilityRole="progressbar"
+        >
+          <ActivityIndicator size="large" />
+          <Typo size="sm" className="text-text-secondary mt-4">
+            Loading showtimes...
+          </Typo>
+        </View>
+      );
+    }
+
+    if (cinemasWithShowtimes.length === 0) {
+      return (
+        <View
+          className="flex-1 items-center justify-center py-16 px-6"
+          accessibilityRole="text"
+        >
+          <Typo
+            size="xl"
+            weight="semibold"
+            className="text-text-secondary text-center mb-2"
+          >
+            No showtimes available
+          </Typo>
+          <Typo size="sm" className="text-text-secondary text-center">
+            Please select a different date
+          </Typo>
+        </View>
+      );
+    }
+
+    return null;
+  }, [isLoading, cinemasWithShowtimes.length]);
+
   return (
     <View className="flex-1 bg-dark-blue">
       <FlashList
-        data={CINEMA_WITH_SHOWTIME_MOCK}
+        data={cinemasWithShowtimes}
         renderItem={renderCinema}
         keyExtractor={keyExtractor}
         ListHeaderComponent={ListHeaderComponent}
         ItemSeparatorComponent={ItemSeparator}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={renderEmpty}
       />
 
       {/* Circular Navigation Button */}
-      <View className="absolute bottom-6 left-0 right-0 items-center">
-        <TouchableOpacity
-          onPress={handleNavigateToSeatSelection}
-          disabled={!isDisabled}
-          accessibilityRole="button"
-          accessibilityLabel="Continue to seat selection"
-          className={`w-14 h-14 rounded-full items-center justify-center ${
-            isDisabled
-              ? 'bg-linear-to-r from-secondary to-primary'
-              : 'bg-bg-quaternary'
-          }`}
-        >
-          <ArrowRightIcon color={iconColorConfig.color} />
-        </TouchableOpacity>
-      </View>
+      {!isLoading && !isError && cinemasWithShowtimes.length > 0 && (
+        <View className="absolute bottom-6 left-0 right-0 items-center">
+          <TouchableOpacity
+            onPress={handleNavigateToSeatSelection}
+            disabled={!isDisabled}
+            accessibilityRole="button"
+            accessibilityLabel="Continue to seat selection"
+            className={`w-14 h-14 rounded-full items-center justify-center ${
+              isDisabled
+                ? 'bg-linear-to-r from-secondary to-primary'
+                : 'bg-bg-quaternary'
+            }`}
+          >
+            <ArrowRightIcon color={iconColorConfig.color} />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
