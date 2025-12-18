@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 
@@ -49,6 +49,7 @@ export const LocationDropdown = memo(
     const [isOpen, setIsOpen] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [hasRequestedPermission, setHasRequestedPermission] = useState(false);
     const [location, setLocation] = useState<LocationGeocodedAddress | null>(
       null,
     );
@@ -70,29 +71,41 @@ export const LocationDropdown = memo(
       let { status } = await requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg(ERROR_MESSAGES.LOCATION_PERMISSION_DENIED);
-        return;
+        return null;
       }
 
-      let location = await getCurrentPositionAsync({});
+      let currentLocation = await getCurrentPositionAsync({});
 
       const address = await reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
       });
 
       setLocation(address[0]);
+      setHasRequestedPermission(true);
+
+      if (address[0]?.city) {
+        onChange(address[0].city);
+      }
+
       return status;
-    }, []);
+    }, [onChange]);
 
     const handleOpen = useCallback(async () => {
       if (disabled) return;
+
+      if (hasRequestedPermission && location?.city) {
+        setIsOpen(true);
+        setIsFocused(true);
+        return;
+      }
 
       const status = await requestLocationPermission();
       if (status !== 'granted') return;
 
       setIsOpen(true);
       setIsFocused(true);
-    }, [disabled, requestLocationPermission]);
+    }, [disabled, requestLocationPermission, hasRequestedPermission, location]);
 
     const handleClose = useCallback(() => {
       setIsOpen(false);
@@ -118,8 +131,9 @@ export const LocationDropdown = memo(
       [errorMsg, isFocused],
     );
 
-    // Show placeholder if no valid option is selected
-    const displayText = selectedOption?.label || 'Select Your Location';
+    // Show the selected value or placeholder
+    const displayText =
+      selectedOption?.label || value || 'Select Your Location';
 
     const renderItem = useCallback(
       ({ item }: { item: LocationOption }) => {
