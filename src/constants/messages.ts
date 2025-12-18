@@ -41,9 +41,12 @@ export const ERROR_MESSAGES = {
   TOP_UP_MAX_AMOUNT: 'Maximum top-up amount is IDR 10.000.000',
   UPDATE_PASSWORD_FAILED: 'Failed to update password. Please try again.',
   CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
+  SOMETHING_WENT_WRONG: 'Something went wrong. Please try again later.',
 };
 
 export const MESSAGES = {
+  NO_SHOWTIMES_AVAILABLE_TITLE: 'No showtimes available',
+  NO_SHOWTIMES_AVAILABLE_DESCRIPTION: 'Please select a different date',
   TICKET_VALIDATED_SUCCESS: 'Ticket validated successfully',
   PERMISSION_REQUIRED: 'Permission Required',
   CAMERA_ROLL_PERMISSION_REQUIRED:
