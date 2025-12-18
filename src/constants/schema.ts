@@ -103,6 +103,65 @@ export const editProfileSchema = v.pipe(
   }),
 );
 
+export const changePasswordSchema = v.pipe(
+  v.object({
+    currentPassword: v.pipe(
+      v.string(ERROR_MESSAGES.PASSWORD_REQUIRED),
+      v.nonEmpty(ERROR_MESSAGES.PASSWORD_REQUIRED),
+    ),
+    newPassword: v.pipe(
+      v.string(ERROR_MESSAGES.PASSWORD_REQUIRED),
+      v.nonEmpty(ERROR_MESSAGES.PASSWORD_REQUIRED),
+      v.minLength(8, ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8)),
+      v.check(hasUppercase, ERROR_MESSAGES.PASSWORD_UPPERCASE),
+      v.check(hasLowercase, ERROR_MESSAGES.PASSWORD_LOWERCASE),
+      v.check(hasSpecialChar, ERROR_MESSAGES.PASSWORD_SPECIAL_CHAR),
+    ),
+    confirmPassword: v.pipe(
+      v.string(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
+      v.nonEmpty(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
+    ),
+  }),
+  v.forward(
+    v.partialCheck(
+      [['newPassword'], ['confirmPassword']],
+      input => input.newPassword === input.confirmPassword,
+      ERROR_MESSAGES.PASSWORD_NOT_MATCH,
+    ),
+    ['confirmPassword'],
+  ),
+);
+
+// Validation schema
+export const resetPasswordSchema = v.pipe(
+  v.object({
+    newPassword: v.pipe(
+      v.string(ERROR_MESSAGES.PASSWORD_REQUIRED),
+      v.nonEmpty(ERROR_MESSAGES.PASSWORD_REQUIRED),
+      v.minLength(8, ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8)),
+      v.check(hasUppercase, ERROR_MESSAGES.PASSWORD_UPPERCASE),
+      v.check(hasLowercase, ERROR_MESSAGES.PASSWORD_LOWERCASE),
+      v.check(hasSpecialChar, ERROR_MESSAGES.PASSWORD_SPECIAL_CHAR),
+    ),
+    confirmPassword: v.pipe(
+      v.string(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
+      v.nonEmpty(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
+    ),
+  }),
+  v.forward(
+    v.partialCheck(
+      [['newPassword'], ['confirmPassword']],
+      input => input.newPassword === input.confirmPassword,
+      ERROR_MESSAGES.PASSWORD_NOT_MATCH,
+    ),
+    ['confirmPassword'],
+  ),
+);
+
+export type ResetPasswordFormData = v.InferOutput<typeof resetPasswordSchema>;
+
+export type ChangePasswordFormData = v.InferOutput<typeof changePasswordSchema>;
+
 export type SignUpFormData = v.InferOutput<typeof signUpSchema>;
 
 export type SignInFormData = v.InferInput<typeof signInSchema>;

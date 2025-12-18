@@ -39,6 +39,8 @@ export const ERROR_MESSAGES = {
   TOP_UP_FAILED: 'Failed to top up wallet. Please try again.',
   TOP_UP_MIN_AMOUNT: 'Minimum top-up amount is IDR 10.000',
   TOP_UP_MAX_AMOUNT: 'Maximum top-up amount is IDR 10.000.000',
+  UPDATE_PASSWORD_FAILED: 'Failed to update password. Please try again.',
+  CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
 };
 
 export const MESSAGES = {
@@ -65,4 +67,5 @@ export const MESSAGES = {
   CHECKOUT_SUCCESS_DESCRIPTION: 'You have successfully bought the ticket.',
   PURCHASE_SUCCESS_TITLE: 'Yummy!',
   PURCHASE_SUCCESS_DESCRIPTION: 'You have successfully top up the wallet.',
+  PASSWORD_UPDATE_SUCCESS: 'Your password has been changed successfully',
 };

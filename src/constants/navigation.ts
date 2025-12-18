@@ -17,11 +17,12 @@ export const SCREENS = {
     CHECKOUT: 'checkout',
     PROFILE: 'profile/index',
     PROFILE_EDIT: 'profile/edit',
+    PROFILE_CHANGE_PASSWORD: 'profile/change-password',
 
     CHECKOUT_SUCCESS: 'checkout-success',
     PURCHASE_SUCCESS: 'purchase-success',
     TOP_UP: 'top-up',
-  
+
     // Modal screens
     SEARCH: 'search',
     CINEMA: 'cinema',
@@ -35,6 +36,7 @@ export const SCREENS = {
     SIGNUP: 'signup',
     ONBOARDING: 'onboarding',
     FORGOT_PASSWORD: 'forgot-password',
+    RESET_PASSWORD: 'reset-password',
   },
 
   // Tab screens
