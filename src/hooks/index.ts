@@ -1,6 +1,7 @@
 export * from './useAuth';
 export * from './useBookings';
 export * from './useDebounce';
+export * from './useDeepLinkHandler';
 export * from './useMovies';
 export * from './useProfile';
 export * from './useSession';

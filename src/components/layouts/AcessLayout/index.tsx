@@ -26,10 +26,13 @@ export const AccessLayout = memo(
     const accessibilityLabel = ACCESSIBILITY_LABEL[mode];
 
     const containerStyles = useResolveClassNames('flex-1 bg-bg-primary');
-    const contentContainerStyles = useResolveClassNames('flex-1 p-4');
+    const contentContainerStyles = useResolveClassNames(
+      `flex-1 p-4 ${isSignin && 'justify-center'}`,
+    );
 
     return (
       <SafeAreaView
+        edges={['bottom']}
         style={containerStyles}
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityLabel}

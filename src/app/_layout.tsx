@@ -26,7 +26,7 @@ import {
 import { ROUTES, SCREENS } from '@/constants';
 
 // Hooks
-import { useAuth } from '@/hooks';
+import { useAuth, useDeepLinkHandler } from '@/hooks';
 
 // Components
 import { Loading } from '@/components/common';
@@ -62,6 +62,9 @@ const RootLayout = () => {
     Montserrat_500Medium,
     Montserrat_600SemiBold,
   });
+
+  //  Deep link handler for OAuth callbacks and password reset
+  useDeepLinkHandler();
 
   useEffect(() => {
     if (error) throw error;

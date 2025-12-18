@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Alert, ScrollView } from 'react-native';
+import { Alert } from 'react-native';
 
 // Constants
 import { ERROR_MESSAGES, MESSAGES, ROUTES } from '@/constants';
@@ -76,9 +76,7 @@ const SignupScreen = () => {
 
   return (
     <AccessLayout mode="signup" loading={isLoading}>
-      <ScrollView contentContainerClassName="items-center mt-24 pb-80">
-        <SignUpForm isPending={isLoading} onSubmit={handleSubmit} />
-      </ScrollView>
+      <SignUpForm isPending={isLoading} onSubmit={handleSubmit} />
     </AccessLayout>
   );
 };
