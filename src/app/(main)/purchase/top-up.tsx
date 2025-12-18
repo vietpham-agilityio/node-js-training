@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Href, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -92,7 +92,7 @@ const TopUpScreen = () => {
       onSuccess: () => {
         setAmount('');
         setSelectedAmount(null);
-        router.push(ROUTES.PURCHASE_SUCCESS);
+        router.push(ROUTES.PURCHASE_SUCCESS as Href);
       },
       onError: (error: Error) => {
         showError(error.message || ERROR_MESSAGES.TOP_UP_FAILED);

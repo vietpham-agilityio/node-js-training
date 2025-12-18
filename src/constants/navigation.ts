@@ -14,19 +14,22 @@ export const SCREENS = {
     WELCOME: 'welcome',
     MOVIES: 'movies/[id]',
     TICKETS: 'tickets/[id]',
-    CHECKOUT: 'checkout',
     PROFILE: 'profile/index',
     PROFILE_EDIT: 'profile/edit',
     PROFILE_CHANGE_PASSWORD: 'profile/change-password',
 
-    CHECKOUT_SUCCESS: 'checkout-success',
-    PURCHASE_SUCCESS: 'purchase-success',
-    TOP_UP: 'top-up',
+    // Booking
+    CINEMA: 'booking/cinema',
+    SEATS: 'booking/seats',
+    CHECKOUT: 'booking/checkout',
+    CHECKOUT_SUCCESS: 'booking/checkout-success',
+
+    // Purchase
+    PURCHASE_SUCCESS: 'purchase/purchase-success',
+    TOP_UP: 'purchase/top-up',
 
     // Modal screens
     SEARCH: 'search',
-    CINEMA: 'cinema',
-    SEATS: 'seats',
   },
 
   // Auth screens
