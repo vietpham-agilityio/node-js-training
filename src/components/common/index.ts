@@ -3,6 +3,7 @@ export * from './Button';
 export * from './Divider';
 export * from './ExpandableText';
 export * from './Input';
+export * from './Loading';
 export * from './MovieBanner';
 export * from './Rating';
 export * from './SearchInput';
