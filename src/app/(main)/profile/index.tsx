@@ -26,6 +26,7 @@ enum SettingKey {
   ChangeLanguage = 'change_language',
   HelpCenter = 'help_center',
   RateApp = 'rate_app',
+  ChangePassword = 'change_password',
   Logout = 'logout',
 }
 
@@ -35,7 +36,7 @@ const ProfileScreen = () => {
 
   const SETTING_ACTIONS: Record<SettingKey, () => void> = useMemo(
     () => ({
-      [SettingKey.Edit]: () => router.navigate(ROUTES.PROFILE_EDIT),
+      [SettingKey.Edit]: () => router.push(ROUTES.PROFILE_EDIT),
       [SettingKey.MyWallet]: () => null,
       [SettingKey.ChangeLanguage]: () => null,
       [SettingKey.HelpCenter]: () => null,
@@ -48,6 +49,8 @@ const ProfileScreen = () => {
           },
         ]);
       },
+      [SettingKey.ChangePassword]: () =>
+        router.push(ROUTES.PROFILE_CHANGE_PASSWORD),
       [SettingKey.Logout]: () => signOut(),
     }),
     [signOut],

@@ -28,3 +28,8 @@ export interface UpdateProfileData {
   email?: string;
   avatarUrl?: string;
 }
+
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+}

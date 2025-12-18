@@ -13,12 +13,14 @@ export const ROUTES = {
   // Profile routes
   PROFILE: '/(main)/profile',
   PROFILE_EDIT: '/(main)/profile/edit',
+  PROFILE_CHANGE_PASSWORD: '/(main)/profile/change-password',
 
   // Auth routes
   LOGIN: '/(auth)/signin',
   SIGNUP: '/(auth)/signup',
   ONBOARDING: '/(auth)/onboarding',
   FORGOT_PASSWORD: '/(auth)/forgot-password',
+  RESET_PASSWORD: '/(auth)/reset-password',
   CONFIRM_ACCOUNT: '/confirm-account',
 
   // Tab routes

@@ -58,6 +58,7 @@ const MainLayout = () => (
     />
     <Stack.Screen name={SCREENS.MAIN.PROFILE} />
     <Stack.Screen name={SCREENS.MAIN.PROFILE_EDIT} />
+    <Stack.Screen name={SCREENS.MAIN.PROFILE_CHANGE_PASSWORD} />
   </Stack>
 );
 

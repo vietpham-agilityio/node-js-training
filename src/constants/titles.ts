@@ -13,6 +13,7 @@ export const HEADER_TITLE_MAP = {
   '/tickets/': 'Ticket Details',
   '/profile/edit': 'Edit Your Profile',
   '/top-up': 'Top Up',
+  '/profile/change-password': 'Change Password',
 } as const;
 
 /**
