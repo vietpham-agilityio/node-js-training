@@ -1,5 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, RefreshControl, View } from 'react-native';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Shopify
@@ -42,6 +47,9 @@ import { useHeaderStore } from '@/stores/header';
 
 import { CastMember } from '@/features/booking/types/movie';
 
+// Icons
+import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
+
 type ContentItem =
   | {
       type: ContentType.SYNOPSIS;
@@ -64,6 +72,8 @@ interface CastAndCrewItem {
 
 const StyledImage = withUniwind(Image);
 const StyledSafeAreaView = withUniwind(SafeAreaView);
+
+const IconWithUniWind = withUniwind(ArrowRightIcon);
 
 const MovieScreen = () => {
   const params = useLocalSearchParams<{ id: string }>();
@@ -131,6 +141,10 @@ const MovieScreen = () => {
       },
     });
   }, [title, id, movie, setHeaderTitle, setMovie]);
+
+  const handleGoBack = useCallback(() => {
+    router.back();
+  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: ContentItem }) => {
@@ -219,6 +233,16 @@ const MovieScreen = () => {
           className="relative w-full top-0 left-0 right-0"
           testID="movie-banner-container"
         >
+          <View className="absolute top-10 left-0 right-0">
+            <TouchableOpacity
+              onPress={handleGoBack}
+              accessibilityRole="button"
+              accessibilityLabel="Go back to home"
+              className="w-14 h-14 rounded-full z-2 rotate-180 items-center justify-center"
+            >
+              <IconWithUniWind className="text-white" />
+            </TouchableOpacity>
+          </View>
           <StyledImage
             contentFit="cover"
             transition={200}
