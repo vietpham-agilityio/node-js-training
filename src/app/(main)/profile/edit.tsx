@@ -1,10 +1,9 @@
-import { useRouter } from 'expo-router';
-import { Alert, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { ERROR_MESSAGES, MESSAGES, ROUTES } from '@/constants';
+import { ERROR_MESSAGES, MESSAGES, ToastType } from '@/constants';
 
 // Hooks
 import {
@@ -12,6 +11,7 @@ import {
   useUpdateProfile,
   useUploadAvatar,
 } from '@/features/setting/hooks/useProfile';
+import { useToastAlert } from '@/hooks/useToast';
 
 // Types
 import { UpdateProfileData } from '@/features/auth/types/auth';
@@ -23,7 +23,7 @@ const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
 
 const EditProfileScreen = () => {
-  const router = useRouter();
+  const toast = useToastAlert();
   const { data: profile, isLoading: isProfileLoading } = useProfile();
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
   const { mutate: uploadAvatar, isPending: isUploading } = useUploadAvatar();
@@ -63,20 +63,22 @@ const EditProfileScreen = () => {
         });
       });
 
-      Alert.alert(MESSAGES.UPDATE_SUCCESS, MESSAGES.PROFILE_UPDATE_SUCCESS, [
+      toast.alert(
+        MESSAGES.UPDATE_SUCCESS,
+        MESSAGES.PROFILE_UPDATE_SUCCESS,
+        [],
         {
-          text: 'OK',
-          onPress: () => {
-            router.replace(ROUTES.PROFILE);
-          },
+          type: ToastType.SUCCESS,
         },
-      ]);
+      );
     } catch (error) {
-      Alert.alert(
+      toast.alert(
         ERROR_MESSAGES.UPDATE_FAILED,
         error instanceof Error
           ? error.message
           : ERROR_MESSAGES.UPDATE_PROFILE_FAILED,
+        [],
+        { type: ToastType.ERROR },
       );
     }
   };

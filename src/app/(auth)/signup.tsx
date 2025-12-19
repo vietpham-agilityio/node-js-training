@@ -1,12 +1,12 @@
 import { useRouter } from 'expo-router';
-import { Alert } from 'react-native';
 
 // Constants
-import { ERROR_MESSAGES, MESSAGES, ROUTES } from '@/constants';
+import { ERROR_MESSAGES, MESSAGES, ROUTES, ToastType } from '@/constants';
 
 // Hooks
 import { useSignUp } from '@/features/auth/hooks/useSignUp';
 import { useUploadAvatar } from '@/features/setting/hooks/useProfile';
+import { useToastAlert } from '@/hooks/useToast';
 
 // Types
 import { SignUpData } from '@/features/auth/types/auth';
@@ -15,9 +15,10 @@ import { SignUpData } from '@/features/auth/types/auth';
 import { SignUpForm } from '@/features/auth/components/SignUpForm';
 
 // Layout
-import { AccessLayout } from '@/layouts/AcessLayout';
+import { AccessLayout } from '@/layouts/AccessLayout';
 
 const SignupScreen = () => {
+  const toast = useToastAlert();
   const router = useRouter();
   const { mutate: signUp, isPending: isSigningUp } = useSignUp();
   const { mutate: uploadAvatar, isPending: isUploading } = useUploadAvatar();
@@ -55,24 +56,29 @@ const SignupScreen = () => {
         });
       }
 
-      Alert.alert(
+      toast.alert(
         MESSAGES.SIGNUP_SUCCESS,
         MESSAGES.ACCOUNT_VERIFICATION_SUCCESS,
         [
           {
             text: 'OK',
-            onPress: () => {
-              router.replace(ROUTES.WELCOME);
-            },
+            onPress: () => router.replace(ROUTES.LOGIN),
           },
         ],
+        {
+          type: ToastType.SUCCESS,
+        },
       );
     } catch (error) {
-      Alert.alert(
+      toast.alert(
         ERROR_MESSAGES.SIGNUP_FAILED,
         error instanceof Error
           ? error.message
           : ERROR_MESSAGES.CREATE_ACCOUNT_FAILED,
+        [],
+        {
+          type: ToastType.ERROR,
+        },
       );
     }
   };

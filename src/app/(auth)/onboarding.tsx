@@ -12,7 +12,7 @@ import { Typo } from '@/components/Typo';
 import { Button } from '@/components/Button';
 
 // Layout
-import { AccessLayout } from '@/layouts/AcessLayout';
+import { AccessLayout } from '@/layouts/AccessLayout';
 
 // Icons
 import { AppIcon } from '@/icons';
