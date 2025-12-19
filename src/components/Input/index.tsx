@@ -22,7 +22,7 @@ import {
 import { EyeIcon, EyeOffIcon } from '@/icons';
 
 // Utils
-import { cn } from '@/utils';
+import { cn, isAndroid } from '@/utils';
 
 export interface InputProps extends Omit<TextInputProps, 'placeholder'> {
   label: string;
@@ -112,6 +112,7 @@ export const Input = memo(
           animatedValue.interpolate({
             inputRange: [0, 1],
             outputRange: [16, -10], // animate the label position to 16 when the value is 0 and -10 when the value is 1
+            ...(isAndroid() && { outputRange: [12, -10] }),
           }),
         [animatedValue],
       );
@@ -181,7 +182,11 @@ export const Input = memo(
               value={value}
               secureTextEntry={secureTextEntry && !isPasswordVisible}
               testID={`${testID}-input`}
-              className={`w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base ${borderColor}`}
+              className={cn(
+                'w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base',
+                isAndroid() && 'pb-1.5',
+                borderColor,
+              )}
               onChangeText={onChangeText}
               onFocus={handleFocus}
               onBlur={handleBlur}
