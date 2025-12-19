@@ -162,7 +162,7 @@ const CinemaScreen = () => {
                     value={label}
                     isPrimary={isSelected}
                     onPress={handleSelectDate}
-                    className="py-5 px-3"
+                    className="py-5 px-3 min-w-17.5"
                   />
                 </View>
               );
@@ -291,7 +291,7 @@ const CinemaScreen = () => {
 
       {/* Circular Navigation Button */}
       {!isLoading && !isError && cinemasWithShowtimes.length > 0 && (
-        <View className="absolute bottom-6 left-0 right-0 items-center">
+        <View className="absolute bottom-10 left-0 right-0 items-center">
           <TouchableOpacity
             onPress={handleNavigateToSeatSelection}
             disabled={!isDisabled}

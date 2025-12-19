@@ -305,7 +305,7 @@ const MovieScreen = () => {
       />
 
       {/* Floating Button */}
-      <View className="absolute bottom-0 left-0 right-0 px-6 pb-10 pt-4 bg-linear-to-t from-bg-quaternary via-bg-quaternary to-transparent">
+      <View className="absolute bottom-0 left-0 right-0 px-6 pb-16.5 pt-4 bg-linear-to-t from-bg-quaternary via-bg-quaternary to-transparent">
         <Button
           onPress={handleNavigateToSelectCinema}
           title="Booking Movie"
