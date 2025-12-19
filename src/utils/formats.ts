@@ -32,7 +32,7 @@ export const formatCurrency = (amount: number, currency = 'IDR'): string => {
  * @returns Formatted currency string (e.g., "IDR 200.000")
  */
 export function formatIDR(
-  amount: number,
+  value: number | string,
   options?: {
     showCurrency?: boolean;
     decimals?: number;
@@ -40,7 +40,16 @@ export function formatIDR(
 ): string {
   const { showCurrency = true, decimals = 0 } = options || {};
 
-  // Format number with dot as thousand separator
+  const amount =
+    typeof value === 'string'
+      ? Number(value.replace(/\./g, '').replace(',', '.'))
+      : value;
+
+  if (isNaN(amount)) {
+    console.warn('[formatIDR] Invalid amount:', value);
+    return showCurrency ? 'IDR 0' : '0';
+  }
+
   const formattedNumber = amount.toLocaleString('id-ID', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
@@ -67,10 +76,39 @@ export const formatDate = (date: string | Date): string => {
   return `${weekday} ${month} ${day}`;
 };
 
-export const formatTime = (time: string): string => {
-  const [hours, minutes] = time.split(':');
-  return `${hours}:${minutes}`;
+export const formatTime = (
+  value: string | Date,
+  timeZone: string = 'UTC',
+): string => {
+  // Case 1: Date object
+  if (value instanceof Date) {
+    return formatDateObj(value, timeZone);
+  }
+
+  // Case 2: time-only string (HH:mm or HH:mm:ss)
+  if (/^\d{2}:\d{2}(:\d{2})?$/.test(value)) {
+    return value.slice(0, 5); // "00:00"
+  }
+
+  // Case 3: ISO string (Supabase)
+  const normalized = value.replace(/\.(\d{3})\d+/, '.$1');
+  const date = new Date(normalized);
+
+  if (isNaN(date.getTime())) {
+    console.warn('[formatTime] Invalid date input:', value);
+    return '--:--';
+  }
+
+  return formatDateObj(date, timeZone);
 };
+
+const formatDateObj = (date: Date, timeZone: string) =>
+  new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone,
+  }).format(date);
 
 export const generateBookingNumber = (): string => {
   return Math.floor(Math.random() * 100000000)

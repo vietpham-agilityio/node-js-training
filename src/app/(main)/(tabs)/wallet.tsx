@@ -13,13 +13,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { ROUTES, Size } from '@/constants';
+import { ROUTES, Size, TABS_FOOTER_HEIGHT } from '@/constants';
 
 // Hooks
 import { useProfile } from '@/features/setting/hooks/useProfile';
 import {
-  useWallet,
   useTransactionsInfinite,
+  useWallet,
 } from '@/features/wallet/hooks/useWallet';
 
 // Types
@@ -27,11 +27,12 @@ import { WalletTransaction } from '@/features/wallet/types/wallet';
 
 // Components
 import { Button } from '@/components/Button';
-import { Typo } from '@/components/Typo';
 import { MovieCard } from '@/components/MovieCard';
+import { Typo } from '@/components/Typo';
 import { WalletCard } from '@/features/wallet/components/WalletCard';
 
 // Icons
+import { Transaction } from '@/features/wallet/components/Transaction';
 import { TopUpIcon } from '@/icons';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
@@ -77,9 +78,7 @@ const WalletScreen = () => {
     await Promise.all([refetchWallet(), refetchTransactions()]);
   }, [refetchWallet, refetchTransactions]);
 
-  const handleTopUp = useCallback(() => {}, []);
-
-  const handleWalletCardPress = useCallback(() => {
+  const handleTopUp = useCallback(() => {
     router.push(ROUTES.TOP_UP as Href);
   }, [router]);
 
@@ -89,13 +88,11 @@ const WalletScreen = () => {
 
       if (!booking)
         return (
-          <MovieCard
-            posterUrl=""
-            title={item.description}
-            showDate={item.createdAt}
+          <Transaction
+            description={item.description}
+            createdAt={item.createdAt}
+            amount={item.amount}
             transactionType={item.transactionType}
-            price={item.amount.toString()}
-            justifyContent="center"
           />
         );
 
@@ -227,7 +224,7 @@ const WalletScreen = () => {
             cardNumber={wallet.cardNumber}
             cardName={profile?.fullName || 'User'}
             accessibilityLabel={`Wallet balance ${wallet.balance} ${wallet.currency}`}
-            onPress={handleWalletCardPress}
+            onPress={handleTopUp}
           />
         ) : null}
 
@@ -236,19 +233,13 @@ const WalletScreen = () => {
         </Typo>
       </View>
     ),
-    [
-      isWalletError,
-      refetchWallet,
-      wallet,
-      profile?.fullName,
-      handleWalletCardPress,
-    ],
+    [isWalletError, refetchWallet, wallet, profile?.fullName, handleTopUp],
   );
 
   if (isLoadingProfile || isLoadingWallet || isLoadingTransactions) {
     return (
       <StyledSafeAreaView
-        edges={['bottom']}
+        edges={[]}
         className="flex-1 bg-bg-primary items-center justify-center"
         accessibilityLabel="Loading wallet"
       >
@@ -260,17 +251,20 @@ const WalletScreen = () => {
 
   return (
     <StyledSafeAreaView
-      edges={['bottom']}
+      edges={[]}
       accessibilityLabel="Wallet screen"
       accessibilityHint="Wallet screen"
-      className="h-full bg-bg-primary"
+      className="flex-1 bg-bg-primary"
     >
       <FlashList
         data={allTransactions}
         renderItem={renderTransaction}
         keyExtractor={keyExtractor}
         getItemType={getItemType}
-        contentContainerStyle={{ paddingHorizontal: 24 }}
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          paddingBottom: TABS_FOOTER_HEIGHT,
+        }}
         ItemSeparatorComponent={() => <View className="h-6" />}
         showsVerticalScrollIndicator={false}
         onEndReached={handleLoadMore}

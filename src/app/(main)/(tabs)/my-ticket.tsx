@@ -13,6 +13,7 @@ import {
   MESSAGES,
   ROUTES,
   Size,
+  TABS_FOOTER_HEIGHT,
   TICKET_TABS,
 } from '@/constants';
 
@@ -24,9 +25,9 @@ import { Ticket, TicketStatus } from '@/features/booking/types/booking';
 
 // Components
 import { Button } from '@/components/Button';
+import { MovieCard } from '@/components/MovieCard';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
-import { MovieCard } from '@/components/MovieCard';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
@@ -241,7 +242,7 @@ const MyTicketScreen = () => {
   if (isLoading) {
     return (
       <StyledSafeAreaView
-        edges={['bottom']}
+        edges={[]}
         className="flex-1 bg-bg-primary items-center justify-center"
         accessibilityLabel="Loading tickets"
       >
@@ -253,17 +254,20 @@ const MyTicketScreen = () => {
 
   return (
     <StyledSafeAreaView
-      edges={['bottom']}
+      edges={[]}
       accessibilityLabel="My Ticket screen"
       accessibilityHint="My Ticket screen"
-      className="h-full bg-bg-primary"
+      className="flex-1 bg-bg-primary"
     >
       <FlashList
         data={filteredTickets}
         renderItem={renderTicket}
         keyExtractor={keyExtractor}
         getItemType={getItemType}
-        contentContainerStyle={{ paddingHorizontal: 24, marginBottom: 24 }}
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          paddingBottom: TABS_FOOTER_HEIGHT,
+        }}
         ItemSeparatorComponent={() => <View className="h-6" />}
         showsVerticalScrollIndicator={false}
         onEndReached={handleLoadMore}
