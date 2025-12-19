@@ -79,7 +79,7 @@ describe('MovieCard Component', () => {
 
     it('should display price when provided', () => {
       render(<MovieCard {...defaultProps} price="150.000" />);
-      expect(screen.getByText('IDR: 150.000')).toBeTruthy();
+      expect(screen.getByText('IDR 150.000')).toBeTruthy();
     });
 
     it('should display cinema location when provided', () => {
@@ -98,7 +98,7 @@ describe('MovieCard Component', () => {
         />,
       );
       expect(screen.getByText('16:40, Thu Dec 18')).toBeTruthy();
-      expect(screen.getByText('IDR: 150.000')).toBeTruthy();
+      expect(screen.getByText('IDR 150.000')).toBeTruthy();
       expect(screen.getByText('FX Sudirman XXI')).toBeTruthy();
     });
 
@@ -169,7 +169,7 @@ describe('MovieCard Component', () => {
 
     it('should handle only price without other booking info', () => {
       render(<MovieCard {...defaultProps} price="150.000" />);
-      expect(screen.getByText('IDR: 150.000')).toBeTruthy();
+      expect(screen.getByText('IDR 150.000')).toBeTruthy();
       expect(screen.queryByTestId('movie-card-showtime')).toBeNull();
       expect(screen.queryByTestId('movie-card-cinema')).toBeNull();
     });

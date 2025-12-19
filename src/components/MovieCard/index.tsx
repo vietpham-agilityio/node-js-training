@@ -19,7 +19,11 @@ import { WalletTransactionType } from '@/features/wallet/types/wallet';
 
 // Utils
 import { cn } from '@/utils';
-import { formatMovieDuration, formatShowtimeDate } from '@/utils/formats';
+import {
+  formatIDR,
+  formatMovieDuration,
+  formatShowtimeDate,
+} from '@/utils/formats';
 
 interface MovieCardProps extends Omit<TouchableOpacityProps, 'children'> {
   title: string;
@@ -137,7 +141,7 @@ export const MovieCard = memo(
                   )}
                   testID="movie-card-price"
                 >
-                  IDR: {price}
+                  {formatIDR(price)}
                 </Typo>
               )}
 
