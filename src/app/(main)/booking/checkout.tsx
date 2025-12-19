@@ -128,6 +128,7 @@ const CheckoutScreen = () => {
 
     createBooking(bookingData, {
       onSuccess: () => {
+        router.dismissAll();
         router.replace(ROUTES.CHECKOUT_SUCCESS as Href);
       },
       onError: (error: Error) => {

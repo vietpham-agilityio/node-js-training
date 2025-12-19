@@ -94,6 +94,8 @@ const TopUpScreen = () => {
       onSuccess: () => {
         setAmount('');
         setSelectedAmount(null);
+
+        router.dismissAll();
         router.push(ROUTES.PURCHASE_SUCCESS as Href);
       },
       onError: (error: Error) => {
@@ -109,8 +111,7 @@ const TopUpScreen = () => {
       className="flex-1 bg-dark-blue"
     >
       <StyledScrollView
-        className="flex-1"
-        contentContainerClassName="px-6 py-6"
+        contentContainerClassName="flex-1 px-6 py-6"
         showsVerticalScrollIndicator={false}
       >
         {/* Amount Input */}
@@ -140,7 +141,7 @@ const TopUpScreen = () => {
                   accessibilityRole="button"
                   accessibilityLabel={`Select amount ${formatIDR(topUpAmount)}`}
                   className={cn(
-                    'flex-1 min-w-[45%] py-2.5 px-11 rounded-lg border',
+                    'flex-1 min-w-[45%] py-2.5 px-11 rounded-lg border-none',
                     isSelected ? 'bg-primary' : 'bg-bg-quaternary',
                   )}
                 >

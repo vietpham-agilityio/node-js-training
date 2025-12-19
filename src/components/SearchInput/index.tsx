@@ -8,7 +8,7 @@ import { SearchIcon } from '@/icons';
 import { useResolveClassNames } from 'uniwind';
 
 // Utils
-import { cn } from '@/utils';
+import { cn, isAndroid } from '@/utils';
 
 export interface SearchInputProps extends Omit<TextInputProps, 'placeholder'> {
   testID?: string;
@@ -48,6 +48,7 @@ export const SearchInput = memo(
             testID={`${testID}-input`}
             className={cn(
               'w-full h-12 pl-14 pr-4 pb-1 bg-dark-navy text-white text-sm border rounded-xl',
+              isAndroid() && 'pb-2',
               className,
             )}
             placeholder={placeholder}

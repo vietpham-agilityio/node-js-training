@@ -16,9 +16,9 @@ import { CardCheckedIcon } from '@/icons/CardCheckedIcon';
 const CheckoutSuccessScreen = () => {
   const router = useRouter();
 
-  const handleNavigateToMyTicket = useCallback(() => {
+  const handleNavigateToMyWallet = useCallback(() => {
     router.dismissAll();
-    router.replace(ROUTES.MY_TICKET);
+    router.replace(ROUTES.MY_WALLET);
   }, [router]);
 
   const handleNavigateToHome = useCallback(() => {
@@ -35,13 +35,13 @@ const CheckoutSuccessScreen = () => {
       />
       <View className="w-full px-11 gap-4">
         <Button
-          title="My Ticket"
+          title="My Wallet"
           isPrimary
-          onPress={handleNavigateToMyTicket}
+          onPress={handleNavigateToMyWallet}
           accessible
           accessibilityRole="button"
-          accessibilityLabel="My Ticket"
-          accessibilityHint="Go to my ticket screen"
+          accessibilityLabel="My Wallet"
+          accessibilityHint="Go to my wallet screen"
         />
         <View className="flex-row justify-center items-center gap-1">
           <Typo weight="regular" size="sm">
