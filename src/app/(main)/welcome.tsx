@@ -5,11 +5,15 @@ import { ActivityIndicator, View } from 'react-native';
 import { ROUTES } from '@/constants';
 
 // Components
-import { Avatar, Button, Typo } from '@/components/common';
-import { AccessLayout } from '@/components/layouts';
+import { Avatar } from '@/components/Avatar';
+import { Button } from '@/components/Button';
+import { Typo } from '@/components/Typo';
+
+// Layouts
+import { AccessLayout } from '@/layouts/AcessLayout';
 
 // Hooks
-import { useProfile } from '@/hooks';
+import { useProfile } from '@/features/setting/hooks/useProfile';
 
 const WelcomeScreen = () => {
   const route = useRouter();

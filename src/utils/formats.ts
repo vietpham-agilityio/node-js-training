@@ -1,4 +1,6 @@
-import { PromoCodeStatus, Seat } from '@/types';
+import { Seat } from '@/features/booking/types/cinema';
+
+import { PromoCodeStatus } from '@/features/booking/types/movie';
 
 export const formatCardNumber = (number?: string) => {
   if (!number) return '•••• •••• •••• ••••';

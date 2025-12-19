@@ -7,7 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Components
-import { Button, Input, Typo } from '@/components/common';
+import { Button } from '@/components/Button';
+import { Input } from '@/components/Input';
+import { Typo } from '@/components/Typo';
 
 // Constants
 import {
@@ -20,14 +22,14 @@ import {
 } from '@/constants';
 
 // Hooks
-import { useTopUp } from '@/hooks';
+import { useTopUp } from '@/features/wallet/hooks/useWallet';
 
 // Utils
 import { cn } from '@/utils';
 import { formatIDR } from '@/utils/formats';
 
 // Stores
-import { useToastStore } from '@/stores';
+import { useToastStore } from '@/stores/toast';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);

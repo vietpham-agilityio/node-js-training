@@ -16,13 +16,22 @@ import {
 } from '@/constants';
 
 // Components
-import { Button, SearchInput, Tabs, Typo } from '@/components/common';
-import { MovieBannerCarousel, PromotionCard } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { SearchInput } from '@/components/SearchInput';
+import { Tabs } from '@/components/Tabs';
+import { Typo } from '@/components/Typo';
+import { MovieBannerCarousel } from '@/features/booking/components/MovieBannerCarousel';
+import { PromotionCard } from '@/features/booking/components/PromotionCard';
+
+// Hooks
+import { useMoviesInfinite } from '@/features/booking/hooks/useMovies';
 
 // Types
-import { useMoviesInfinite } from '@/hooks';
+
+import { MovieStatus } from '@/features/booking/types/movie';
+
+// Mock
 import { MOCK_PROMOTIONS } from '@/mocks';
-import { MovieStatus } from '@/types';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
@@ -77,7 +86,7 @@ const HomeScreen = () => {
     if (activeCategory !== FILTER_CATEGORY_TABS[0].id) {
       filtered = nowPlayingMovies.filter(movie =>
         movie.genre?.some(
-          g => g.toLowerCase() === activeCategory.toLowerCase(),
+          (g: string) => g.toLowerCase() === activeCategory.toLowerCase(),
         ),
       );
     }
@@ -96,7 +105,7 @@ const HomeScreen = () => {
     if (activeCategory !== FILTER_CATEGORY_TABS[0].id) {
       filtered = comingSoonMovies.filter(movie =>
         movie.genre?.some(
-          g => g.toLowerCase() === activeCategory.toLowerCase(),
+          (g: string) => g.toLowerCase() === activeCategory.toLowerCase(),
         ),
       );
     }

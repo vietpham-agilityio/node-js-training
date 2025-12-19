@@ -17,14 +17,16 @@ import {
 } from '@/constants';
 
 // Hooks
-import { useTicketsInfinite } from '@/hooks';
+import { useTicketsInfinite } from '@/features/ticket/hooks/useTickets';
 
 // Types
-import { Ticket, TicketStatus } from '@/types';
+import { Ticket, TicketStatus } from '@/features/booking/types/booking';
 
 // Components
-import { Button, Tabs, Typo } from '@/components/common';
-import { MovieCard } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { Tabs } from '@/components/Tabs';
+import { Typo } from '@/components/Typo';
+import { MovieCard } from '@/components/MovieCard';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 

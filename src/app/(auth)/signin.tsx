@@ -6,10 +6,14 @@ import { Alert, Pressable, View } from 'react-native';
 import { ERROR_MESSAGES, ROUTES } from '@/constants';
 
 // Hooks
-import { useSignIn, useSignInWithFacebook, useSignInWithGoogle } from '@/hooks';
+import {
+  useSignIn,
+  useSignInWithFacebook,
+  useSignInWithGoogle,
+} from '@/features/auth/hooks/useSignIn';
 
 // Types
-import { SignInData } from '@/types';
+import { SignInData } from '@/features/auth/types/auth';
 
 // Icons
 import { AppIcon } from '@/icons';
@@ -18,13 +22,15 @@ import { AppIcon } from '@/icons';
 import { useResolveClassNames } from 'uniwind';
 
 // Components
+import { Typo } from '@/components/Typo';
+import { SignInForm } from '@/features/auth/components/SignInForm';
 import {
   ThirdPartyButton,
   ThirdPartyButtonType,
-  Typo,
-} from '@/components/common';
-import { SignInForm } from '@/components/feature';
-import { AccessLayout } from '@/components/layouts';
+} from '@/features/auth/components/ThirdPartyButton';
+
+// Layout
+import { AccessLayout } from '@/layouts/AcessLayout';
 
 const LoginScreen = () => {
   const { mutate: signIn, isPending: isSigningIn } = useSignIn();
@@ -70,12 +76,12 @@ const LoginScreen = () => {
   return (
     <AccessLayout mode="signin" loading={isLoading}>
       <View className="mt-8">
-      <AppIcon
-        width={88}
-        height={88}
-        color={appIconColorConfig.color}
-        stopColor={appIconColorConfig.backgroundColor}
-      />
+        <AppIcon
+          width={88}
+          height={88}
+          color={appIconColorConfig.color}
+          stopColor={appIconColorConfig.backgroundColor}
+        />
       </View>
       <View
         className="flex-col gap-1 mt-8 mb-[30]"

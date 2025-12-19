@@ -1,8 +1,16 @@
-import { API_CONFIG } from '@/constants';
-import { authService } from '@/services/supabase';
-import { useAuthStore } from '@/stores';
-import { ChangePasswordData } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
+
+// Constants
+import { API_CONFIG } from '@/constants';
+
+// Service
+import { authService } from '@/features/auth/services/auth';
+
+// Store
+import { useAuthStore } from '@/features/auth/store/auth';
+
+// Types
+import { ChangePasswordData } from '@/features/auth/types/auth';
 
 export const useSession = () => {
   return useQuery({

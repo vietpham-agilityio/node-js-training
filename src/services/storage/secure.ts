@@ -1,10 +1,12 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+
+// Constants
 import {
   SECURE_STORE_SIZE_LIMIT,
   SENSITIVE_SESSION_FIELDS,
   STORAGE_KEYS,
 } from '@/constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
 
 // Helper to determine if a session field is sensitive
 const isSessionFieldSensitive = (field: string): boolean => {

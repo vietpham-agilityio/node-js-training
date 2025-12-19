@@ -1,4 +1,4 @@
-import { Seat, SeatStatus } from '@/types';
+import { Seat, SeatStatus } from '@/features/booking/types/cinema';
 
 // Generate seat layout: Rows A-J, Columns 1-10
 export const generateSeats = (): Seat[] => {

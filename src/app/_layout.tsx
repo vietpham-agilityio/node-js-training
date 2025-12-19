@@ -26,11 +26,12 @@ import {
 import { ROUTES, SCREENS } from '@/constants';
 
 // Hooks
-import { useAuth, useDeepLinkHandler } from '@/hooks';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useDeepLinkHandler } from '@/hooks/useDeepLinkHandler';
 
 // Components
-import { Loading } from '@/components/common';
-import { Toast } from '@/components/feature';
+import { Loading } from '@/components/Loading';
+import { Toast } from '@/components/Toast';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();

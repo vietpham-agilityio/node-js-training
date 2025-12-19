@@ -7,7 +7,8 @@ import { Tabs } from 'expo-router';
 import { TABS } from '@/constants';
 
 // Components
-import { MainHeader, NavigationTabBar } from '@/components/feature';
+import { MainHeader } from '@/components/MainHeader';
+import { NavigationTabBar } from '@/components/NavigationTabBar';
 
 // Icons
 import { HomeIcon, TicketIcon, WalletIcon } from '@/icons';
