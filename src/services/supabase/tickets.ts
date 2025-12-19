@@ -16,66 +16,202 @@ export class TicketsService {
   }
 
   async getTickets(userId: string): Promise<Ticket[]> {
-    const { data, error } = await supabase
-      .from('tickets')
-      .select(
-        `
-        *,
-        booking:bookings(
-          *,
-          showtime:showtimes(
-            *,
-            movie:movies(*),
-            cinemaHall:cinema_halls(*, cinema:cinemas(*))
-          )
-        )
-      `,
-      )
-      .eq('booking.user_id', userId)
-      .order('created_at', { ascending: false });
+    try {
+      // Get all bookings for user first (RLS will filter automatically)
+      const { data: bookings, error: bookingsError } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('user_id', userId);
 
-    if (error) throw error;
-    return keysToCamel(data) as Ticket[];
+      if (bookingsError) {
+        throw bookingsError;
+      }
+
+      if (!bookings || bookings.length === 0) {
+        return [];
+      }
+
+      const bookingIds = bookings.map(b => b.id);
+
+      // Now get tickets for these bookings
+      // Optimized: Only select needed fields
+      const { data, error } = await supabase
+        .from('tickets')
+        .select(
+          `
+          id,
+          booking_id,
+          seat_number,
+          ticket_number,
+          qr_code_data,
+          price,
+          status,
+          scanned_at,
+          created_at,
+          booking:bookings!inner(
+            id,
+            booking_number,
+            booking_status,
+            total_seats,
+            seat_numbers,
+            total_amount,
+            created_at,
+            showtime:showtimes!inner(
+              id,
+              show_date,
+              show_time,
+              end_time,
+              price,
+              movie:movies!inner(
+                id,
+                title,
+                poster_url,
+                genre,
+                duration_minutes,
+                rating
+              ),
+              cinema_hall:cinema_halls!inner(
+                id,
+                name,
+                hall_type,
+                cinema:cinemas!inner(
+                  id,
+                  name,
+                  city,
+                  address
+                )
+              )
+            )
+          )
+        `,
+        )
+        .in('booking_id', bookingIds)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      return keysToCamel(data || []) as Ticket[];
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getTicketById(ticketId: string): Promise<Ticket> {
-    const { data, error } = await supabase
-      .from('tickets')
-      .select(
-        `
-        *,
-        booking:bookings(
-          *,
-          showtime:showtimes(
-            *,
-            movie:movies(*),
-            cinemaHall:cinema_halls(*, cinema:cinemas(*))
+    try {
+      const { data, error } = await supabase
+        .from('tickets')
+        .select(
+          `
+          id,
+          booking_id,
+          seat_number,
+          ticket_number,
+          qr_code_data,
+          price,
+          status,
+          scanned_at,
+          created_at,
+          booking:bookings!inner(
+            id,
+            booking_number,
+            booking_status,
+            user_id,
+            total_seats,
+            seat_numbers,
+            total_amount,
+            payment_status,
+            created_at,
+            showtime:showtimes!inner(
+              id,
+              show_date,
+              show_time,
+              end_time,
+              price,
+              movie:movies!inner(
+                id,
+                title,
+                synopsis,
+                poster_url,
+                genre,
+                duration_minutes,
+                rating,
+                language
+              ),
+              cinema_hall:cinema_halls!inner(
+                id,
+                name,
+                hall_type,
+                total_seats,
+                cinema:cinemas!inner(
+                  id,
+                  name,
+                  city,
+                  address,
+                  phone_number
+                )
+              )
+            )
           )
+        `,
         )
-      `,
-      )
-      .eq('id', ticketId)
-      .single();
+        .eq('id', ticketId)
+        .single();
 
-    if (error) throw error;
-    return keysToCamel(data) as Ticket;
+      if (error) {
+        throw error;
+      }
+
+      return keysToCamel(data) as Ticket;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async validateTicket(qrData: string) {
     try {
-      const data = JSON.parse(qrData);
+      // Parse QR data
+      let parsedData;
+      try {
+        parsedData = JSON.parse(qrData);
+      } catch {
+        return {
+          valid: false,
+          message: ERROR_MESSAGES.TICKET_INVALID_FORMAT,
+        };
+      }
 
+      const { booking_id, seat, timestamp } = parsedData;
+
+      if (!booking_id || !seat) {
+        return {
+          valid: false,
+          message: ERROR_MESSAGES.TICKET_INVALID_FORMAT,
+        };
+      }
+
+      // Get ticket with booking info
       const { data: ticket, error } = await supabase
         .from('tickets')
-        .select('*, booking:bookings(*)')
-        .eq('id', data.ticketId)
-        .eq('booking_id', data.bookingId)
+        .select(
+          `
+          *,
+          booking:bookings!inner(
+            booking_status,
+            expires_at
+          )
+        `,
+        )
+        .eq('booking_id', booking_id)
+        .eq('seat_number', seat)
         .single();
 
       if (error || !ticket) {
         return { valid: false, message: ERROR_MESSAGES.INVALID_TICKET };
       }
 
+      // Check if already scanned
       if (ticket.scanned_at) {
         return {
           valid: false,
@@ -84,11 +220,18 @@ export class TicketsService {
         };
       }
 
+      // Check if expired
       if (ticket.status === TicketStatus.EXPIRED) {
         return { valid: false, message: ERROR_MESSAGES.TICKET_EXPIRED };
       }
 
-      await supabase
+      // Check booking status
+      if (ticket.booking.booking_status === 'cancelled') {
+        return { valid: false, message: 'Booking has been cancelled' };
+      }
+
+      // Update ticket as scanned
+      const { error: updateError } = await supabase
         .from('tickets')
         .update({
           scanned_at: new Date().toISOString(),
@@ -96,15 +239,19 @@ export class TicketsService {
         })
         .eq('id', ticket.id);
 
+      if (updateError) {
+        throw updateError;
+      }
+
       return {
         valid: true,
-        ticket,
+        ticket: keysToCamel(ticket),
         message: MESSAGES.TICKET_VALIDATED_SUCCESS,
       };
     } catch {
       return {
         valid: false,
-        message: ERROR_MESSAGES.TICKET_INVALID_FORMAT,
+        message: ERROR_MESSAGES.TICKET_VALIDATION_FAILED,
       };
     }
   }
@@ -114,27 +261,79 @@ export class TicketsService {
     page = PAGINATION.PAGE_OFFSET,
     limit = PAGINATION.PAGE_LIMIT_MAX,
   ): Promise<Ticket[]> {
-    const { data, error } = await supabase
-      .from('tickets')
-      .select(
-        `
-        *,
-        booking:bookings(
-          *,
-          showtime:showtimes(
-            *,
-            movie:movies(*),
-            cinemaHall:cinema_halls(*, cinema:cinemas(*))
-          )
-        )
-      `,
-      )
-      .eq('booking.user_id', userId)
-      .order('created_at', { ascending: false })
-      .range(page * limit, (page + 1) * limit - 1);
+    try {
+      // Get bookings first (RLS filters automatically)
+      const { data: bookings, error: bookingsError } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('user_id', userId);
 
-    if (error) throw error;
-    return keysToCamel(data) as Ticket[];
+      if (bookingsError) {
+        throw bookingsError;
+      }
+
+      if (!bookings || bookings.length === 0) {
+        return [];
+      }
+
+      const bookingIds = bookings.map(b => b.id);
+
+      // Get paginated tickets
+      const { data, error } = await supabase
+        .from('tickets')
+        .select(
+          `
+          id,
+          booking_id,
+          seat_number,
+          ticket_number,
+          qr_code_data,
+          price,
+          status,
+          scanned_at,
+          created_at,
+          booking:bookings!inner(
+            id,
+            booking_number,
+            total_seats,
+            seat_numbers,
+            created_at,
+            showtime:showtimes!inner(
+              id,
+              show_date,
+              show_time,
+              movie:movies!inner(
+                id,
+                title,
+                poster_url,
+                genre,
+                duration_minutes
+              ),
+              cinema_hall:cinema_halls!inner(
+                id,
+                name,
+                cinema:cinemas!inner(
+                  id,
+                  name,
+                  city
+                )
+              )
+            )
+          )
+        `,
+        )
+        .in('booking_id', bookingIds)
+        .order('created_at', { ascending: false })
+        .range(page * limit, (page + 1) * limit - 1);
+
+      if (error) {
+        throw error;
+      }
+
+      return keysToCamel(data || []) as Ticket[];
+    } catch (error) {
+      throw error;
+    }
   }
 }
 
