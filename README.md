@@ -55,33 +55,45 @@ This document provides information about React Native Expo big practice.
 
 ```
 movea-app/
-├── app/                    # App router screens
-├── assets/                 # Images, fonts, and other static files
-├── components/             # Reusable components
-├── constants/              # App constants and configuration
-├── hooks/                  # Custom React hooks
-├── mocks/                  # Mock data
-├── services/               # API services
-├── stores/                 # State management stores
-├── types/                  # TypeScript type definitions
-├── utils/                  # Utility functions
-├── .editorconfig           # Editor configuration
-├── .gitignore              # Git ignore rules
-├── .lintstagedrc.js        # Lint-staged configuration
-├── .prettierrc             # Prettier configuration
-├── app.json                # Expo configuration
-├── babel.config.js         # Babel configuration
-├── eas.json                # EAS configuration
-├── eslint.config.js        # ESLint configuration
-├── index.ts                # Entry point
-├── jest.config.js          # Jest configuration
-├── jest.setup.ts           # Jest setup
-├── metro.config.js         # Metro bundler configuration
-├── package.json            # Dependencies
-├── tsconfig.json           # TypeScript configuration
-├── unistyles.ts            # Unistyles configuration
-├── pnpm-lock.yaml           # Pnpm lock file
-└── README.md               # This file
+├── src/
+│   ├── app/                    # Expo Router screens & navigation
+│   ├── components/             # Reusable UI components
+│   ├── constants/              # App-wide constants & config
+│   ├── features/               # Feature-based modules (logic + UI)
+│   |   ├── auth
+│   │   ├── booking
+│   │   ├── setting
+│   │   ├── ticket
+│   │   └── wallet
+│   ├── hooks/                  # Custom React hooks
+│   ├── icons/                  # SVG & icon components
+│   ├── layouts/                # Layout components (Auth, Main, etc.)
+│   ├── mocks/                  # Mock data for development & testing
+│   ├── services/               # API / Supabase / Edge Function services
+│   ├── stores/                 # State management (Zustand, etc.)
+│   ├── types/                  # Global TypeScript types
+│   ├── utils/                  # Utility & helper functions
+│   ├── global.css              # Global styles (UniWind)
+│   ├── uniwind-types.d.ts      # UniWind type definitions
+│   └── index.ts                # App entry helpers / exports
+│
+├── assets/                     # Images, fonts, static assets
+├── .editorconfig               # Editor configuration
+├── .gitignore                  # Git ignore rules
+├── .lintstagedrc.js            # Lint-staged configuration
+├── .prettierrc                 # Prettier configuration
+├── app.json                    # Expo app configuration
+├── babel.config.js             # Babel configuration
+├── eas.json                    # EAS build configuration
+├── eslint.config.js            # ESLint configuration
+├── jest.config.js              # Jest configuration
+├── jest.setup.ts               # Jest setup
+├── metro.config.js             # Metro bundler configuration
+├── package.json                # Dependencies
+├── tsconfig.json               # TypeScript configuration
+├── unistyles.ts                # Unistyles configuration
+├── pnpm-lock.yaml              # PNPM lock file
+└── README.md                   # Project documentation
 ```
 
 ## 🚀 Getting Started
@@ -89,7 +101,7 @@ movea-app/
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- npm or pnpm 
+- npm or pnpm
 - Expo CLI
 - iOS Simulator (Mac only) or Android Emulator
 
@@ -206,16 +218,18 @@ yarn lint
 ## 🎯 Project Goals
 
 - ✅ Handle platform differences between Android and iOS
-- ✅ Achieve >80% unit test coverage
-- ✅ Custom app icon and splash screen
-- ✅ Authentication screens (Login/Signup)
-- ✅ Home screen with 100+ paginated items
-- ✅ Profile screen with camera/image picker integration
-- ✅ Accessibility compliance
+- ✅ Handle platform differences between Android, iOS
+- ✅ Unit test coverage should be greater than 80%
+- ✅ Configure the AppIcon and SplashScreen that match the Expo app.
+- ✅ Must have a form with multiple inputs
+- ✅ Must have a Home screen with a list greater than 1000 items
+- ✅ Must have a screen using Camera and Image Picker
+- ✅ Apply Linking and Deep Linking
+- ✅ Push Notifications
 
 ## 📝 Design
 
-Design specifications can be found at: [Design Link](https://www.figma.com/design/TdbzhXYFUNAW3vjyUc5aKt/News-App-UI-Kit--Community-?node-id=0-1&t=9f9b56y6ptuOSdWd-1)
+Design specifications can be found at: [Design Link](https://www.figma.com/design/g9Fn2CZXGHlHescFFIVBP7/Movea---Movie-Ticket-App?node-id=122-120&t=CMiMONaFu5Gcypz9-1)
 
 ## 📄 License
 
