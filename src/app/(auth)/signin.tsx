@@ -1,9 +1,9 @@
 import { Link, router } from 'expo-router';
 import { useCallback } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 // Constants
-import { ERROR_MESSAGES, ROUTES } from '@/constants';
+import { ERROR_MESSAGES, MESSAGES, ROUTES, ToastType } from '@/constants';
 
 // Hooks
 import {
@@ -11,6 +11,7 @@ import {
   useSignInWithFacebook,
   useSignInWithGoogle,
 } from '@/features/auth/hooks/useSignIn';
+import { useToastAlert } from '@/hooks/useToast';
 
 // Types
 import { SignInData } from '@/features/auth/types/auth';
@@ -30,9 +31,10 @@ import {
 } from '@/features/auth/components/ThirdPartyButton';
 
 // Layout
-import { AccessLayout } from '@/layouts/AcessLayout';
+import { AccessLayout } from '@/layouts/AccessLayout';
 
 const LoginScreen = () => {
+  const toast = useToastAlert();
   const { mutate: signIn, isPending: isSigningIn } = useSignIn();
   const { mutate: signInWithGoogle, isPending: isGoogleLoading } =
     useSignInWithGoogle();
@@ -45,31 +47,45 @@ const LoginScreen = () => {
     (data: SignInData) => {
       signIn(data, {
         onError: (error: Error) => {
-          Alert.alert(
+          toast.alert(
             ERROR_MESSAGES.LOGIN_FAILED,
             error.message || ERROR_MESSAGES.INVALID_EMAIL_PASSWORD,
+            [],
+            {
+              type: ToastType.ERROR,
+            },
           );
         },
       });
+
+      toast.success(MESSAGES.SIGNIN_SUCCESS);
     },
-    [signIn],
+    [signIn, toast],
   );
 
   const handleGoogleSignIn = useCallback(() => {
     signInWithGoogle(undefined, {
       onError: (error: Error) => {
-        Alert.alert(ERROR_MESSAGES.GOOGLE_SIGN_IN_FAILED, error.message);
+        toast.alert(ERROR_MESSAGES.GOOGLE_SIGN_IN_FAILED, error.message, [], {
+          type: ToastType.ERROR,
+        });
       },
     });
-  }, [signInWithGoogle]);
+
+    toast.success(MESSAGES.SIGNIN_SUCCESS);
+  }, [signInWithGoogle, toast]);
 
   const handleFacebookSignIn = useCallback(() => {
     signInWithFacebook(undefined, {
       onError: (error: Error) => {
-        Alert.alert(ERROR_MESSAGES.FACEBOOK_SIGN_IN_FAILED, error.message);
+        toast.alert(ERROR_MESSAGES.FACEBOOK_SIGN_IN_FAILED, error.message, [], {
+          type: ToastType.ERROR,
+        });
       },
     });
-  }, [signInWithFacebook]);
+
+    toast.success(MESSAGES.SIGNIN_SUCCESS);
+  }, [signInWithFacebook, toast]);
 
   const isLoading = isSigningIn || isGoogleLoading || isFacebookLoading;
 

@@ -10,7 +10,7 @@ import { Button } from '@/components/Button';
 import { Typo } from '@/components/Typo';
 
 // Layouts
-import { AccessLayout } from '@/layouts/AcessLayout';
+import { AccessLayout } from '@/layouts/AccessLayout';
 
 // Hooks
 import { useProfile } from '@/features/setting/hooks/useProfile';

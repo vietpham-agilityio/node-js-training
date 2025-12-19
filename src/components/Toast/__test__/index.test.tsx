@@ -3,9 +3,6 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 // Component
 import { Toast } from '../';
 
-// Constants
-import { ToastType } from '@/constants';
-
 // Mock the store
 const mockUseToastStore = jest.fn();
 jest.mock('@/stores/toast', () => ({
@@ -25,15 +22,19 @@ describe('Toast Component', () => {
   const mockHide = jest.fn();
   const mockShowSuccess = jest.fn();
   const mockShowError = jest.fn();
+  const mockShowWarning = jest.fn();
+  const mockShowInfo = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     mockUseToastStore.mockReturnValue({
-      toast: null,
+      toasts: [],
       hide: mockHide,
       showSuccess: mockShowSuccess,
       showError: mockShowError,
+      showWarning: mockShowWarning,
+      showInfo: mockShowInfo,
     });
   });
 
@@ -43,17 +44,21 @@ describe('Toast Component', () => {
   });
 
   describe('Rendering', () => {
-    it('should return null when no toast is present', () => {
+    it('should return null when no toasts are present', () => {
       const { toJSON } = render(<Toast />);
       expect(toJSON()).toBeNull();
     });
 
     it('should render success toast when toast is present', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Success message',
-          type: ToastType.SUCCESS,
-        },
+        toasts: [
+          {
+            id: '1',
+            message: 'Success message',
+            type: 'success',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
@@ -63,10 +68,14 @@ describe('Toast Component', () => {
 
     it('should render error toast when toast is present', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Error message',
-          type: ToastType.ERROR,
-        },
+        toasts: [
+          {
+            id: '2',
+            message: 'Error message',
+            type: 'error',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
@@ -74,70 +83,106 @@ describe('Toast Component', () => {
       expect(getByText('Error message')).toBeTruthy();
     });
 
-    it('should render matching snapshot for success toast', () => {
+    it('should render warning toast', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Success message',
-          type: ToastType.SUCCESS,
-        },
-        hide: mockHide,
-      });
-
-      const { toJSON } = render(<Toast />);
-      expect(toJSON()).toMatchSnapshot();
-    });
-
-    it('should render matching snapshot for error toast', () => {
-      mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Error message',
-          type: ToastType.ERROR,
-        },
-        hide: mockHide,
-      });
-
-      const { toJSON } = render(<Toast />);
-      expect(toJSON()).toMatchSnapshot();
-    });
-  });
-
-  describe('Toast Types', () => {
-    it('should apply success styling for success toast', () => {
-      mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Success!',
-          type: ToastType.SUCCESS,
-        },
+        toasts: [
+          {
+            id: '3',
+            message: 'Warning message',
+            type: 'warning',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
       const { getByText } = render(<Toast />);
-      const toastContainer = getByText('Success!').parent?.parent;
-      expect(toastContainer).toBeTruthy();
+      expect(getByText('Warning message')).toBeTruthy();
     });
 
-    it('should apply error styling for error toast', () => {
+    it('should render info toast', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Error!',
-          type: ToastType.ERROR,
-        },
+        toasts: [
+          {
+            id: '4',
+            message: 'Info message',
+            type: 'info',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
       const { getByText } = render(<Toast />);
-      const toastContainer = getByText('Error!').parent?.parent;
-      expect(toastContainer).toBeTruthy();
+      expect(getByText('Info message')).toBeTruthy();
+    });
+
+    it('should render multiple toasts simultaneously', () => {
+      mockUseToastStore.mockReturnValue({
+        toasts: [
+          {
+            id: '1',
+            message: 'First toast',
+            type: 'success',
+            duration: 3000,
+          },
+          {
+            id: '2',
+            message: 'Second toast',
+            type: 'error',
+            duration: 3000,
+          },
+          {
+            id: '3',
+            message: 'Third toast',
+            type: 'info',
+            duration: 3000,
+          },
+        ],
+        hide: mockHide,
+      });
+
+      const { getByText } = render(<Toast />);
+      expect(getByText('First toast')).toBeTruthy();
+      expect(getByText('Second toast')).toBeTruthy();
+      expect(getByText('Third toast')).toBeTruthy();
+    });
+
+    it('should render toast with action button', () => {
+      const mockActionPress = jest.fn();
+      mockUseToastStore.mockReturnValue({
+        toasts: [
+          {
+            id: '1',
+            message: 'Toast with action',
+            type: 'success',
+            duration: 5000,
+            action: {
+              label: 'UNDO',
+              onPress: mockActionPress,
+            },
+          },
+        ],
+        hide: mockHide,
+      });
+
+      const { getByText } = render(<Toast />);
+      expect(getByText('Toast with action')).toBeTruthy();
+      expect(getByText('UNDO')).toBeTruthy();
     });
   });
 
   describe('Interactions', () => {
-    it('should call hide when toast is pressed', () => {
+    it('should call hide with correct ID when toast is pressed', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Test message',
-          type: ToastType.SUCCESS,
-        },
+        toasts: [
+          {
+            id: 'test-id-1',
+            message: 'Test message',
+            type: 'success',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
@@ -145,19 +190,56 @@ describe('Toast Component', () => {
       const touchable = getByLabelText('success toast: Test message');
 
       fireEvent.press(touchable);
+
       // Wait for animation to complete
       act(() => {
         jest.advanceTimersByTime(200);
       });
-      expect(mockHide).toHaveBeenCalledTimes(1);
+
+      expect(mockHide).toHaveBeenCalledWith('test-id-1');
+    });
+
+    it('should call hide for specific toast when multiple toasts exist', () => {
+      mockUseToastStore.mockReturnValue({
+        toasts: [
+          {
+            id: 'toast-1',
+            message: 'First toast',
+            type: 'success',
+            duration: 3000,
+          },
+          {
+            id: 'toast-2',
+            message: 'Second toast',
+            type: 'error',
+            duration: 3000,
+          },
+        ],
+        hide: mockHide,
+      });
+
+      const { getByLabelText } = render(<Toast />);
+      const secondToast = getByLabelText('error toast: Second toast');
+
+      fireEvent.press(secondToast);
+
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+
+      expect(mockHide).toHaveBeenCalledWith('toast-2');
     });
 
     it('should have correct accessibility label', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Test message',
-          type: ToastType.SUCCESS,
-        },
+        toasts: [
+          {
+            id: '1',
+            message: 'Test message',
+            type: 'success',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
@@ -167,10 +249,14 @@ describe('Toast Component', () => {
 
     it('should have correct accessibility label for error', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Error occurred',
-          type: ToastType.ERROR,
-        },
+        toasts: [
+          {
+            id: '1',
+            message: 'Error occurred',
+            type: 'error',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
@@ -179,13 +265,75 @@ describe('Toast Component', () => {
     });
   });
 
-  describe('Auto Dismiss', () => {
-    it('should auto dismiss after TOAST_DURATION', async () => {
+  describe('Action Buttons', () => {
+    it('should call action onPress when action button is pressed', () => {
+      const mockActionPress = jest.fn();
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Auto dismiss test',
-          type: ToastType.SUCCESS,
-        },
+        toasts: [
+          {
+            id: 'action-toast',
+            message: 'Action toast',
+            type: 'success',
+            duration: 5000,
+            action: {
+              label: 'UNDO',
+              onPress: mockActionPress,
+            },
+          },
+        ],
+        hide: mockHide,
+      });
+
+      const { getByLabelText } = render(<Toast />);
+      const actionButton = getByLabelText('UNDO');
+
+      fireEvent.press(actionButton);
+
+      expect(mockActionPress).toHaveBeenCalledTimes(1);
+    });
+
+    it('should hide toast after action button is pressed', () => {
+      const mockActionPress = jest.fn();
+      mockUseToastStore.mockReturnValue({
+        toasts: [
+          {
+            id: 'action-toast',
+            message: 'Action toast',
+            type: 'success',
+            duration: 5000,
+            action: {
+              label: 'RETRY',
+              onPress: mockActionPress,
+            },
+          },
+        ],
+        hide: mockHide,
+      });
+
+      const { getByLabelText } = render(<Toast />);
+      const actionButton = getByLabelText('RETRY');
+
+      fireEvent.press(actionButton);
+
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+
+      expect(mockHide).toHaveBeenCalledWith('action-toast');
+    });
+  });
+
+  describe('Auto Dismiss', () => {
+    it('should auto dismiss after default duration (3000ms)', async () => {
+      mockUseToastStore.mockReturnValue({
+        toasts: [
+          {
+            id: 'auto-dismiss',
+            message: 'Auto dismiss test',
+            type: 'success',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
@@ -193,37 +341,74 @@ describe('Toast Component', () => {
 
       // Fast-forward time to trigger auto dismiss
       act(() => {
-        jest.advanceTimersByTime(3000); // TOAST_DURATION
+        jest.advanceTimersByTime(3000);
       });
 
       // Wait for animation to complete
       act(() => {
-        jest.advanceTimersByTime(200); // Animation duration
+        jest.advanceTimersByTime(200);
       });
 
       await waitFor(() => {
-        expect(mockHide).toHaveBeenCalledTimes(1);
+        expect(mockHide).toHaveBeenCalledWith('auto-dismiss');
+      });
+    });
+
+    it('should auto dismiss after custom duration', async () => {
+      mockUseToastStore.mockReturnValue({
+        toasts: [
+          {
+            id: 'custom-duration',
+            message: 'Custom duration test',
+            type: 'error',
+            duration: 5000,
+          },
+        ],
+        hide: mockHide,
+      });
+
+      render(<Toast />);
+
+      // Should not dismiss before custom duration
+      act(() => {
+        jest.advanceTimersByTime(3000);
+      });
+      expect(mockHide).not.toHaveBeenCalled();
+
+      // Should dismiss after custom duration
+      act(() => {
+        jest.advanceTimersByTime(2000);
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+
+      await waitFor(() => {
+        expect(mockHide).toHaveBeenCalledWith('custom-duration');
       });
     });
 
     it('should clear timer when component unmounts', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: 'Test',
-          type: ToastType.SUCCESS,
-        },
+        toasts: [
+          {
+            id: 'unmount-test',
+            message: 'Test',
+            type: 'success',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
       const { unmount } = render(<Toast />);
       unmount();
 
-      // Fast-forward time
       act(() => {
         jest.advanceTimersByTime(3000);
       });
 
-      // hide should not be called after unmount
       expect(mockHide).not.toHaveBeenCalled();
     });
   });
@@ -231,10 +416,14 @@ describe('Toast Component', () => {
   describe('Edge Cases', () => {
     it('should handle empty message', () => {
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: '',
-          type: ToastType.SUCCESS,
-        },
+        toasts: [
+          {
+            id: '1',
+            message: '',
+            type: 'success',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 
@@ -245,10 +434,14 @@ describe('Toast Component', () => {
     it('should handle very long messages', () => {
       const longMessage = 'A'.repeat(200);
       mockUseToastStore.mockReturnValue({
-        toast: {
-          message: longMessage,
-          type: ToastType.ERROR,
-        },
+        toasts: [
+          {
+            id: '1',
+            message: longMessage,
+            type: 'error',
+            duration: 3000,
+          },
+        ],
         hide: mockHide,
       });
 

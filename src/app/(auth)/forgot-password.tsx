@@ -3,19 +3,21 @@ import { useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 
 // Constants
-import { ROUTES } from '@/constants';
+import { ROUTES, ToastType } from '@/constants';
 
 // Hooks
 import { useResetPassword } from '@/hooks/useSession';
+import { useToastAlert } from '@/hooks/useToast';
 
 // Components
 import { Input } from '@/components/Input';
 import { Typo } from '@/components/Typo';
 
 // Layout
-import { AccessLayout } from '@/layouts/AcessLayout';
+import { AccessLayout } from '@/layouts/AccessLayout';
 
 const ForgotPasswordScreen = () => {
+  const toast = useToastAlert();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const { mutate: resetPassword, isPending } = useResetPassword();
@@ -28,14 +30,17 @@ const ForgotPasswordScreen = () => {
 
     resetPassword(email, {
       onSuccess: () => {
-        Alert.alert(
-          'Success',
+        toast.withAction(
           'Password reset link has been sent to your email.',
-          [{ text: 'OK', onPress: () => router.replace(ROUTES.LOGIN) }],
+          {
+            label: 'OK',
+            onPress: () => router.replace(ROUTES.LOGIN),
+          },
+          ToastType.SUCCESS,
         );
       },
-      onError: (error: any) => {
-        Alert.alert('Error', error.message || 'Failed to send reset link');
+      onError: () => {
+        toast.error('Failed to send reset link');
       },
     });
   };

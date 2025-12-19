@@ -2,7 +2,7 @@ import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useRouter } from 'expo-router';
 import { memo, useCallback, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Alert, TextInput, View } from 'react-native';
+import { TextInput, View } from 'react-native';
 
 // Components
 import { Button } from '@/components/Button';
@@ -10,6 +10,7 @@ import { Input } from '@/components/Input';
 
 // Hooks
 import { useUpdatePassword } from '@/hooks/useSession';
+import { useToastAlert } from '@/hooks/useToast';
 
 // Constants
 import {
@@ -17,9 +18,11 @@ import {
   changePasswordSchema,
   ERROR_MESSAGES,
   MESSAGES,
+  ToastType,
 } from '@/constants';
 
 export const ChangePasswordForm = memo(() => {
+  const toast = useToastAlert();
   const router = useRouter();
   const { mutate: updatePassword, isPending } = useUpdatePassword();
 
@@ -56,7 +59,7 @@ export const ChangePasswordForm = memo(() => {
     (data: ChangePasswordFormData): void => {
       updatePassword(data, {
         onSuccess: () => {
-          Alert.alert(
+          toast.alert(
             MESSAGES.UPDATE_SUCCESS,
             MESSAGES.PASSWORD_UPDATE_SUCCESS,
             [
@@ -67,19 +70,22 @@ export const ChangePasswordForm = memo(() => {
                 },
               },
             ],
+            { type: ToastType.SUCCESS },
           );
         },
         onError: error => {
-          Alert.alert(
+          toast.alert(
             ERROR_MESSAGES.UPDATE_FAILED,
             error instanceof Error
               ? error.message
               : ERROR_MESSAGES.UPDATE_PASSWORD_FAILED,
+            [],
+            { type: ToastType.ERROR },
           );
         },
       });
     },
-    [router, updatePassword],
+    [router, toast, updatePassword],
   );
 
   return (

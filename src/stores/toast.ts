@@ -4,24 +4,97 @@ import { create } from 'zustand';
 import { ToastType } from '@/constants';
 
 export interface Toast {
+  id: string;
   message: string;
   type: ToastType;
+  duration?: number;
+  action?: {
+    label: string;
+    onPress: () => void;
+  };
 }
 
-interface ToastState {
-  toast: Toast | null;
-  showSuccess: (message: string) => void;
-  showError: (message: string) => void;
-  hide: () => void;
+interface ToastStore {
+  toasts: Toast[];
+  show: (message: string, type?: ToastType, duration?: number) => void;
+  showSuccess: (message: string, duration?: number) => void;
+  showError: (message: string, duration?: number) => void;
+  showWarning: (message: string, duration?: number) => void;
+  showInfo: (message: string, duration?: number) => void;
+  showWithAction: (
+    message: string,
+    type: ToastType,
+    action: { label: string; onPress: () => void },
+    duration?: number,
+  ) => void;
+  hide: (id: string) => void;
+  hideAll: () => void;
 }
 
-export const useToastStore = create<ToastState>(set => ({
-  toast: null,
-  showSuccess: (message: string) => {
-    set({ toast: { message, type: ToastType.SUCCESS } });
+export const useToastStore = create<ToastStore>(set => ({
+  toasts: [],
+
+  show: (message, type = ToastType.INFO, duration = 3000) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    const toast: Toast = { id, message, type, duration };
+
+    set(state => ({
+      toasts: [...state.toasts, toast],
+    }));
   },
-  showError: (message: string) => {
-    set({ toast: { message, type: ToastType.ERROR } });
+
+  showSuccess: (message, duration = 3000) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    const toast: Toast = { id, message, type: ToastType.SUCCESS, duration };
+
+    set(state => ({
+      toasts: [...state.toasts, toast],
+    }));
   },
-  hide: () => set({ toast: null }),
+
+  showError: (message, duration = 4000) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    const toast: Toast = { id, message, type: ToastType.ERROR, duration };
+
+    set(state => ({
+      toasts: [...state.toasts, toast],
+    }));
+  },
+
+  showWarning: (message, duration = 3500) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    const toast: Toast = { id, message, type: ToastType.WARNING, duration };
+
+    set(state => ({
+      toasts: [...state.toasts, toast],
+    }));
+  },
+
+  showInfo: (message, duration = 3000) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    const toast: Toast = { id, message, type: ToastType.INFO, duration };
+
+    set(state => ({
+      toasts: [...state.toasts, toast],
+    }));
+  },
+
+  showWithAction: (message, type, action, duration = 5000) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    const toast: Toast = { id, message, type, action, duration };
+
+    set(state => ({
+      toasts: [...state.toasts, toast],
+    }));
+  },
+
+  hide: id => {
+    set(state => ({
+      toasts: state.toasts.filter(toast => toast.id !== id),
+    }));
+  },
+
+  hideAll: () => {
+    set({ toasts: [] });
+  },
 }));

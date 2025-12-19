@@ -55,6 +55,7 @@ export const MESSAGES = {
   CAMERA_PERMISSION_REQUIRED:
     'Sorry, we need camera permissions to take photos!',
   SIGNUP_SUCCESS: 'Sign up successful',
+  SIGNIN_SUCCESS: 'Successfully signed in!',
   ACCOUNT_VERIFICATION_SUCCESS:
     'Account created successfully! Please check your email to verify your account.',
   SIGN_OUT: 'Sign Out',

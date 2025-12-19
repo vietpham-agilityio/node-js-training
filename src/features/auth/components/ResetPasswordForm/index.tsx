@@ -1,8 +1,8 @@
-import { useCallback, useRef } from 'react';
-import { Alert, Text, TextInput, View } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { Controller, useForm } from 'react-hook-form';
 import { valibotResolver } from '@hookform/resolvers/valibot';
+import { useLocalSearchParams } from 'expo-router';
+import { useCallback, useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Text, TextInput, View } from 'react-native';
 
 // Uniwind
 import { withUniwind } from 'uniwind';
@@ -17,10 +17,12 @@ import {
   MESSAGES,
   ResetPasswordFormData,
   resetPasswordSchema,
+  ToastType,
 } from '@/constants';
 
 // Hooks
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useToastAlert } from '@/hooks/useToast';
 
 // Services
 import { authService } from '@/features/auth/services/auth';
@@ -34,6 +36,7 @@ export const ResetPasswordForm = () => {
     access_token: string;
     refresh_token: string;
   }>();
+  const toast = useToastAlert();
   const { signOut } = useAuth();
 
   const newPasswordRef = useRef<TextInput>(null);
@@ -66,11 +69,13 @@ export const ResetPasswordForm = () => {
       });
 
       if (sessionError) {
-        Alert.alert(
+        toast.alert(
           ERROR_MESSAGES.UPDATE_FAILED,
           sessionError instanceof Error
             ? sessionError.message
             : ERROR_MESSAGES.UPDATE_PASSWORD_FAILED,
+          [],
+          { type: ToastType.ERROR },
         );
         return;
       }
@@ -79,24 +84,31 @@ export const ResetPasswordForm = () => {
         // Update password
         await authService.updatePassword(data.newPassword);
 
-        Alert.alert(MESSAGES.UPDATE_SUCCESS, MESSAGES.PASSWORD_UPDATE_SUCCESS, [
-          {
-            text: 'OK',
-            onPress: async () => {
-              await signOut();
+        toast.alert(
+          MESSAGES.UPDATE_SUCCESS,
+          MESSAGES.PASSWORD_UPDATE_SUCCESS,
+          [
+            {
+              text: 'OK',
+              onPress: async () => {
+                await signOut();
+              },
             },
-          },
-        ]);
+          ],
+          { type: ToastType.SUCCESS },
+        );
       } catch (error) {
-        Alert.alert(
+        toast.alert(
           ERROR_MESSAGES.UPDATE_FAILED,
           error instanceof Error
             ? error.message
             : ERROR_MESSAGES.UPDATE_PASSWORD_FAILED,
+          [],
+          { type: ToastType.ERROR },
         );
       }
     },
-    [params.access_token, params.refresh_token, signOut],
+    [params.access_token, params.refresh_token, signOut, toast],
   );
 
   return (
