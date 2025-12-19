@@ -42,6 +42,7 @@ export const ERROR_MESSAGES = {
   UPDATE_PASSWORD_FAILED: 'Failed to update password. Please try again.',
   CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
   SOMETHING_WENT_WRONG: 'Something went wrong. Please try again later.',
+  TICKET_VALIDATION_FAILED: 'Failed to validate ticket. Please try again.',
 };
 
 export const MESSAGES = {

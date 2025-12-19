@@ -59,6 +59,7 @@ const WalletScreen = () => {
     return data.pages.flat();
   }, [data]);
 
+
   const handleLoadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -79,7 +80,17 @@ const WalletScreen = () => {
     ({ item }: { item: WalletTransaction }) => {
       const { booking } = item;
 
-      if (!booking) return null;
+      if (!booking)
+        return (
+          <MovieCard
+            posterUrl=""
+            title={item.description}
+            showDate={item.createdAt}
+            transactionType={item.transactionType}
+            price={item.amount.toString()}
+            justifyContent="center"
+          />
+        );
 
       const { showtime } = booking;
       const { movie, cinemaHall, showTime, showDate } = showtime || {};

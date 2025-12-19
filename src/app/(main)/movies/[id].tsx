@@ -30,7 +30,6 @@ import {
   ROUTES,
   Size,
   TABS_FOOTER_HEIGHT,
-  TABS_HEADER_HEIGHT,
 } from '@/constants';
 
 // Hooks
@@ -193,10 +192,9 @@ const MovieScreen = () => {
     // TODO: Will handle global loading
     return (
       <StyledSafeAreaView
-        edges={['top', 'bottom']}
+        edges={['bottom']}
         accessibilityLabel="Loading home screen"
         className="h-full bg-bg-primary items-center justify-center"
-        style={{ marginTop: TABS_HEADER_HEIGHT }}
       >
         <ActivityIndicator size="large" className="text-primary" />
         <Typo className="text-text-secondary mt-4">Movie Loading...</Typo>
