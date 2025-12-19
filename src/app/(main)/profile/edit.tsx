@@ -7,13 +7,17 @@ import { withUniwind } from 'uniwind';
 import { ERROR_MESSAGES, MESSAGES, ROUTES } from '@/constants';
 
 // Hooks
-import { useProfile, useUpdateProfile, useUploadAvatar } from '@/hooks';
+import {
+  useProfile,
+  useUpdateProfile,
+  useUploadAvatar,
+} from '@/features/setting/hooks/useProfile';
 
 // Types
-import { UpdateProfileData } from '@/types';
+import { UpdateProfileData } from '@/features/auth/types/auth';
 
 // Components
-import { EditProfileForm } from '@/components/feature';
+import { EditProfileForm } from '@/features/setting/components/EditProfileForm';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
@@ -37,7 +41,7 @@ const EditProfileScreen = () => {
             { uri: data.avatarUrl! },
             {
               onSuccess: uploadedUrl => {
-                avatarUploadUrl = uploadedUrl;
+                avatarUploadUrl = uploadedUrl as string;
                 resolve();
               },
               onError: error => reject(error),

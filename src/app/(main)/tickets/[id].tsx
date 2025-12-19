@@ -14,11 +14,14 @@ import { Size } from '@/constants';
 import { formatDate, formatIDR, formatTime } from '@/utils';
 
 // Hooks
-import { useTicket } from '@/hooks';
+import { useTicket } from '@/features/ticket/hooks/useTickets';
 
 // Components
-import { Button, Divider, OrderDetailRow, Typo } from '@/components/common';
-import { MovieCard } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { Divider } from '@/components/Divider';
+import { OrderDetailRow } from '@/components/OrderDetailRow';
+import { Typo } from '@/components/Typo';
+import { MovieCard } from '@/components/MovieCard';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);

@@ -2,7 +2,7 @@
  * Tab constants for movie filtering and detail views
  */
 
-import { TicketStatus } from '@/types';
+import { TicketStatus } from '@/features/booking/types/booking';
 
 export const CATEGORY_TABS = {
   ALL: { ID: 'all', LABEL: 'All' },

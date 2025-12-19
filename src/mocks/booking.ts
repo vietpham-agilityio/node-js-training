@@ -1,4 +1,4 @@
-import { PromoCode, PromoCodeStatus } from '@/types';
+import { PromoCode, PromoCodeStatus } from '@/features/booking/types/movie';
 
 export const MOCK_PROMOTIONS: PromoCode[] = [
   {

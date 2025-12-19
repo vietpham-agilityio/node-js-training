@@ -6,11 +6,14 @@ import { Alert, Pressable, View } from 'react-native';
 import { ROUTES } from '@/constants';
 
 // Hooks
-import { useResetPassword } from '@/hooks';
+import { useResetPassword } from '@/hooks/useSession';
 
 // Components
-import { Input, Typo } from '@/components/common';
-import { AccessLayout } from '@/components/layouts';
+import { Input } from '@/components/Input';
+import { Typo } from '@/components/Typo';
+
+// Layout
+import { AccessLayout } from '@/layouts/AcessLayout';
 
 const ForgotPasswordScreen = () => {
   const router = useRouter();

@@ -8,8 +8,11 @@ import { useResolveClassNames } from 'uniwind';
 import { ROUTES } from '@/constants';
 
 // Components
-import { Typo, Button } from '@/components/common';
-import { AccessLayout } from '@/components/layouts';
+import { Typo } from '@/components/Typo';
+import { Button } from '@/components/Button';
+
+// Layout
+import { AccessLayout } from '@/layouts/AcessLayout';
 
 // Icons
 import { AppIcon } from '@/icons';

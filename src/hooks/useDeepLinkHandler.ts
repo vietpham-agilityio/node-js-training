@@ -1,8 +1,14 @@
-import { ROUTES } from '@/constants';
-import { supabase } from '@/services/supabase/client';
+import { useEffect } from 'react';
+
+// SDKs
 import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+
+// Constants
+import { ROUTES } from '@/constants';
+
+// Services
+import { supabase } from '@/services/supabase/client';
 
 /**
  * Hook to handle deep links for OAuth callbacks and password reset

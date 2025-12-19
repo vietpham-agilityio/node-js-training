@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { router } from 'expo-router';
 import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,13 +10,16 @@ import { withUniwind } from 'uniwind';
 import { ROUTES, SETTING_ITEMS } from '@/constants';
 
 // Hooks
-import { useAuth, useProfile } from '@/hooks';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useProfile } from '@/features/setting/hooks/useProfile';
 
 // Components
-import { Avatar, Typo } from '@/components/common';
-import { SettingItem } from '@/components/feature';
+import { Avatar } from '@/components/Avatar';
+import { Typo } from '@/components/Typo';
+import { SettingItem } from '@/features/setting/components/SettingItem';
+
+// Icons
 import { UserProfileIcon } from '@/icons';
-import { router } from 'expo-router';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);

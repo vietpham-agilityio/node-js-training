@@ -20,14 +20,23 @@ import {
 } from '@/constants';
 
 // Hooks
-import { useDebounce, useMoviesInfinite, useSearchMovies } from '@/hooks';
+import {
+  useMoviesInfinite,
+  useSearchMovies,
+} from '@/features/booking/hooks/useMovies';
+import { useDebounce } from '@/hooks/useDebounce';
 
 // Types
-import { Movie } from '@/types';
+import { Movie } from '@/features/booking/types/movie';
 
 // Components
-import { Button, SearchInput, Tabs, Typo } from '@/components/common';
-import { MovieCard } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { MovieCard } from '@/components/MovieCard';
+import { SearchInput } from '@/components/SearchInput';
+import { Tabs } from '@/components/Tabs';
+import { Typo } from '@/components/Typo';
+
+// Icons
 import { CancelIcon } from '@/icons';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
@@ -81,7 +90,7 @@ const SearchScreen = () => {
 
     if (minRating === 0) return movies;
 
-    return movies.filter(movie => (movie.rating || 0) >= minRating);
+    return movies.filter((movie: Movie) => (movie.rating || 0) >= minRating);
   }, [isSearchActive, searchResults, allMovies, selectedRating]);
 
   const isLoading = isSearchActive ? isSearching : isLoadingAllMovies;

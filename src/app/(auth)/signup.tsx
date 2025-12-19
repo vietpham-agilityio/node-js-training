@@ -5,14 +5,17 @@ import { Alert } from 'react-native';
 import { ERROR_MESSAGES, MESSAGES, ROUTES } from '@/constants';
 
 // Hooks
-import { useSignUp, useUploadAvatar } from '@/hooks';
+import { useSignUp } from '@/features/auth/hooks/useSignUp';
+import { useUploadAvatar } from '@/features/setting/hooks/useProfile';
 
 // Types
-import { SignUpData } from '@/types';
+import { SignUpData } from '@/features/auth/types/auth';
 
 // Components
-import { SignUpForm } from '@/components/feature';
-import { AccessLayout } from '@/components/layouts';
+import { SignUpForm } from '@/features/auth/components/SignUpForm';
+
+// Layout
+import { AccessLayout } from '@/layouts/AcessLayout';
 
 const SignupScreen = () => {
   const router = useRouter();

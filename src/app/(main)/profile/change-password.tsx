@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Components
-import { ChangePasswordForm } from '@/components/feature';
+import { ChangePasswordForm } from '@/features/setting/components/ChangePasswordForm';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);

@@ -4,13 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
 // Expo
-import { router } from 'expo-router';
+import { Href, router } from 'expo-router';
 
 // Unwind
 import { withUniwind } from 'uniwind';
 
 // Components
-import { Button, SelectBox, Typo } from '@/components/common';
+import { Button } from '@/components/Button';
+import { SelectBox } from '@/features/booking/components/SelectBox';
+import { Typo } from '@/components/Typo';
 
 // Constants
 import { ROUTES, Size } from '@/constants';
@@ -19,7 +21,7 @@ import { ROUTES, Size } from '@/constants';
 import { ScreenIcon } from '@/icons';
 
 // Stores
-import { useBookingStore } from '@/stores';
+import { useBookingStore } from '@/features/booking/store/booking';
 
 // Utils
 import {
@@ -30,7 +32,7 @@ import {
 } from '@/utils';
 
 // Types
-import { Seat, SeatStatus } from '@/types';
+import { Seat, SeatStatus } from '@/features/booking/types/cinema';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
@@ -99,7 +101,7 @@ const SeatsScreen = () => {
   const handleBookTicket = useCallback(() => {
     if (selectedSeats.length === 0 || !selectedShowtime) return;
 
-    router.push(ROUTES.CHECKOUT);
+    router.push(ROUTES.CHECKOUT as Href);
   }, [selectedSeats.length, selectedShowtime]);
 
   const renderSeat = useCallback(

@@ -8,20 +8,21 @@ import {
 } from 'react-native';
 
 // Expo
-import { router, useLocalSearchParams } from 'expo-router';
+import { Href, router, useLocalSearchParams } from 'expo-router';
 
 // Unwind
 import { useResolveClassNames } from 'uniwind';
 
 // Components
-import { SelectBox, Typo } from '@/components/common';
-import { LocationDropdown } from '@/components/feature';
+import { Typo } from '@/components/Typo';
+import { SelectBox } from '@/features/booking/components/SelectBox';
+import { LocationDropdown } from '@/features/booking/components/LocationDropdown';
 
 // Constants
 import { ERROR_MESSAGES, ROUTES } from '@/constants';
 
 // Hooks
-import { useShowtimes } from '@/hooks';
+import { useShowtimes } from '@/features/booking/hooks/useShowtimes';
 
 // Icons
 import { ArrowRightIcon } from '@/icons';
@@ -30,10 +31,12 @@ import { ArrowRightIcon } from '@/icons';
 import { formatShowtimes, formatTime, getDayOfWeekLabels } from '@/utils';
 
 // Store
-import { useBookingStore, useHeaderStore, useToastStore } from '@/stores';
+import { useBookingStore } from '@/features/booking/store/booking';
+import { useHeaderStore } from '@/stores/header';
+import { useToastStore } from '@/stores/toast';
 
 // Types
-import { CinemaWithShowtimes, Showtime } from '@/types';
+import { CinemaWithShowtimes, Showtime } from '@/features/booking/types/cinema';
 
 const CinemaScreen = () => {
   const params = useLocalSearchParams<{
@@ -88,7 +91,7 @@ const CinemaScreen = () => {
     if (!selectedShowtime) return;
 
     clearHeaderTitle();
-    router.push(ROUTES.SEATS);
+    router.push(ROUTES.SEATS as Href);
   }, [selectedShowtime, clearHeaderTitle]);
 
   const handleDateSelect = useCallback((dateId: string) => {
@@ -100,7 +103,7 @@ const CinemaScreen = () => {
     (cinemaId: string, showtimeId: string) => {
       const showtime = cinemasWithShowtimes
         .find(cinema => cinema.cinema.id === cinemaId)
-        ?.showtimes.find(showtime => showtime.id === showtimeId);
+        ?.showtimes.find((showtime: Showtime) => showtime.id === showtimeId);
       setSelectedShowtime({ cinemaId, showtimeId });
 
       if (showtime) {

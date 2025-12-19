@@ -1,7 +1,7 @@
-import { Database } from '@/types';
+import { Database } from '@/types/database';
 import { createClient } from '@supabase/supabase-js';
 import 'react-native-url-polyfill/auto';
-import { secureStorage } from '../storage';
+import { secureStorage } from '@/services/storage/secure';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;

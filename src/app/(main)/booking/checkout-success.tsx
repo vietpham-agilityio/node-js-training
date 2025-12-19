@@ -6,8 +6,9 @@ import { Pressable, View } from 'react-native';
 import { MESSAGES, ROUTES } from '@/constants';
 
 // Components
-import { Button, Typo } from '@/components/common';
-import { ConfirmationState } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { Typo } from '@/components/Typo';
+import { ConfirmationState } from '@/components/ConfirmationState';
 
 // Icons
 import { TicketCheckedIcon } from '@/icons';

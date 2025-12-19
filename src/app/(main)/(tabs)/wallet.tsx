@@ -16,14 +16,22 @@ import { withUniwind } from 'uniwind';
 import { ROUTES, Size } from '@/constants';
 
 // Hooks
-import { useProfile, useTransactionsInfinite, useWallet } from '@/hooks';
+import { useProfile } from '@/features/setting/hooks/useProfile';
+import {
+  useWallet,
+  useTransactionsInfinite,
+} from '@/features/wallet/hooks/useWallet';
 
 // Types
-import { WalletTransaction } from '@/types';
+import { WalletTransaction } from '@/features/wallet/types/wallet';
 
 // Components
-import { Button, Typo } from '@/components/common';
-import { MovieCard, WalletCard } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { Typo } from '@/components/Typo';
+import { MovieCard } from '@/components/MovieCard';
+import { WalletCard } from '@/features/wallet/components/WalletCard';
+
+// Icons
 import { TopUpIcon } from '@/icons';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
@@ -58,7 +66,6 @@ const WalletScreen = () => {
     if (!data?.pages) return [];
     return data.pages.flat();
   }, [data]);
-
 
   const handleLoadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {

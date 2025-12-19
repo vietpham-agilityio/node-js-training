@@ -13,14 +13,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { withUniwind } from 'uniwind';
 
 // Components
-import {
-  Button,
-  ExpandableText,
-  Tabs,
-  Typo,
-  UserCard,
-} from '@/components/common';
-import { MovieCard, MovieTrailerCarousel } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { MovieCard } from '@/components/MovieCard';
+import { Tabs } from '@/components/Tabs';
+import { Typo } from '@/components/Typo';
+import { ExpandableText } from '@/features/booking/components/ExpandableText';
+import { MovieTrailerCarousel } from '@/features/booking/components/MovieTrailerCarousel';
+import { UserCard } from '@/features/booking/components/UserCard';
 
 // Constants
 import {
@@ -33,10 +32,15 @@ import {
 } from '@/constants';
 
 // Hooks
-import { useMovie } from '@/hooks/useMovies';
+import { useMovie } from '@/features/booking/hooks/useMovies';
 
 // Stores
-import { useBookingStore, useHeaderStore } from '@/stores';
+import { useBookingStore } from '@/features/booking/store/booking';
+import { useHeaderStore } from '@/stores/header';
+
+// Types
+
+import { CastMember } from '@/features/booking/types/movie';
 
 type ContentItem =
   | {
@@ -86,7 +90,7 @@ const MovieScreen = () => {
 
   const castAndCrew: CastAndCrewItem[] = useMemo(
     () =>
-      castCrew?.actors.map(({ name, imageUrl }) => ({
+      castCrew?.actors.map(({ name, imageUrl }: CastMember) => ({
         id: name,
         name: name,
         imageUrl: imageUrl,

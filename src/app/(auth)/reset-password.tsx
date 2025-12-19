@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Components
-import { Button } from '@/components/common';
-import { ResetPasswordForm } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { ResetPasswordForm } from '@/features/auth/components/ResetPasswordForm';
 
 // Constants
 import { ROUTES } from '@/constants';

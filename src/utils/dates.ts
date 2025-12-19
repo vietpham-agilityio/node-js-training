@@ -1,4 +1,9 @@
-import { Cinema, CinemaHall, CinemaWithShowtimes, Showtime } from '@/types';
+import {
+  Cinema,
+  CinemaHall,
+  CinemaWithShowtimes,
+  Showtime,
+} from '@/features/booking/types/cinema';
 
 /**
  * Get the labels for the next 7 days of the week
@@ -103,7 +108,7 @@ export const formatShowtimes = (
   showDate: string,
 ): CinemaWithShowtimes[] => {
   const filteredShowtimes = filterShowtimesByTime(showtimes, showDate);
-  
+
   // Create a Map to group showtimes by cinema ID
   // Map is used here because:
   // 1. It allows efficient lookup by cinema ID (O(1) complexity)
@@ -137,14 +142,16 @@ export const formatShowtimes = (
   });
 
   // Convert map to array and sort showtimes by showTime
-  return Array.from(cinemaMap.values())
-    .map(item => ({
-      ...item,
-      // Sort showtimes within each cinema by time (ascending)
-      showtimes: item.showtimes.sort((a, b) =>
-        a.showTime.localeCompare(b.showTime),
-      ),
-    }))
-    // Sort cinemas alphabetically by name
-    .sort((a, b) => a.cinema.name.localeCompare(b.cinema.name));
+  return (
+    Array.from(cinemaMap.values())
+      .map(item => ({
+        ...item,
+        // Sort showtimes within each cinema by time (ascending)
+        showtimes: item.showtimes.sort((a, b) =>
+          a.showTime.localeCompare(b.showTime),
+        ),
+      }))
+      // Sort cinemas alphabetically by name
+      .sort((a, b) => a.cinema.name.localeCompare(b.cinema.name))
+  );
 };

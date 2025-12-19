@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Href, useRouter } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,25 +8,28 @@ import { useShallow } from 'zustand/react/shallow';
 import { withUniwind } from 'uniwind';
 
 // Components
-import { Button, Divider, OrderDetailRow } from '@/components/common';
-import { MovieCard } from '@/components/feature';
+import { Button } from '@/components/Button';
+import { Divider } from '@/components/Divider';
+import { OrderDetailRow } from '@/components/OrderDetailRow';
+import { MovieCard } from '@/components/MovieCard';
 
 // Constants
 import { ERROR_MESSAGES, ROUTES, Size } from '@/constants';
 
 // Hooks
-import { useCreateBooking, useWallet } from '@/hooks';
+import { useCreateBooking } from '@/features/booking/hooks/useBookings';
+import { useWallet } from '@/features/wallet/hooks/useWallet';
 
 // Utils
 import { formatCurrency, formatIDR } from '@/utils/formats';
 
 // Store
-import {
-  useAuthStore,
-  useBookingStore,
-  useLoadingStore,
-  useToastStore,
-} from '@/stores';
+import { useAuthStore } from '@/features/auth/store/auth';
+import { useBookingStore } from '@/features/booking/store/booking';
+import { useLoadingStore } from '@/stores/loading';
+import { useToastStore } from '@/stores/toast';
+
+// Utils
 import { cn } from '@/utils';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
@@ -125,7 +128,7 @@ const CheckoutScreen = () => {
 
     createBooking(bookingData, {
       onSuccess: () => {
-        router.replace(ROUTES.CHECKOUT_SUCCESS);
+        router.replace(ROUTES.CHECKOUT_SUCCESS as Href);
       },
       onError: (error: Error) => {
         showError(error.message || ERROR_MESSAGES.CHECKOUT_FAILED);
