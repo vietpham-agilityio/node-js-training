@@ -185,7 +185,7 @@ const WalletScreen = () => {
         >
           No transactions yet
         </Typo>
-        <Typo size="sm" className="text-text-tertiary text-center mb-6">
+        <Typo size="sm" className="text-gradient-medium text-center mb-6">
           Top up your wallet to start booking tickets
         </Typo>
         <Button

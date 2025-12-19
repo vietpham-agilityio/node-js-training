@@ -23,6 +23,7 @@ import { EyeIcon, EyeOffIcon } from '@/icons';
 
 // Utils
 import { cn, isAndroid } from '@/utils';
+import { Typo } from '../Typo';
 
 export interface InputProps extends Omit<TextInputProps, 'placeholder'> {
   label: string;
@@ -112,7 +113,7 @@ export const Input = memo(
           animatedValue.interpolate({
             inputRange: [0, 1],
             outputRange: [16, -10], // animate the label position to 16 when the value is 0 and -10 when the value is 1
-            ...(isAndroid() && { outputRange: [12, -10] }),
+            ...(isAndroid() && { outputRange: [14, -10] }),
           }),
         [animatedValue],
       );
@@ -159,6 +160,7 @@ export const Input = memo(
                 className={labelColor}
                 style={{
                   fontSize: labelFontSize,
+                  fontFamily: 'Montserrat_400Regular',
                 }}
                 onPress={handleLabelPress}
               >
@@ -210,14 +212,16 @@ export const Input = memo(
 
           {/* Error Message */}
           {error && (
-            <Text
+            <Typo
               accessibilityRole="alert"
               accessibilityLabel={error}
-              className="text-red text-xs mt-1 ml-4"
+              size="xs"
+              weight="regular"
+              className="text-red mt-1 ml-4"
               testID={`${testID}-error`}
             >
               {error}
-            </Text>
+            </Typo>
           )}
         </View>
       );
