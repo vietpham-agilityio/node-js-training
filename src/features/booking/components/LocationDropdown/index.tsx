@@ -1,6 +1,6 @@
+import { FlashList } from '@shopify/flash-list';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
 
 // SDKs
 import {
@@ -65,7 +65,12 @@ export const LocationDropdown = memo(
               value: location.city,
             },
           ]
-        : [];
+        : [
+            {
+              label: location?.region || 'Unknown Location',
+              value: location?.region || 'Unknown Location',
+            },
+          ];
     }, [location]);
 
     const requestLocationPermission = useCallback(async () => {
@@ -85,8 +90,8 @@ export const LocationDropdown = memo(
       setLocation(address[0]);
       setHasRequestedPermission(true);
 
-      if (address[0]?.city) {
-        onChange(address[0].city);
+      if (address[0]?.city || address[0]?.region) {
+        onChange(address[0].city || address[0].region!);
       }
 
       return status;

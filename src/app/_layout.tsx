@@ -28,6 +28,7 @@ import { ROUTES, SCREENS } from '@/constants';
 // Hooks
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useDeepLinkHandler } from '@/hooks/useDeepLinkHandler';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 // Components
 import { Loading } from '@/components/Loading';
@@ -61,6 +62,9 @@ const RootLayout = () => {
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
   const hasInitializedRef = useRef(false);
 
+  // Initialize push notifications
+  const { expoPushToken } = usePushNotifications();
+
   const [loaded, error] = useFonts({
     Montserrat_300Light,
     Montserrat_400Regular,
@@ -78,6 +82,12 @@ const RootLayout = () => {
   useEffect(() => {
     Uniwind.setTheme('dark');
   }, []);
+
+  useEffect(() => {
+    if (expoPushToken) {
+      console.info('Push notifications ready!!');
+    }
+  }, [expoPushToken]);
 
   // Handle authentication routing
   useEffect(() => {

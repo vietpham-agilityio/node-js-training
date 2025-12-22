@@ -19,9 +19,9 @@ import { useTicket } from '@/features/ticket/hooks/useTickets';
 // Components
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
+import { MovieCard } from '@/components/MovieCard';
 import { OrderDetailRow } from '@/components/OrderDetailRow';
 import { Typo } from '@/components/Typo';
-import { MovieCard } from '@/components/MovieCard';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
@@ -41,7 +41,7 @@ const TicketDetailScreen = () => {
     if (!ticket?.booking) return null;
 
     const { booking } = ticket;
-    const { showtime, seatNumbers } = booking;
+    const { showtime } = booking;
     const { movie, cinemaHall, showTime, showDate } = showtime || {};
     const { cinema } = cinemaHall || {};
 
@@ -51,7 +51,7 @@ const TicketDetailScreen = () => {
       movie,
       movieName: movie.title,
       cinemaName: cinema.name,
-      seatNumbers: seatNumbers,
+      seatNumber: ticket.seatNumber,
       paid: formatIDR(booking.totalAmount),
       showTime: showTime,
       showDate: showDate,
@@ -73,7 +73,7 @@ const TicketDetailScreen = () => {
     },
     {
       label: 'Seat Number',
-      value: ticketDetail?.seatNumbers.join(', ') || '',
+      value: ticketDetail?.seatNumber || '',
       testID: 'order-seats',
     },
     {
