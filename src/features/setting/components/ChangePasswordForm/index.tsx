@@ -179,14 +179,16 @@ export const ChangePasswordForm = memo(() => {
       </View>
 
       {/* Submit Button */}
-      <Button
-        accessible
-        disabled={isDisabled}
-        testID="change-password-submit-button"
-        title="Change Password"
-        accessibilityLabel="Change Password"
-        onPress={handleSubmit(handleSubmitForm)}
-      />
+      <View className="mb-12">
+        <Button
+          accessible
+          disabled={isDisabled}
+          testID="change-password-submit-button"
+          title="Change Password"
+          accessibilityLabel="Change Password"
+          onPress={handleSubmit(handleSubmitForm)}
+        />
+      </View>
     </View>
   );
 });
