@@ -30,7 +30,7 @@ import { useLoadingStore } from '@/stores/loading';
 import { useToastStore } from '@/stores/toast';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);

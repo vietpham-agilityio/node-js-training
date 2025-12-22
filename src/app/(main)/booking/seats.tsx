@@ -27,9 +27,9 @@ import { useBookingStore } from '@/features/booking/store/booking';
 import {
   calculateTotalPrice,
   formatCurrency,
-  generateSeats,
   groupSeatsByRow,
-} from '@/utils';
+} from '@/utils/formats';
+import { generateSeats } from '@/utils/data';
 
 // Types
 import { Seat, SeatStatus } from '@/features/booking/types/cinema';

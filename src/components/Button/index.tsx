@@ -10,7 +10,7 @@ import {
 import { Size } from '@/constants/enum';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 export interface ButtonProps extends TouchableOpacityProps {
   title: string;

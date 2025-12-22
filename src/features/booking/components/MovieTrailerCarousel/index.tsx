@@ -4,7 +4,7 @@ import Animated, { useSharedValue } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
 
 // Utils
-import { isAndroid, isIOS } from '@/utils';
+import { isAndroid, isIOS } from '@/utils/platform';
 
 // Components
 import { MovieTrailer } from '../MovieTrailer';

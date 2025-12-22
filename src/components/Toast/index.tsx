@@ -9,7 +9,7 @@ import { Typo } from '../Typo';
 import { Toast as ToastType, useToastStore } from '@/stores/toast';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 interface ToastItemProps {
   toast: ToastType;

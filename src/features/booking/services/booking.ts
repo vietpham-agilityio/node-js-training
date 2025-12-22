@@ -13,7 +13,7 @@ import {
 } from '@/features/booking/types/cinema';
 
 // Utils
-import { keysToCamel } from '@/utils';
+import { keysToCamel } from '@/utils/convert';
 
 // Constants
 import { PAGINATION } from '@/constants';

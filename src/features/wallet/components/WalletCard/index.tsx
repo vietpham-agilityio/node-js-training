@@ -6,7 +6,7 @@ import { Dimensions, TouchableOpacity, View } from 'react-native';
 import Card from '@assets/images/card.webp';
 
 // Utils
-import { formatCardNumber, formatCurrency, formatIDR } from '@/utils';
+import { formatCardNumber, formatCurrency, formatIDR } from '@/utils/formats';
 
 // Components
 import { Typo } from '@/components/Typo';

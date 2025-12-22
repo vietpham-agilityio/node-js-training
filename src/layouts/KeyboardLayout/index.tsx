@@ -15,7 +15,8 @@ import {
 import { withUniwind } from 'uniwind';
 
 // Utils
-import { cn, isIOS } from '@/utils';
+import { cn } from '@/utils/cn';
+import { isIOS } from '@/utils/platform';
 
 // Constants
 import { KEYBOARD_BOTTOM_PADDING } from '@/constants';

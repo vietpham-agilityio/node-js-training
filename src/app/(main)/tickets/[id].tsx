@@ -11,7 +11,7 @@ import { withUniwind } from 'uniwind';
 import { Size } from '@/constants';
 
 // Utils
-import { formatDate, formatIDR, formatTime } from '@/utils';
+import { formatDate, formatIDR, formatTime } from '@/utils/formats';
 
 // Hooks
 import { useTicket } from '@/features/ticket/hooks/useTickets';

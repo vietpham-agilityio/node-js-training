@@ -8,7 +8,7 @@ import { type FontSize, type FontWeight } from '@/components/Typo';
 import { TEXT_MAX_LENGTH } from '@/constants';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 export interface ExpandableTextProps {
   text: string;

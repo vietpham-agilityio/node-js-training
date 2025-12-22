@@ -19,7 +19,8 @@ import { UserProfileIcon } from '@/icons/UserProfileIcon';
 import { useProfile } from '@/features/setting/hooks/useProfile';
 
 // Utils
-import { cn, STATUS_BAR_HEIGHT } from '@/utils';
+import { cn } from '@/utils/cn';
+import { STATUS_BAR_HEIGHT } from '@/utils/platform';
 
 export interface MainHeaderProps extends BottomTabHeaderProps {
   isLeftTitle?: boolean;

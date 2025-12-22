@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Text } from 'react-native';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 export type FontSize =
   | '4xs'

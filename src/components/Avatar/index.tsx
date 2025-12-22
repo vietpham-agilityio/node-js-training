@@ -23,7 +23,7 @@ import { PhotoProfileIcon } from '@/icons/PhotoProfileIcon';
 import { UserProfileIcon } from '@/icons/UserProfileIcon';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 type Size = 48 | 92 | 132 | 160;
 type Variant = 'default' | 'picker';

@@ -14,12 +14,9 @@ import { ArrowBackIcon } from '@/icons/ArrowBackIcon';
 // Constants
 
 // Utils
-import {
-  cn,
-  getHeaderTitle,
-  isScreenPathname,
-  STATUS_BAR_HEIGHT,
-} from '@/utils';
+import { cn } from '@/utils/cn';
+import { STATUS_BAR_HEIGHT } from '@/utils/platform';
+import { getHeaderTitle, isScreenPathname } from '@/utils/convert';
 
 // Stores
 import { ROUTES, SCREENS } from '@/constants';

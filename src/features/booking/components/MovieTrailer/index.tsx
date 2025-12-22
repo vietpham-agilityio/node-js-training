@@ -20,7 +20,8 @@ import { VIDEO_SOURCE } from '@/constants';
 import { PlayIcon } from '@/icons/PlayIcon';
 
 // Utils
-import { cn, isAndroid, isIOS } from '@/utils';
+import { cn } from '@/utils/cn';
+import { isAndroid, isIOS } from '@/utils/platform';
 
 interface MovieTrailerProps extends Omit<ViewProps, 'children'> {
   videoUrl?: string;

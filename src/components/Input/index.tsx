@@ -22,7 +22,10 @@ import { EyeIcon } from '@/icons/EyeIcon';
 import { EyeOffIcon } from '@/icons/EyeOffIcon';
 
 // Utils
-import { cn, isAndroid } from '@/utils';
+import { cn } from '@/utils/cn';
+import { isAndroid } from '@/utils/platform';
+
+// Components
 import { Typo } from '../Typo';
 
 export interface InputProps extends Omit<TextInputProps, 'placeholder'> {
