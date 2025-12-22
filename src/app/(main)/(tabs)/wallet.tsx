@@ -33,7 +33,7 @@ import { WalletCard } from '@/features/wallet/components/WalletCard';
 
 // Icons
 import { Transaction } from '@/features/wallet/components/Transaction';
-import { TopUpIcon } from '@/icons';
+import { TopUpIcon } from '@/icons/TopUpIcon';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 

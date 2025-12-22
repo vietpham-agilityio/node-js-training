@@ -1,11 +1,10 @@
-import {
-  HomeIcon,
-  HomeOutlineIcon,
-  TicketIcon,
-  TicketOutlineIcon,
-  WalletIcon,
-  WalletOutlineIcon,
-} from '@/icons';
+// Icons
+import { HomeIcon } from '@/icons/HomeIcon';
+import { TicketIcon } from '@/icons/TicketIcon';
+import { WalletIcon } from '@/icons/WalletIcon';
+import { HomeOutlineIcon } from '@/icons/HomeOutlineIcon';
+import { TicketOutlineIcon } from '@/icons/TicketOutlineIcon';
+import { WalletOutlineIcon } from '@/icons/WalletOutlineIcon';
 
 export const SCREENS = {
   // Main screens

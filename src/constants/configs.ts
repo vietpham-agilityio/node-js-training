@@ -1,12 +1,11 @@
-import {
-  ArrowRightIcon,
-  ChangeLanguageIcon,
-  EditProfileIcon,
-  EyeIcon,
-  HelpCenterIcon,
-  LikeIcon,
-  MyWalletIcon,
-} from '@/icons';
+// Icons
+import { LogoutIcon } from '@/icons/LogoutIcon';
+import { LockIcon } from '@/icons/LockIcon';
+import { EditProfileIcon } from '@/icons/EditProfileIcon';
+import { MyWalletIcon } from '@/icons/MyWalletIcon';
+import { ChangeLanguageIcon } from '@/icons/ChangeLanguageIcon';
+import { HelpCenterIcon } from '@/icons/HelpCenterIcon';
+import { LikeIcon } from '@/icons/LikeIcon';
 
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
@@ -101,12 +100,12 @@ export const SETTING_ITEMS = [
   },
   {
     TITLE: 'Change Password',
-    ICON: EyeIcon,
+    ICON: LockIcon,
     TEST_ID: 'change_password',
   },
   {
     TITLE: 'Logout',
-    ICON: ArrowRightIcon,
+    ICON: LogoutIcon,
     TEST_ID: 'logout',
   },
 ];

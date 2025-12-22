@@ -3,6 +3,8 @@ import { TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 
 // Components
 import { Typo } from '@/components/Typo';
+
+// Icons
 import { MovieTopUpIcon } from '@/icons/MovieTopUpIcon';
 
 // Types

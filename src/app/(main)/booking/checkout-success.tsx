@@ -11,7 +11,7 @@ import { Typo } from '@/components/Typo';
 import { ConfirmationState } from '@/components/ConfirmationState';
 
 // Icons
-import { TicketCheckedIcon } from '@/icons';
+import { TicketCheckedIcon } from '@/icons/TicketCheckedIcon';
 
 const CheckoutSuccessScreen = () => {
   const router = useRouter();

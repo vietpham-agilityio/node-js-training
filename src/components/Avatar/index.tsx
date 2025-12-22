@@ -15,12 +15,12 @@ import { BLUR_HASH, ERROR_MESSAGES, MESSAGES } from '@/constants';
 import { Typo } from '../Typo';
 
 // Icons
-import {
-  AddIcon,
-  CancelIcon,
-  PhotoProfileIcon,
-  UserProfileIcon,
-} from '@/icons';
+import { AddIcon } from '@/icons/AddIcon';
+import { CancelIcon } from '@/icons/CancelIcon';
+import { PhotoProfileIcon } from '@/icons/PhotoProfileIcon';
+import { UserProfileIcon } from '@/icons/UserProfileIcon';
+
+// Utils
 import { cn } from '@/utils';
 
 type Size = 48 | 92 | 132 | 160;

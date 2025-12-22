@@ -5,7 +5,8 @@ import React from 'react';
 import { ConfirmationState } from '../';
 
 // Icons
-import { CancelIcon, TicketCheckedIcon } from '@/icons';
+import { CancelIcon } from '@/icons/CancelIcon';
+import { TicketCheckedIcon } from '@/icons/TicketCheckedIcon';
 
 describe('ConfirmationState Component', () => {
   const defaultProps = {

@@ -17,7 +17,7 @@ import * as VideoThumbnails from 'expo-video-thumbnails';
 import { VIDEO_SOURCE } from '@/constants';
 
 // Icons
-import { PlayIcon } from '@/icons';
+import { PlayIcon } from '@/icons/PlayIcon';
 
 // Utils
 import { cn, isAndroid, isIOS } from '@/utils';

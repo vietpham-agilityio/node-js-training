@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { TextInput, View, type TextInputProps } from 'react-native';
 
 // Icons
-import { SearchIcon } from '@/icons';
+import { SearchIcon } from '@/icons/SearchIcon';
 
 // Uniwind
 import { useResolveClassNames } from 'uniwind';
