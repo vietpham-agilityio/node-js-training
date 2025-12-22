@@ -34,7 +34,7 @@ export const getDayOfWeekLabels = () => {
 
 /**
  * Get the minimum showtime (current time rounded up to next 30-minute interval)
- * Returns null if current time is past 21:00
+ * Returns null if current time is past 23:00
  */
 export const getMinimumShowtime = (): string | null => {
   const now = new Date();
@@ -54,8 +54,8 @@ export const getMinimumShowtime = (): string | null => {
     startMinute = 0;
   }
 
-  // If current time is already past 21:00, return null
-  if (startHour > 21 || (startHour === 21 && startMinute > 0)) {
+  // If current time is already past 23:00, return null
+  if (startHour > 23 || (startHour === 23 && startMinute > 0)) {
     return null;
   }
 
@@ -65,7 +65,7 @@ export const getMinimumShowtime = (): string | null => {
 /**
  * Filter showtimes based on time constraints:
  * - Showtimes must be >= current time (rounded up to next 30-minute interval)
- * - Showtimes must be <= 21:00
+ * - Showtimes must be <= 23:00
  * - Only applies if showDate is today
  */
 export const filterShowtimesByTime = (
@@ -81,7 +81,7 @@ export const filterShowtimesByTime = (
 
   const minimumTime = getMinimumShowtime();
   if (!minimumTime) {
-    // If past 21:00, return empty array
+    // If past 23:00, return empty array
     return [];
   }
 
@@ -96,9 +96,9 @@ export const filterShowtimesByTime = (
     // Convert to minutes for comparison
     const timeInMinutes = timeHours * 60 + timeMinutes;
     const minInMinutes = minHours * 60 + minMinutes;
-    const maxInMinutes = 21 * 60; // 21:00
+    const maxInMinutes = 23 * 60; // 23:00
 
-    // Showtime must be >= minimum time and <= 21:00
+    // Showtime must be >= minimum time and <= 23:00
     return timeInMinutes >= minInMinutes && timeInMinutes <= maxInMinutes;
   });
 };
