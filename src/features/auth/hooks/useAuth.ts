@@ -12,6 +12,7 @@ export const useAuth = () => {
     session,
     isLoading,
     isAuthenticated,
+    isSigningUp,
     setSession,
     setLoading,
     initialize,
@@ -24,14 +25,16 @@ export const useAuth = () => {
     const {
       data: { subscription },
     } = authService.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setLoading(false);
+      if (!isSigningUp) {
+        setSession(session);
+        setLoading(false);
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [initialize, setLoading, setSession]);
+  }, [initialize, isSigningUp, setLoading, setSession]);
 
   return {
     user,

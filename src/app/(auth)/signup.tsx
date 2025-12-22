@@ -1,12 +1,13 @@
-import { useRouter } from 'expo-router';
-
 // Constants
-import { ERROR_MESSAGES, MESSAGES, ROUTES, ToastType } from '@/constants';
+import { ERROR_MESSAGES } from '@/constants';
 
 // Hooks
 import { useSignUp } from '@/features/auth/hooks/useSignUp';
 import { useUploadAvatar } from '@/features/setting/hooks/useProfile';
 import { useToastAlert } from '@/hooks/useToast';
+
+// Stores
+import { useAuthStore } from '@/features/auth/store/auth';
 
 // Types
 import { SignUpData } from '@/features/auth/types/auth';
@@ -19,68 +20,37 @@ import { AccessLayout } from '@/layouts/AccessLayout';
 
 const SignupScreen = () => {
   const toast = useToastAlert();
-  const router = useRouter();
-  const { mutate: signUp, isPending: isSigningUp } = useSignUp();
-  const { mutate: uploadAvatar, isPending: isUploading } = useUploadAvatar();
+
+  const { mutateAsync: signUp, isPending: isSigningUp } = useSignUp();
+  const { mutateAsync: uploadAvatar, isPending: isUploading } =
+    useUploadAvatar();
+  const { setSigningUp } = useAuthStore();
 
   const isLoading = isSigningUp || isUploading;
 
   const handleSubmit = async (data: SignUpData) => {
-    try {
-      const { fullName, password, email, avatarUrl } = data;
-      // First, sign up the user with email and password
-      await new Promise<void>((resolve, reject) => {
-        signUp(
-          {
-            fullName,
-            email,
-            password,
-          },
-          {
-            onSuccess: () => resolve(),
-            onError: error => reject(error),
-          },
-        );
-      });
+    setSigningUp(true);
 
-      // Then, upload avatar
-      if (avatarUrl) {
-        await new Promise<void>((resolve, reject) => {
-          uploadAvatar(
-            { uri: avatarUrl },
-            {
-              onSuccess: () => resolve(),
-              onError: error => reject(error),
-            },
-          );
+    const { fullName, password, email, avatarUrl } = data;
+
+    // First, sign up the user with email and password
+    const signUpData = await signUp({ email, password, fullName });
+
+    // Then, upload avatar
+    if (avatarUrl && signUpData.user) {
+      try {
+        await uploadAvatar({
+          userId: signUpData.user.id,
+          file: {
+            uri: avatarUrl,
+          },
         });
+      } catch {
+        toast.error(ERROR_MESSAGES.UPDATE_PROFILE_FAILED);
       }
-
-      toast.alert(
-        MESSAGES.SIGNUP_SUCCESS,
-        MESSAGES.ACCOUNT_VERIFICATION_SUCCESS,
-        [
-          {
-            text: 'OK',
-            onPress: () => router.replace(ROUTES.LOGIN),
-          },
-        ],
-        {
-          type: ToastType.SUCCESS,
-        },
-      );
-    } catch (error) {
-      toast.alert(
-        ERROR_MESSAGES.SIGNUP_FAILED,
-        error instanceof Error
-          ? error.message
-          : ERROR_MESSAGES.CREATE_ACCOUNT_FAILED,
-        [],
-        {
-          type: ToastType.ERROR,
-        },
-      );
     }
+
+    setSigningUp(false);
   };
 
   return (
