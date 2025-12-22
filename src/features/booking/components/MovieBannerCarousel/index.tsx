@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Dimensions, View } from 'react-native';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
@@ -55,6 +55,12 @@ export const MovieBannerCarousel = memo(
     const progress = useSharedValue<number>(0);
     const width = Dimensions.get('screen').width;
 
+    // Generate unique key based on movies IDs
+    // This forces carousel to remount when movies change
+    const carouselKey = useMemo(() => {
+      return movies.map(m => m.id).join('-');
+    }, [movies]);
+
     if (movies.length === 0) {
       return null;
     }
@@ -76,6 +82,7 @@ export const MovieBannerCarousel = memo(
         })}
       >
         <Carousel
+          key={carouselKey} // Forces remount when movies change
           autoPlayInterval={2000}
           data={movies}
           height={VARIANTS_MAP[variant].height}
