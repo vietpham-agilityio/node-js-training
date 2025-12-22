@@ -1,4 +1,5 @@
 import { Link, router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 
@@ -20,7 +21,7 @@ import { SignInData } from '@/features/auth/types/auth';
 import { AppIcon } from '@/icons/AppIcon';
 
 // Uniwind
-import { useResolveClassNames } from 'uniwind';
+import { useResolveClassNames, useUniwind } from 'uniwind';
 
 // Components
 import { Typo } from '@/components/Typo';
@@ -35,6 +36,8 @@ import { AccessLayout } from '@/layouts/AccessLayout';
 
 const LoginScreen = () => {
   const toast = useToastAlert();
+  const { theme } = useUniwind();
+
   const { mutate: signIn, isPending: isSigningIn } = useSignIn();
   const { mutate: signInWithGoogle, isPending: isGoogleLoading } =
     useSignInWithGoogle();
@@ -91,6 +94,7 @@ const LoginScreen = () => {
 
   return (
     <AccessLayout mode="signin" loading={isLoading}>
+      <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
       <View className="mt-8">
         <AppIcon
           width={88}

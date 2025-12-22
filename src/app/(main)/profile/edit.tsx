@@ -1,7 +1,3 @@
-import { ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { withUniwind } from 'uniwind';
-
 // Constants
 import { ERROR_MESSAGES, MESSAGES, ToastType } from '@/constants';
 
@@ -19,8 +15,8 @@ import { UpdateProfileData } from '@/features/auth/types/auth';
 // Components
 import { EditProfileForm } from '@/features/setting/components/EditProfileForm';
 
-const StyledSafeAreaView = withUniwind(SafeAreaView);
-const StyledScrollView = withUniwind(ScrollView);
+// Layout
+import { KeyboardLayout } from '@/layouts/KeyboardLayout';
 
 const EditProfileScreen = () => {
   const toast = useToastAlert();
@@ -84,23 +80,16 @@ const EditProfileScreen = () => {
   };
 
   return (
-    <StyledSafeAreaView
-      edges={['bottom']}
-      className="flex-1 bg-bg-primary"
-      accessibilityLabel="Profile screen"
-      accessibilityHint="Profile screen"
+    <KeyboardLayout
+      accessibilityLabel="Edit Profile screen"
+      accessibilityHint="Edit Profile screen"
     >
-      <StyledScrollView
-        contentContainerClassName="flex-1 px-6 pb-16"
-        showsVerticalScrollIndicator={false}
-      >
-        <EditProfileForm
-          userInfo={profile}
-          isPending={isLoading}
-          onSubmit={handleSubmit}
-        />
-      </StyledScrollView>
-    </StyledSafeAreaView>
+      <EditProfileForm
+        userInfo={profile}
+        isPending={isLoading}
+        onSubmit={handleSubmit}
+      />
+    </KeyboardLayout>
   );
 };
 

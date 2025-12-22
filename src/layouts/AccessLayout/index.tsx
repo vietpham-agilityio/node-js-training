@@ -1,10 +1,22 @@
 import { memo, ReactNode } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Keyboard,
+  KeyboardAvoidingView,
+  ScrollView,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useResolveClassNames } from 'uniwind';
+
+// Uniwind
+import { useResolveClassNames, withUniwind } from 'uniwind';
 
 // Components
 import { Typo } from '@/components/Typo';
+
+// Utils
+import { cn, isIOS } from '@/utils';
 
 type AccessLayoutProps = {
   loading?: boolean;
@@ -19,30 +31,54 @@ const ACCESSIBILITY_LABEL = {
   confirmation: 'Confirmation screen',
 };
 
+const StyledScrollView = withUniwind(ScrollView);
+const StyledKeyboardAvoidingView = withUniwind(KeyboardAvoidingView);
+
 export const AccessLayout = memo(
   ({ loading = false, mode = 'signin', children }: AccessLayoutProps) => {
     const isSignin = mode === 'signin';
+    const isSignup = mode === 'signup';
+
+    // Both signin and signup need keyboard-friendly behavior
+    const needsKeyboardHandling = isSignin || isSignup;
+    const withKeyboardHandlingStyles = needsKeyboardHandling
+      ? cn(
+          'flex-grow ',
+          isSignin ? 'justify-center pb-8' : 'pb-42', // flex-grow allows scrolling, pb ensures submit button is visible
+        )
+      : 'flex-1';
 
     const accessibilityLabel = ACCESSIBILITY_LABEL[mode];
 
     const containerStyles = useResolveClassNames('flex-1 bg-bg-primary');
-    const contentContainerStyles = useResolveClassNames(
-      `flex-1 p-4 ${isSignin && 'justify-center'}`,
-    );
+
+    const handleKeyboardDismiss = () => {
+      Keyboard.dismiss();
+    };
 
     return (
       <SafeAreaView
-        edges={['bottom']}
+        edges={isSignin ? ['top', 'bottom'] : ['bottom']} // SignIn mode needs top edge for keyboard offset
         style={containerStyles}
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityLabel}
       >
-        <ScrollView
-          contentContainerStyle={contentContainerStyles}
-          showsVerticalScrollIndicator={false}
+        <StyledKeyboardAvoidingView
+          behavior={isIOS() ? 'padding' : 'height'}
+          className="flex-1"
+          keyboardVerticalOffset={isIOS() ? 0 : 20}
         >
-          {children}
-        </ScrollView>
+          <TouchableWithoutFeedback onPress={handleKeyboardDismiss}>
+            <StyledScrollView
+              contentContainerClassName={cn('px-4', withKeyboardHandlingStyles)}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              bounces={false}
+            >
+              {children}
+            </StyledScrollView>
+          </TouchableWithoutFeedback>
+        </StyledKeyboardAvoidingView>
 
         {/* Loading Overlay */}
         {loading && (

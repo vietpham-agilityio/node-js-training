@@ -204,14 +204,16 @@ export const EditProfileForm = memo(
           </View>
         </View>
         {/* Submit Button */}
-        <Button
-          accessible
-          disabled={isDisabled}
-          testID="update-my-profile-submit-button"
-          title="Update My Profile"
-          accessibilityLabel="Update My Profile"
-          onPress={handleSubmit(handleSubmitForm)}
-        />
+        <View className="mb-12">
+          <Button
+            accessible
+            disabled={isDisabled}
+            testID="update-my-profile-submit-button"
+            title="Update My Profile"
+            accessibilityLabel="Update My Profile"
+            onPress={handleSubmit(handleSubmitForm)}
+          />
+        </View>
       </View>
     );
   },
