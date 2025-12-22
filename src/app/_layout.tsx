@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
@@ -57,6 +57,10 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
+  // Track previous authentication state to detect logout vs fresh install
+  const prevIsAuthenticatedRef = useRef<boolean | null>(null);
+  const hasInitializedRef = useRef(false);
+
   const [loaded, error] = useFonts({
     Montserrat_300Light,
     Montserrat_400Regular,
@@ -79,11 +83,23 @@ const RootLayout = () => {
   useEffect(() => {
     if (isLoading || !loaded) return;
 
+    // Track if this is the first initialization
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      prevIsAuthenticatedRef.current = isAuthenticated;
+    }
+
     const inAuthGroup = segments[0] === SCREENS.AUTH.LAYOUT;
 
     if (!isAuthenticated && !inAuthGroup) {
-      // Redirect to login if not authenticated
-      router.replace(ROUTES.ONBOARDING);
+      // Detect logout: user was authenticated before but now is not
+      // Fresh install: user was never authenticated (prevIsAuthenticatedRef is null or false)
+      const wasAuthenticatedBefore = prevIsAuthenticatedRef.current === true;
+      const isLogout = wasAuthenticatedBefore && !isAuthenticated;
+
+      // Only redirect to signin if user logged out (was authenticated before)
+      // Otherwise, redirect to onboarding for new users
+      router.replace(isLogout ? ROUTES.LOGIN : ROUTES.ONBOARDING);
     } else if (isAuthenticated && inAuthGroup) {
       const currentScreen = segments[segments.length - 1];
 
@@ -95,6 +111,9 @@ const RootLayout = () => {
         router.replace(ROUTES.HOME);
       }
     }
+
+    // Update previous authentication state
+    prevIsAuthenticatedRef.current = isAuthenticated;
 
     // Hide splash screen
     SplashScreen.hideAsync();
