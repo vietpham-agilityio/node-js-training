@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 
 // Constants
 import { MESSAGES, ROUTES } from '@/constants';
@@ -13,18 +14,33 @@ import { ConfirmationState } from '@/components/ConfirmationState';
 // Icons
 import { TicketCheckedIcon } from '@/icons/TicketCheckedIcon';
 
+// Stores
+import { useBookingStore } from '@/features/booking/store/booking';
+
 const CheckoutSuccessScreen = () => {
   const router = useRouter();
+  const { selectedSeats, removeSeat } = useBookingStore(
+    useShallow(state => ({
+      selectedSeats: state.selectedSeats,
+      removeSeat: state.removeSeat,
+    })),
+  );
+
+  const handleClearSeats = useCallback(() => {
+    selectedSeats.forEach(seat => removeSeat(seat));
+  }, [selectedSeats, removeSeat]);
 
   const handleNavigateToMyTicket = useCallback(() => {
+    handleClearSeats();
     router.dismissAll();
     router.replace(ROUTES.MY_TICKET);
-  }, [router]);
+  }, [router, handleClearSeats]);
 
   const handleNavigateToHome = useCallback(() => {
+    handleClearSeats();
     router.dismissAll();
     router.replace(ROUTES.HOME);
-  }, [router]);
+  }, [router, handleClearSeats]);
 
   return (
     <View className="flex-1 bg-dark-blue items-center justify-center gap-18">
