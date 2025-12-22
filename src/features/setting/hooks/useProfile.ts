@@ -66,21 +66,25 @@ export const useUpdateProfile = () => {
 
 export const useUploadAvatar = () => {
   const queryClient = useQueryClient();
-  const user = useAuthStore(state => state.user);
 
   return useMutation({
-    mutationFn: (file: { uri: string; type?: string; name?: string }) =>
-      profileService.uploadAvatar(user!.id, file),
-    onSuccess: avatarUrl => {
+    mutationFn: ({
+      userId,
+      file,
+    }: {
+      userId: string;
+      file: { uri: string; name?: string; type?: string };
+    }) => profileService.uploadAvatar(userId, file),
+    onSuccess: (avatarUrl, variables) => {
       queryClient.setQueryData(
-        queryKeys.profile.detail(user!.id),
+        queryKeys.profile.detail(variables.userId),
         (old: UserProfile) => {
           if (!old) return old;
           return { ...old, avatarUrl };
         },
       );
       queryClient.invalidateQueries({
-        queryKey: queryKeys.profile.detail(user!.id),
+        queryKey: queryKeys.profile.detail(variables.userId),
       });
     },
   });
