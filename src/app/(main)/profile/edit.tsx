@@ -1,5 +1,7 @@
+import { useRouter } from 'expo-router';
+
 // Constants
-import { ERROR_MESSAGES, MESSAGES, ToastType } from '@/constants';
+import { ERROR_MESSAGES, MESSAGES, ROUTES, ToastType } from '@/constants';
 
 // Hooks
 import {
@@ -20,49 +22,45 @@ import { KeyboardLayout } from '@/layouts/KeyboardLayout';
 
 const EditProfileScreen = () => {
   const toast = useToastAlert();
+  const router = useRouter();
   const { data: profile, isLoading: isProfileLoading } = useProfile();
-  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
-  const { mutate: uploadAvatar, isPending: isUploading } = useUploadAvatar();
+  const { mutateAsync: updateProfile, isPending: isUpdating } =
+    useUpdateProfile();
+  const { mutateAsync: uploadAvatar, isPending: isUploading } =
+    useUploadAvatar();
 
   const isLoading = isProfileLoading || isUpdating || isUploading;
 
   const handleSubmit = async (data: UpdateProfileData) => {
-    try {
-      let avatarUploadUrl: string | undefined = undefined;
+    let avatarUploadUrl: string | undefined = undefined;
 
-      // Only update avatar if it has changed
-      if (data.avatarUrl && data.avatarUrl !== profile?.avatarUrl) {
-        await new Promise<void>((resolve, reject) => {
-          uploadAvatar(
-            { uri: data.avatarUrl! },
-            {
-              onSuccess: uploadedUrl => {
-                avatarUploadUrl = uploadedUrl as string;
-                resolve();
-              },
-              onError: error => reject(error),
-            },
-          );
+    // Only update avatar if it has changed
+    if (data.avatarUrl && data.avatarUrl !== profile?.avatarUrl) {
+      try {
+        avatarUploadUrl = await uploadAvatar({
+          userId: profile?.id!,
+          file: {
+            uri: data.avatarUrl!,
+          },
         });
+      } catch {
+        toast.error(ERROR_MESSAGES.UPDATE_PROFILE_FAILED);
       }
+    }
 
+    try {
       // Update profile
       const updatePayload = {
         ...data,
         ...(avatarUploadUrl ? { avatarUrl: avatarUploadUrl } : {}),
       };
 
-      await new Promise<void>((resolve, reject) => {
-        updateProfile(updatePayload, {
-          onSuccess: () => resolve(),
-          onError: error => reject(error),
-        });
-      });
+      await updateProfile(updatePayload);
 
       toast.alert(
         MESSAGES.UPDATE_SUCCESS,
         MESSAGES.PROFILE_UPDATE_SUCCESS,
-        [],
+        [{ onPress: () => router.push(ROUTES.PROFILE) }],
         {
           type: ToastType.SUCCESS,
         },

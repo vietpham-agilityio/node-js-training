@@ -97,7 +97,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           name: string
-          seat_layout: Json
+          seat_layout: Json | null
           total_seats: number
           updated_at: string | null
         }
@@ -108,7 +108,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name: string
-          seat_layout: Json
+          seat_layout?: Json | null
           total_seats: number
           updated_at?: string | null
         }
@@ -119,7 +119,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name?: string
-          seat_layout?: Json
+          seat_layout?: Json | null
           total_seats?: number
           updated_at?: string | null
         }
@@ -135,8 +135,8 @@ export type Database = {
       }
       cinemas: {
         Row: {
-          address: string
-          city: string
+          address: string | null
+          city: string | null
           created_at: string | null
           facilities: string[] | null
           id: string
@@ -147,8 +147,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          address: string
-          city: string
+          address?: string | null
+          city?: string | null
           created_at?: string | null
           facilities?: string[] | null
           id?: string
@@ -159,8 +159,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          address?: string
-          city?: string
+          address?: string | null
+          city?: string | null
           created_at?: string | null
           facilities?: string[] | null
           id?: string
@@ -222,6 +222,50 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      notification_logs: {
+        Row: {
+          body: string
+          data: Json | null
+          id: string
+          notification_type: string
+          sent_at: string | null
+          status: string | null
+          ticket_id: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          data?: Json | null
+          id?: string
+          notification_type: string
+          sent_at?: string | null
+          status?: string | null
+          ticket_id?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          data?: Json | null
+          id?: string
+          notification_type?: string
+          sent_at?: string | null
+          status?: string | null
+          ticket_id?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_logs_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promo_code_usage: {
         Row: {
@@ -306,6 +350,39 @@ export type Database = {
           usage_limit?: number | null
           valid_from?: string
           valid_until?: string
+        }
+        Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          created_at: string | null
+          device_id: string | null
+          expo_push_token: string
+          id: string
+          is_active: boolean | null
+          platform: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_id?: string | null
+          expo_push_token: string
+          id?: string
+          is_active?: boolean | null
+          platform: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_id?: string | null
+          expo_push_token?: string
+          id?: string
+          is_active?: boolean | null
+          platform?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -547,6 +624,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "wallet_transactions_reference_id_fkey"
+            columns: ["reference_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "wallet_transactions_wallet_id_fkey"
             columns: ["wallet_id"]
             isOneToOne: false
@@ -593,6 +677,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      deactivate_old_push_tokens: { Args: never; Returns: undefined }
       decrement_available_seats: {
         Args: { seats_count: number; showtime_id: string }
         Returns: undefined
@@ -608,6 +693,10 @@ export type Database = {
         Returns: string
       }
       generate_ticket_number: { Args: never; Returns: string }
+      increment_balance: {
+        Args: { amount: number; wallet_id: string }
+        Returns: number
+      }
       release_expired_reservations: { Args: never; Returns: undefined }
     }
     Enums: {

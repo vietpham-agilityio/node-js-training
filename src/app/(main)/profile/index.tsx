@@ -1,6 +1,12 @@
-import { useMemo } from 'react';
 import { router } from 'expo-router';
-import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Switch,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Unwind
@@ -12,6 +18,8 @@ import { ROUTES, SETTING_ITEMS } from '@/constants';
 // Hooks
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useProfile } from '@/features/setting/hooks/useProfile';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useToastAlert } from '@/hooks/useToast';
 
 // Components
 import { Avatar } from '@/components/Avatar';
@@ -20,6 +28,9 @@ import { SettingItem } from '@/features/setting/components/SettingItem';
 
 // Icons
 import { UserProfileIcon } from '@/icons/UserProfileIcon';
+
+// Services
+import { pushNotificationService } from '@/services/notification/push-notification';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
@@ -37,13 +48,34 @@ enum SettingKey {
 const ProfileScreen = () => {
   const { data: profile, isLoading: isProfileLoading } = useProfile();
   const { signOut } = useAuth();
+  const toast = useToastAlert();
+
+  const { sendTestNotification } = usePushNotifications();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  const toggleNotifications = async () => {
+    if (notificationsEnabled) {
+      // Disable: Cancel all scheduled notifications
+      await pushNotificationService.cancelAllScheduledNotifications();
+      setNotificationsEnabled(false);
+      toast.info('Notifications disabled');
+    } else {
+      // Enable: Request permission again
+      const token =
+        await pushNotificationService.registerForPushNotifications();
+      if (token) {
+        setNotificationsEnabled(true);
+        toast.success('Notifications enabled');
+      }
+    }
+  };
 
   const SETTING_ACTIONS: Record<SettingKey, () => void> = useMemo(
     () => ({
       [SettingKey.Edit]: () => router.push(ROUTES.PROFILE_EDIT),
       [SettingKey.MyWallet]: () => null,
       [SettingKey.ChangeLanguage]: () => null,
-      [SettingKey.HelpCenter]: () => null,
+      [SettingKey.HelpCenter]: () => sendTestNotification(),
       [SettingKey.RateApp]: () => {
         Alert.alert('Enjoying Movea?', 'Please take a moment to rate us ⭐', [
           { text: 'Later', style: 'cancel' },
@@ -57,7 +89,7 @@ const ProfileScreen = () => {
         router.push(ROUTES.PROFILE_CHANGE_PASSWORD),
       [SettingKey.Logout]: () => signOut(),
     }),
-    [signOut],
+    [sendTestNotification, signOut],
   );
 
   if (isProfileLoading) {
@@ -101,6 +133,17 @@ const ProfileScreen = () => {
               {profile?.email}
             </Typo>
           </View>
+        </View>
+
+        <View className="flex-row items-center justify-between mt-8">
+          <Typo size="base" weight="medium">
+            Notifications
+          </Typo>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={toggleNotifications}
+            accessibilityLabel="Toggle notifications"
+          />
         </View>
 
         <View className="mt-8 gap-5">

@@ -10,8 +10,8 @@ import { withUniwind } from 'uniwind';
 // Components
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
-import { OrderDetailRow } from '@/components/OrderDetailRow';
 import { MovieCard } from '@/components/MovieCard';
+import { OrderDetailRow } from '@/components/OrderDetailRow';
 
 // Constants
 import { ERROR_MESSAGES, ROUTES, Size } from '@/constants';
@@ -19,6 +19,8 @@ import { ERROR_MESSAGES, ROUTES, Size } from '@/constants';
 // Hooks
 import { useCreateBooking } from '@/features/booking/hooks/useBookings';
 import { useWallet } from '@/features/wallet/hooks/useWallet';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useToastAlert } from '@/hooks/useToast';
 
 // Utils
 import { formatCurrency, formatIDR } from '@/utils/formats';
@@ -27,10 +29,10 @@ import { formatCurrency, formatIDR } from '@/utils/formats';
 import { useAuthStore } from '@/features/auth/store/auth';
 import { useBookingStore } from '@/features/booking/store/booking';
 import { useLoadingStore } from '@/stores/loading';
-import { useToastStore } from '@/stores/toast';
 
 // Utils
 import { cn } from '@/utils/cn';
+import { Booking } from '@/features/booking/types/booking';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
@@ -38,13 +40,17 @@ const StyledScrollView = withUniwind(ScrollView);
 const CheckoutScreen = () => {
   const router = useRouter();
   const user = useAuthStore(state => state.user);
-  const showError = useToastStore(state => state.showError);
+  const toast = useToastAlert();
   const { showLoading, hideLoading } = useLoadingStore(
     useShallow(state => ({
       showLoading: state.showLoading,
       hideLoading: state.hideLoading,
     })),
   );
+
+  // Push notification hook
+  const { scheduleTicketExpiration, scheduleShowReminder } =
+    usePushNotifications();
 
   const {
     selectedMovie,
@@ -114,6 +120,72 @@ const CheckoutScreen = () => {
     [reservationId, selectedShowtime, selectedSeats, totalPrice],
   );
 
+  /**
+   * Schedule notifications for booking
+   */
+  const scheduleNotifications = useCallback(
+    async (booking: Booking) => {
+      try {
+        if (!selectedShowtime || !selectedMovie) {
+          console.warn('Missing showtime or movie data for notifications');
+          return;
+        }
+
+        const showDate = selectedShowtime.showDate;
+        const showTime = selectedShowtime.showTime;
+        const movieTitle = selectedMovie.title;
+
+        // Parse show datetime
+        const showDateTime = new Date(`${showDate} ${showTime}`);
+
+        // Calculate ticket expiration (30 minutes before show)
+        const expirationDate = new Date(
+          showDateTime.getTime() - 30 * 60 * 1000,
+        );
+
+        // Get tickets from booking
+        const tickets = booking.tickets || [];
+
+        // Schedule notifications for each ticket
+        for (const ticket of tickets) {
+          try {
+            // Schedule expiration notification (1 hour before ticket expires)
+            await scheduleTicketExpiration(
+              ticket.id,
+              movieTitle,
+              showDate,
+              showTime,
+              expirationDate,
+            );
+
+            // Schedule show reminder (1 hour before show)
+            await scheduleShowReminder(
+              ticket.id,
+              movieTitle,
+              showDate,
+              showTime,
+              showDateTime,
+            );
+          } catch (error) {
+            console.error(
+              `Error scheduling notifications for ticket ${ticket.id}:`,
+              error,
+            );
+          }
+        }
+      } catch (error) {
+        console.error('Error scheduling notifications:', error);
+        // Don't block checkout if notification scheduling fails
+      }
+    },
+    [
+      selectedShowtime,
+      selectedMovie,
+      scheduleTicketExpiration,
+      scheduleShowReminder,
+    ],
+  );
+
   const handleCheckout = useCallback(() => {
     const bookingData = {
       userId: user?.id || '',
@@ -127,12 +199,21 @@ const CheckoutScreen = () => {
     showLoading('Creating your booking...');
 
     createBooking(bookingData, {
-      onSuccess: () => {
+      onSuccess: async booking => {
+        // Schedule push notifications
+        await scheduleNotifications(booking);
+
+        // Show success message
+        toast.success(
+          'Booking confirmed! You will receive reminders before the show.',
+        );
+
+        // Navigate to success screen
         router.dismissAll();
         router.replace(ROUTES.CHECKOUT_SUCCESS as Href);
       },
       onError: (error: Error) => {
-        showError(error.message || ERROR_MESSAGES.CHECKOUT_FAILED);
+        toast.error(error.message || ERROR_MESSAGES.CHECKOUT_FAILED);
       },
       onSettled: hideLoading,
     });
@@ -145,9 +226,10 @@ const CheckoutScreen = () => {
     discountAmount,
     router,
     createBooking,
-    showError,
+    toast,
     showLoading,
     hideLoading,
+    scheduleNotifications,
   ]);
 
   return (
