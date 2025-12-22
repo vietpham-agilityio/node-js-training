@@ -2,7 +2,8 @@ import { memo } from 'react';
 import { TouchableOpacity } from 'react-native';
 
 // Icons
-import { FacebookIcon, GoogleIcon } from '@/icons';
+import { FacebookIcon } from '@/icons/FacebookIcon';
+import { GoogleIcon } from '@/icons/GoogleIcon';
 
 export enum ThirdPartyButtonType {
   FACEBOOK = 'facebook',

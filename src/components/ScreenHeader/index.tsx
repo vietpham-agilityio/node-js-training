@@ -9,7 +9,7 @@ import { usePathname, useRouter } from 'expo-router';
 import { Typo } from '../Typo';
 
 // Icons
-import { ArrowBackIcon } from '@/icons';
+import { ArrowBackIcon } from '@/icons/ArrowBackIcon';
 
 // Constants
 

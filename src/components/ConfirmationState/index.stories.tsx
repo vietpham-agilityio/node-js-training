@@ -5,7 +5,9 @@ import { View } from 'react-native';
 import { ConfirmationState } from '.';
 
 // Icons
-import { CancelIcon, TicketCheckedIcon, TicketIcon } from '@/icons';
+import { CancelIcon } from '@/icons/CancelIcon';
+import { TicketCheckedIcon } from '@/icons/TicketCheckedIcon';
+import { TicketIcon } from '@/icons/TicketIcon';
 
 const meta: Meta<typeof ConfirmationState> = {
   title: 'Feature/ConfirmationState',

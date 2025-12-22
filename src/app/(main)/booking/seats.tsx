@@ -18,7 +18,7 @@ import { Typo } from '@/components/Typo';
 import { ROUTES, Size } from '@/constants';
 
 // Icons
-import { ScreenIcon } from '@/icons';
+import { ScreenIcon } from '@/icons/ScreenIcon';
 
 // Stores
 import { useBookingStore } from '@/features/booking/store/booking';

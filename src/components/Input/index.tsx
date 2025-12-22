@@ -9,7 +9,6 @@ import {
 } from 'react';
 import {
   Animated,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -19,7 +18,8 @@ import {
 } from 'react-native';
 
 // Icons
-import { EyeIcon, EyeOffIcon } from '@/icons';
+import { EyeIcon } from '@/icons/EyeIcon';
+import { EyeOffIcon } from '@/icons/EyeOffIcon';
 
 // Utils
 import { cn, isAndroid } from '@/utils';

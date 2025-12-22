@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { View } from 'react-native';
 
 // Icons
-import { StarIcon } from '@/icons';
+import { StarIcon } from '@/icons/StarIcon';
 
 // Components
 import { Typo } from '../Typo';

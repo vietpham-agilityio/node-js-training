@@ -15,7 +15,7 @@ import { Button } from '@/components/Button';
 import { AccessLayout } from '@/layouts/AccessLayout';
 
 // Icons
-import { AppIcon } from '@/icons';
+import { AppIcon } from '@/icons/AppIcon';
 
 const OnboardingScreen = () => {
   const navigate = useRouter();

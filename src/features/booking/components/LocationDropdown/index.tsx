@@ -14,7 +14,8 @@ import {
 import { useResolveClassNames } from 'uniwind';
 
 // Icons
-import { ChevronDownIcon, LocationIcon } from '@/icons';
+import { ChevronDownIcon } from '@/icons/ChevronDownIcon';
+import { LocationIcon } from '@/icons/LocationIcon';
 
 // Components
 import { Typo } from '@/components/Typo';

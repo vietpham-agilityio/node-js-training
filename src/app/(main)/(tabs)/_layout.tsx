@@ -11,7 +11,9 @@ import { MainHeader } from '@/components/MainHeader';
 import { NavigationTabBar } from '@/components/NavigationTabBar';
 
 // Icons
-import { HomeIcon, TicketIcon, WalletIcon } from '@/icons';
+import { HomeIcon } from '@/icons/HomeIcon';
+import { TicketIcon } from '@/icons/TicketIcon';
+import { WalletIcon } from '@/icons/WalletIcon';
 
 const BOTTOM_TAB = [
   {

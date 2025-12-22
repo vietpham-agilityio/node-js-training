@@ -17,7 +17,7 @@ import { useToastAlert } from '@/hooks/useToast';
 import { SignInData } from '@/features/auth/types/auth';
 
 // Icons
-import { AppIcon } from '@/icons';
+import { AppIcon } from '@/icons/AppIcon';
 
 // Uniwind
 import { useResolveClassNames } from 'uniwind';

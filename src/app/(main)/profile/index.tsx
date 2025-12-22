@@ -19,7 +19,7 @@ import { Typo } from '@/components/Typo';
 import { SettingItem } from '@/features/setting/components/SettingItem';
 
 // Icons
-import { UserProfileIcon } from '@/icons';
+import { UserProfileIcon } from '@/icons/UserProfileIcon';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);

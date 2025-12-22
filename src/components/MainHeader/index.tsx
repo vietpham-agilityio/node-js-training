@@ -13,7 +13,7 @@ import { Typo } from '../Typo';
 import { MAIN_TITLE_MAP, ROUTES } from '@/constants';
 
 // Types
-import { UserProfileIcon } from '@/icons';
+import { UserProfileIcon } from '@/icons/UserProfileIcon';
 
 // Hooks
 import { useProfile } from '@/features/setting/hooks/useProfile';

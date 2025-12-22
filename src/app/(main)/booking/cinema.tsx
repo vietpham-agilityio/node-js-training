@@ -25,7 +25,7 @@ import { ERROR_MESSAGES, ROUTES } from '@/constants';
 import { useShowtimes } from '@/features/booking/hooks/useShowtimes';
 
 // Icons
-import { ArrowRightIcon } from '@/icons';
+import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 
 // Utils
 import { formatShowtimes, formatTime, getDayOfWeekLabels } from '@/utils';

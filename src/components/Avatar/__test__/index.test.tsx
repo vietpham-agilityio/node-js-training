@@ -18,10 +18,19 @@ jest.mock('expo-image-picker');
 
 jest.mock('@expo/vector-icons/MaterialIcons', () => 'MaterialIcons');
 
-jest.mock('@/icons', () => ({
+jest.mock('@/icons/AddIcon', () => ({
   AddIcon: 'AddIcon',
+}));
+
+jest.mock('@/icons/CancelIcon', () => ({
   CancelIcon: 'CancelIcon',
+}));
+
+jest.mock('@/icons/PhotoProfileIcon', () => ({
   PhotoProfileIcon: 'PhotoProfileIcon',
+}));
+
+jest.mock('@/icons/UserProfileIcon', () => ({
   UserProfileIcon: 'UserProfileIcon',
 }));
 

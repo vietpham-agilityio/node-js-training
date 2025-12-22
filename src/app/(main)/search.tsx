@@ -37,7 +37,7 @@ import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
 
 // Icons
-import { CancelIcon } from '@/icons';
+import { CancelIcon } from '@/icons/CancelIcon';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
