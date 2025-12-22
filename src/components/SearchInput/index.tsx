@@ -1,5 +1,10 @@
 import { memo } from 'react';
-import { TextInput, View, type TextInputProps } from 'react-native';
+import {
+  TextInput,
+  TouchableOpacity,
+  View,
+  type TextInputProps,
+} from 'react-native';
 
 // Icons
 import { SearchIcon } from '@/icons';
@@ -23,6 +28,7 @@ export const SearchInput = memo(
     testID,
     className,
     containerClassName,
+    onPress,
     ...rest
   }: SearchInputProps) => {
     const themes = useResolveClassNames('text-white');
@@ -30,16 +36,6 @@ export const SearchInput = memo(
     return (
       <View className={cn(`w-full`, containerClassName)} testID={testID}>
         <View className="relative flex-row items-center">
-          {/* Search Icon */}
-          <View
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="Search"
-            className="absolute left-5 z-1"
-          >
-            <SearchIcon color={themes.color} />
-          </View>
-
           {/* Text Input */}
           <TextInput
             accessible
@@ -53,8 +49,20 @@ export const SearchInput = memo(
             )}
             placeholder={placeholder}
             placeholderTextColor={themes.color}
+            onPress={onPress}
             {...rest}
           />
+
+          {/* Search Icon */}
+          <TouchableOpacity
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Search"
+            className="absolute left-5"
+            onPress={onPress}
+          >
+            <SearchIcon color={themes.color} />
+          </TouchableOpacity>
         </View>
       </View>
     );

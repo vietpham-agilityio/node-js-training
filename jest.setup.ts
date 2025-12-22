@@ -65,3 +65,10 @@ jest.mock('expo-image', () => ({
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid-v4'),
 }));
+
+jest.mock('expo-image-manipulator', () => ({
+  ImageManipulator: {
+    manipulate: jest.fn(),
+  },
+  SaveFormat: { JPEG: 'jpeg' },
+}));

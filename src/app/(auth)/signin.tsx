@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 
 // Constants
-import { ERROR_MESSAGES, MESSAGES, ROUTES, ToastType } from '@/constants';
+import { ERROR_MESSAGES, ROUTES, ToastType } from '@/constants';
 
 // Hooks
 import {
@@ -57,8 +57,6 @@ const LoginScreen = () => {
           );
         },
       });
-
-      toast.success(MESSAGES.SIGNIN_SUCCESS);
     },
     [signIn, toast],
   );
@@ -71,8 +69,6 @@ const LoginScreen = () => {
         });
       },
     });
-
-    toast.success(MESSAGES.SIGNIN_SUCCESS);
   }, [signInWithGoogle, toast]);
 
   const handleFacebookSignIn = useCallback(() => {
@@ -83,8 +79,6 @@ const LoginScreen = () => {
         });
       },
     });
-
-    toast.success(MESSAGES.SIGNIN_SUCCESS);
   }, [signInWithFacebook, toast]);
 
   const isLoading = isSigningIn || isGoogleLoading || isFacebookLoading;

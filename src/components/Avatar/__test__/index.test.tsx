@@ -15,6 +15,12 @@ jest.mock('expo-camera', () => ({
 }));
 
 jest.mock('expo-image-picker');
+jest.mock('expo-image-manipulator', () => ({
+  ImageManipulator: {
+    manipulate: jest.fn(),
+  },
+  SaveFormat: { JPEG: 'jpeg' },
+}));
 
 jest.mock('@expo/vector-icons/MaterialIcons', () => 'MaterialIcons');
 
