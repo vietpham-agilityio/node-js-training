@@ -2,10 +2,12 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ComponentType, memo, useState } from 'react';
 import { Alert, Modal, Platform, TouchableOpacity, View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
+import { withUniwind } from 'uniwind';
 
 // SDKs
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { Image } from 'expo-image';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 
 // Constants
@@ -34,6 +36,8 @@ interface AvatarProps {
   defaultAvatar?: ComponentType<SvgProps>;
   accessibilityLabel?: string;
   accessibilityHint?: string;
+  maxImageSize?: number; // Maximum width/height in pixels (default: 800)
+  imageQuality?: number; // Image quality 0-1 (default: 0.7)
 }
 
 // Size configurations mapping
@@ -77,6 +81,8 @@ const SIZE_MAP: Record<
   },
 };
 
+const StyledCameraView = withUniwind(CameraView);
+
 export const Avatar = memo(
   ({
     size = 92,
@@ -86,6 +92,8 @@ export const Avatar = memo(
     defaultAvatar,
     accessibilityLabel,
     accessibilityHint,
+    maxImageSize = 800, // Reduced from 1024 for smaller file sizes
+    imageQuality = 0.7, // Reduced from 0.8 for better compression
   }: AvatarProps) => {
     const [imageUri, setImageUri] = useState<string | null>(source || null);
     const [showOptions, setShowOptions] = useState(false);
@@ -110,11 +118,41 @@ export const Avatar = memo(
       : 'Double tap to select a profile picture from your device';
 
     /**
+     * Compress and resize image to reduce file size
+     * Optimized for 2MB storage limit - produces ~150-400KB images
+     * Uses the new ImageManipulator.manipulate() API
+     */
+    const compressImage = async (uri: string): Promise<string> => {
+      try {
+        // Create manipulation context
+        const context = ImageManipulator.manipulate(uri);
+
+        // Resize the image
+        context.resize({ width: maxImageSize });
+
+        // Render the manipulated image
+        const renderedImage = await context.renderAsync();
+
+        // Save with compression
+        const result = await renderedImage.saveAsync({
+          compress: imageQuality,
+          format: SaveFormat.JPEG,
+        });
+
+        return result.uri;
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        // Return original URI if compression fails
+        return uri;
+      }
+    };
+
+    /**
      * Handle the image picker result. If the variant is 'default',
      * do nothing. If the permission status is not 'granted', show an alert.
-     * If the result is not canceled and has a valid URI, set the image URI
-     * and call the onChangeImage callback with the new URI. Finally, hide the
-     * options modal.
+     * If the result is not canceled and has a valid URI, compress the image,
+     * set the image URI and call the onChangeImage callback with the new URI.
+     * Finally, hide the options modal.
      */
     const handlePickImage = async () => {
       if (variant === 'default') return;
@@ -140,9 +178,11 @@ export const Avatar = memo(
       });
 
       if (!result.canceled && result.assets?.[0]?.uri) {
-        const uri = result.assets[0].uri;
-        setImageUri(uri);
-        onChangeImage?.(uri);
+        const originalUri = result.assets[0].uri;
+        // Compress the image before setting it
+        const compressedUri = await compressImage(originalUri);
+        setImageUri(compressedUri);
+        onChangeImage?.(compressedUri);
       }
 
       setShowOptions(false);
@@ -187,21 +227,25 @@ export const Avatar = memo(
 
     /**
      * Handle taking a picture from the camera. If the camera ref is null, do nothing.
-     * If the camera ref is valid, take a picture, and if successful, set the image URI
-     * and call the onChangeImage callback with the new URI. If the picture taking fails,
+     * If the camera ref is valid, take a picture with lower quality settings,
+     * compress the image, and if successful, set the image URI and call the
+     * onChangeImage callback with the new URI. If the picture taking fails,
      * show an error alert.
      */
     const handleTakePicture = async () => {
       if (cameraRef) {
         try {
           const photo = await cameraRef.takePictureAsync({
-            quality: 1,
+            quality: 0.6, // Lower quality for initial capture
             base64: false,
+            skipProcessing: false,
           });
 
           if (photo?.uri) {
-            setImageUri(photo.uri);
-            onChangeImage?.(photo.uri);
+            // Compress the captured photo
+            const compressedUri = await compressImage(photo.uri);
+            setImageUri(compressedUri);
+            onChangeImage?.(compressedUri);
             setShowCamera(false);
           }
         } catch (error) {
@@ -391,10 +435,17 @@ export const Avatar = memo(
           onRequestClose={handleCloseCamera}
         >
           <View className="flex-1 bg-bg-primary">
-            <CameraView
+            <StyledCameraView
               className="flex-1"
               facing={facing}
               ref={ref => setCameraRef(ref)}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+              }}
             />
 
             {/* Camera Controls Overlay */}

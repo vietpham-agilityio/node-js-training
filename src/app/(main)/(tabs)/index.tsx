@@ -144,6 +144,26 @@ const HomeScreen = () => {
       accessibilityHint="Home screen"
       className="h-full bg-bg-primary"
     >
+      {/* Search Input */}
+      <View className="px-6 mb-7">
+        <SearchInput
+          className="border-0"
+          editable={false}
+          accessibilityRole="button"
+          accessibilityLabel="Search movies"
+          onPress={handleSearchPress}
+        />
+      </View>
+
+      {/* Category Tabs */}
+      <View className="pl-6 mb-3">
+        <Tabs
+          tabs={FILTER_CATEGORY_TABS}
+          activeTab={activeCategory}
+          onTabChange={setActiveCategory}
+        />
+      </View>
+
       <FlashList
         data={MOCK_PROMOTIONS}
         renderItem={() => null}
@@ -160,20 +180,8 @@ const HomeScreen = () => {
           />
         }
         ListHeaderComponent={
-          <View>
-            <View className="px-6">
-              <SearchInput className="border-0" onFocus={handleSearchPress} />
-            </View>
-
-            <View className="pl-6 mt-7">
-              <Tabs
-                tabs={FILTER_CATEGORY_TABS}
-                activeTab={activeCategory}
-                onTabChange={setActiveCategory}
-              />
-            </View>
-
-            <View className="mt-7 gap-2">
+          <View className="pt-3">
+            <View className="gap-2">
               <View className="px-6 flex-row items-center justify-between">
                 <Typo size="xl" weight="semibold" accessibilityRole="header">
                   Now Playing
