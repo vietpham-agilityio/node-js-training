@@ -13,7 +13,7 @@ import {
 } from '@/features/wallet/types/wallet';
 
 // Utils
-import { keysToCamel } from '@/utils';
+import { keysToCamel } from '@/utils/convert';
 
 export class WalletService {
   private static instance: WalletService;

@@ -8,7 +8,8 @@ import { useResolveClassNames } from 'uniwind';
 import { NAVIGATION_BOTTOM_TABS, TAB_BAR_THEME } from '@/constants';
 
 // Utils
-import { cn, isIOS } from '@/utils';
+import { cn } from '@/utils/cn';
+import { isIOS } from '@/utils/platform';
 
 // Components
 import { Typo } from '../Typo';

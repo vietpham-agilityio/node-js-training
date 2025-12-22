@@ -13,7 +13,8 @@ import { SearchIcon } from '@/icons/SearchIcon';
 import { useResolveClassNames } from 'uniwind';
 
 // Utils
-import { cn, isAndroid } from '@/utils';
+import { cn } from '@/utils/cn';
+import { isAndroid } from '@/utils/platform';
 
 export interface SearchInputProps extends Omit<TextInputProps, 'placeholder'> {
   testID?: string;

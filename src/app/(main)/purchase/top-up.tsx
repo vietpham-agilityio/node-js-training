@@ -25,7 +25,7 @@ import {
 import { useTopUp } from '@/features/wallet/hooks/useWallet';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 import { formatIDR } from '@/utils/formats';
 
 // Stores

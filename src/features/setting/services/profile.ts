@@ -6,7 +6,7 @@ import { supabase } from '@/services/supabase/client';
 import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
 
 // Utils
-import { keysToCamel } from '@/utils';
+import { keysToCamel } from '@/utils/convert';
 
 export class ProfileService {
   private static instance: ProfileService;

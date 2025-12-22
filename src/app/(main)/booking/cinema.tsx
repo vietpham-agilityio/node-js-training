@@ -28,7 +28,8 @@ import { useShowtimes } from '@/features/booking/hooks/useShowtimes';
 import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 
 // Utils
-import { formatShowtimes, formatTime, getDayOfWeekLabels } from '@/utils';
+import { formatTime } from '@/utils/formats';
+import { getDayOfWeekLabels, formatShowtimes } from '@/utils/dates';
 
 // Store
 import { useBookingStore } from '@/features/booking/store/booking';

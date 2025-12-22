@@ -16,7 +16,8 @@ import { useResolveClassNames, withUniwind } from 'uniwind';
 import { Typo } from '@/components/Typo';
 
 // Utils
-import { cn, isIOS } from '@/utils';
+import { cn } from '@/utils/cn';
+import { isIOS } from '@/utils/platform';
 
 type AccessLayoutProps = {
   loading?: boolean;

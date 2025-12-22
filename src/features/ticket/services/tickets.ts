@@ -2,7 +2,7 @@
 import { Ticket, TicketStatus } from '@/features/booking/types/booking';
 
 // Utils
-import { keysToCamel } from '@/utils';
+import { keysToCamel } from '@/utils/convert';
 
 // Constants
 import { ERROR_MESSAGES, MESSAGES, PAGINATION } from '@/constants';

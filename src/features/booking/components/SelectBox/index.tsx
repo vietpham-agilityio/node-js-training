@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react';
 import { TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 // Components
 import { Typo } from '@/components/Typo';

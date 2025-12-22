@@ -16,7 +16,7 @@ import { Movie } from '@/features/booking/types/movie';
 import { MovieBanner } from '../MovieBanner';
 
 // Utils
-import { isAndroid, isIOS } from '@/utils';
+import { isAndroid, isIOS } from '@/utils/platform';
 
 type Variant = 'horizontal' | 'vertical';
 

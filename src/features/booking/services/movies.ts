@@ -6,7 +6,7 @@ import { Movie, MovieStatus } from '../types/movie';
 
 // Utils
 import { supabase } from '@/services/supabase/client';
-import { keysToCamel } from '@/utils';
+import { keysToCamel } from '@/utils/convert';
 
 export class MoviesService {
   private static instance: MoviesService;

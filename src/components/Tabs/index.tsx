@@ -6,7 +6,8 @@ import { useResolveClassNames } from 'uniwind';
 import { Typo } from '../Typo';
 
 // Utils
-import { cn, isAndroid, isIOS } from '@/utils';
+import { cn } from '@/utils/cn';
+import { isAndroid, isIOS } from '@/utils/platform';
 
 interface Tab {
   id: string;

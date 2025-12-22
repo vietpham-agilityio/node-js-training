@@ -14,7 +14,7 @@ import { BLUR_HASH } from '@/constants';
 import { Movie } from '@/features/booking/types/movie';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 // Components
 import { Rating } from '@/components/Rating';

@@ -21,7 +21,7 @@ import { LocationIcon } from '@/icons/LocationIcon';
 import { Typo } from '@/components/Typo';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 // Constants
 import { ERROR_MESSAGES } from '@/constants';

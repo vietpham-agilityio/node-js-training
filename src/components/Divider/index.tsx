@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { View } from 'react-native';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 
 interface DividerProps {
   className?: string;

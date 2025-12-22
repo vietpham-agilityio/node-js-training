@@ -18,7 +18,7 @@ import { Typo } from '../Typo';
 import { WalletTransactionType } from '@/features/wallet/types/wallet';
 
 // Utils
-import { cn } from '@/utils';
+import { cn } from '@/utils/cn';
 import {
   formatIDR,
   formatMovieDuration,

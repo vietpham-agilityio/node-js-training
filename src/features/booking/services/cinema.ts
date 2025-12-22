@@ -4,7 +4,7 @@ import { supabase } from '@/services/supabase/client';
 import { Cinema } from '@/features/booking/types/cinema';
 
 // Utils
-import { keysToCamel } from '@/utils';
+import { keysToCamel } from '@/utils/convert';
 
 export class CinemaService {
   private static instance: CinemaService;

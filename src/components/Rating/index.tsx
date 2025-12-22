@@ -8,7 +8,7 @@ import { StarIcon } from '@/icons/StarIcon';
 import { Typo } from '../Typo';
 
 // Utils
-import { clampedRatingToStars } from '@/utils';
+import { clampedRatingToStars } from '@/utils/formats';
 
 interface RatingProps {
   rating: number; // 0 to 5
