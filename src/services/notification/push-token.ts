@@ -1,5 +1,5 @@
 import { PushToken } from '@/types/notification';
-import { keysToCamel } from '@/utils';
+import { keysToCamel } from '@/utils/convert';
 import { supabase } from '../supabase/client';
 
 export class PushTokenService {
