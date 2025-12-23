@@ -265,6 +265,13 @@ export type Database = {
             referencedRelation: "tickets"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "notification_logs_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets_with_status"
+            referencedColumns: ["id"]
+          },
         ]
       }
       promo_code_usage: {
@@ -674,7 +681,29 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      tickets_with_status: {
+        Row: {
+          booking_id: string | null
+          computed_status: string | null
+          created_at: string | null
+          id: string | null
+          price: number | null
+          qr_code_data: string | null
+          scanned_at: string | null
+          seat_number: string | null
+          status: string | null
+          ticket_number: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       deactivate_old_push_tokens: { Args: never; Returns: undefined }
@@ -698,6 +727,7 @@ export type Database = {
         Returns: number
       }
       release_expired_reservations: { Args: never; Returns: undefined }
+      trigger_expire_tickets: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never

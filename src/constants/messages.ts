@@ -1,3 +1,5 @@
+import { TicketStatus } from '@/features/booking/types/booking';
+
 export const ERROR_MESSAGES = {
   INVALID_TICKET: 'Invalid ticket',
   TICKET_ALREADY_USED: 'Ticket already used',
@@ -73,4 +75,11 @@ export const MESSAGES = {
   PURCHASE_SUCCESS_TITLE: 'Yummy!',
   PURCHASE_SUCCESS_DESCRIPTION: 'You have successfully top up the wallet.',
   PASSWORD_UPDATE_SUCCESS: 'Your password has been changed successfully',
+};
+
+export const UNACTIVE_MESSAGE: Record<TicketStatus, string> = {
+  [TicketStatus.ACTIVE]: '',
+  [TicketStatus.EXPIRED]: 'This ticket has expired and can no longer be used.',
+  [TicketStatus.USED]: 'This ticket has already been scanned and used.',
+  [TicketStatus.CANCELLED]: 'This booking has been cancelled.',
 };

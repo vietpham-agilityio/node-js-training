@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,6 +18,7 @@ import {
 } from '@/constants';
 
 // Hooks
+import { useTicketExpiration } from '@/features/ticket/hooks/useTicketExpiration';
 import { useTicketsInfinite } from '@/features/ticket/hooks/useTickets';
 
 // Types
@@ -34,6 +35,9 @@ const StyledSafeAreaView = withUniwind(SafeAreaView);
 const MyTicketScreen = () => {
   const [activeTab, setActiveTab] = useState(TICKET_TABS[0].id);
 
+  // Hooks for ticket expiration
+  const { checkExpiredTickets } = useTicketExpiration();
+
   const {
     data,
     isLoading,
@@ -45,6 +49,13 @@ const MyTicketScreen = () => {
     refetch,
     isRefetching,
   } = useTicketsInfinite();
+
+  // Check for expired tickets when screen focuses
+  useFocusEffect(
+    useCallback(() => {
+      checkExpiredTickets();
+    }, [checkExpiredTickets]),
+  );
 
   // Flatten paginated data
   const allTickets = useMemo(() => {
@@ -98,6 +109,12 @@ const MyTicketScreen = () => {
   const handleTicketDetails = useCallback((ticketId: string) => {
     router.push(ROUTES.TICKET_DETAILS(ticketId));
   }, []);
+
+  // Handle refresh action for expired tickets to check for updates
+  const handleRefresh = useCallback(async () => {
+    await checkExpiredTickets();
+    refetch();
+  }, [checkExpiredTickets, refetch]);
 
   const renderTicket = useCallback(
     ({ item }: { item: Ticket }) => {
@@ -278,7 +295,7 @@ const MyTicketScreen = () => {
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
-            onRefresh={refetch}
+            onRefresh={handleRefresh}
             accessibilityLabel="Pull to refresh tickets"
           />
         }

@@ -8,13 +8,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { Size } from '@/constants';
+import { Size, UNACTIVE_MESSAGE } from '@/constants';
 
 // Utils
 import { formatDate, formatIDR, formatTime } from '@/utils/formats';
 
 // Hooks
 import { useTicket } from '@/features/ticket/hooks/useTickets';
+
+// Types
+import { TicketStatus } from '@/features/booking/types/booking';
 
 // Components
 import { Button } from '@/components/Button';
@@ -57,8 +60,12 @@ const TicketDetailScreen = () => {
       showDate: showDate,
       qrCode: ticket.qrCodeData,
       idOrder: booking.bookingNumber,
+      status: ticket.status,
     };
   }, [ticket]);
+
+  // Determine if QR should be shown
+  const isActive = ticketDetail?.status === TicketStatus.ACTIVE;
 
   const orderRows = [
     {
@@ -81,7 +88,15 @@ const TicketDetailScreen = () => {
       value: ticketDetail?.paid || '',
       testID: 'paid',
     },
+    {
+      label: 'Status',
+      value: ticketDetail?.status || '',
+      testID: 'ticket-status',
+    },
   ];
+
+  const unActiveMessage =
+    UNACTIVE_MESSAGE[ticketDetail?.status as TicketStatus] || '';
 
   if (isLoading) {
     return (
@@ -129,21 +144,38 @@ const TicketDetailScreen = () => {
                   label={row.label}
                   value={row.value}
                   testID={row.testID}
+                  valueClassName={
+                    row.testID === 'ticket-status'
+                      ? isActive
+                        ? 'text-green-500'
+                        : undefined
+                      : undefined
+                  }
                 />
               ))}
             </View>
 
             <Divider className="border-dashed" />
 
-            {/* Wallet Information */}
+            {/* QR Code Section - Only show if active */}
             <View className="items-center justify-center gap-2">
-              <View className="w-[200] h-[200] items-center justify-center bg-white ">
-                <QRCode
-                  value={ticketDetail?.qrCode}
-                  size={174}
-                  color="black"
-                  backgroundColor="white"
-                />
+              <View className="w-[200] h-[200] items-center justify-center bg-white">
+                {isActive ? (
+                  <QRCode
+                    value={ticketDetail?.qrCode}
+                    size={174}
+                    color="black"
+                    backgroundColor="white"
+                  />
+                ) : (
+                  <Typo
+                    size="lg"
+                    weight="semibold"
+                    className="text-center text-text-primary uppercase"
+                  >
+                    {ticketDetail.status}
+                  </Typo>
+                )}
               </View>
 
               <View className="justify-between items-center">
@@ -155,7 +187,7 @@ const TicketDetailScreen = () => {
                   ID Order
                 </Typo>
                 <Typo size="base" weight="regular" className="text-center">
-                  {ticketDetail?.idOrder}
+                  {isActive ? ticketDetail?.idOrder : unActiveMessage}
                 </Typo>
               </View>
             </View>
