@@ -26,7 +26,7 @@ import { useBookingStore } from '@/features/booking/store/booking';
 // Utils
 import {
   calculateTotalPrice,
-  formatCurrency,
+  formatIDR,
   groupSeatsByRow,
 } from '@/utils/formats';
 import { generateSeats } from '@/utils/data';
@@ -206,7 +206,7 @@ const SeatsScreen = () => {
             {selectedSeats.length !== 1 ? 's' : ''})
           </Typo>
           <Typo size="xl" weight="semibold">
-            {formatCurrency(totalPrice)}
+            {formatIDR(totalPrice)}
           </Typo>
         </View>
         <Button

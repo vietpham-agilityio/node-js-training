@@ -106,14 +106,14 @@ const CheckoutScreen = () => {
       },
       {
         label: 'Price',
-        value: `Rp ${selectedShowtime?.price.toLocaleString(
+        value: `IDR ${selectedShowtime?.price.toLocaleString(
           'id-ID',
         )} x ${selectedSeats.length}`,
         testID: 'order-price',
       },
       {
         label: 'Total',
-        value: formatCurrency(totalPrice),
+        value: formatIDR(totalPrice),
         testID: 'order-total',
       },
     ],
