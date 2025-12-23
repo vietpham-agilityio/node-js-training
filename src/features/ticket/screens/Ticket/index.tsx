@@ -55,6 +55,7 @@ const TicketDetailScreen = () => {
       movieName: movie.title,
       cinemaName: cinema.name,
       seatNumber: ticket.seatNumber,
+      seatsNumber: booking.seatNumbers,
       paid: formatIDR(booking.totalAmount),
       showTime: showTime,
       showDate: showDate,
@@ -81,6 +82,11 @@ const TicketDetailScreen = () => {
     {
       label: 'Seat Number',
       value: ticketDetail?.seatNumber || '',
+      testID: 'order-seat',
+    },
+    {
+      label: 'Seats Number',
+      value: ticketDetail?.seatsNumber.join(', ') || '',
       testID: 'order-seats',
     },
     {
@@ -147,8 +153,8 @@ const TicketDetailScreen = () => {
                   valueClassName={
                     row.testID === 'ticket-status'
                       ? isActive
-                        ? 'text-green-500'
-                        : undefined
+                        ? 'text-text-success'
+                        : 'text-text-error'
                       : undefined
                   }
                 />
@@ -158,39 +164,38 @@ const TicketDetailScreen = () => {
             <Divider className="border-dashed" />
 
             {/* QR Code Section - Only show if active */}
-            <View className="items-center justify-center gap-2">
-              <View className="w-[200] h-[200] items-center justify-center bg-white">
-                {isActive ? (
+            {isActive ? (
+              <View className="items-center justify-center gap-2">
+                <View className="w-[200] h-[200] items-center justify-center bg-white">
                   <QRCode
                     value={ticketDetail?.qrCode}
                     size={174}
                     color="black"
                     backgroundColor="white"
                   />
-                ) : (
+                </View>
+                <View className="justify-between items-center">
                   <Typo
-                    size="lg"
-                    weight="semibold"
-                    className="text-center text-text-primary uppercase"
+                    size="base"
+                    weight="regular"
+                    className="text-overlay-soft"
                   >
-                    {ticketDetail.status}
+                    ID Order
                   </Typo>
-                )}
+                  <Typo size="base" weight="regular" className="text-center">
+                    {ticketDetail?.idOrder}
+                  </Typo>
+                </View>
               </View>
-
-              <View className="justify-between items-center">
-                <Typo
-                  size="base"
-                  weight="regular"
-                  className="text-text-white/70"
-                >
-                  ID Order
-                </Typo>
-                <Typo size="base" weight="regular" className="text-center">
-                  {isActive ? ticketDetail?.idOrder : unActiveMessage}
-                </Typo>
-              </View>
-            </View>
+            ) : (
+              <Typo
+                size="base"
+                weight="regular"
+                className="text-center italic text-overlay-soft"
+              >
+                {unActiveMessage}
+              </Typo>
+            )}
           </View>
         )}
       </StyledScrollView>
