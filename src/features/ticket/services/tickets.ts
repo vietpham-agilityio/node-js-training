@@ -24,6 +24,9 @@ export class TicketsService {
 
   async getTickets(userId: string): Promise<Ticket[]> {
     try {
+      // First, expire any old tickets
+      await this.expireOldTickets();
+
       // Get all bookings for user first (RLS will filter automatically)
       const { data: bookings, error: bookingsError } = await supabase
         .from('bookings')
@@ -105,8 +108,15 @@ export class TicketsService {
     }
   }
 
+  /**
+   * Get ticket by ID
+   * Automatically checks for expiration first
+   */
   async getTicketById(ticketId: string): Promise<Ticket> {
     try {
+      // First, expire any old tickets
+      await this.expireOldTickets();
+
       const { data, error } = await supabase
         .from('tickets')
         .select(
@@ -176,8 +186,15 @@ export class TicketsService {
     }
   }
 
+  /**
+   * Validate ticket QR code
+   * Checks expiration before validation
+   */
   async validateTicket(qrData: string) {
     try {
+      // First, expire any old tickets
+      await this.expireOldTickets();
+
       // Parse QR data
       let parsedData;
       try {
@@ -263,12 +280,19 @@ export class TicketsService {
     }
   }
 
+  /**
+   * Get paginated tickets
+   * Automatically checks for expired tickets first
+   */
   async getTicketsPaginated(
     userId: string,
     page = PAGINATION.PAGE_OFFSET,
     limit = PAGINATION.PAGE_LIMIT_MAX,
   ): Promise<Ticket[]> {
     try {
+      // First, expire any old tickets
+      await this.expireOldTickets();
+
       // Get bookings first (RLS filters automatically)
       const { data: bookings, error: bookingsError } = await supabase
         .from('bookings')
@@ -340,6 +364,28 @@ export class TicketsService {
       return keysToCamel(data || []) as Ticket[];
     } catch (error) {
       throw error;
+    }
+  }
+
+  /**
+   * Helper method to call the database function
+   */
+  private async expireOldTickets(): Promise<number> {
+    try {
+      const { data, error } = await supabase.rpc('trigger_expire_tickets');
+
+      if (error) {
+        return 0;
+      }
+
+      const count = data || 0;
+      if (count > 0) {
+        console.info(`Auto-expired ${count} tickets`);
+      }
+
+      return count;
+    } catch {
+      return 0;
     }
   }
 }
