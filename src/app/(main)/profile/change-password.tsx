@@ -1,17 +1,3 @@
-// Components
-import { ChangePasswordForm } from '@/features/setting/components/ChangePasswordForm';
-
-// Layout
-import { KeyboardLayout } from '@/layouts/KeyboardLayout';
-
-const ChangePasswordScreen = () => (
-  <KeyboardLayout
-    contentPadding="px-6 pt-4"
-    accessibilityLabel="Change Password screen"
-    accessibilityHint="Change Password screen"
-  >
-    <ChangePasswordForm />
-  </KeyboardLayout>
-);
+import ChangePasswordScreen from '@/features/setting/screens/ChangePassword';
 
 export default ChangePasswordScreen;
