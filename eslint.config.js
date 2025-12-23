@@ -16,5 +16,10 @@ module.exports = defineConfig([
         },
       },
     },
+    rules: {
+      // Disable import/no-unresolved warning for TypeScript path aliases
+      // TypeScript compiler already handles these path resolutions
+      'import/no-unresolved': 'off',
+    },
   },
 ]);
