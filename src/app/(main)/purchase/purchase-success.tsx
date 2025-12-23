@@ -17,12 +17,10 @@ const CheckoutSuccessScreen = () => {
   const router = useRouter();
 
   const handleNavigateToMyWallet = useCallback(() => {
-    router.dismissAll();
     router.replace(ROUTES.MY_WALLET);
   }, [router]);
 
   const handleNavigateToHome = useCallback(() => {
-    router.dismissAll();
     router.replace(ROUTES.HOME);
   }, [router]);
 

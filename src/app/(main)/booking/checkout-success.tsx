@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
 import { useRouter } from 'expo-router';
+import { useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -8,8 +8,8 @@ import { MESSAGES, ROUTES } from '@/constants';
 
 // Components
 import { Button } from '@/components/Button';
-import { Typo } from '@/components/Typo';
 import { ConfirmationState } from '@/components/ConfirmationState';
+import { Typo } from '@/components/Typo';
 
 // Icons
 import { TicketCheckedIcon } from '@/icons/TicketCheckedIcon';
@@ -32,13 +32,11 @@ const CheckoutSuccessScreen = () => {
 
   const handleNavigateToMyTicket = useCallback(() => {
     handleClearSeats();
-    router.dismissAll();
     router.replace(ROUTES.MY_TICKET);
   }, [router, handleClearSeats]);
 
   const handleNavigateToHome = useCallback(() => {
     handleClearSeats();
-    router.dismissAll();
     router.replace(ROUTES.HOME);
   }, [router, handleClearSeats]);
 
