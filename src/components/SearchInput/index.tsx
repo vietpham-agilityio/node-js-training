@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import {
+  Pressable,
   TextInput,
   TouchableOpacity,
   View,
@@ -34,9 +35,15 @@ export const SearchInput = memo(
   }: SearchInputProps) => {
     const themes = useResolveClassNames('text-white');
 
+    const InputWrapper = isAndroid() ? Pressable : View;
+
     return (
       <View className={cn(`w-full`, containerClassName)} testID={testID}>
-        <View className="relative flex-row items-center">
+        <InputWrapper
+          onPress={onPress}
+          className="relative flex-row items-center"
+          disabled={!onPress}
+        >
           {/* Text Input */}
           <TextInput
             accessible
@@ -50,7 +57,7 @@ export const SearchInput = memo(
             )}
             placeholder={placeholder}
             placeholderTextColor={themes.color}
-            onPress={onPress}
+            {...(!isAndroid() && { onPress })}
             {...rest}
           />
 
@@ -64,7 +71,7 @@ export const SearchInput = memo(
           >
             <SearchIcon color={themes.color} />
           </TouchableOpacity>
-        </View>
+        </InputWrapper>
       </View>
     );
   },
