@@ -226,10 +226,7 @@ export const LocationDropdown = memo(
             onPress={handleClose}
             testID={`${testID}-modal-backdrop`}
           >
-            <View
-              className="bg-dark-blue rounded-t-3xl"
-              onStartShouldSetResponder={() => true}
-            >
+            <View className="bg-dark-blue rounded-t-3xl">
               {/* Modal Header */}
               <View className="flex-row items-center justify-between px-6 py-4 border-b border-white/10">
                 <Typo size="lg" weight="semibold" className="text-white">

@@ -304,7 +304,7 @@ const SearchScreen = () => {
             {searchQuery.length > 0 && (
               <TouchableOpacity
                 onPress={handleClearSearch}
-                className="w-11.5 h-11.5 items-center justify-center rounded-lg bg-gradient-to-r from-secondary to-primary"
+                className="w-11.5 h-11.5 items-center justify-center rounded-lg bg-linear-to-r from-secondary to-primary"
                 accessibilityRole="button"
                 accessibilityLabel="Clear search"
                 accessibilityHint="Clears the search input and shows all movies"

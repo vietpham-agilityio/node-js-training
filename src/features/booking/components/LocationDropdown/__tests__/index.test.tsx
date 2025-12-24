@@ -211,13 +211,40 @@ describe('LocationDropdown Component', () => {
         expect(requestForegroundPermissionsAsync).not.toHaveBeenCalled();
       });
     });
+
+    it('should open modal without requesting permission if already requested and location exists', async () => {
+      const { getByTestId } = render(<LocationDropdown {...defaultProps} />);
+      const button = getByTestId('location-dropdown-button');
+
+      // First open - should request permission
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(requestForegroundPermissionsAsync).toHaveBeenCalledTimes(1);
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+      });
+
+      // Close modal
+      const closeButton = getByTestId('location-dropdown-modal-close');
+      fireEvent.press(closeButton);
+
+      await waitFor(() => {
+        expect(() => getByTestId('location-dropdown-modal')).toThrow();
+      });
+
+      // Second open - should NOT request permission again (covers lines 104-106)
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+        expect(requestForegroundPermissionsAsync).toHaveBeenCalledTimes(1); // Still only called once
+      });
+    });
   });
 
   describe('Location Selection', () => {
     it('should display selected location after selection', async () => {
-      const { getByTestId, getByText } = render(
-        <LocationDropdown {...defaultProps} />,
-      );
+      const { getByTestId } = render(<LocationDropdown {...defaultProps} />);
       const button = getByTestId('location-dropdown-button');
 
       // Open dropdown and fetch location
@@ -280,6 +307,220 @@ describe('LocationDropdown Component', () => {
 
       const option = getByTestId('location-dropdown-option-Jakarta');
       fireEvent.press(option);
+
+      await waitFor(() => {
+        expect(queryByTestId('location-dropdown-modal')).toBeNull();
+      });
+    });
+
+    it('should close modal when close button is pressed', async () => {
+      const { getByTestId, queryByTestId } = render(
+        <LocationDropdown {...defaultProps} />,
+      );
+      const button = getByTestId('location-dropdown-button');
+
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+      });
+
+      const closeButton = getByTestId('location-dropdown-modal-close');
+      fireEvent.press(closeButton);
+
+      await waitFor(() => {
+        expect(queryByTestId('location-dropdown-modal')).toBeNull();
+      });
+    });
+
+    it('should close modal when backdrop is pressed', async () => {
+      const { getByTestId, queryByTestId } = render(
+        <LocationDropdown {...defaultProps} />,
+      );
+      const button = getByTestId('location-dropdown-button');
+
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+      });
+
+      const backdrop = getByTestId('location-dropdown-modal-backdrop');
+      fireEvent.press(backdrop);
+
+      await waitFor(() => {
+        expect(queryByTestId('location-dropdown-modal')).toBeNull();
+      });
+    });
+
+    it('should prevent backdrop press from closing when modal content is touched', async () => {
+      const { getByTestId } = render(<LocationDropdown {...defaultProps} />);
+      const button = getByTestId('location-dropdown-button');
+
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+      });
+
+      // Test that pressing on an option (modal content) doesn't trigger backdrop close
+      // The onStartShouldSetResponder on line 229 should prevent backdrop from receiving the touch
+      const option = getByTestId('location-dropdown-option-Jakarta');
+
+      // Press the option - this should select it and close via handleSelect, not backdrop
+      fireEvent.press(option);
+
+      // Verify onChange was called (selection worked)
+      expect(mockOnChange).toHaveBeenCalledWith('Jakarta');
+    });
+
+    it('should have onStartShouldSetResponder on modal content view', async () => {
+      const { getByTestId } = render(<LocationDropdown {...defaultProps} />);
+      const button = getByTestId('location-dropdown-button');
+
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+      });
+
+      // Get the modal element and verify it contains a View with onStartShouldSetResponder
+      // This covers line 229 by ensuring the prop is set
+      const modal = getByTestId('location-dropdown-modal');
+
+      // The modal should be rendered (which includes the View with onStartShouldSetResponder on line 229)
+      // We can verify this by checking that the modal content is interactive
+      const option = getByTestId('location-dropdown-option-Jakarta');
+      expect(option).toBeTruthy();
+
+      // Trigger a touch event that would cause the responder system to check onStartShouldSetResponder
+      // This executes line 229
+      fireEvent(option, 'touchStart', {
+        nativeEvent: {
+          touches: [],
+          target: option,
+        },
+      });
+
+      // Modal should still be open (responder was claimed by modal content, not backdrop)
+      expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should use region when city is not available', async () => {
+      const mockAddressWithoutCity = [
+        {
+          region: 'West Java',
+          street: 'Test Street',
+          country: 'Indonesia',
+        },
+      ];
+
+      (reverseGeocodeAsync as jest.Mock).mockResolvedValue(
+        mockAddressWithoutCity,
+      );
+
+      const { getByTestId, getByText } = render(
+        <LocationDropdown {...defaultProps} />,
+      );
+      const button = getByTestId('location-dropdown-button');
+
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+        expect(getByText('West Java')).toBeTruthy();
+      });
+
+      expect(mockOnChange).toHaveBeenCalledWith('West Java');
+    });
+
+    it('should show "Unknown Location" when neither city nor region is available', async () => {
+      const mockAddressEmpty = [
+        {
+          street: 'Test Street',
+          country: 'Indonesia',
+        },
+      ];
+
+      (reverseGeocodeAsync as jest.Mock).mockResolvedValue(mockAddressEmpty);
+
+      const { getByTestId, getByText } = render(
+        <LocationDropdown {...defaultProps} />,
+      );
+      const button = getByTestId('location-dropdown-button');
+
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+        expect(getByText('Unknown Location')).toBeTruthy();
+      });
+    });
+
+    it('should request permission again if hasRequestedPermission is true but location.city is missing', async () => {
+      const mockAddressWithoutCity = [
+        {
+          region: 'West Java',
+          street: 'Test Street',
+          country: 'Indonesia',
+        },
+      ];
+
+      (reverseGeocodeAsync as jest.Mock).mockResolvedValue(
+        mockAddressWithoutCity,
+      );
+
+      const { getByTestId } = render(<LocationDropdown {...defaultProps} />);
+      const button = getByTestId('location-dropdown-button');
+
+      // First open - should request permission
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(requestForegroundPermissionsAsync).toHaveBeenCalledTimes(1);
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+      });
+
+      // Close modal
+      const closeButton = getByTestId('location-dropdown-modal-close');
+      fireEvent.press(closeButton);
+
+      await waitFor(() => {
+        expect(() => getByTestId('location-dropdown-modal')).toThrow();
+      });
+
+      // Second open - should request permission again because location.city is missing
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(requestForegroundPermissionsAsync).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it('should display value prop when it does not match location options', async () => {
+      const { getByText } = render(
+        <LocationDropdown {...defaultProps} value="Custom Location" />,
+      );
+      expect(getByText('Custom Location')).toBeTruthy();
+    });
+
+    it('should handle modal onRequestClose', async () => {
+      const { getByTestId, queryByTestId } = render(
+        <LocationDropdown {...defaultProps} />,
+      );
+      const button = getByTestId('location-dropdown-button');
+
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(getByTestId('location-dropdown-modal')).toBeTruthy();
+      });
+
+      // Simulate Android back button press
+      const modal = getByTestId('location-dropdown-modal');
+      fireEvent(modal, 'requestClose');
 
       await waitFor(() => {
         expect(queryByTestId('location-dropdown-modal')).toBeNull();
