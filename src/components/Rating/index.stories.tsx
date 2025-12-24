@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { View } from 'react-native';
 
 // Components
 import { Rating } from './';
 
 const meta: Meta<typeof Rating> = {
-  title: 'common/Rating',
+  title: 'Rating',
   component: Rating,
   parameters: {
     notes:
@@ -118,30 +117,4 @@ export const NoSpacing: Story = {
     size: 24,
     spacing: 0,
   },
-};
-
-const AllRatingsComponent = () => {
-  const ratings = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
-
-  return (
-    <View className="h-full p-6 bg-dark-blue gap-4">
-      <View className="text-white text-2xl font-montserrat-bold mb-2">
-        All Rating Values
-      </View>
-      {ratings.map(rating => (
-        <View key={rating} className="flex-row items-center gap-4">
-          <View className="w-12">
-            <View className="text-white text-sm font-montserrat-medium">
-              {rating.toFixed(1)}
-            </View>
-          </View>
-          <Rating rating={rating} size={20} spacing={3} />
-        </View>
-      ))}
-    </View>
-  );
-};
-
-export const AllRatings: Story = {
-  render: () => <AllRatingsComponent />,
 };

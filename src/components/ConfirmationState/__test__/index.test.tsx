@@ -10,7 +10,7 @@ import { TicketCheckedIcon } from '@/icons/TicketCheckedIcon';
 
 describe('ConfirmationState Component', () => {
   const defaultProps = {
-    icon: <TicketCheckedIcon />,
+    icon: TicketCheckedIcon,
     title: 'Test Title',
     description: 'Test Description',
   };
@@ -42,7 +42,7 @@ describe('ConfirmationState Component', () => {
     it('should render with different icon', () => {
       const { toJSON } = render(
         <ConfirmationState
-          icon={<CancelIcon />}
+          icon={CancelIcon}
           title="Error Title"
           description="Error Description"
         />,
@@ -69,7 +69,7 @@ describe('ConfirmationState Component', () => {
     it('should render with short text', () => {
       render(
         <ConfirmationState
-          icon={<TicketCheckedIcon />}
+          icon={TicketCheckedIcon}
           title="Done"
           description="Complete."
         />,

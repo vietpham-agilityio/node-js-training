@@ -10,7 +10,7 @@ import { TicketCheckedIcon } from '@/icons/TicketCheckedIcon';
 import { TicketIcon } from '@/icons/TicketIcon';
 
 const meta: Meta<typeof ConfirmationState> = {
-  title: 'Feature/ConfirmationState',
+  title: 'ConfirmationState',
   component: ConfirmationState,
   decorators: [
     Story => (
@@ -46,7 +46,7 @@ type Story = StoryObj<typeof meta>;
 // Default Story - Success State
 export const Success: Story = {
   args: {
-    icon: <TicketCheckedIcon />,
+    icon: TicketCheckedIcon,
     title: 'Enjoy Your Movie!',
     description:
       'Woo hoo! You have successfully booked your ticket. Enjoy watching your movie!',
@@ -56,7 +56,7 @@ export const Success: Story = {
 // Error State
 export const Error: Story = {
   args: {
-    icon: <CancelIcon width={176} height={176} />,
+    icon: CancelIcon,
     title: 'Booking Failed',
     description:
       'We encountered an issue processing your booking. Please try again or contact support if the problem persists.',
@@ -66,7 +66,7 @@ export const Error: Story = {
 // Info State
 export const Info: Story = {
   args: {
-    icon: <TicketIcon width={176} height={176} />,
+    icon: TicketIcon,
     title: 'Booking Pending',
     description:
       'Your booking is being processed. You will receive a confirmation email shortly.',
@@ -76,7 +76,7 @@ export const Info: Story = {
 // Long Description
 export const LongDescription: Story = {
   args: {
-    icon: <TicketCheckedIcon />,
+    icon: TicketCheckedIcon,
     title: 'Success!',
     description:
       'This is a longer description to test how the component handles multiple lines of text. The description should wrap properly and remain centered within the maximum width constraint.',
@@ -86,7 +86,7 @@ export const LongDescription: Story = {
 // Short Text
 export const ShortText: Story = {
   args: {
-    icon: <TicketCheckedIcon />,
+    icon: TicketCheckedIcon,
     title: 'Done',
     description: 'Complete.',
   },

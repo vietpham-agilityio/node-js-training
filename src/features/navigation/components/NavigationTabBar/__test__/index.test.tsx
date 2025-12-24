@@ -2,7 +2,7 @@ import { TAB_BAR_THEME } from '@/constants';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
-import { NavigationTabBar } from '../';
+import { NavigationTabBar } from '..';
 
 // Mock uniwind
 jest.mock('uniwind', () => ({

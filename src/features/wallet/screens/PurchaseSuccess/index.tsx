@@ -1,14 +1,14 @@
-import { useCallback } from 'react';
 import { useRouter } from 'expo-router';
-import { View, Pressable } from 'react-native';
+import { useCallback } from 'react';
+import { Pressable, View } from 'react-native';
 
 // Constants
 import { MESSAGES, ROUTES } from '@/constants';
 
 // Components
 import { Button } from '@/components/Button';
-import { Typo } from '@/components/Typo';
 import { ConfirmationState } from '@/components/ConfirmationState';
+import { Typo } from '@/components/Typo';
 
 // Icons
 import { CardCheckedIcon } from '@/icons/CardCheckedIcon';
@@ -27,7 +27,7 @@ const PurchaseSuccessScreen = () => {
   return (
     <View className="flex-1 bg-dark-blue items-center justify-center gap-18">
       <ConfirmationState
-        icon={<CardCheckedIcon />}
+        icon={CardCheckedIcon}
         title={MESSAGES.PURCHASE_SUCCESS_TITLE}
         description={MESSAGES.PURCHASE_SUCCESS_DESCRIPTION}
       />

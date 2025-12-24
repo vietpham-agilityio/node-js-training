@@ -88,7 +88,7 @@ export const Empty: Story = {
 export const WithContainerClassName: Story = {
   args: {
     placeholder: 'Search movie',
-    containerClassName: 'max-w-md',
+    containerClassName: 'bg-white p-2',
     testID: 'search-input-container',
     onChangeText: (text: string) => console.log('Search:', text),
   },

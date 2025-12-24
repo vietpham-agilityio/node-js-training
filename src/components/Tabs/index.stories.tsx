@@ -1,6 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { useState } from 'react';
-import { View } from 'react-native';
 
 // Components
 import { Tabs } from './index';
@@ -12,7 +10,7 @@ interface Tab {
 }
 
 const meta: Meta<typeof Tabs> = {
-  title: 'common/Tabs',
+  title: 'Tabs',
   component: Tabs,
   parameters: {
     notes:
@@ -99,19 +97,6 @@ export const ManyTabsScrollable: Story = {
   },
 };
 
-export const LongLabels: Story = {
-  args: {
-    tabs: [
-      { id: '1', label: 'Getting Started' },
-      { id: '2', label: 'Documentation' },
-      { id: '3', label: 'Advanced Features' },
-    ],
-    activeTab: '1',
-    variant: 'secondary',
-    onTabChange: (tabId: string) => console.log('Tab changed to:', tabId),
-  },
-};
-
 export const SingleTab: Story = {
   args: {
     tabs: [{ id: 'only', label: 'Dashboard' }],
@@ -119,189 +104,4 @@ export const SingleTab: Story = {
     variant: 'primary',
     onTabChange: (tabId: string) => console.log('Tab changed to:', tabId),
   },
-};
-
-// Interactive component wrappers
-const InteractivePrimaryComponent = () => {
-  const [activeTab, setActiveTab] = useState('home');
-
-  return (
-    <View className="w-full h-full p-4 bg-dark-blue">
-      <Tabs
-        tabs={defaultTabs}
-        activeTab={activeTab}
-        variant="primary"
-        onTabChange={setActiveTab}
-      />
-    </View>
-  );
-};
-
-const InteractiveSecondaryComponent = () => {
-  const [activeTab, setActiveTab] = useState('movies');
-
-  return (
-    <View className="w-full h-full p-4 bg-dark-blue">
-      <Tabs
-        tabs={manyTabs}
-        activeTab={activeTab}
-        variant="secondary"
-        onTabChange={setActiveTab}
-      />
-    </View>
-  );
-};
-
-const BothVariantsComponent = () => {
-  const [primaryActiveTab, setPrimaryActiveTab] = useState('home');
-  const [secondaryActiveTab, setSecondaryActiveTab] = useState('explore');
-
-  return (
-    <View className="h-full p-4 bg-dark-blue gap-8">
-      <View>
-        <View className="mb-2">
-          <View className="text-white text-sm font-montserrat-semibold">
-            Primary Variant
-          </View>
-        </View>
-        <Tabs
-          tabs={defaultTabs}
-          activeTab={primaryActiveTab}
-          variant="primary"
-          onTabChange={setPrimaryActiveTab}
-        />
-      </View>
-
-      <View>
-        <View className="mb-2">
-          <View className="text-white text-sm font-montserrat-semibold">
-            Secondary Variant
-          </View>
-        </View>
-        <Tabs
-          tabs={defaultTabs}
-          activeTab={secondaryActiveTab}
-          variant="secondary"
-          onTabChange={setSecondaryActiveTab}
-        />
-      </View>
-    </View>
-  );
-};
-
-const DifferentTabCountsComponent = () => {
-  const [tab2Active, setTab2Active] = useState('login');
-  const [tab3Active, setTab3Active] = useState('home');
-  const [tab5Active, setTab5Active] = useState('all');
-
-  const twoTabs: Tab[] = [
-    { id: 'login', label: 'Login' },
-    { id: 'signup', label: 'Sign Up' },
-  ];
-
-  const threeTabs: Tab[] = [
-    { id: 'home', label: 'Home' },
-    { id: 'explore', label: 'Explore' },
-    { id: 'profile', label: 'Profile' },
-  ];
-
-  const fiveTabs: Tab[] = [
-    { id: 'all', label: 'All' },
-    { id: 'movies', label: 'Movies' },
-    { id: 'series', label: 'TV Series' },
-    { id: 'sports', label: 'Sports' },
-    { id: 'news', label: 'News' },
-  ];
-
-  return (
-    <View className="h-full p-4 bg-dark-blue gap-6">
-      <View>
-        <View className="mb-2 text-white text-xs font-montserrat-medium opacity-70">
-          2 Tabs - Primary
-        </View>
-        <Tabs
-          tabs={twoTabs}
-          activeTab={tab2Active}
-          variant="primary"
-          onTabChange={setTab2Active}
-        />
-      </View>
-
-      <View>
-        <View className="mb-2 text-white text-xs font-montserrat-medium opacity-70">
-          3 Tabs - Secondary
-        </View>
-        <Tabs
-          tabs={threeTabs}
-          activeTab={tab3Active}
-          variant="secondary"
-          onTabChange={setTab3Active}
-        />
-      </View>
-
-      <View>
-        <View className="mb-2 text-white text-xs font-montserrat-medium opacity-70">
-          5 Tabs - Primary (Scrollable)
-        </View>
-        <Tabs
-          tabs={fiveTabs}
-          activeTab={tab5Active}
-          variant="primary"
-          onTabChange={setTab5Active}
-        />
-      </View>
-    </View>
-  );
-};
-
-const RealWorldExampleComponent = () => {
-  const [activeTab, setActiveTab] = useState('upcoming');
-
-  const movieTabs: Tab[] = [
-    { id: 'upcoming', label: 'Upcoming' },
-    { id: 'now-playing', label: 'Now Playing' },
-    { id: 'popular', label: 'Popular' },
-    { id: 'top-rated', label: 'Top Rated' },
-  ];
-
-  return (
-    <View className="h-full bg-dark-blue">
-      <View className="p-4">
-        <View className="text-white text-2xl font-montserrat-bold mb-4">
-          Movies
-        </View>
-        <Tabs
-          tabs={movieTabs}
-          activeTab={activeTab}
-          variant="secondary"
-          onTabChange={setActiveTab}
-        />
-      </View>
-      <View className="flex-1 items-center justify-center">
-        <View className="text-white text-base font-montserrat-medium">
-          {movieTabs.find(t => t.id === activeTab)?.label} Content
-        </View>
-      </View>
-    </View>
-  );
-};
-
-export const InteractivePrimary: Story = {
-  render: () => <InteractivePrimaryComponent />,
-};
-
-export const InteractiveSecondary: Story = {
-  render: () => <InteractiveSecondaryComponent />,
-};
-
-export const BothVariants: Story = {
-  render: () => <BothVariantsComponent />,
-};
-
-export const DifferentTabCounts: Story = {
-  render: () => <DifferentTabCountsComponent />,
-};
-
-export const RealWorldExample: Story = {
-  render: () => <RealWorldExampleComponent />,
 };

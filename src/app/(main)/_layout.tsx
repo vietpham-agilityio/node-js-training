@@ -4,7 +4,7 @@ import { Stack } from 'expo-router';
 import { SCREENS } from '@/constants';
 
 // Components
-import { ScreenHeader } from '@/components/ScreenHeader';
+import { ScreenHeader } from '@/features/navigation/components/ScreenHeader';
 
 const MainLayout = () => (
   <Stack
