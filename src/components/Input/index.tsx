@@ -67,7 +67,7 @@ export const Input = memo(
           Animated.timing(animatedValue, {
             toValue: 1,
             duration: 200,
-            useNativeDriver: false,
+            useNativeDriver: true,
           }).start();
           onFocus?.(e);
         },
@@ -87,7 +87,7 @@ export const Input = memo(
             Animated.timing(animatedValue, {
               toValue: 0,
               duration: 200,
-              useNativeDriver: false,
+              useNativeDriver: true,
             }).start();
           }
           onBlur?.(e);
@@ -106,28 +106,21 @@ export const Input = memo(
         Animated.timing(animatedValue, {
           toValue: shouldBeAtTop ? 1 : 0,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }).start();
       }, [value, isFocused, animatedValue]);
 
       // Animated label position and size based on the value
-      const labelTop = useMemo(
-        () =>
-          animatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [16, -10], // animate the label position to 16 when the value is 0 and -10 when the value is 1
-            ...(isAndroid() && { outputRange: [14, -10] }),
-          }),
-        [animatedValue],
-      );
-
-      // Animated label font size based on the value
-      const labelFontSize = useMemo(
-        () =>
-          animatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [14, 14], // keep the font size the same regardless of the value
-          }),
+      const labelTransform = useMemo(
+        () => [
+          {
+            translateY: animatedValue.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, -26],
+              ...(isAndroid() && { outputRange: [0, -24] }),
+            }),
+          },
+        ],
         [animatedValue],
       );
 
@@ -154,20 +147,18 @@ export const Input = memo(
             <Animated.View
               className="bg-dark-blue px-1 z-1 left-4 absolute"
               style={{
-                top: labelTop,
+                top: isAndroid() ? 14 : 16,
+                transform: labelTransform,
               }}
             >
               <Animated.Text
                 accessibilityRole="text"
                 accessibilityLabel={label}
-                className={labelColor}
-                style={{
-                  fontSize: labelFontSize,
-                  fontFamily: 'Montserrat_400Regular',
-                }}
                 onPress={handleLabelPress}
               >
-                {label}
+                <Typo size="sm" weight="regular" className={labelColor}>
+                  {label}
+                </Typo>
               </Animated.Text>
             </Animated.View>
 

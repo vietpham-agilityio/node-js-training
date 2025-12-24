@@ -68,38 +68,43 @@ const TicketDetailScreen = () => {
   // Determine if QR should be shown
   const isActive = ticketDetail?.status === TicketStatus.ACTIVE;
 
-  const orderRows = [
-    {
-      label: 'Cinema',
-      value: ticketDetail?.cinemaName || '',
-      testID: 'cinema-name',
-    },
-    {
-      label: 'Date & Time',
-      value: `${formatDate(ticketDetail?.showDate || '')}, ${formatTime(ticketDetail?.showTime || '')}`,
-      testID: 'order-datetime',
-    },
-    {
-      label: 'Seat Number',
-      value: ticketDetail?.seatNumber || '',
-      testID: 'order-seat',
-    },
-    {
-      label: 'Seats Number',
-      value: ticketDetail?.seatsNumber.join(', ') || '',
-      testID: 'order-seats',
-    },
-    {
-      label: 'Paid',
-      value: ticketDetail?.paid || '',
-      testID: 'paid',
-    },
-    {
-      label: 'Status',
-      value: ticketDetail?.status || '',
-      testID: 'ticket-status',
-    },
-  ];
+  const orderRows = useMemo(
+    () => [
+      {
+        label: 'Cinema',
+        value: ticketDetail?.cinemaName || '',
+        testID: 'cinema-name',
+      },
+      {
+        label: 'Date & Time',
+        value: `${formatDate(ticketDetail?.showDate || '')}, ${formatTime(
+          ticketDetail?.showTime || '',
+        )}`,
+        testID: 'order-datetime',
+      },
+      {
+        label: 'Seat Number',
+        value: ticketDetail?.seatNumber || '',
+        testID: 'order-seat',
+      },
+      {
+        label: 'Seats Number',
+        value: ticketDetail?.seatsNumber.join(', ') || '',
+        testID: 'order-seats',
+      },
+      {
+        label: 'Paid',
+        value: ticketDetail?.paid || '',
+        testID: 'paid',
+      },
+      {
+        label: 'Status',
+        value: ticketDetail?.status || '',
+        testID: 'ticket-status',
+      },
+    ],
+    [ticketDetail],
+  );
 
   const unActiveMessage =
     UNACTIVE_MESSAGE[ticketDetail?.status as TicketStatus] || '';

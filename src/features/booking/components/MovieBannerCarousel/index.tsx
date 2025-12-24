@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { Dimensions, View } from 'react-native';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
@@ -13,12 +13,10 @@ import { ROUTES } from '@/constants';
 import { Movie } from '@/features/booking/types/movie';
 
 // Components
-import { MovieBanner } from '../MovieBanner';
+import { CarouselItem, Variant } from './CarouseItem';
 
 // Utils
 import { isAndroid, isIOS } from '@/utils/platform';
-
-type Variant = 'horizontal' | 'vertical';
 
 interface MovieBannerCarouselProps {
   variant?: Variant;
@@ -61,15 +59,18 @@ export const MovieBannerCarousel = memo(
       return movies.map(m => m.id).join('-');
     }, [movies]);
 
+    const variantLabel = variant === 'horizontal' ? 'horizontal' : 'vertical';
+
+    const handleMoviePress = useCallback(
+      (movieId: string) => {
+        navigate.push(ROUTES.MOVIE_DETAILS(movieId));
+      },
+      [navigate],
+    );
+
     if (movies.length === 0) {
       return null;
     }
-
-    const variantLabel = variant === 'horizontal' ? 'horizontal' : 'vertical';
-
-    const handleMoviePress = (movieId: string) => {
-      navigate.push(ROUTES.MOVIE_DETAILS(movieId));
-    };
 
     return (
       <View
@@ -117,10 +118,10 @@ export const MovieBannerCarousel = memo(
                 accessibilityTraits: ['button'],
               })}
             >
-              <MovieBanner
-                movie={item}
+              <CarouselItem
+                item={item}
                 variant={variant}
-                onPress={() => handleMoviePress(item.id)}
+                handleMoviePress={handleMoviePress}
               />
             </Animated.View>
           )}
