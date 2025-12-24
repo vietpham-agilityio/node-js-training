@@ -91,58 +91,64 @@ export const usePushNotifications = () => {
   /**
    * Schedule ticket expiration notification
    */
-  const scheduleTicketExpiration = async (
-    ticketId: string,
-    movieTitle: string,
-    showDate: string,
-    showTime: string,
-    expirationDate: Date,
-  ) => {
-    try {
-      const notificationId =
-        await pushNotificationService.scheduleTicketExpirationNotification(
-          ticketId,
-          movieTitle,
-          showDate,
-          showTime,
-          expirationDate,
-        );
+  const scheduleTicketExpiration = useCallback(
+    async (
+      ticketId: string,
+      movieTitle: string,
+      showDate: string,
+      showTime: string,
+      expirationDate: Date,
+    ) => {
+      try {
+        const notificationId =
+          await pushNotificationService.scheduleTicketExpirationNotification(
+            ticketId,
+            movieTitle,
+            showDate,
+            showTime,
+            expirationDate,
+          );
 
-      return notificationId;
-    } catch (error) {
-      throw error;
-    }
-  };
+        return notificationId;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [],
+  );
 
   /**
    * Schedule show reminder notification
    */
-  const scheduleShowReminder = async (
-    ticketId: string,
-    movieTitle: string,
-    showDate: string,
-    showTime: string,
-    showDateTime: Date,
-  ) => {
-    try {
-      const notificationId =
-        await pushNotificationService.scheduleShowReminderNotification(
-          ticketId,
-          movieTitle,
-          showDate,
-          showTime,
-          showDateTime,
-        );
-      return notificationId;
-    } catch (error) {
-      throw error;
-    }
-  };
+  const scheduleShowReminder = useCallback(
+    async (
+      ticketId: string,
+      movieTitle: string,
+      showDate: string,
+      showTime: string,
+      showDateTime: Date,
+    ) => {
+      try {
+        const notificationId =
+          await pushNotificationService.scheduleShowReminderNotification(
+            ticketId,
+            movieTitle,
+            showDate,
+            showTime,
+            showDateTime,
+          );
+        return notificationId;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [],
+  );
 
   /**
    * Send test notification
    */
-  const sendTestNotification = async () => {
+  const sendTestNotification = useCallback(async () => {
     try {
       await pushNotificationService.sendLocalNotification(
         'Test Notification 🎬',
@@ -152,7 +158,7 @@ export const usePushNotifications = () => {
     } catch (error) {
       throw error;
     }
-  };
+  }, []);
 
   return {
     expoPushToken,

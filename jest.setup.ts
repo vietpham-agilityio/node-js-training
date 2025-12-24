@@ -61,9 +61,10 @@ jest.mock('expo-image', () => ({
   Image: jest.fn(() => 'Image'),
 }));
 
-// Mock uuid package (ES module)
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => 'mock-uuid-v4'),
+// Mock UUID utility (replaced uuid package)
+jest.mock('@/utils/uuid', () => ({
+  generateUUID: jest.fn(() => Promise.resolve('mock-uuid-async')),
+  generateUUIDSync: jest.fn(() => 'mock-uuid-sync'),
 }));
 
 jest.mock('expo-image-manipulator', () => ({

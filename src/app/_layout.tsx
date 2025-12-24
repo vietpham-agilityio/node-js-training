@@ -142,7 +142,13 @@ const RootLayout = () => {
   return (
     <Fragment>
       <QueryClientProvider client={queryClient}>
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+            animationTypeForReplace: 'push',
+          }}
+        >
           {/* Storybook - Only accessible when enabled */}
           <Stack.Protected guard={StorybookEnabled}>
             <Stack.Screen name={SCREENS.STORYBOOK} />

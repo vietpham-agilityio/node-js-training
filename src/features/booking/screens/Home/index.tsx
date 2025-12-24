@@ -124,6 +124,112 @@ const HomeScreen = () => {
     router.push(ROUTES.SEARCH);
   }, []);
 
+  const ListHeader = useCallback(
+    () => (
+      <View className="pt-3">
+        <View className="gap-2">
+          <View className="px-6 flex-row items-center justify-between">
+            <Typo size="xl" weight="semibold" accessibilityRole="header">
+              Now Playing
+            </Typo>
+            {isFetchingNextNowPlaying && <ActivityIndicator size="small" />}
+          </View>
+
+          {filteredNowPlayingMovies.length > 0 ? (
+            <MovieBannerCarousel movies={filteredNowPlayingMovies} />
+          ) : (
+            <View className="px-6 py-8 gap-2">
+              <Typo className="text-text-secondary text-center">
+                No movies available in this category
+              </Typo>
+              {hasNextNowPlaying && (
+                <Button
+                  size={Size.EXTRA_SMALL}
+                  title="Load more movies"
+                  onPress={() => fetchNextNowPlaying()}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load more movies"
+                />
+              )}
+            </View>
+          )}
+        </View>
+
+        <View className="gap-7">
+          <View className="px-6 flex-row items-center justify-between">
+            <Typo size="xl" weight="semibold" accessibilityRole="header">
+              Coming Soon
+            </Typo>
+            {isFetchingNextComingSoon && <ActivityIndicator size="small" />}
+          </View>
+
+          {filteredComingSoonMovies.length > 0 ? (
+            <MovieBannerCarousel
+              movies={filteredComingSoonMovies}
+              variant="vertical"
+            />
+          ) : (
+            <View className="px-6 py-8 gap-2">
+              <Typo className="text-text-secondary text-center">
+                No upcoming movies in this category
+              </Typo>
+              {hasNextComingSoon && (
+                <Button
+                  size={Size.EXTRA_SMALL}
+                  title="Load more movies"
+                  onPress={() => fetchNextComingSoon()}
+                  accessibilityRole="button"
+                  accessibilityLabel="Load more movies"
+                />
+              )}
+            </View>
+          )}
+        </View>
+      </View>
+    ),
+    [
+      filteredNowPlayingMovies,
+      filteredComingSoonMovies,
+      isFetchingNextNowPlaying,
+      isFetchingNextComingSoon,
+      hasNextNowPlaying,
+      hasNextComingSoon,
+      fetchNextNowPlaying,
+      fetchNextComingSoon,
+    ],
+  );
+
+  const ListFooter = useCallback(
+    () => (
+      <View className="px-6">
+        <View className="gap-4 mt-7 mb-6">
+          <View className="flex-row justify-between items-center">
+            <Typo size="xl" weight="semibold" accessibilityRole="header">
+              Promotions
+            </Typo>
+            <Link href={ROUTES.HOME} asChild>
+              <Typo
+                size="sm"
+                weight="medium"
+                className="text-text-currency"
+                accessibilityRole="link"
+                accessibilityLabel="See all promotions"
+              >
+                View all
+              </Typo>
+            </Link>
+          </View>
+        </View>
+        <View className="gap-4">
+          {MOCK_PROMOTIONS.map(promotion => (
+            <PromotionCard key={promotion.id} {...promotion} />
+          ))}
+        </View>
+      </View>
+    ),
+    [],
+  );
+
   if (isLoading) {
     return (
       <StyledSafeAreaView
@@ -179,95 +285,8 @@ const HomeScreen = () => {
             accessibilityLabel="Pull to refresh movies"
           />
         }
-        ListHeaderComponent={
-          <View className="pt-3">
-            <View className="gap-2">
-              <View className="px-6 flex-row items-center justify-between">
-                <Typo size="xl" weight="semibold" accessibilityRole="header">
-                  Now Playing
-                </Typo>
-                {isFetchingNextNowPlaying && <ActivityIndicator size="small" />}
-              </View>
-
-              {filteredNowPlayingMovies.length > 0 ? (
-                <MovieBannerCarousel movies={filteredNowPlayingMovies} />
-              ) : (
-                <View className="px-6 py-8 gap-2">
-                  <Typo className="text-text-secondary text-center">
-                    No movies available in this category
-                  </Typo>
-                  {hasNextNowPlaying && (
-                    <Button
-                      size={Size.EXTRA_SMALL}
-                      title="Load more movies"
-                      onPress={() => fetchNextNowPlaying()}
-                      accessibilityRole="button"
-                      accessibilityLabel="Load more movies"
-                    />
-                  )}
-                </View>
-              )}
-            </View>
-
-            <View className="gap-7">
-              <View className="px-6 flex-row items-center justify-between">
-                <Typo size="xl" weight="semibold" accessibilityRole="header">
-                  Coming Soon
-                </Typo>
-                {isFetchingNextComingSoon && <ActivityIndicator size="small" />}
-              </View>
-
-              {filteredComingSoonMovies.length > 0 ? (
-                <MovieBannerCarousel
-                  movies={filteredComingSoonMovies}
-                  variant="vertical"
-                />
-              ) : (
-                <View className="px-6 py-8 gap-2">
-                  <Typo className="text-text-secondary text-center">
-                    No upcoming movies in this category
-                  </Typo>
-                  {hasNextComingSoon && (
-                    <Button
-                      size={Size.EXTRA_SMALL}
-                      title="Load more movies"
-                      onPress={() => fetchNextComingSoon()}
-                      accessibilityRole="button"
-                      accessibilityLabel="Load more movies"
-                    />
-                  )}
-                </View>
-              )}
-            </View>
-          </View>
-        }
-        ListFooterComponent={
-          <View className="px-6">
-            <View className="gap-4 mt-7 mb-6">
-              <View className="flex-row justify-between items-center">
-                <Typo size="xl" weight="semibold" accessibilityRole="header">
-                  Promotions
-                </Typo>
-                <Link href={ROUTES.HOME} asChild>
-                  <Typo
-                    size="sm"
-                    weight="medium"
-                    className="text-text-currency"
-                    accessibilityRole="link"
-                    accessibilityLabel="See all promotions"
-                  >
-                    View all
-                  </Typo>
-                </Link>
-              </View>
-            </View>
-            <View className="gap-4">
-              {MOCK_PROMOTIONS.map(promotion => (
-                <PromotionCard key={promotion.id} {...promotion} />
-              ))}
-            </View>
-          </View>
-        }
+        ListHeaderComponent={ListHeader}
+        ListFooterComponent={ListFooter}
       />
     </StyledSafeAreaView>
   );

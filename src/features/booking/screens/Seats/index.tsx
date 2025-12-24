@@ -12,7 +12,7 @@ import { withUniwind } from 'uniwind';
 // Components
 import { Button } from '@/components/Button';
 import { Typo } from '@/components/Typo';
-import { SelectBox } from '@/features/booking/components/SelectBox';
+import { SeatItem } from './SeatItem';
 
 // Constants
 import { ROUTES, Size } from '@/constants';
@@ -76,7 +76,10 @@ const SeatsScreen = () => {
   }, [seats, selectedSeats]);
 
   // Group seats by row
-  const seatsByRow = groupSeatsByRow(seatsWithStatus);
+  const seatsByRow = useMemo(
+    () => groupSeatsByRow(seatsWithStatus),
+    [seatsWithStatus],
+  );
 
   const totalPrice = calculateTotalPrice(
     selectedShowtime?.price || 0,
@@ -103,43 +106,6 @@ const SeatsScreen = () => {
 
     router.push(ROUTES.CHECKOUT as Href);
   }, [selectedSeats.length, selectedShowtime]);
-
-  const renderSeat = useCallback(
-    (seat: Seat) => {
-      const isBooked = seat.status === SeatStatus.BOOKED;
-      const isSelected = seat.status === SeatStatus.SELECTED;
-      const hasAisleSpacing = seat.number === 5;
-
-      const seatLabel = `Seat ${seat.id}`;
-      const seatHint = isBooked
-        ? 'This seat is already booked'
-        : isSelected
-          ? 'Tap to deselect this seat'
-          : 'Tap to select this seat';
-
-      return (
-        <View
-          key={seat.id}
-          className={
-            hasAisleSpacing
-              ? 'w-9 h-9 rounded-base ml-10'
-              : 'w-9 h-9 rounded-base'
-          }
-        >
-          <SelectBox
-            value={seat.id}
-            isPrimary={isSelected}
-            disabled={isBooked}
-            onPress={() => handleSeatPress(seat)}
-            accessibilityLabel={seatLabel}
-            accessibilityHint={seatHint}
-            className="pt-1.5 pb-2.5 rounded-base"
-          />
-        </View>
-      );
-    },
-    [handleSeatPress],
-  );
 
   return (
     <StyledSafeAreaView
@@ -191,7 +157,13 @@ const SeatsScreen = () => {
                   <View key={row} className="flex-row items-center mb-2">
                     {/* Seats */}
                     <View className="flex-row gap-2">
-                      {rowSeats.map(seat => renderSeat(seat))}
+                      {rowSeats.map(seat => (
+                        <SeatItem
+                          key={seat.id}
+                          seat={seat}
+                          onSeatPress={handleSeatPress}
+                        />
+                      ))}
                     </View>
                   </View>
                 ))}

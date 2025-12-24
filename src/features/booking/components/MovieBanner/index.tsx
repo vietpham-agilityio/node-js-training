@@ -86,6 +86,9 @@ export const MovieBanner = memo(
             VARIANTS_MAP[variant].size,
             VARIANTS_MAP[variant].rounded,
           )}
+          cachePolicy="memory-disk"
+          priority="high"
+          recyclingKey={movie.posterUrl}
         />
 
         {/* Movie Information */}

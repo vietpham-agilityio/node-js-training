@@ -4,7 +4,9 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { v4 as uuidv4 } from 'uuid';
+
+// Utils
+import { generateUUIDSync } from '@/utils/uuid';
 
 // Constant
 import { API_CONFIG, PAGINATION, queryKeys } from '@/constants';
@@ -146,9 +148,9 @@ export const useCreateBooking = () => {
           if (!old) return old;
 
           const optimisticBooking = {
-            id: uuidv4(), // temporary ID
+            id: generateUUIDSync(), // temporary ID
             ...newBooking,
-            bookingNumber: uuidv4(),
+            bookingNumber: generateUUIDSync(),
             bookingStatus: BookingStatus.ACTIVE,
             createdAt: new Date().toISOString(),
           };
@@ -176,9 +178,9 @@ export const useCreateBooking = () => {
           if (!old?.pages) return old;
 
           const optimisticBooking = {
-            id: uuidv4(),
+            id: generateUUIDSync(),
             ...newBooking,
-            bookingNumber: uuidv4(),
+            bookingNumber: generateUUIDSync(),
             bookingStatus: BookingStatus.ACTIVE,
             createdAt: new Date().toISOString(),
           };

@@ -105,6 +105,8 @@ export const MovieCard = memo(
             placeholder={{
               blurhash: BLUR_HASH,
             }}
+            cachePolicy="memory-disk"
+            recyclingKey={posterUrl}
           />
         </View>
 

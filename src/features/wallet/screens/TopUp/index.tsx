@@ -1,6 +1,6 @@
 import { Href, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Unwind
@@ -9,16 +9,16 @@ import { withUniwind } from 'uniwind';
 // Components
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import { Typo } from '@/components/Typo';
+import { TopUpAmountButton } from './TopUpAmountButton';
 
 // Constants
 import {
   ERROR_MESSAGES,
   ROUTES,
-  TOP_UP_AMOUNTS,
-  TOP_UP_MIN_AMOUNT,
-  TOP_UP_MAX_AMOUNT,
   Size,
+  TOP_UP_AMOUNTS,
+  TOP_UP_MAX_AMOUNT,
+  TOP_UP_MIN_AMOUNT,
 } from '@/constants';
 
 // Hooks
@@ -134,26 +134,12 @@ const TopUpScreen = () => {
               const isSelected = selectedAmount === topUpAmount;
 
               return (
-                <TouchableOpacity
+                <TopUpAmountButton
                   key={topUpAmount}
-                  activeOpacity={0.8}
-                  onPress={() => handleAmountSelect(topUpAmount)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Select amount ${formatIDR(topUpAmount)}`}
-                  className={cn(
-                    'flex-1 min-w-[45%] py-2.5 px-11 rounded-lg border-none',
-                    isSelected ? 'bg-primary' : 'bg-bg-quaternary',
-                  )}
-                >
-                  <View className="items-center justify-center">
-                    <Typo className="text-center text-gradient-medium">
-                      IDR
-                    </Typo>
-                    <Typo className="text-center">
-                      {formatIDR(topUpAmount, { showCurrency: false })}
-                    </Typo>
-                  </View>
-                </TouchableOpacity>
+                  amount={topUpAmount}
+                  isSelected={isSelected}
+                  onSelect={handleAmountSelect}
+                />
               );
             })}
           </View>
