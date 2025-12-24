@@ -258,8 +258,15 @@ const CinemaScreen = () => {
           className="flex-1 items-center justify-center py-16"
           accessibilityRole="progressbar"
         >
-          <ActivityIndicator size="large" />
-          <Typo size="sm" className="text-text-secondary mt-4">
+          <ActivityIndicator
+            size="large"
+            testID="showtimes-loading-indicator"
+          />
+          <Typo
+            size="sm"
+            className="text-text-secondary mt-4"
+            testID="showtimes-loading-text"
+          >
             Loading showtimes...
           </Typo>
         </View>
@@ -285,8 +292,6 @@ const CinemaScreen = () => {
         </View>
       );
     }
-
-    return null;
   }, [isLoading, cinemasWithShowtimes.length]);
 
   return (

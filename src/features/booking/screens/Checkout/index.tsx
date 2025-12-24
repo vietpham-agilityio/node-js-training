@@ -23,7 +23,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useToastAlert } from '@/hooks/useToast';
 
 // Utils
-import { formatCurrency, formatIDR } from '@/utils/formats';
+import { formatIDR } from '@/utils/formats';
 
 // Store
 import { useAuthStore } from '@/features/auth/store/auth';
@@ -173,8 +173,7 @@ const CheckoutScreen = () => {
             );
           }
         }
-      } catch (error) {
-        console.error('Error scheduling notifications:', error);
+      } catch {
         // Don't block checkout if notification scheduling fails
       }
     },

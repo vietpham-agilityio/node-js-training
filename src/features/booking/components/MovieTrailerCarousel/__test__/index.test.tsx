@@ -19,12 +19,25 @@ jest.mock('react-native-reanimated-carousel', () => {
   ));
 });
 
+jest.mock('@/utils/platform', () => ({
+  isAndroid: jest.fn(() => false),
+  isIOS: jest.fn(() => false),
+}));
+
 describe('MovieTrailerCarousel Component', () => {
   const mockTrailers = [
     'https://example.com/trailer1.mp4',
     'https://example.com/trailer2.mp4',
     'https://example.com/trailer3.mp4',
   ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Reset platform mocks to default (neither Android nor iOS)
+    const platformUtils = require('@/utils/platform');
+    platformUtils.isAndroid.mockReturnValue(false);
+    platformUtils.isIOS.mockReturnValue(false);
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -194,16 +207,100 @@ describe('MovieTrailerCarousel Component', () => {
         expect(slide.props.accessible).toBe(true);
       });
     });
+  });
 
-    it('should have iOS-specific accessibility props on slides', () => {
+  describe('Platform-specific Accessibility', () => {
+    it('should add Android-specific accessibility props to container when on Android', () => {
+      const platformUtils = require('@/utils/platform');
+      platformUtils.isAndroid.mockReturnValue(true);
+      platformUtils.isIOS.mockReturnValue(false);
+
+      const { getByTestId } = render(
+        <MovieTrailerCarousel trailers={mockTrailers} />,
+      );
+
+      const container = getByTestId('movie-trailer-carousel');
+      expect(container.props.accessibilityLiveRegion).toBe('polite');
+    });
+
+    it('should not add Android-specific props to container when not on Android', () => {
+      const platformUtils = require('@/utils/platform');
+      platformUtils.isAndroid.mockReturnValue(false);
+      platformUtils.isIOS.mockReturnValue(false);
+
+      const { getByTestId } = render(
+        <MovieTrailerCarousel trailers={mockTrailers} />,
+      );
+
+      const container = getByTestId('movie-trailer-carousel');
+      expect(container.props.accessibilityLiveRegion).toBeUndefined();
+    });
+
+    it('should add Android-specific accessibility props to slides when on Android', () => {
+      const platformUtils = require('@/utils/platform');
+      platformUtils.isAndroid.mockReturnValue(true);
+      platformUtils.isIOS.mockReturnValue(false);
+
       const { getByTestId } = render(
         <MovieTrailerCarousel trailers={mockTrailers} />,
       );
 
       mockTrailers.forEach((_, index) => {
         const slide = getByTestId(`movie-trailer-slide-item-${index}`);
-        expect(slide.props.accessibilityTraits).toBeDefined();
+        expect(slide.props.accessibilityLiveRegion).toBe('polite');
+        expect(slide.props.accessibilityTraits).toBeUndefined();
       });
+    });
+
+    it('should add iOS-specific accessibility props to slides when on iOS', () => {
+      const platformUtils = require('@/utils/platform');
+      platformUtils.isAndroid.mockReturnValue(false);
+      platformUtils.isIOS.mockReturnValue(true);
+
+      const { getByTestId } = render(
+        <MovieTrailerCarousel trailers={mockTrailers} />,
+      );
+
+      mockTrailers.forEach((_, index) => {
+        const slide = getByTestId(`movie-trailer-slide-item-${index}`);
+        expect(slide.props.accessibilityTraits).toEqual(['button']);
+        expect(slide.props.accessibilityLiveRegion).toBeUndefined();
+      });
+    });
+
+    it('should not add platform-specific props to slides when on neither Android nor iOS', () => {
+      const platformUtils = require('@/utils/platform');
+      platformUtils.isAndroid.mockReturnValue(false);
+      platformUtils.isIOS.mockReturnValue(false);
+
+      const { getByTestId } = render(
+        <MovieTrailerCarousel trailers={mockTrailers} />,
+      );
+
+      mockTrailers.forEach((_, index) => {
+        const slide = getByTestId(`movie-trailer-slide-item-${index}`);
+        expect(slide.props.accessibilityLiveRegion).toBeUndefined();
+        expect(slide.props.accessibilityTraits).toBeUndefined();
+      });
+    });
+
+    it('should prioritize Android props when both Android and iOS return true', () => {
+      const platformUtils = require('@/utils/platform');
+      platformUtils.isAndroid.mockReturnValue(true);
+      platformUtils.isIOS.mockReturnValue(true);
+
+      const { getByTestId } = render(
+        <MovieTrailerCarousel trailers={mockTrailers} />,
+      );
+
+      // Container should have Android props
+      const container = getByTestId('movie-trailer-carousel');
+      expect(container.props.accessibilityLiveRegion).toBe('polite');
+
+      // Slides should have both Android and iOS props (both spread operators apply)
+      const slide = getByTestId('movie-trailer-slide-item-0');
+      expect(slide.props.accessibilityLiveRegion).toBe('polite');
+      expect(slide.props.accessibilityTraits).toEqual(['button']);
     });
   });
 
