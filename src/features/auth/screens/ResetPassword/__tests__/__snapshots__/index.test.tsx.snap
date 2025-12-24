@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot 1`] = `
+<RNCSafeAreaView
+  accessibilityLabel="Reset Password screen"
+  className="flex-1 bg-bg-primary"
+  edges={
+    {
+      "bottom": "additive",
+      "left": "off",
+      "right": "off",
+      "top": "off",
+    }
+  }
+  testID="reset-password-screen"
+>
+  <RCTScrollView
+    contentContainerClassName="flex-1 px-6 pb-16"
+    showsVerticalScrollIndicator={false}
+    testID="reset-password-scroll-view"
+  >
+    <View>
+      <View
+        testID="reset-password-form"
+      />
+    </View>
+  </RCTScrollView>
+</RNCSafeAreaView>
+`;

@@ -34,21 +34,33 @@ const OnboardingScreen = () => {
           accessible
           accessibilityRole="image"
           accessibilityLabel="App logo"
+          testID="on-boarding-app-icon"
         >
           <AppIcon
             color={appIconColorConfig.color as string}
             stopColor={appIconColorConfig.backgroundColor as string}
           />
         </View>
-        <Typo size="2xl" weight="medium" accessibilityRole="header">
+        <Typo
+          size="2xl"
+          weight="medium"
+          accessibilityRole="header"
+          testID="on-boarding-title"
+        >
           New Experience
         </Typo>
-        <Typo size="lg" weight="light" className="max-w-60 text-center mt-4">
+        <Typo
+          size="lg"
+          weight="light"
+          className="max-w-60 text-center mt-4"
+          testID="on-boarding-description"
+        >
           Watch a new movie much easier than any before
         </Typo>
         <View className="w-full px-11 mt-18">
           <Button
             title="Get Started"
+            testID="get-started-button"
             isPrimary={false}
             onPress={handleNavigateToSignin}
             accessible

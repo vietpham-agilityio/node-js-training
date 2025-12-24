@@ -23,16 +23,23 @@ const ResetPasswordScreen = () => {
     return (
       <StyledSafeAreaView edges={['bottom']} className="flex-1 bg-bg-primary">
         <StyledView className="flex-1 items-center px-6">
-          <StyledText className="text-text-primary text-lg text-center mb-4">
+          <StyledText
+            className="text-text-primary text-lg text-center mb-4"
+            testID="reset-password-invalid-link-title"
+          >
             Invalid or expired reset link
           </StyledText>
-          <StyledText className="text-text-secondary text-base text-center mb-6">
+          <StyledText
+            className="text-text-secondary text-base text-center mb-6"
+            testID="reset-password-invalid-link-description"
+          >
             This password reset link is invalid or has expired. Please request a
             new one.
           </StyledText>
           <Button
             title="Request New Link"
             onPress={() => router.replace(ROUTES.FORGOT_PASSWORD)}
+            testID="request-new-link-button"
           />
         </StyledView>
       </StyledSafeAreaView>
@@ -44,10 +51,12 @@ const ResetPasswordScreen = () => {
       edges={['bottom']}
       className="flex-1 bg-bg-primary"
       accessibilityLabel="Reset Password screen"
+      testID="reset-password-screen"
     >
       <StyledScrollView
         contentContainerClassName="flex-1 px-6 pb-16"
         showsVerticalScrollIndicator={false}
+        testID="reset-password-scroll-view"
       >
         <ResetPasswordForm />
       </StyledScrollView>
