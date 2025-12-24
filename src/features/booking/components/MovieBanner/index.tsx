@@ -64,7 +64,7 @@ export const MovieBanner = memo(
       accessibilityLabel={
         accessibilityLabel || `View details for ${movie.title}`
       }
-      accessibilityHint="Double tap to view movie details"
+      accessibilityHint="Tap to view movie details"
       className={cn(
         VARIANTS_MAP[variant].size,
         VARIANTS_MAP[variant].rounded,

@@ -1,5 +1,5 @@
-import { memo } from 'react';
 import { ImageBackground } from 'expo-image';
+import { memo } from 'react';
 import { Dimensions, TouchableOpacity, View } from 'react-native';
 
 // Assets
@@ -48,7 +48,7 @@ export const WalletCard = memo(
         accessibilityRole={onPress ? 'button' : 'text'}
         accessibilityLabel={
           accessibilityLabel ||
-          `Wallet balance ${currency} ${formatCurrency(balance)}, Card holder ${cardName}${onPress ? '. Double tap to top up' : ''}`
+          `Wallet balance ${currency} ${formatCurrency(balance)}, Card holder ${cardName}${onPress ? '. Tap to top up' : ''}`
         }
       >
         <ImageBackground

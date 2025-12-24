@@ -73,6 +73,7 @@ export const Button = memo(
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={title}
+        accessibilityState={{ disabled }}
         {...rest}
       >
         <View className={cn(buttonClassName, className)}>

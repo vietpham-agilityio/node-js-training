@@ -89,7 +89,7 @@ export const MovieCard = memo(
       <TouchableOpacity
         testID="movie-card"
         accessibilityLabel={title}
-        accessibilityHint="Double tap to view movie details"
+        accessibilityHint="Tap to view movie details"
         className={cn('w-full flex-row rounded-xl pr-4 gap-4', className)}
         {...rest}
       >

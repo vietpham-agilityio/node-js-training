@@ -2,6 +2,7 @@
 
 exports[`SelectBox Component Rendering should render matching snapshot 1`] = `
 <View
+  accessibilityHint="Test Value is currently selected"
   accessibilityLabel="Test Value"
   accessibilityRole="button"
   accessibilityState={
@@ -10,7 +11,7 @@ exports[`SelectBox Component Rendering should render matching snapshot 1`] = `
       "checked": undefined,
       "disabled": undefined,
       "expanded": undefined,
-      "selected": undefined,
+      "selected": true,
     }
   }
   accessibilityValue={
