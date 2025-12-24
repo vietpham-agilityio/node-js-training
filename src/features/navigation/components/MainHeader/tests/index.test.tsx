@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react-native';
 
 // Component
-import { MainHeader } from '../';
+import { MainHeader } from '..';
 
 // Type
 import { type BottomTabNavigationProp } from '@react-navigation/bottom-tabs';

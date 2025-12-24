@@ -43,7 +43,7 @@ const CheckoutSuccessScreen = () => {
   return (
     <View className="flex-1 bg-dark-blue items-center justify-center gap-18">
       <ConfirmationState
-        icon={<TicketCheckedIcon />}
+        icon={TicketCheckedIcon}
         title={MESSAGES.CHECKOUT_SUCCESS_TITLE}
         description={MESSAGES.CHECKOUT_SUCCESS_DESCRIPTION}
       />

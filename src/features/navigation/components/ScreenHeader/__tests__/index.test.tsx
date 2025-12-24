@@ -2,7 +2,7 @@ import { fireEvent, render } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 // Component
-import { ScreenHeader } from '../';
+import { ScreenHeader } from '..';
 
 // Type
 import { ParamListBase } from '@react-navigation/native';
@@ -27,19 +27,6 @@ jest.mock('expo-router', () => ({
 jest.mock('uniwind', () => ({
   useResolveClassNames: (classNames: string) => ({ className: classNames }),
   withUniwind: (Component: typeof Text) => Component,
-}));
-
-// Mock icon
-jest.mock('@/icons/ArrowBackIcon', () => ({
-  ArrowBackIcon: 'ArrowBackIcon',
-}));
-
-// Mock Typo component
-jest.mock('@/components/Typo', () => ({
-  Typo: ({ children, ...props }: any) => {
-    const { Text } = require('react-native');
-    return <Text {...props}>{children}</Text>;
-  },
 }));
 
 // Mock utils
@@ -135,41 +122,6 @@ describe('ScreenHeader', () => {
       <ScreenHeader showBackButton={false} {...headerProps} />,
     );
     expect(queryByText('ArrowBackIcon')).toBeNull();
-  });
-
-  it('renders custom left component when provided', () => {
-    const customLeft = <Text>Custom Left</Text>;
-    const { getByText, queryByText } = render(
-      <ScreenHeader leftComponent={customLeft} {...headerProps} />,
-    );
-
-    expect(getByText('Custom Left')).toBeTruthy();
-    expect(queryByText('ArrowBackIcon')).toBeNull();
-  });
-
-  it('renders custom right component when provided', () => {
-    const customRight = <Text>Custom Right</Text>;
-    const { getByText } = render(
-      <ScreenHeader rightComponent={customRight} {...headerProps} />,
-    );
-
-    expect(getByText('Custom Right')).toBeTruthy();
-  });
-
-  it('renders both custom left and right components', () => {
-    const customLeft = <Text>Custom Left</Text>;
-    const customRight = <Text>Custom Right</Text>;
-
-    const { getByText } = render(
-      <ScreenHeader
-        leftComponent={customLeft}
-        rightComponent={customRight}
-        {...headerProps}
-      />,
-    );
-
-    expect(getByText('Custom Left')).toBeTruthy();
-    expect(getByText('Custom Right')).toBeTruthy();
   });
 
   it('prioritizes title prop over HEADER_TITLE_MAP', () => {

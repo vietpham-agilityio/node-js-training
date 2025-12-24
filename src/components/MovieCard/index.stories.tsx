@@ -8,7 +8,7 @@ import { MovieCard } from './';
 import { Size } from '@/constants';
 
 const meta = {
-  title: 'feature/MovieCard',
+  title: 'MovieCard',
   component: MovieCard,
   decorators: [
     Story => (

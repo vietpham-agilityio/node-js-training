@@ -93,6 +93,12 @@ const RootLayout = () => {
   useEffect(() => {
     if (isLoading || !loaded) return;
 
+    if (StorybookEnabled) {
+      // If storybook is enabled, do not perform any redirects
+      SplashScreen.hideAsync();
+      return;
+    }
+
     // Track if this is the first initialization
     if (!hasInitializedRef.current) {
       hasInitializedRef.current = true;

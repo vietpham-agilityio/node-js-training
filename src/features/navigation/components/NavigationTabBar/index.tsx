@@ -12,7 +12,7 @@ import { cn } from '@/utils/cn';
 import { isIOS } from '@/utils/platform';
 
 // Components
-import { Typo } from '../Typo';
+import { Typo } from '@/components/Typo';
 
 type CustomTabBarProps = BottomTabBarProps & {
   disabledRoutes?: string[];

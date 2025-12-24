@@ -6,8 +6,8 @@ import { TouchableOpacity, View } from 'react-native';
 import { router, usePathname } from 'expo-router';
 
 // Components
-import { Avatar } from '../Avatar';
-import { Typo } from '../Typo';
+import { Avatar } from '@/components/Avatar';
+import { Typo } from '@/components/Typo';
 
 // Constants
 import { MAIN_TITLE_MAP, ROUTES } from '@/constants';
