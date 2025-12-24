@@ -46,7 +46,7 @@ export const Transaction = memo(
       <TouchableOpacity
         testID="transaction"
         accessibilityLabel={description}
-        accessibilityHint="Double tap to view transaction details"
+        accessibilityHint="Tap to view transaction details"
         className={cn('w-full flex-row rounded-xl pr-4 gap-4', className)}
         {...rest}
       >

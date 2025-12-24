@@ -207,7 +207,7 @@ export const CustomAccessibility: Story = {
     size: 92,
     variant: 'picker',
     accessibilityLabel: 'Team member avatar',
-    accessibilityHint: 'Double tap to change team member photo',
+    accessibilityHint: 'Tap to change team member photo',
   },
   parameters: {
     docs: {

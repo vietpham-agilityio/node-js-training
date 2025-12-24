@@ -259,7 +259,7 @@ describe('MovieTrailer Component', () => {
       expect(button.props.accessibilityRole).toBe('button');
       expect(button.props.accessibilityLabel).toBe('Play movie trailer');
       expect(button.props.accessibilityHint).toBe(
-        'Double tap to play the trailer video',
+        'Tap to play the trailer video',
       );
     });
 
@@ -303,7 +303,7 @@ describe('MovieTrailer Component', () => {
         const toggleButton = screen.getByTestId('movie-trailer-toggle-button');
         expect(toggleButton.props.accessibilityLabel).toBe('Pause video');
         expect(toggleButton.props.accessibilityHint).toBe(
-          'Double tap to pause the video',
+          'Tap to pause the video',
         );
       });
     });
@@ -320,7 +320,7 @@ describe('MovieTrailer Component', () => {
         const toggleButton = screen.getByTestId('movie-trailer-toggle-button');
         expect(toggleButton.props.accessibilityLabel).toBe('Play video');
         expect(toggleButton.props.accessibilityHint).toBe(
-          'Double tap to play the video',
+          'Tap to play the video',
         );
       });
     });

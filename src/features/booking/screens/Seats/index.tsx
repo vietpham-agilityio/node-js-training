@@ -11,8 +11,8 @@ import { withUniwind } from 'uniwind';
 
 // Components
 import { Button } from '@/components/Button';
-import { SelectBox } from '@/features/booking/components/SelectBox';
 import { Typo } from '@/components/Typo';
+import { SelectBox } from '@/features/booking/components/SelectBox';
 
 // Constants
 import { ROUTES, Size } from '@/constants';
@@ -24,12 +24,12 @@ import { ScreenIcon } from '@/icons/ScreenIcon';
 import { useBookingStore } from '@/features/booking/store/booking';
 
 // Utils
+import { generateSeats } from '@/utils/data';
 import {
   calculateTotalPrice,
   formatIDR,
   groupSeatsByRow,
 } from '@/utils/formats';
-import { generateSeats } from '@/utils/data';
 
 // Types
 import { Seat, SeatStatus } from '@/features/booking/types/cinema';
@@ -110,6 +110,13 @@ const SeatsScreen = () => {
       const isSelected = seat.status === SeatStatus.SELECTED;
       const hasAisleSpacing = seat.number === 5;
 
+      const seatLabel = `Seat ${seat.id}`;
+      const seatHint = isBooked
+        ? 'This seat is already booked'
+        : isSelected
+          ? 'Tap to deselect this seat'
+          : 'Tap to select this seat';
+
       return (
         <View
           key={seat.id}
@@ -124,6 +131,8 @@ const SeatsScreen = () => {
             isPrimary={isSelected}
             disabled={isBooked}
             onPress={() => handleSeatPress(seat)}
+            accessibilityLabel={seatLabel}
+            accessibilityHint={seatHint}
             className="pt-1.5 pb-2.5 rounded-base"
           />
         </View>
@@ -153,7 +162,13 @@ const SeatsScreen = () => {
         <View className="pr-6 mb-6">
           <View className="flex-row items-center justify-center gap-10">
             {STATUS_COLORS.map(({ color, label }) => (
-              <View key={label} className="flex-row items-center gap-2">
+              <View
+                key={label}
+                className="flex-row items-center gap-2"
+                accessible
+                accessibilityLabel={label}
+                accessibilityRole="text"
+              >
                 <View className={`w-5 h-5 rounded ${color}`} />
                 <Typo size="sm">{label}</Typo>
               </View>

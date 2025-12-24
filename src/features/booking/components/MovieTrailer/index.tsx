@@ -93,7 +93,7 @@ export const MovieTrailer = memo(
             onPress={handlePlayer}
             accessibilityRole="button"
             accessibilityLabel="Play movie trailer"
-            accessibilityHint="Double tap to play the trailer video"
+            accessibilityHint="Tap to play the trailer video"
             accessible
             {...(isAndroid() && {
               accessibilityLiveRegion: 'polite',
@@ -171,9 +171,7 @@ export const MovieTrailer = memo(
             accessibilityRole="button"
             accessibilityLabel={isPlaying ? 'Pause video' : 'Play video'}
             accessibilityHint={
-              isPlaying
-                ? 'Double tap to pause the video'
-                : 'Double tap to play the video'
+              isPlaying ? 'Tap to pause the video' : 'Tap to play the video'
             }
             accessibilityState={{ selected: isPlaying }}
             accessible

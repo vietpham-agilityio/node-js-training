@@ -180,7 +180,9 @@ export const LocationDropdown = memo(
             activeOpacity={1}
             accessible
             accessibilityRole="button"
-            accessibilityLabel={`location dropdown${selectedOption ? `, selected: ${selectedOption.label}` : ''}`}
+            accessibilityLabel={`Location selector${selectedOption ? `, currently selected: ${selectedOption.label}` : ', no location selected'}`}
+            accessibilityHint="Tap to open location selection menu"
+            accessibilityState={{ disabled }}
             testID={`${testID}-button`}
             className={cn(
               'w-full h-12 px-4 flex-row items-center justify-between border rounded-base',

@@ -15,8 +15,8 @@ import { useResolveClassNames } from 'uniwind';
 
 // Components
 import { Typo } from '@/components/Typo';
-import { SelectBox } from '@/features/booking/components/SelectBox';
 import { LocationDropdown } from '@/features/booking/components/LocationDropdown';
+import { SelectBox } from '@/features/booking/components/SelectBox';
 
 // Constants
 import { ERROR_MESSAGES, ROUTES } from '@/constants';
@@ -28,8 +28,8 @@ import { useShowtimes } from '@/features/booking/hooks/useShowtimes';
 import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 
 // Utils
+import { formatShowtimes, getDayOfWeekLabels } from '@/utils/dates';
 import { formatTime } from '@/utils/formats';
-import { getDayOfWeekLabels, formatShowtimes } from '@/utils/dates';
 
 // Store
 import { useBookingStore } from '@/features/booking/store/booking';
@@ -163,6 +163,12 @@ const CinemaScreen = () => {
                     value={label}
                     isPrimary={isSelected}
                     onPress={handleSelectDate}
+                    accessibilityLabel={`Select date ${label}`}
+                    accessibilityHint={
+                      isSelected
+                        ? `${label} is currently selected`
+                        : `Select ${label} as the show date`
+                    }
                     className="py-5 px-3 min-w-17.5"
                   />
                 </View>
@@ -201,7 +207,12 @@ const CinemaScreen = () => {
         <SelectBox
           value={formattedTime}
           isPrimary={isSelected}
-          accessibilityLabel={`Select showtime ${formattedTime} at ${cinemaName}`}
+          accessibilityLabel={`Showtime ${formattedTime} at ${cinemaName}`}
+          accessibilityHint={
+            isSelected
+              ? `${formattedTime} is currently selected. Tap to deselect`
+              : `Select showtime ${formattedTime} at ${cinemaName}`
+          }
           className="py-3 px-4.5"
           onPress={() => handleShowtimeSelect(cinemaId, showtime.id)}
         />

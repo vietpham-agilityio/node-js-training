@@ -114,8 +114,8 @@ export const Avatar = memo(
       ? 'Remove profile picture'
       : 'Add profile picture';
     const pickerButtonHint = isImageSelected
-      ? 'Double tap to remove your profile picture'
-      : 'Double tap to select a profile picture from your device';
+      ? 'Tap to remove your profile picture'
+      : 'Tap to select a profile picture from your device';
 
     /**
      * Compress and resize image to reduce file size

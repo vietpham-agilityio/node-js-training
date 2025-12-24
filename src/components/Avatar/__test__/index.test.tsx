@@ -569,9 +569,7 @@ describe('Avatar Component', () => {
     it('should have correct accessibility hint for picker button', () => {
       const { getByHintText } = render(<Avatar variant="picker" />);
       expect(
-        getByHintText(
-          'Double tap to select a profile picture from your device',
-        ),
+        getByHintText('Tap to select a profile picture from your device'),
       ).toBeTruthy();
     });
 

@@ -35,6 +35,16 @@ export const SelectBox = memo(
           : `${baseClasses} bg-dark-navy`;
     }, [disabled, isPrimary]);
 
+    const accessibilityHint = useMemo(() => {
+      if (disabled) {
+        return `${value} is disabled`;
+      }
+      if (isPrimary) {
+        return `${value} is currently selected`;
+      }
+      return `Select ${value}`;
+    }, [disabled, isPrimary, value]);
+
     return (
       <TouchableOpacity
         disabled={disabled}
@@ -43,6 +53,8 @@ export const SelectBox = memo(
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={value}
+        accessibilityHint={accessibilityHint}
+        accessibilityState={{ disabled, selected: isPrimary }}
         {...rest}
       >
         <View className={cn(SelectBoxClassName, className)}>

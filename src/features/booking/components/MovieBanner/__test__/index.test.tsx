@@ -169,9 +169,7 @@ describe('MovieBanner Component', () => {
       const { getByTestId } = render(<MovieBanner movie={mockMovie} />);
       const banner = getByTestId('movie-banner');
 
-      expect(banner.props.accessibilityHint).toBe(
-        'Double tap to view movie details',
-      );
+      expect(banner.props.accessibilityHint).toBe('Tap to view movie details');
     });
   });
 
