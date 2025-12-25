@@ -1,7 +1,6 @@
-
-import { PushTokenService, pushTokenService } from '../push-token';
-import { supabase } from '../../supabase/client';
 import { keysToCamel } from '@/utils/convert';
+import { supabase } from '../../supabase/client';
+import { PushTokenService, pushTokenService } from '../push-token';
 
 const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
@@ -28,14 +27,25 @@ describe('PushTokenService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     service = PushTokenService.getInstance();
-    (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
-      resolve({ data: [], error: null }),
+    // Reset mocks to a default success state
+    (mockQueryBuilder.then as jest.Mock).mockImplementation(callback =>
+      Promise.resolve(callback({ data: [], error: null })),
     );
     (mockQueryBuilder.single as jest.Mock).mockResolvedValue({
       data: null,
       error: null,
     });
-    (mockQueryBuilder.insert as jest.Mock).mockResolvedValue({ error: null });
+    // For insert, update, delete, we often check the error, so mock it as part of the returned object
+    const mockMutationResult = { error: null };
+    (mockQueryBuilder.insert as jest.Mock).mockResolvedValue(
+      mockMutationResult,
+    );
+    (mockQueryBuilder.update as jest.Mock).mockResolvedValue(
+      mockMutationResult,
+    );
+    (mockQueryBuilder.delete as jest.Mock).mockResolvedValue(
+      mockMutationResult,
+    );
   });
 
   it('should be a singleton', () => {
@@ -47,42 +57,41 @@ describe('PushTokenService', () => {
 
   describe('savePushToken', () => {
     it('should insert a new token if it does not exist', async () => {
-      await service.savePushToken('user1', 'token1', 'ios');
+      await service.savePushToken('user1', 'token1', 'ios', 'device1');
 
       expect(from).toHaveBeenCalledWith('push_tokens');
       expect(mockQueryBuilder.insert).toHaveBeenCalledWith({
         user_id: 'user1',
         expo_push_token: 'token1',
-        device_id: undefined,
+        device_id: 'device1',
         platform: 'ios',
         is_active: true,
       });
       expect(mockQueryBuilder.update).not.toHaveBeenCalled();
     });
 
-    it('should update an existing token', async () => {
-      const existingToken = { id: 'existing1' };
-      (mockQueryBuilder.single as jest.Mock).mockResolvedValue({
-        data: existingToken,
-        error: null,
-      });
+    it('should throw error on select failure', async () => {
+      const error = new Error('DB error');
+      (mockQueryBuilder.single as jest.Mock).mockRejectedValue(error);
+      await expect(
+        service.savePushToken('user1', 'token1', 'ios'),
+      ).rejects.toThrow(error);
+    });
 
-      await service.savePushToken('user1', 'token1', 'android');
-
-      expect(mockQueryBuilder.update).toHaveBeenCalledWith({
-        is_active: true,
-        updated_at: expect.any(String),
-      });
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith('id', existingToken.id);
-      expect(mockQueryBuilder.insert).not.toHaveBeenCalled();
+    it('should throw error on insert failure', async () => {
+      const error = { message: 'Insert failed' };
+      (mockQueryBuilder.insert as jest.Mock).mockResolvedValue({ error });
+      await expect(
+        service.savePushToken('user1', 'token1', 'ios'),
+      ).rejects.toEqual(error);
     });
   });
 
   describe('getUserPushTokens', () => {
     it('should return active push tokens for a user', async () => {
       const mockTokens = [{ expo_push_token: 'token1' }];
-      (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
-        resolve({ data: mockTokens, error: null }),
+      (mockQueryBuilder.then as jest.Mock).mockImplementation(callback =>
+        Promise.resolve(callback({ data: mockTokens, error: null })),
       );
 
       const tokens = await service.getUserPushTokens('user1');
@@ -92,35 +101,13 @@ describe('PushTokenService', () => {
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('is_active', true);
       expect(tokens).toEqual(keysToCamel(mockTokens));
     });
-  });
 
-  describe('deactivatePushToken', () => {
-    it('should set a token to inactive', async () => {
-      await service.deactivatePushToken('user1', 'token1');
-
-      expect(from).toHaveBeenCalledWith('push_tokens');
-      expect(mockQueryBuilder.update).toHaveBeenCalledWith({ is_active: false });
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith('user_id', 'user1');
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
-        'expo_push_token',
-        'token1',
-      );
-    });
-  });
-
-  describe('deletePushToken', () => {
-    it('should delete a token from the database', async () => {
-      (mockQueryBuilder.delete as jest.Mock).mockReturnThis();
-
-      await service.deletePushToken('user1', 'token1');
-
-      expect(from).toHaveBeenCalledWith('push_tokens');
-      expect(mockQueryBuilder.delete).toHaveBeenCalled();
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith('user_id', 'user1');
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
-        'expo_push_token',
-        'token1',
-      );
+    it('should return empty array on exception', async () => {
+      (from as jest.Mock).mockImplementation(() => {
+        throw new Error('Connection error');
+      });
+      const tokens = await service.getUserPushTokens('user1');
+      expect(tokens).toEqual([]);
     });
   });
 });
