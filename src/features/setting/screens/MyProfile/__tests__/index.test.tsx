@@ -133,7 +133,7 @@ describe('MyProfileScreen', () => {
       expect(getByText('My Wallet')).toBeTruthy();
       expect(getByText('Change Language')).toBeTruthy();
       expect(getByText('Help Center')).toBeTruthy();
-      expect(getByText('Rate Flutix App')).toBeTruthy();
+      expect(getByText('Rate Movea App')).toBeTruthy();
       expect(getByText('Change Password')).toBeTruthy();
       expect(getByText('Logout')).toBeTruthy();
     });
@@ -278,7 +278,7 @@ describe('MyProfileScreen', () => {
       expect(getByLabelText('My Wallet setting')).toBeTruthy();
       expect(getByLabelText('Change Language setting')).toBeTruthy();
       expect(getByLabelText('Help Center setting')).toBeTruthy();
-      expect(getByLabelText('Rate Flutix App setting')).toBeTruthy();
+      expect(getByLabelText('Rate Movea App setting')).toBeTruthy();
       expect(getByLabelText('Change Password setting')).toBeTruthy();
       expect(getByLabelText('Logout setting')).toBeTruthy();
     });
