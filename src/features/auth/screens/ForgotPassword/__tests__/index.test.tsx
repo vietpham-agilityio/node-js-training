@@ -34,15 +34,6 @@ jest.mock('@/hooks/useToast', () => ({
   }),
 }));
 
-jest.mock('@/layouts/AccessLayout', () => {
-  const { View } = require('react-native');
-  return {
-    AccessLayout: ({ children, loading }: any) => (
-      <View testID="access-layout">{children}</View>
-    ),
-  };
-});
-
 // Mock Alert
 jest.spyOn(Alert, 'alert');
 

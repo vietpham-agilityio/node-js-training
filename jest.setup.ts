@@ -14,6 +14,9 @@ jest.mock('react-native-reanimated', () => ({
 jest.mock('uniwind', () => ({
   useResolveClassNames: (classNames: string) => ({ className: classNames }),
   withUniwind: (Component: typeof Text) => Component,
+  useUniwind: () => ({
+    theme: 'dark',
+  }),
 }));
 
 // Mock @react-native-async-storage/async-storage
@@ -35,6 +38,16 @@ jest.mock('base64-arraybuffer', () => ({
 // Mock dependencies
 jest.mock('expo', () => ({
   useEvent: jest.fn((player, event, initialState) => initialState),
+}));
+
+const mockBack = jest.fn();
+const mockReplace = jest.fn();
+
+jest.mock('expo-router', () => ({
+  useRouter: () => ({
+    back: mockBack,
+    replace: mockReplace,
+  }),
 }));
 
 jest.mock('expo-video', () => ({

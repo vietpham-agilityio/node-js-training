@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { StatusBar } from 'expo-status-bar';
 
 //
@@ -43,93 +43,6 @@ jest.mock('@/hooks/useToast', () => ({
   }),
 }));
 
-jest.mock('@/layouts/AccessLayout', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    AccessLayout: ({ children, loading }: any) =>
-      React.createElement(
-        View,
-        {
-          testID: 'access-layout',
-          'data-loading': loading,
-        },
-        children,
-      ),
-  };
-});
-
-jest.mock('@/features/auth/components/SignInForm', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    SignInForm: ({ isPending, onSubmit, onForgotPassword }: any) =>
-      React.createElement(
-        View,
-        { testID: 'signin-form', 'data-pending': isPending },
-        [
-          React.createElement(View, {
-            key: 'submit',
-            testID: 'submit-trigger',
-            onPress: () =>
-              onSubmit({
-                email: 'test@example.com',
-                password: 'password123',
-              }),
-          }),
-          React.createElement(View, {
-            key: 'forgot',
-            testID: 'forgot-password-trigger',
-            onPress: onForgotPassword,
-          }),
-        ],
-      ),
-  };
-});
-
-jest.mock('@/features/auth/components/ThirdPartyButton', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    ThirdPartyButton: ({ type, onPress, isPending }: any) =>
-      React.createElement(View, {
-        testID: `third-party-button-${type}`,
-        onPress,
-        'data-pending': isPending,
-      }),
-    ThirdPartyButtonType: {
-      GOOGLE: 'GOOGLE',
-      FACEBOOK: 'FACEBOOK',
-    },
-  };
-});
-
-jest.mock('@/icons/AppIcon', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    AppIcon: () => React.createElement(View, { testID: 'app-icon' }),
-  };
-});
-
-jest.mock('uniwind', () => ({
-  useResolveClassNames: () => ({
-    color: 'white',
-    backgroundColor: 'secondary',
-  }),
-  useUniwind: () => ({
-    theme: 'dark',
-  }),
-}));
-
 describe('LoginScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -169,8 +82,8 @@ describe('LoginScreen', () => {
 
     it('should render third-party sign-in buttons', () => {
       const { getByTestId } = render(<LoginScreen />);
-      expect(getByTestId('third-party-button-GOOGLE')).toBeTruthy();
-      expect(getByTestId('third-party-button-FACEBOOK')).toBeTruthy();
+      expect(getByTestId('signin-google-button')).toBeTruthy();
+      expect(getByTestId('signin-facebook-button')).toBeTruthy();
     });
 
     it('should render StatusBar', () => {
@@ -181,28 +94,47 @@ describe('LoginScreen', () => {
   });
 
   describe('Form Submission', () => {
-    it('should call signIn mutation when form is submitted', () => {
-      const { getByTestId } = render(<LoginScreen />);
-      const submitTrigger = getByTestId('submit-trigger');
+    const fillFormAndSubmit = async (
+      getByTestId: ReturnType<typeof render>['getByTestId'],
+    ) => {
+      const emailInput = getByTestId('signin-email-input');
+      const passwordInput = getByTestId('signin-password-input');
+      const submitButton = getByTestId('signin-submit-button');
 
-      fireEvent.press(submitTrigger);
+      // Fill in valid form data
+      fireEvent.changeText(emailInput, 'test@example.com');
+      fireEvent(emailInput, 'blur');
+      fireEvent.changeText(passwordInput, 'Password123!');
+      fireEvent(passwordInput, 'blur');
+
+      // Wait for form state to update, then press submit
+      await waitFor(() => {
+        fireEvent.press(submitButton);
+      });
+
+      // Wait for form validation and submission
+      await waitFor(() => {
+        expect(mockSignIn).toHaveBeenCalled();
+      });
+    };
+
+    it('should call signIn mutation when form is submitted', async () => {
+      const { getByTestId } = render(<LoginScreen />);
+
+      await fillFormAndSubmit(getByTestId);
 
       expect(mockSignIn).toHaveBeenCalledWith(
-        {
-          email: 'test@example.com',
-          password: 'password123',
-        },
+        { email: 'test@example.com', password: 'Password123!' },
         expect.objectContaining({
           onError: expect.any(Function),
         }),
       );
     });
 
-    it('should show error toast when signIn fails', () => {
+    it('should show error toast when signIn fails', async () => {
       const { getByTestId } = render(<LoginScreen />);
-      const submitTrigger = getByTestId('submit-trigger');
 
-      fireEvent.press(submitTrigger);
+      await fillFormAndSubmit(getByTestId);
 
       // Get the onError callback
       const signInCall = mockSignIn.mock.calls[0];
@@ -222,11 +154,10 @@ describe('LoginScreen', () => {
       );
     });
 
-    it('should show default error message when error has no message', () => {
+    it('should show default error message when error has no message', async () => {
       const { getByTestId } = render(<LoginScreen />);
-      const submitTrigger = getByTestId('submit-trigger');
 
-      fireEvent.press(submitTrigger);
+      await fillFormAndSubmit(getByTestId);
 
       const signInCall = mockSignIn.mock.calls[0];
       const onErrorCallback = signInCall[1].onError;
@@ -248,7 +179,7 @@ describe('LoginScreen', () => {
   describe('Third-Party Sign In', () => {
     it('should call signInWithGoogle when Google button is pressed', () => {
       const { getByTestId } = render(<LoginScreen />);
-      const googleButton = getByTestId('third-party-button-GOOGLE');
+      const googleButton = getByTestId('signin-google-button');
 
       fireEvent.press(googleButton);
 
@@ -262,7 +193,7 @@ describe('LoginScreen', () => {
 
     it('should show error toast when Google sign in fails', () => {
       const { getByTestId } = render(<LoginScreen />);
-      const googleButton = getByTestId('third-party-button-GOOGLE');
+      const googleButton = getByTestId('signin-google-button');
 
       fireEvent.press(googleButton);
 
@@ -284,7 +215,7 @@ describe('LoginScreen', () => {
 
     it('should call signInWithFacebook when Facebook button is pressed', () => {
       const { getByTestId } = render(<LoginScreen />);
-      const facebookButton = getByTestId('third-party-button-FACEBOOK');
+      const facebookButton = getByTestId('signin-facebook-button');
 
       fireEvent.press(facebookButton);
 
@@ -298,7 +229,7 @@ describe('LoginScreen', () => {
 
     it('should show error toast when Facebook sign in fails', () => {
       const { getByTestId } = render(<LoginScreen />);
-      const facebookButton = getByTestId('third-party-button-FACEBOOK');
+      const facebookButton = getByTestId('signin-facebook-button');
 
       fireEvent.press(facebookButton);
 

@@ -16,17 +16,6 @@ jest.mock('expo-router', () => ({
   },
 }));
 
-jest.mock('@/features/auth/components/ResetPasswordForm', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    ResetPasswordForm: () =>
-      React.createElement(View, { testID: 'reset-password-form' }),
-  };
-});
-
 describe('ResetPasswordScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();

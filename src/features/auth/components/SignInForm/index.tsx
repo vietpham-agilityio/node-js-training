@@ -47,7 +47,7 @@ export const SignInForm = memo(
     };
 
     return (
-      <View className="w-full">
+      <View className="w-full" testID="signin-form">
         {/* Email Address Input */}
         <View className={errors.email ? 'gap-4' : 'gap-9'}>
           <Controller
