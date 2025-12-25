@@ -86,7 +86,7 @@ export const KeyboardLayout = memo(
       >
         <StyledKeyboardAvoidingView
           className="flex-1"
-          behavior={isIOS() ? 'padding' : 'height'}
+          behavior="padding"
           keyboardVerticalOffset={keyboardVerticalOffset}
         >
           <TouchableWithoutFeedback onPress={handleKeyboardDismiss}>
