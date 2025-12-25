@@ -112,7 +112,6 @@ export class AuthService {
     try {
       const redirectUrl = makeRedirectUri({
         scheme: 'movieticketbooking',
-        path: 'auth/callback',
       });
 
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -175,7 +174,6 @@ export class AuthService {
     try {
       const redirectUrl = makeRedirectUri({
         scheme: 'movieticketbooking',
-        path: 'auth/callback',
       });
 
       const { data, error } = await supabase.auth.signInWithOAuth({
