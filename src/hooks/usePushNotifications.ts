@@ -57,7 +57,7 @@ export const usePushNotifications = () => {
           await pushTokenService.savePushToken(user.id, token, platform);
         }
       } catch (error) {
-        console.error('❌ Error registering push notifications:', error);
+        throw error;
       }
     };
 
