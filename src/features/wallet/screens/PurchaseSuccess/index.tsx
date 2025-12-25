@@ -34,6 +34,7 @@ const PurchaseSuccessScreen = () => {
       <View className="w-full px-11 gap-4">
         <Button
           title="My Wallet"
+          testID="my-wallet"
           isPrimary
           onPress={handleNavigateToMyWallet}
           accessible

@@ -18,7 +18,7 @@ export const ConfirmationState = memo(
     const Icon = icon;
 
     return (
-      <View className="items-center justify-center">
+      <View className="items-center justify-center" testID="confirmation-state">
         <View
           className="mb-18"
           accessible

@@ -169,6 +169,7 @@ const SearchScreen = () => {
 
     return (
       <View
+        testID="footer-loading"
         className="py-4 items-center"
         accessibilityRole="progressbar"
         accessibilityLabel="Loading more movies"
@@ -185,6 +186,7 @@ const SearchScreen = () => {
     if (isLoading) {
       return (
         <View
+          testID="empty-loading"
           className="flex-1 items-center justify-center py-16"
           accessibilityRole="progressbar"
         >
@@ -199,6 +201,7 @@ const SearchScreen = () => {
     if (isError) {
       return (
         <View
+          testID="empty-error"
           className="flex-1 items-center justify-center py-16 px-6 gap-3"
           accessibilityRole="alert"
         >
@@ -227,29 +230,10 @@ const SearchScreen = () => {
       );
     }
 
-    if (isSearchActive) {
-      return (
-        <View
-          className="flex-1 items-center justify-center py-16 px-6"
-          accessibilityRole="text"
-        >
-          <Typo
-            size="lg"
-            className="text-text-secondary text-center"
-            weight="semibold"
-          >
-            Search for movies
-          </Typo>
-          <Typo size="sm" className="text-center mt-2">
-            Enter characters to start searching
-          </Typo>
-        </View>
-      );
-    }
-
     if (isSearchActive && displayedMovies.length === 0) {
       return (
         <View
+          testID="empty-no-results"
           className="flex-1 items-center justify-center py-16 px-6"
           accessibilityRole="text"
         >
@@ -291,6 +275,7 @@ const SearchScreen = () => {
           <View className="flex-row items-center gap-2">
             <View className="flex-1">
               <SearchInput
+                testID="search-input"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 placeholder="Search movies..."
@@ -303,13 +288,14 @@ const SearchScreen = () => {
 
             {searchQuery.length > 0 && (
               <TouchableOpacity
+                testID="clear-search-button"
                 onPress={handleClearSearch}
                 className="w-11.5 h-11.5 items-center justify-center rounded-lg bg-linear-to-r from-secondary to-primary"
                 accessibilityRole="button"
                 accessibilityLabel="Clear search"
                 accessibilityHint="Clears the search input and shows all movies"
               >
-                <CancelIcon />
+                <CancelIcon testID="cancel-icon" />
               </TouchableOpacity>
             )}
           </View>

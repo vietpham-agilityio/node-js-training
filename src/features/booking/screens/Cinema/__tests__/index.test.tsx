@@ -64,10 +64,6 @@ jest.mock('@/stores/toast', () => ({
   useToastStore: (selector: any) => mockUseToastStore(selector),
 }));
 
-jest.mock('uniwind', () => ({
-  useResolveClassNames: () => ({ color: '#FFFFFF' }),
-}));
-
 // Mock utils
 jest.mock('@/utils/dates', () => ({
   getDayOfWeekLabels: () => [
@@ -92,50 +88,6 @@ jest.mock('@/utils/dates', () => ({
 jest.mock('@/utils/formats', () => ({
   formatTime: (time: string) => time,
 }));
-
-// Mock components
-jest.mock('@/components/Typo', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Text } = require('react-native');
-  return {
-    Typo: ({ children, size, weight, className, testID }: any) =>
-      React.createElement(
-        Text,
-        { testID, className, 'data-size': size, 'data-weight': weight },
-        children,
-      ),
-  };
-});
-
-jest.mock('@/features/booking/components/SelectBox', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { TouchableOpacity, Text } = require('react-native');
-  return {
-    SelectBox: ({
-      value,
-      isPrimary,
-      onPress,
-      className,
-      accessibilityLabel,
-      testID,
-    }: any) =>
-      React.createElement(
-        TouchableOpacity,
-        {
-          onPress,
-          testID: testID || `selectbox-${value}`,
-          className,
-          accessibilityLabel,
-          'data-primary': isPrimary,
-        },
-        React.createElement(Text, null, value),
-      ),
-  };
-});
 
 jest.mock('@/features/booking/components/LocationDropdown', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -162,67 +114,6 @@ jest.mock('@/features/booking/components/LocationDropdown', () => {
       ),
   };
 });
-
-jest.mock('@/icons/ArrowRightIcon', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    ArrowRightIcon: ({ color, testID }: any) =>
-      React.createElement(View, {
-        testID: testID || 'arrow-right-icon',
-        'data-color': color,
-      }),
-  };
-});
-
-// Mock FlashList
-jest.mock('@shopify/flash-list', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { FlatList, View } = require('react-native');
-  return {
-    FlashList: ({
-      data,
-      renderItem,
-      keyExtractor,
-      ListHeaderComponent,
-      ListEmptyComponent,
-      ItemSeparatorComponent,
-      testID,
-    }: any) => {
-      const items = data || [];
-      return React.createElement(
-        View,
-        { testID: testID || 'flash-list' },
-        ListHeaderComponent && React.createElement(ListHeaderComponent),
-        items.length === 0 &&
-          ListEmptyComponent &&
-          React.createElement(ListEmptyComponent),
-        items.length > 0 &&
-          React.createElement(FlatList, {
-            data: items,
-            renderItem,
-            keyExtractor,
-            ItemSeparatorComponent,
-            testID: 'flash-list-items',
-          }),
-      );
-    },
-  };
-});
-
-// Mock constants
-jest.mock('@/constants', () => ({
-  ERROR_MESSAGES: {
-    SOMETHING_WENT_WRONG: 'Something went wrong',
-  },
-  ROUTES: {
-    SEATS: '/seats',
-  },
-}));
 
 const createWrapper = () => {
   const queryClient = new QueryClient({

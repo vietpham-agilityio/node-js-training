@@ -35,6 +35,7 @@ export const SeatItem = memo(({ seat, onSeatPress }: SeatItemProps) => {
       }
     >
       <SelectBox
+        testID={`seat-${seat.id}`}
         value={seat.id}
         isPrimary={isSelected}
         disabled={isBooked}

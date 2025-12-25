@@ -38,6 +38,7 @@ export const WalletCard = memo(
 
     return (
       <TouchableOpacity
+        testID="wallet-card"
         onPress={onPress}
         activeOpacity={0.9}
         className="w-full justify-center items-center rounded-xl overflow-hidden shadow-lg"
@@ -73,6 +74,7 @@ export const WalletCard = memo(
               </Typo>
 
               <Typo
+                testID="wallet-card-name"
                 size="base"
                 weight="semibold"
                 className="text-white"
@@ -85,6 +87,7 @@ export const WalletCard = memo(
 
             {/* Card Number */}
             <Typo
+              testID="wallet-card-number"
               size="lg"
               weight="semibold"
               className="text-white truncate line-clamp-2"
@@ -96,6 +99,7 @@ export const WalletCard = memo(
 
             {/* Balance Section */}
             <Typo
+              testID="wallet-balance"
               size="2xl"
               weight="semibold"
               className="text-white truncate line-clamp-1"

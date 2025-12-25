@@ -49,11 +49,6 @@ describe('LoginScreen', () => {
   });
 
   describe('Rendering', () => {
-    it('should render without crashing', () => {
-      const { getByText } = render(<LoginScreen />);
-      expect(getByText('Welcome Back,')).toBeTruthy();
-    });
-
     it('should render welcome message', () => {
       const { getByText } = render(<LoginScreen />);
       expect(getByText('Welcome Back,')).toBeTruthy();

@@ -286,7 +286,7 @@ const MyWalletScreen = () => {
       <View className="absolute bottom-6 right-6">
         <TouchableOpacity
           onPress={handleTopUp}
-          className="w-fit justify-center items-center p-2.5 rounded-full bg-gradient-to-r from-gradient-blue-start to-gradient-blue-end"
+          className="w-fit justify-center items-center p-2.5 rounded-full bg-linear-to-r from-gradient-blue-start to-gradient-blue-end"
           accessibilityRole="button"
           accessibilityLabel="Top up wallet"
           accessibilityHint="Navigate to top up wallet screen"

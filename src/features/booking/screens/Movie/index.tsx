@@ -281,6 +281,9 @@ const MovieScreen = () => {
         </View>
       </>
       <FlashList
+        testID="vertical-flash-list"
+        accessibilityLabel="Movie content list"
+        accessibilityHint="Movie content list"
         data={contentItems}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
@@ -290,6 +293,7 @@ const MovieScreen = () => {
         }}
         refreshControl={
           <RefreshControl
+            testID="refresh-control"
             refreshing={isLoading}
             onRefresh={refetchMovie}
             accessibilityLabel="Pull to refresh movie"
@@ -309,6 +313,7 @@ const MovieScreen = () => {
         <Button
           onPress={handleNavigateToSelectCinema}
           title="Booking Movie"
+          testID="booking-button"
           accessibilityLabel="Booking Movie"
           accessibilityHint="Navigate to select cinema screen"
         />
