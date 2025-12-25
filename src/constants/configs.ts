@@ -94,7 +94,7 @@ export const SETTING_ITEMS = [
     TEST_ID: 'help_center',
   },
   {
-    TITLE: 'Rate Flutix App',
+    TITLE: 'Rate Movea App',
     ICON: LikeIcon,
     TEST_ID: 'rate_app',
   },
