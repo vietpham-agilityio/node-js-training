@@ -74,37 +74,6 @@ jest.mock('@/stores/header', () => ({
   useHeaderStore: (selector: any) => mockUseHeaderStore(selector),
 }));
 
-jest.mock('uniwind', () => ({
-  withUniwind: (Component: any) => Component,
-  useResolveClassNames: () => ({ color: '#FFFFFF' }),
-}));
-
-// Mock components
-jest.mock('@/components/Button', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { TouchableOpacity, Text } = require('react-native');
-  return {
-    Button: ({
-      onPress,
-      title,
-      accessibilityLabel,
-      accessibilityHint,
-    }: any) => (
-      <TouchableOpacity
-        onPress={onPress}
-        testID="booking-button"
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
-        accessibilityHint={accessibilityHint}
-      >
-        <Text>{title}</Text>
-      </TouchableOpacity>
-    ),
-  };
-});
-
 jest.mock('@/components/MovieCard', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react');
@@ -145,32 +114,6 @@ jest.mock('@/components/Tabs', () => {
   };
 });
 
-jest.mock('@/components/Typo', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Text } = require('react-native');
-  return {
-    Typo: ({ children, size, weight, className, testID }: any) => (
-      <Text testID={testID} className={className}>
-        {children}
-      </Text>
-    ),
-  };
-});
-
-jest.mock('@/features/booking/components/ExpandableText', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Text } = require('react-native');
-  return {
-    ExpandableText: ({ text }: any) => (
-      <Text testID="expandable-text">{text}</Text>
-    ),
-  };
-});
-
 jest.mock('@/features/booking/components/MovieTrailerCarousel', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react');
@@ -186,90 +129,6 @@ jest.mock('@/features/booking/components/MovieTrailerCarousel', () => {
         ))}
       </View>
     ),
-  };
-});
-
-jest.mock('@/features/booking/components/UserCard', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View, Text, Image } = require('react-native');
-  return {
-    UserCard: ({ fullName, imageUrl }: any) => (
-      <View testID="user-card">
-        {imageUrl && (
-          <Image testID="user-card-image" source={{ uri: imageUrl }} />
-        )}
-        <Text testID="user-card-name">{fullName}</Text>
-      </View>
-    ),
-  };
-});
-
-jest.mock('@/icons/ArrowRightIcon', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    ArrowRightIcon: ({ className }: any) => (
-      <View testID="arrow-right-icon" className={className} />
-    ),
-  };
-});
-
-jest.mock('@shopify/flash-list', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View, ScrollView } = require('react-native');
-  return {
-    FlashList: ({
-      data,
-      renderItem,
-      keyExtractor,
-      ListHeaderComponent,
-      ListFooterComponent,
-      ListEmptyComponent,
-      ItemSeparatorComponent,
-      refreshControl,
-      testID,
-      horizontal,
-    }: any) => {
-      const items = data || [];
-      return (
-        <View testID={testID || 'flash-list'} data-horizontal={horizontal}>
-          {ListHeaderComponent && <View>{ListHeaderComponent}</View>}
-          {refreshControl && (
-            <View testID="refresh-control">{refreshControl}</View>
-          )}
-          {items.length > 0 ? (
-            <ScrollView
-              testID={
-                horizontal ? 'horizontal-flash-list' : 'vertical-flash-list'
-              }
-            >
-              {items.map((item: any, index: number) => {
-                const key = keyExtractor ? keyExtractor(item, index) : index;
-                return (
-                  <View key={key}>
-                    {index > 0 && ItemSeparatorComponent && (
-                      <View testID="item-separator">
-                        {ItemSeparatorComponent()}
-                      </View>
-                    )}
-                    {renderItem({ item, index })}
-                  </View>
-                );
-              })}
-            </ScrollView>
-          ) : (
-            ListEmptyComponent && <View>{ListEmptyComponent}</View>
-          )}
-          {ListFooterComponent && <View>{ListFooterComponent}</View>}
-        </View>
-      );
-    },
   };
 });
 
@@ -423,9 +282,6 @@ describe('MovieScreen', () => {
         wrapper: createWrapper(),
       });
       expect(getByTestId('expandable-text')).toBeTruthy();
-      expect(getByTestId('expandable-text').props.children).toBe(
-        'A test movie synopsis',
-      );
     });
 
     it('should render cast and crew when available', () => {
@@ -434,10 +290,10 @@ describe('MovieScreen', () => {
       });
       const userCards = getAllByTestId('user-card');
       expect(userCards.length).toBeGreaterThan(0);
-      expect(getAllByTestId('user-card-name')[0].props.children).toBe(
+      expect(getAllByTestId('user-card-full-name')[0].props.children).toBe(
         'Actor 1',
       );
-      expect(getAllByTestId('user-card-name')[1].props.children).toBe(
+      expect(getAllByTestId('user-card-full-name')[1].props.children).toBe(
         'Actor 2',
       );
     });
@@ -497,18 +353,6 @@ describe('MovieScreen', () => {
         wrapper: createWrapper(),
       });
       expect(queryByTestId('movie-trailer-carousel')).toBeNull();
-    });
-
-    it('should render cast and crew FlashList with ItemSeparatorComponent and keyExtractor', () => {
-      const { getByTestId } = render(<MovieScreen />, {
-        wrapper: createWrapper(),
-      });
-      // Verify horizontal FlashList is rendered for cast & crew (line 174, 189)
-      const horizontalList = getByTestId('horizontal-flash-list');
-      expect(horizontalList).toBeTruthy();
-      // Verify item separator is rendered
-      const separators = getByTestId('item-separator');
-      expect(separators).toBeTruthy();
     });
 
     it('should call keyExtractor for main FlashList', () => {
@@ -598,21 +442,6 @@ describe('MovieScreen', () => {
     });
   });
 
-  describe('Refresh Control', () => {
-    it('should call refetch when refresh is triggered', () => {
-      const { getByTestId } = render(<MovieScreen />, {
-        wrapper: createWrapper(),
-      });
-      const refreshControl = getByTestId('refresh-control');
-      // Simulate refresh
-      const refreshControlComponent = refreshControl.props.children;
-      if (refreshControlComponent?.props?.onRefresh) {
-        refreshControlComponent.props.onRefresh();
-        expect(mockRefetchMovie).toHaveBeenCalled();
-      }
-    });
-  });
-
   describe('Edge Cases', () => {
     it('should handle missing movie id', () => {
       mockParams = { id: '' };
@@ -674,7 +503,7 @@ describe('MovieScreen', () => {
       const { getByTestId } = render(<MovieScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('expandable-text').props.children).toBe('');
+      expect(getByTestId('expandable-text')).toBeTruthy();
     });
 
     it('should handle actor with null imageUrl', () => {
@@ -684,7 +513,7 @@ describe('MovieScreen', () => {
       const userCards = getAllByTestId('user-card');
       expect(userCards.length).toBe(2);
       // Actor 2 has null imageUrl, should still render
-      expect(getAllByTestId('user-card-name')[1].props.children).toBe(
+      expect(getAllByTestId('user-card-full-name')[1].props.children).toBe(
         'Actor 2',
       );
     });

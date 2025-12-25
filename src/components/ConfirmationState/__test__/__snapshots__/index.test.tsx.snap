@@ -3,6 +3,7 @@
 exports[`ConfirmationState Component Snapshot should match snapshot with default props 1`] = `
 <View
   className="items-center justify-center"
+  testID="confirmation-state"
 >
   <View
     accessibilityLabel="confirmation state icon"

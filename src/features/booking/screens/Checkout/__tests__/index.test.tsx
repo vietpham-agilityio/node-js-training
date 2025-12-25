@@ -109,10 +109,6 @@ jest.mock('@/stores/loading', () => ({
     }),
 }));
 
-jest.mock('uniwind', () => ({
-  withUniwind: (Component: any) => Component,
-}));
-
 // Mock components
 jest.mock('@/components/MovieCard', () => {
   const React = require('react');
@@ -127,41 +123,6 @@ jest.mock('@/components/MovieCard', () => {
         React.createElement(Text, null, `Genre: ${genre}`),
         React.createElement(Text, null, `Duration: ${durationMinutes} min`),
       ),
-  };
-});
-
-jest.mock('@/components/OrderDetailRow', () => {
-  const React = require('react');
-  const { View, Text } = require('react-native');
-  return {
-    OrderDetailRow: ({ label, value, testID, valueClassName }: any) =>
-      React.createElement(
-        View,
-        { testID },
-        React.createElement(Text, null, label),
-        React.createElement(Text, { className: valueClassName }, value),
-      ),
-  };
-});
-
-jest.mock('@/components/Button', () => {
-  const React = require('react');
-  const { TouchableOpacity, Text } = require('react-native');
-  return {
-    Button: ({ title, onPress, disabled, testID }: any) =>
-      React.createElement(
-        TouchableOpacity,
-        { onPress, disabled, testID },
-        React.createElement(Text, null, title),
-      ),
-  };
-});
-
-jest.mock('@/components/Divider', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-  return {
-    Divider: () => React.createElement(View, { testID: 'divider' }),
   };
 });
 

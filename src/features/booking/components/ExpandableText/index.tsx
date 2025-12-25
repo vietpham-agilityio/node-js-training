@@ -59,7 +59,7 @@ export const ExpandableText = memo(
 
     return (
       <View className={cn(containerClassName)} testID={testID}>
-        <Text>
+        <Text testID="expandable-text">
           <Typo size={textSize} weight={textWeight} className={textClassName}>
             {displayedText}
           </Typo>

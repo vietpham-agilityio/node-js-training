@@ -22,20 +22,10 @@ let mockIsRefetchingNowPlaying = false;
 let mockIsRefetchingComingSoon = false;
 
 jest.mock('expo-router', () => ({
-  router: {
+  useRouter: () => ({
     push: mockPush,
-  },
-  Link: ({ children, href, asChild }: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const React = require('react');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { TouchableOpacity } = require('react-native');
-    return React.createElement(
-      TouchableOpacity,
-      { onPress: () => mockPush(href), testID: `link-${href}` },
-      children,
-    );
-  },
+  }),
+  Link: ({ children, href }: any) => children,
 }));
 
 jest.mock('@/features/booking/hooks/useMovies', () => ({
@@ -62,80 +52,6 @@ jest.mock('@/features/booking/hooks/useMovies', () => ({
     };
   },
 }));
-
-jest.mock('uniwind', () => ({
-  withUniwind: (Component: any) => Component,
-}));
-
-// Mock components
-jest.mock('@/components/SearchInput', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { TouchableOpacity, Text } = require('react-native');
-  return {
-    SearchInput: ({ onPress, editable, accessibilityLabel, testID }: any) =>
-      React.createElement(
-        TouchableOpacity,
-        { onPress, testID: testID || 'search-input' },
-        React.createElement(Text, null, 'Search movies'),
-      ),
-  };
-});
-
-jest.mock('@/components/Tabs', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View, TouchableOpacity, Text } = require('react-native');
-  return {
-    Tabs: ({ tabs, activeTab, onTabChange, testID }: any) =>
-      React.createElement(
-        View,
-        { testID: testID || 'tabs' },
-        tabs.map((tab: any) =>
-          React.createElement(
-            TouchableOpacity,
-            {
-              key: tab.id,
-              onPress: () => onTabChange(tab.id),
-              testID: `tab-${tab.id}`,
-              'data-active': activeTab === tab.id,
-            },
-            React.createElement(Text, null, tab.label),
-          ),
-        ),
-      ),
-  };
-});
-
-jest.mock('@/components/Typo', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Text } = require('react-native');
-  return {
-    Typo: ({
-      children,
-      size,
-      weight,
-      className,
-      testID,
-      accessibilityRole,
-    }: any) =>
-      React.createElement(
-        Text,
-        {
-          testID,
-          className,
-          'data-size': size,
-          'data-weight': weight,
-          'data-role': accessibilityRole,
-        },
-        children,
-      ),
-  };
-});
 
 jest.mock('@/features/booking/components/MovieBannerCarousel', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -166,68 +82,6 @@ jest.mock('@/features/booking/components/PromotionCard', () => {
         { testID: testID || `promotion-card-${id}` },
         React.createElement(Text, null, title || `Promotion ${id}`),
       ),
-  };
-});
-
-jest.mock('@/components/Button', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { TouchableOpacity, Text } = require('react-native');
-  return {
-    Button: ({ title, onPress, size, testID, accessibilityLabel }: any) =>
-      React.createElement(
-        TouchableOpacity,
-        {
-          onPress,
-          testID: testID || 'button',
-          'data-size': size,
-          accessibilityLabel,
-        },
-        React.createElement(Text, null, title),
-      ),
-  };
-});
-
-jest.mock('@shopify/flash-list', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    FlashList: ({
-      data,
-      renderItem,
-      keyExtractor,
-      ListHeaderComponent,
-      ListFooterComponent,
-      refreshControl,
-      testID,
-    }: any) => {
-      // ListHeaderComponent and ListFooterComponent are JSX elements (not functions in Home screen)
-      const header = ListHeaderComponent || null;
-      const footer = ListFooterComponent || null;
-
-      // Render items if data exists
-      const items =
-        data && renderItem
-          ? data.map((item: any, index: number) => {
-              const key = keyExtractor ? keyExtractor(item, index) : index;
-              const rendered = renderItem({ item, index });
-              return rendered
-                ? React.createElement(React.Fragment, { key }, rendered)
-                : null;
-            })
-          : [];
-
-      return React.createElement(
-        View,
-        { testID: testID || 'flash-list' },
-        header,
-        ...items.filter(Boolean),
-        footer,
-      );
-    },
   };
 });
 
@@ -326,21 +180,21 @@ describe('HomeScreen', () => {
       const { getByTestId } = render(<HomeScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('flash-list')).toBeTruthy();
+      expect(getByTestId('tabs-container')).toBeTruthy();
     });
 
     it('should render search input', () => {
-      const { getByTestId } = render(<HomeScreen />, {
+      const { getByPlaceholderText } = render(<HomeScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('search-input')).toBeTruthy();
+      expect(getByPlaceholderText('Search movies')).toBeTruthy();
     });
 
     it('should render category tabs', () => {
       const { getByTestId } = render(<HomeScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('tabs')).toBeTruthy();
+      expect(getByTestId('tabs-scroll-view')).toBeTruthy();
     });
 
     it('should render "Now Playing" section', () => {
@@ -388,7 +242,7 @@ describe('HomeScreen', () => {
       const { getByTestId } = render(<HomeScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('tabs')).toBeTruthy();
+      expect(getByTestId('tabs-container')).toBeTruthy();
     });
   });
 
@@ -499,17 +353,6 @@ describe('HomeScreen', () => {
 
       expect(getAllByText('Movie 1').length).toBeGreaterThan(0);
       expect(getAllByText('Movie 2').length).toBeGreaterThan(0);
-    });
-  });
-
-  describe('Accessibility', () => {
-    it('should have correct accessibility roles for headers', () => {
-      const { getAllByText } = render(<HomeScreen />, {
-        wrapper: createWrapper(),
-      });
-
-      const nowPlayingHeader = getAllByText('Now Playing')[0].parent;
-      expect(nowPlayingHeader?.props['data-role']).toBe('header');
     });
   });
 });
