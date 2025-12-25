@@ -17,7 +17,6 @@ import { Typo } from '@/components/Typo';
 
 // Utils
 import { cn } from '@/utils/cn';
-import { isIOS } from '@/utils/platform';
 
 type AccessLayoutProps = {
   loading?: boolean;
@@ -65,9 +64,9 @@ export const AccessLayout = memo(
         accessibilityHint={accessibilityLabel}
       >
         <StyledKeyboardAvoidingView
-          behavior={isIOS() ? 'padding' : 'height'}
+          behavior="padding"
           className="flex-1"
-          keyboardVerticalOffset={isIOS() ? 0 : 20}
+          keyboardVerticalOffset={0}
         >
           <TouchableWithoutFeedback onPress={handleKeyboardDismiss}>
             <StyledScrollView
