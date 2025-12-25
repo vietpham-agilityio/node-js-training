@@ -70,7 +70,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
   );
 
   return (
-    <View className="w-full">
+    <View className="w-full" testID="signup-form">
       <Controller
         control={control}
         name="avatarUrl"

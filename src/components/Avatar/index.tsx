@@ -344,6 +344,7 @@ export const Avatar = memo(
     return (
       <>
         <View
+          testID="avatar-container"
           className={cn('relative', config.container)}
           accessible={variant === 'default'}
           accessibilityLabel={

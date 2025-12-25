@@ -28,7 +28,7 @@ export const AppIcon = ({
   const s = (value: number) => (value as number) * scale;
 
   return (
-    <Svg width={width} height={height} fill="none" {...props}>
+    <Svg width={width} height={height} fill="none" {...props} testID="app-icon">
       <G clipPath="url(#a)">
         <Rect width={width} height={height} fill="url(#b)" rx={s(32)} />
         <Circle

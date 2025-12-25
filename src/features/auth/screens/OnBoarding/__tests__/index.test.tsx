@@ -10,34 +10,6 @@ jest.mock('expo-router', () => ({
   }),
 }));
 
-jest.mock('@/layouts/AccessLayout', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    AccessLayout: ({ children }: any) =>
-      React.createElement(View, { testID: 'access-layout' }, children),
-  };
-});
-
-jest.mock('@/icons/AppIcon', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    AppIcon: () => React.createElement(View, { testID: 'app-icon' }),
-  };
-});
-
-jest.mock('uniwind', () => ({
-  useResolveClassNames: () => ({
-    color: 'white',
-    backgroundColor: 'secondary',
-  }),
-}));
-
 describe('OnboardingScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();

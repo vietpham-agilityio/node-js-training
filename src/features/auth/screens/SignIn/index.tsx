@@ -137,11 +137,13 @@ const LoginScreen = () => {
 
       <View className="flex-row justify-center items-center gap-8 mt-7">
         <ThirdPartyButton
+          testID="signin-google-button"
           type={ThirdPartyButtonType.GOOGLE}
           onPress={handleGoogleSignIn}
           isPending={isLoading}
         />
         <ThirdPartyButton
+          testID="signin-facebook-button"
           type={ThirdPartyButtonType.FACEBOOK}
           onPress={handleFacebookSignIn}
           isPending={isLoading}

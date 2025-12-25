@@ -112,7 +112,7 @@ export const ResetPasswordForm = () => {
   );
 
   return (
-    <StyledView className="flex-1 justify-between">
+    <StyledView className="flex-1 justify-between" testID="reset-password-form">
       <StyledView className="w-full">
         <StyledText className="text-text-primary text-2xl font-bold mb-2">
           Reset Password

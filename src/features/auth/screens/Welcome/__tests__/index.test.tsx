@@ -22,26 +22,6 @@ jest.mock('@/features/setting/hooks/useProfile', () => ({
   useProfile: jest.fn(),
 }));
 
-jest.mock('@/layouts/AccessLayout', () => {
-  const { View } = require('react-native');
-  return {
-    AccessLayout: ({ children }: any) => (
-      <View testID="access-layout">{children}</View>
-    ),
-  };
-});
-
-jest.mock('@/components/Avatar', () => {
-  const { View } = require('react-native');
-  return {
-    Avatar: ({ source, accessibilityLabel }: any) => (
-      <View testID="avatar" accessibilityLabel={accessibilityLabel}>
-        {source}
-      </View>
-    ),
-  };
-});
-
 describe('WelcomeScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -86,7 +66,7 @@ describe('WelcomeScreen', () => {
 
     it('should render avatar', () => {
       const { getByTestId } = render(<WelcomeScreen />);
-      expect(getByTestId('avatar')).toBeTruthy();
+      expect(getByTestId('avatar-container')).toBeTruthy();
     });
 
     it('should render "Explore Movies" button', () => {
