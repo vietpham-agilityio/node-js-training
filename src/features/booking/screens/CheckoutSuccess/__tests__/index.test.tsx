@@ -2,6 +2,9 @@ import { fireEvent, render } from '@testing-library/react-native';
 
 import CheckoutSuccessScreen from '../index';
 
+// Constants
+import { MESSAGES } from '@/constants';
+
 // Mock dependencies
 const mockReplace = jest.fn();
 const mockRemoveSeat = jest.fn();
@@ -23,97 +26,6 @@ const mockUseBookingStore = jest.fn((selector: any) =>
 
 jest.mock('@/features/booking/store/booking', () => ({
   useBookingStore: (selector: any) => mockUseBookingStore(selector),
-}));
-
-// Mock components
-jest.mock('@/components/ConfirmationState', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View, Text } = require('react-native');
-  return {
-    ConfirmationState: ({ icon, title, description }: any) =>
-      React.createElement(
-        View,
-        { testID: 'confirmation-state' },
-        React.createElement(Text, { testID: 'confirmation-title' }, title),
-        React.createElement(
-          Text,
-          { testID: 'confirmation-description' },
-          description,
-        ),
-        icon,
-      ),
-  };
-});
-
-jest.mock('@/components/Button', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { TouchableOpacity, Text } = require('react-native');
-  return {
-    Button: ({
-      title,
-      onPress,
-      isPrimary,
-      accessible,
-      accessibilityRole,
-      accessibilityLabel,
-      accessibilityHint,
-      testID,
-    }: any) =>
-      React.createElement(
-        TouchableOpacity,
-        {
-          onPress,
-          accessible,
-          accessibilityRole,
-          accessibilityLabel,
-          accessibilityHint,
-          testID: testID || 'button',
-        },
-        React.createElement(Text, null, title),
-      ),
-  };
-});
-
-jest.mock('@/components/Typo', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { Text } = require('react-native');
-  return {
-    Typo: ({ children, weight, size, className, testID }: any) =>
-      React.createElement(
-        Text,
-        { testID, className, 'data-weight': weight, 'data-size': size },
-        children,
-      ),
-  };
-});
-
-jest.mock('@/icons/TicketCheckedIcon', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require('react-native');
-  return {
-    TicketCheckedIcon: () =>
-      React.createElement(View, { testID: 'ticket-checked-icon' }),
-  };
-});
-
-// Mock constants
-jest.mock('@/constants', () => ({
-  MESSAGES: {
-    CHECKOUT_SUCCESS_TITLE: 'Booking Confirmed!',
-    CHECKOUT_SUCCESS_DESCRIPTION: 'Your tickets have been successfully booked.',
-  },
-  ROUTES: {
-    MY_TICKET: '/my-ticket',
-    HOME: '/home',
-  },
 }));
 
 describe('CheckoutSuccessScreen', () => {
@@ -138,10 +50,8 @@ describe('CheckoutSuccessScreen', () => {
       const { getByTestId, getByText } = render(<CheckoutSuccessScreen />);
 
       expect(getByTestId('confirmation-state')).toBeTruthy();
-      expect(getByText('Booking Confirmed!')).toBeTruthy();
-      expect(
-        getByText('Your tickets have been successfully booked.'),
-      ).toBeTruthy();
+      expect(getByText(MESSAGES.CHECKOUT_SUCCESS_TITLE)).toBeTruthy();
+      expect(getByText(MESSAGES.CHECKOUT_SUCCESS_DESCRIPTION)).toBeTruthy();
     });
 
     it('should render "My Ticket" button', () => {
@@ -163,7 +73,7 @@ describe('CheckoutSuccessScreen', () => {
 
       fireEvent.press(button!);
 
-      expect(mockReplace).toHaveBeenCalledWith('/my-ticket');
+      expect(mockReplace).toHaveBeenCalledWith('/(main)/(tabs)/my-ticket');
     });
 
     it('should navigate to HOME when "Back to home" is pressed', () => {
@@ -172,7 +82,7 @@ describe('CheckoutSuccessScreen', () => {
 
       fireEvent.press(pressable!);
 
-      expect(mockReplace).toHaveBeenCalledWith('/home');
+      expect(mockReplace).toHaveBeenCalledWith('/(main)/(tabs)');
     });
   });
 
@@ -220,7 +130,7 @@ describe('CheckoutSuccessScreen', () => {
       // Should not call removeSeat when seats array is empty
       expect(mockRemoveSeat).not.toHaveBeenCalled();
       // But should still navigate
-      expect(mockReplace).toHaveBeenCalledWith('/my-ticket');
+      expect(mockReplace).toHaveBeenCalledWith('/(main)/(tabs)/my-ticket');
     });
 
     it('should handle single seat', () => {

@@ -181,7 +181,7 @@ const SeatsScreen = () => {
           >
             Screen
           </Typo>
-          <ScreenIcon />
+          <ScreenIcon testID="screen-icon" />
         </View>
       </View>
 

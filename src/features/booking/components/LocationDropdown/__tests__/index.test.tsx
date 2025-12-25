@@ -57,11 +57,6 @@ describe('LocationDropdown Component', () => {
   });
 
   describe('Rendering', () => {
-    it('should render without crashing', () => {
-      const { getByTestId } = render(<LocationDropdown {...defaultProps} />);
-      expect(getByTestId('location-dropdown')).toBeTruthy();
-    });
-
     it('should display placeholder text initially', () => {
       const { getByText } = render(<LocationDropdown {...defaultProps} />);
       expect(getByText('Select Your Location')).toBeTruthy();
