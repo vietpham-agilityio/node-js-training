@@ -257,7 +257,7 @@ describe('CinemaScreen', () => {
       });
     });
 
-    it('should show default error message when error message is missing', () => {
+    it('should show default error message when error message is missing', async () => {
       mockIsError = true;
       mockError = new Error('');
 
@@ -265,8 +265,10 @@ describe('CinemaScreen', () => {
         wrapper: createWrapper(),
       });
 
-      waitFor(() => {
-        expect(mockShowToast).toHaveBeenCalledWith('Something went wrong');
+      await waitFor(() => {
+        expect(mockShowToast).toHaveBeenCalledWith(
+          'Something went wrong. Please try again later.',
+        );
       });
     });
 

@@ -1,0 +1,1207 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
+<View
+  className="flex-1 justify-between"
+>
+  <View
+    className="w-full"
+  >
+    <View
+      className="items-center mt-4 mb-12"
+    >
+      <View
+        accessible={false}
+        className="relative w-23 h-23"
+        testID="avatar-container"
+      >
+        Image
+        <View
+          accessibilityHint="Tap to remove your profile picture"
+          accessibilityLabel="Remove profile picture"
+          accessibilityRole="button"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": false,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+        >
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={24}
+            bbWidth={24}
+            fill="none"
+            focusable={false}
+            height={24}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {
+                  "flex": 0,
+                  "height": 24,
+                  "width": 24,
+                },
+              ]
+            }
+            vbHeight={24}
+            vbWidth={24}
+            width={24}
+          >
+            <RNSVGGroup
+              fill={null}
+              propList={
+                [
+                  "fill",
+                ]
+              }
+            >
+              <RNSVGPath
+                clipRule={0}
+                d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2Zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Zm0-9.41L15.59 7 17 8.41 13.41 12 17 15.59 15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59Z"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                fillRule={0}
+                propList={
+                  [
+                    "fillRule",
+                  ]
+                }
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
+        </View>
+      </View>
+    </View>
+    <View
+      className="mb-9"
+    >
+      <View
+        className="w-full"
+        testID="signup-fullname-input"
+      >
+        <View
+          className="relative"
+        >
+          <View
+            className="bg-dark-blue px-1 z-1 left-4 absolute"
+            collapsable={false}
+            style={
+              {
+                "top": 16,
+                "transform": [
+                  {
+                    "translateY": -26,
+                  },
+                ],
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="Full Name"
+              accessibilityRole="text"
+              collapsable={false}
+              onPress={[Function]}
+            >
+              <Text
+                accessibilityRole="text"
+                className="text-sm font-montserrat-regular text-overlay-soft"
+              >
+                Full Name
+              </Text>
+            </Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Full Name input field"
+            accessibilityRole="text"
+            accessible={true}
+            autoCapitalize="words"
+            autoCorrect={false}
+            className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            onSubmitEditing={[Function]}
+            returnKeyType="next"
+            testID="signup-fullname-input-input"
+            value="John Doe"
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      className="mb-9"
+    >
+      <View
+        className="w-full"
+        testID="signup-email-input"
+      >
+        <View
+          className="relative"
+        >
+          <View
+            className="bg-dark-blue px-1 z-1 left-4 absolute"
+            collapsable={false}
+            style={
+              {
+                "top": 16,
+                "transform": [
+                  {
+                    "translateY": -26,
+                  },
+                ],
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="Email Address"
+              accessibilityRole="text"
+              collapsable={false}
+              onPress={[Function]}
+            >
+              <Text
+                accessibilityRole="text"
+                className="text-sm font-montserrat-regular text-overlay-soft"
+              >
+                Email Address
+              </Text>
+            </Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Email Address input field"
+            accessibilityRole="text"
+            accessible={true}
+            autoCapitalize="none"
+            autoCorrect={false}
+            className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+            keyboardType="email-address"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            onSubmitEditing={[Function]}
+            returnKeyType="next"
+            testID="signup-email-input-input"
+            value="john@example.com"
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      className="mb-9"
+    >
+      <View
+        className="w-full"
+        testID="edit-address-input"
+      >
+        <View
+          className="relative"
+        >
+          <View
+            className="bg-dark-blue px-1 z-1 left-4 absolute"
+            collapsable={false}
+            style={
+              {
+                "top": 16,
+                "transform": [
+                  {
+                    "translateY": -26,
+                  },
+                ],
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="Address"
+              accessibilityRole="text"
+              collapsable={false}
+              onPress={[Function]}
+            >
+              <Text
+                accessibilityRole="text"
+                className="text-sm font-montserrat-regular text-overlay-soft"
+              >
+                Address
+              </Text>
+            </Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Address input field"
+            accessibilityRole="text"
+            accessible={true}
+            autoCapitalize="none"
+            autoCorrect={false}
+            className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            onSubmitEditing={[Function]}
+            returnKeyType="next"
+            testID="edit-address-input-input"
+            value="123 Main St"
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      className="mb-5"
+    >
+      <View
+        className="w-full mb-7"
+        testID="edit-phone-number-input"
+      >
+        <View
+          className="relative"
+        >
+          <View
+            className="bg-dark-blue px-1 z-1 left-4 absolute"
+            collapsable={false}
+            style={
+              {
+                "top": 16,
+                "transform": [
+                  {
+                    "translateY": -26,
+                  },
+                ],
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="Phone Number"
+              accessibilityRole="text"
+              collapsable={false}
+              onPress={[Function]}
+            >
+              <Text
+                accessibilityRole="text"
+                className="text-sm font-montserrat-regular text-overlay-soft"
+              >
+                Phone Number
+              </Text>
+            </Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Phone Number input field"
+            accessibilityRole="text"
+            accessible={true}
+            autoCapitalize="none"
+            autoCorrect={false}
+            className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+            inputMode="tel"
+            keyboardType="phone-pad"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            returnKeyType="done"
+            testID="edit-phone-number-input-input"
+            value="+1234567890"
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    className="mb-12"
+  >
+    <View
+      accessibilityLabel="Update My Profile"
+      accessibilityRole="button"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": true,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+      testID="update-my-profile-submit-button"
+    >
+      <View
+        className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
+      >
+        <Text
+          className="font-montserrat-medium text-white text-center text-lg leading-6"
+          testID="update-my-profile-submit-button-text"
+        >
+          Update My Profile
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`EditProfileForm Component Snapshot should match snapshot with empty userInfo 1`] = `
+<View
+  className="flex-1 justify-between"
+>
+  <View
+    className="w-full"
+  >
+    <View
+      className="items-center mt-4 mb-12"
+    >
+      <View
+        accessible={false}
+        className="relative w-23 h-23"
+        testID="avatar-container"
+      >
+        <View
+          accessibilityHint="Default avatar placeholder"
+          accessibilityLabel="Select avatar"
+          accessibilityRole="image"
+          accessible={true}
+          className="w-23 h-23 rounded-full items-center justify-center overflow-hidden"
+          testID="default-avatar-icon"
+        >
+          <View
+            className="items-center justify-center w-full h-full"
+            importantForAccessibility="no-hide-descendants"
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={92}
+              bbWidth={92}
+              fill="none"
+              focusable={false}
+              height={92}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 92,
+                    "width": 92,
+                  },
+                ]
+              }
+              vbHeight={92}
+              vbWidth={92}
+              width={92}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              >
+                <RNSVGGroup
+                  clipPath="a"
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                >
+                  <RNSVGRect
+                    fill={
+                      {
+                        "brushRef": "b",
+                        "type": 1,
+                      }
+                    }
+                    height={92}
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                    rx={46}
+                    width={92}
+                    x={0}
+                    y={0}
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M111.526 115.141s-8.864-13.594-18.68-24.884c-8.953-10.294-15.71-16.296-22.447-10.894-8.461 6.783 2.114 18.91 8.247 26.397 4.414 5.386 14.664 15.766 20.433 20.779 9.203 7.995 19.476-3.511 12.447-11.398Z"
+                    fill={
+                      {
+                        "payload": 4294953369,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M83.112 111.62c-6.133-7.486-25.137-21.974-14.379-33.432 9.664-10.293 17.881 3.157 29.174 17.403L83.112 111.62Z"
+                    fill={
+                      {
+                        "payload": 4293192695,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M-15.64 115.141s8.864-13.594 18.68-24.884c8.953-10.294 15.709-16.296 22.447-10.894 8.461 6.783-2.114 18.91-8.247 26.397-4.413 5.386-14.664 15.766-20.433 20.779-9.203 7.995-19.476-3.511-12.447-11.398Z"
+                    fill={
+                      {
+                        "payload": 4294953369,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M12.775 111.62c6.133-7.486 26.388-23.685 15.63-35.144C18.741 66.184 9.272 81.345-2.021 95.59l14.796 16.029Z"
+                    fill={
+                      {
+                        "payload": 4291489279,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="m58.091 53.224.026-8.688s6.652-4.253 7.504.157c.866 4.495-2.065 8.28-4.989 8.795-1.92.338-2.54-.264-2.54-.264ZM37.045 53.224l-.027-8.688s-6.652-4.253-7.503.157c-.867 4.495 2.076 8.844 4.989 8.795 1.95-.033 2.54-.264 2.54-.264Z"
+                    fill={
+                      {
+                        "payload": 4294953369,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M60.881 47.065c-1.12 9.528-4.014 16.596-13.519 16.596-9.927 0-12.25-9.393-13.306-17.373-1.975-14.92 6.802-18.502 14.151-18.502 7.35 0 14.153 6.709 12.674 19.279Z"
+                    fill={
+                      {
+                        "payload": 4294953369,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M33.614 70.162s3.515 9.317 14.593 9.317c12.861 0 13.487-9.663 13.487-9.663l-2.992-.962a1.787 1.787 0 0 1-1.237-1.57 399.305 399.305 0 0 1-.85-16.443c-11.044-3.64-17.155-.314-17.155-.314s-.617 9.64-1.189 16.608a1.792 1.792 0 0 1-1.133 1.525c-1.094.427-2.763 1.098-3.524 1.502Z"
+                    fill={
+                      {
+                        "payload": 4294953369,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M58.516 40.286c-2.667-1.824-3.338-5.085-3.338-5.085.216.1-6.762 3.63-10.35 4.449-3.061.699-5.058-.134-1.479-4.025-3.952 2.21-6.44 3.925-7.725 4.879a2.716 2.716 0 0 0-1.1 2.138l-.117 6.47-2.535-6.073s-1.83.707-2.675-1.129c-1.069-2.325 1.901-7.027 1.901-7.027s-2.545.75-2.182-2.013c.363-2.762 7.322-6.356 7.322-6.356s-2.119-.113-1.32-2.249c.8-2.135 9.206-1.564 9.206-1.564s-1.409-2.26 1.624-2.482c3.43-.25 9.219 4.177 9.219 4.177s4.224-3.955 5.045 2.581c4.248.668 5.939 4.48 2.84 5.611 3.099 2.683 3.345 4.45.246 4.731 1.69 2.26 2.219 5.403-.95 6.568l-1.69 5.367-.312-6.056a3.76 3.76 0 0 0-1.63-2.912Z"
+                    fill={
+                      {
+                        "payload": 4280628072,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    d="M50.968 41.587c1.433-.349 2.912-.472 4.311-.233.583.1 1.135.263 1.652.493a.565.565 0 0 1-.456 1.031 5.805 5.805 0 0 0-1.385-.411c-1.227-.21-2.56-.099-3.856.217-.232.056-.448.116-.644.177l-.143.045c-.137.044-.23.078-.276.095a.565.565 0 0 1-.406-1.053l.194-.069.142-.047c.258-.084.55-.167.867-.245Z"
+                    fill={
+                      {
+                        "payload": 4280628072,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    d="M44.06 42.16a.278.278 0 0 1 .35.068l.028.041 1.162 2.119a.28.28 0 0 1 .031.09l.004.048L45.532 51l2.023.38a.28.28 0 0 1 .227.282l-.005.045a.279.279 0 0 1-.28.227l-.045-.004-2.253-.425a.279.279 0 0 1-.224-.234l-.003-.044.105-6.636-1.127-2.052a.28.28 0 0 1 .068-.352l.042-.028Z"
+                    fill={
+                      {
+                        "payload": 4292711279,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M42.575 46.5c0 1.17-.662 2.119-1.48 2.119-.815 0-1.477-.95-1.477-2.12 0-1.17.662-2.117 1.478-2.117.817 0 1.48.948 1.48 2.118ZM54.756 46.5c0 1.17-.663 2.119-1.479 2.119-.817 0-1.479-.95-1.479-2.12 0-1.17.662-2.117 1.479-2.117.816 0 1.479.948 1.479 2.118Z"
+                    fill={
+                      {
+                        "payload": 4280628072,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    d="M48.852 57.588a.279.279 0 0 1 .045.555l-.045.003h-2.394a.279.279 0 0 1-.045-.554l.045-.004h2.394Z"
+                    fill={
+                      {
+                        "payload": 4292711279,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    d="M38.208 41.768c1.61-.486 3.308-.464 4.91-.138.431.088.753.177.938.239a.565.565 0 0 1-.299 1.086l-.261-.076a9.007 9.007 0 0 0-.602-.143c-1.435-.292-2.956-.312-4.361.113-.263.079-.517.173-.764.283a.565.565 0 0 1-.457-1.032c.29-.129.59-.24.896-.332Z"
+                    fill={
+                      {
+                        "payload": 4280628072,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    d="M41.557 62.242a.278.278 0 0 1 .383-.092c1.77 1.093 3.665 1.704 5.61 1.704 1.945 0 3.892-.585 5.743-1.625a.28.28 0 0 1 .272.487c-1.929 1.084-3.968 1.696-6.015 1.696-2.055 0-4.05-.643-5.902-1.786a.28.28 0 0 1-.091-.384Z"
+                    fill={
+                      {
+                        "payload": 4292711279,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M43.406 53.666s4.045.591 7.788-.28c0 0-.837 2.383-3.51 2.576-3.373.245-4.278-2.296-4.278-2.296Z"
+                    fill={
+                      {
+                        "payload": 4294967295,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    d="M51.123 53.076c-.25.058-.506.11-.767.158-1.846.332-3.812.377-5.654.242l-.367-.03a21.822 21.822 0 0 1-.411-.038l-.242-.027a9.338 9.338 0 0 1-.23-.03.318.318 0 0 0-.345.422c.118.33.39.804.863 1.276.876.87 2.11 1.349 3.737 1.23 1.212-.087 2.172-.595 2.897-1.383.28-.303.505-.628.681-.954a3.34 3.34 0 0 0 .209-.45.318.318 0 0 0-.371-.416Zm-.508.756-.054.087c-.121.187-.262.37-.423.546-.621.674-1.435 1.105-2.477 1.18-1.44.104-2.496-.305-3.244-1.049l-.113-.117a3.47 3.47 0 0 1-.29-.363l-.044-.064.31.03c1.998.172 4.155.145 6.188-.222l.147-.028Z"
+                    fill={
+                      {
+                        "payload": 4294933062,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    clipRule={0}
+                    d="M26.715 133.678c-5.22 9.499.563 10.169.563 10.169 12.376.844 41.12 0 41.12 0 6.57-4.847 2.251-11.299 2.251-11.299s13.387-53.819 9.11-56.883c-3.942-2.824-10.954-5.05-20.207-6.602-.258.578-2.851 5.085-11.511 5.19-9.48.117-11.518-4.15-11.862-4.897-7.761.966-12.66 1.568-17.49 4.578-1.493.929-.48 24.07 8.026 59.744Z"
+                    fill={
+                      {
+                        "payload": 4291489279,
+                        "type": 0,
+                      }
+                    }
+                    fillRule={0}
+                    propList={
+                      [
+                        "fill",
+                        "fillRule",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    d="M61.213 73.088a.28.28 0 0 1 .39.074.283.283 0 0 1-.073.392c-6.996 4.79-14.411 5.168-21.241 2.938a22.976 22.976 0 0 1-2.278-.873l-.266-.122-.237-.114-.263-.133a3.314 3.314 0 0 1-.062-.034.283.283 0 0 1 .272-.494l.142.075.055.028c.167.084.364.178.59.279.645.29 1.39.58 2.22.852 6.68 2.18 13.917 1.811 20.75-2.868Z"
+                    fill={
+                      {
+                        "payload": 4294441727,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                  <RNSVGPath
+                    d="M19.49 91.451a.281.281 0 0 1 .321.237l.55 3.586.508 3.269c.745 4.774 1.508 9.548 2.25 14.047l.512 3.087.47 2.78c1.235 7.246 2.226 12.501 2.887 15.153a.282.282 0 1 1-.546.136l-.135-.558c-.697-2.958-1.704-8.387-2.945-15.72l-.4-2.374-.228-1.378c-.682-4.115-1.383-8.481-2.076-12.883l-.643-4.114-.409-2.647-.351-2.3a.282.282 0 0 1 .236-.32Z"
+                    fill={
+                      {
+                        "payload": 4288918998,
+                        "type": 0,
+                      }
+                    }
+                    propList={
+                      [
+                        "fill",
+                      ]
+                    }
+                  />
+                </RNSVGGroup>
+                <RNSVGDefs>
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12668683,
+                        1,
+                        -16080641,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="b"
+                    x1={2.81}
+                    x2={103.998}
+                    y1={5.948}
+                    y2={21.033}
+                  />
+                  <RNSVGClipPath
+                    fill={
+                      {
+                        "payload": 4278190080,
+                        "type": 0,
+                      }
+                    }
+                    name="a"
+                  >
+                    <RNSVGRect
+                      fill={
+                        {
+                          "payload": 4294967295,
+                          "type": 0,
+                        }
+                      }
+                      height={92}
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                      rx={46}
+                      width={92}
+                      x={0}
+                      y={0}
+                    />
+                  </RNSVGClipPath>
+                </RNSVGDefs>
+              </RNSVGGroup>
+            </RNSVGSvgView>
+          </View>
+        </View>
+        <View
+          accessibilityHint="Tap to select a profile picture from your device"
+          accessibilityLabel="Add profile picture"
+          accessibilityRole="button"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": false,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+        >
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={24}
+            bbWidth={24}
+            fill="none"
+            focusable={false}
+            height={24}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {
+                  "flex": 0,
+                  "height": 24,
+                  "width": 24,
+                },
+              ]
+            }
+            vbHeight={24}
+            vbWidth={24}
+            width={24}
+          >
+            <RNSVGGroup
+              fill={null}
+              propList={
+                [
+                  "fill",
+                ]
+              }
+            >
+              <RNSVGPath
+                clipRule={0}
+                d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2Zm-1 5v4H7v2h4v4h2v-4h4v-2h-4V7h-2Zm-7 5c0 4.41 3.59 8 8 8s8-3.59 8-8-3.59-8-8-8-8 3.59-8 8Z"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                fillRule={0}
+                propList={
+                  [
+                    "fillRule",
+                  ]
+                }
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
+        </View>
+      </View>
+    </View>
+    <View
+      className="mb-9"
+    >
+      <View
+        className="w-full"
+        testID="signup-fullname-input"
+      >
+        <View
+          className="relative"
+        >
+          <View
+            className="bg-dark-blue px-1 z-1 left-4 absolute"
+            collapsable={false}
+            style={
+              {
+                "top": 16,
+                "transform": [
+                  {
+                    "translateY": 0,
+                  },
+                ],
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="Full Name"
+              accessibilityRole="text"
+              collapsable={false}
+              onPress={[Function]}
+            >
+              <Text
+                accessibilityRole="text"
+                className="text-sm font-montserrat-regular text-overlay-soft"
+              >
+                Full Name
+              </Text>
+            </Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Full Name input field"
+            accessibilityRole="text"
+            accessible={true}
+            autoCapitalize="words"
+            autoCorrect={false}
+            className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            onSubmitEditing={[Function]}
+            returnKeyType="next"
+            testID="signup-fullname-input-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      className="mb-9"
+    >
+      <View
+        className="w-full"
+        testID="signup-email-input"
+      >
+        <View
+          className="relative"
+        >
+          <View
+            className="bg-dark-blue px-1 z-1 left-4 absolute"
+            collapsable={false}
+            style={
+              {
+                "top": 16,
+                "transform": [
+                  {
+                    "translateY": 0,
+                  },
+                ],
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="Email Address"
+              accessibilityRole="text"
+              collapsable={false}
+              onPress={[Function]}
+            >
+              <Text
+                accessibilityRole="text"
+                className="text-sm font-montserrat-regular text-overlay-soft"
+              >
+                Email Address
+              </Text>
+            </Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Email Address input field"
+            accessibilityRole="text"
+            accessible={true}
+            autoCapitalize="none"
+            autoCorrect={false}
+            className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+            keyboardType="email-address"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            onSubmitEditing={[Function]}
+            returnKeyType="next"
+            testID="signup-email-input-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      className="mb-9"
+    >
+      <View
+        className="w-full"
+        testID="edit-address-input"
+      >
+        <View
+          className="relative"
+        >
+          <View
+            className="bg-dark-blue px-1 z-1 left-4 absolute"
+            collapsable={false}
+            style={
+              {
+                "top": 16,
+                "transform": [
+                  {
+                    "translateY": 0,
+                  },
+                ],
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="Address"
+              accessibilityRole="text"
+              collapsable={false}
+              onPress={[Function]}
+            >
+              <Text
+                accessibilityRole="text"
+                className="text-sm font-montserrat-regular text-overlay-soft"
+              >
+                Address
+              </Text>
+            </Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Address input field"
+            accessibilityRole="text"
+            accessible={true}
+            autoCapitalize="none"
+            autoCorrect={false}
+            className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            onSubmitEditing={[Function]}
+            returnKeyType="next"
+            testID="edit-address-input-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+    <View
+      className="mb-5"
+    >
+      <View
+        className="w-full mb-7"
+        testID="edit-phone-number-input"
+      >
+        <View
+          className="relative"
+        >
+          <View
+            className="bg-dark-blue px-1 z-1 left-4 absolute"
+            collapsable={false}
+            style={
+              {
+                "top": 16,
+                "transform": [
+                  {
+                    "translateY": 0,
+                  },
+                ],
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="Phone Number"
+              accessibilityRole="text"
+              collapsable={false}
+              onPress={[Function]}
+            >
+              <Text
+                accessibilityRole="text"
+                className="text-sm font-montserrat-regular text-overlay-soft"
+              >
+                Phone Number
+              </Text>
+            </Text>
+          </View>
+          <TextInput
+            accessibilityLabel="Phone Number input field"
+            accessibilityRole="text"
+            accessible={true}
+            autoCapitalize="none"
+            autoCorrect={false}
+            className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+            inputMode="tel"
+            keyboardType="phone-pad"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            returnKeyType="done"
+            testID="edit-phone-number-input-input"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    className="mb-12"
+  >
+    <View
+      accessibilityLabel="Update My Profile"
+      accessibilityRole="button"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": true,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+      testID="update-my-profile-submit-button"
+    >
+      <View
+        className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
+      >
+        <Text
+          className="font-montserrat-medium text-white text-center text-lg leading-6"
+          testID="update-my-profile-submit-button-text"
+        >
+          Update My Profile
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
