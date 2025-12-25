@@ -147,6 +147,7 @@ const TopUpScreen = () => {
 
         {/* Top Up Button */}
         <Button
+          testID="top-up-button"
           title="Top Up Now"
           onPress={handleTopUp}
           disabled={isPending || !parsedAmount || parsedAmount === 0 || !!error}

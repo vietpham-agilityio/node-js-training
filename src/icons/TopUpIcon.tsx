@@ -11,6 +11,7 @@ export const TopUpIcon = ({
 
   return (
     <Svg
+      testID="top-up-icon"
       width={width}
       height={height}
       fill="none"
