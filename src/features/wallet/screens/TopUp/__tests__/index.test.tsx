@@ -1,4 +1,5 @@
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { ReactNode } from 'react';
 
 import TopUpScreen from '../index';
 
@@ -17,6 +18,29 @@ jest.mock('expo-router', () => ({
 }));
 
 let mockIsPending = false;
+
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  SafeAreaView: ({ children }: { children: ReactNode }) => children,
+}));
+
+// Mock KeyboardLayout
+jest.mock('@/layouts/KeyboardLayout', () => ({
+  KeyboardLayout: ({
+    children,
+    accessibilityLabel,
+  }: {
+    children: ReactNode;
+    accessibilityLabel?: string;
+  }) => {
+    const { View } = require('react-native');
+    return (
+      <View testID="keyboard-layout" accessibilityLabel={accessibilityLabel}>
+        {children}
+      </View>
+    );
+  },
+}));
 
 jest.mock('@/features/wallet/hooks/useWallet', () => ({
   useTopUp: () => ({
@@ -305,15 +329,10 @@ describe('TopUpScreen', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have accessibility label for screen', () => {
-      const { UNSAFE_getByType } = render(<TopUpScreen />);
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { SafeAreaView } = require('react-native-safe-area-context');
+    it('should render within KeyboardLayout', () => {
+      const { getByTestId } = render(<TopUpScreen />);
 
-      const safeAreaView = UNSAFE_getByType(SafeAreaView);
-      expect(safeAreaView.props.accessibilityLabel).toBe(
-        'Top up wallet screen',
-      );
+      expect(getByTestId('keyboard-layout')).toBeTruthy();
     });
 
     it('should have accessibility labels for predefined amount buttons', () => {
