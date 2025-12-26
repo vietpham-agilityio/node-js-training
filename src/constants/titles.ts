@@ -22,7 +22,7 @@ export const HEADER_TITLE_MAP = {
  * Used for displaying prominent titles on main content areas
  */
 export const MAIN_TITLE_MAP = {
-  '/': 'Find Your Best Movie',
-  '/wallet': 'My Wallet',
-  '/my-ticket': 'My Ticket',
+  Movies: 'Find Your Best Movie',
+  Wallet: 'My Wallet',
+  'My Ticket': 'My Ticket',
 } as const;

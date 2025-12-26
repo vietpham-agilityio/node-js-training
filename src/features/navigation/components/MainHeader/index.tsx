@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 // Expo
-import { router, usePathname } from 'expo-router';
+import { router } from 'expo-router';
 
 // Components
 import { Avatar } from '@/components/Avatar';
@@ -32,13 +32,13 @@ export const MainHeader = ({
   isLeftTitle,
   isRenderUserProfile = true,
   topInset = STATUS_BAR_HEIGHT,
+  ...props
 }: MainHeaderProps) => {
-  const pathname = usePathname();
   const { data: user, isLoading } = useProfile();
 
   const title = useMemo(
-    () => MAIN_TITLE_MAP[pathname as keyof typeof MAIN_TITLE_MAP],
-    [pathname],
+    () => MAIN_TITLE_MAP[props.options.title as keyof typeof MAIN_TITLE_MAP],
+    [props.options.title],
   );
 
   const handleProfilePress = () => {

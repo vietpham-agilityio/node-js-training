@@ -39,6 +39,11 @@ jest.mock('expo-router', () => ({
 jest.mock('@/features/auth/hooks/useAuth', () => ({
   useAuth: () => ({
     signOut: mockSignOut,
+    user: {
+      app_metadata: {
+        provider: 'email',
+      },
+    },
   }),
 }));
 

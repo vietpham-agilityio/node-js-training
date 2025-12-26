@@ -1,5 +1,5 @@
 import { useEvent } from 'expo';
-import { memo, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -12,6 +12,7 @@ import { withUniwind } from 'uniwind';
 // SDKs
 import { useVideoPlayer, VideoView } from 'expo-video';
 import * as VideoThumbnails from 'expo-video-thumbnails';
+import * as WebBrowser from 'expo-web-browser';
 
 // Constants
 import { VIDEO_SOURCE } from '@/constants';
@@ -20,6 +21,10 @@ import { VIDEO_SOURCE } from '@/constants';
 import { PlayIcon } from '@/icons/PlayIcon';
 
 // Utils
+import {
+  getYouTubeThumbnail,
+  isYouTubeUrl,
+} from '@/features/booking/utils/youtube';
 import { cn } from '@/utils/cn';
 import { isAndroid, isIOS } from '@/utils/platform';
 
@@ -53,10 +58,18 @@ export const MovieTrailer = memo(
     useEffect(() => {
       const loadThumbnail = async () => {
         try {
-          const { uri } = await VideoThumbnails.getThumbnailAsync(videoUrl, {
-            time: 1000,
-          });
-          setThumbnail(uri);
+          let thumbnail = null;
+
+          if (isYouTubeUrl(videoUrl)) {
+            thumbnail = getYouTubeThumbnail(videoUrl);
+          } else {
+            const { uri } = await VideoThumbnails.getThumbnailAsync(videoUrl, {
+              time: 1000,
+            });
+            thumbnail = uri;
+          }
+
+          setThumbnail(thumbnail);
         } catch (err) {
           console.log('Thumbnail error:', err);
         }
@@ -64,15 +77,23 @@ export const MovieTrailer = memo(
       loadThumbnail();
     }, [videoUrl]);
 
-    const handlePlayer = () => {
+    const handlePlayer = useCallback(() => {
       setShowPlayer(true);
       player.play();
-    };
+    }, [player]);
 
-    const handleTogglePlayer = () => {
+    const handleTogglePlayer = useCallback(() => {
       if (isPlaying) player.pause();
       else player.play();
-    };
+    }, [isPlaying, player]);
+
+    const handleOpenWebBrowser = useCallback(async () => {
+      if (isYouTubeUrl(videoUrl)) {
+        await WebBrowser.openBrowserAsync(videoUrl);
+      } else {
+        handlePlayer();
+      }
+    }, [handlePlayer, videoUrl]);
 
     return (
       <View
@@ -90,7 +111,7 @@ export const MovieTrailer = memo(
           <TouchableOpacity
             testID={`${testID}-thumbnail-button`}
             className="w-full h-full bg-gradient-to-t from-bg-quaternary/70 to-bg-quaternary/0"
-            onPress={handlePlayer}
+            onPress={handleOpenWebBrowser}
             accessibilityRole="button"
             accessibilityLabel="Play movie trailer"
             accessibilityHint="Tap to play the trailer video"
