@@ -9,7 +9,7 @@ export const HEADER_TITLE_MAP = {
   '/seats': '',
   '/signup': 'Create Your New Account',
   '/confirm-account': 'Confirm New Account',
-  '/checkout': 'Checkout Movie',
+  '/booking/checkout': 'Checkout Movie',
   '/tickets/': 'Ticket Details',
   '/profile/edit': 'Edit Your Profile',
   '/purchase/top-up': 'Top Up',

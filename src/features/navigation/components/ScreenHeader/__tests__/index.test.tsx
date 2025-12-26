@@ -23,12 +23,6 @@ jest.mock('expo-router', () => ({
   usePathname: () => mockUsePathname(),
 }));
 
-// Mock uniwind
-jest.mock('uniwind', () => ({
-  useResolveClassNames: (classNames: string) => ({ className: classNames }),
-  withUniwind: (Component: typeof Text) => Component,
-}));
-
 // Mock utils
 const mockGetHeaderTitle = jest.fn();
 const mockIsScreenPathname = jest.fn();
@@ -61,10 +55,14 @@ jest.mock('@/constants', () => ({
 }));
 
 // Mock header store
-const mockUseHeaderStore = jest.fn();
+const mockClearTitle = jest.fn();
+const mockHeaderStoreState = {
+  title: null as string | null,
+  clearTitle: mockClearTitle,
+};
 
 jest.mock('@/stores/header', () => ({
-  useHeaderStore: (selector: any) => mockUseHeaderStore(selector),
+  useHeaderStore: (selector: any) => selector(mockHeaderStoreState),
 }));
 
 describe('ScreenHeader', () => {
@@ -74,7 +72,7 @@ describe('ScreenHeader', () => {
     mockUsePathname.mockReturnValue('/signup');
     mockGetHeaderTitle.mockReturnValue('Create Your New Account');
     mockIsScreenPathname.mockReturnValue(false);
-    mockUseHeaderStore.mockReturnValue(null);
+    mockHeaderStoreState.title = null;
   });
 
   const headerProps = {
@@ -161,7 +159,7 @@ describe('ScreenHeader', () => {
 
   it('uses headerStoreTitle when title prop and getHeaderTitle are not provided', () => {
     mockGetHeaderTitle.mockReturnValue(undefined);
-    mockUseHeaderStore.mockReturnValue('Store Title');
+    mockHeaderStoreState.title = 'Store Title';
 
     const { getByText } = render(<ScreenHeader {...headerProps} />);
 
@@ -170,7 +168,7 @@ describe('ScreenHeader', () => {
 
   it('does not render title section when headerTitle is falsy', () => {
     mockGetHeaderTitle.mockReturnValue(undefined);
-    mockUseHeaderStore.mockReturnValue(null);
+    mockHeaderStoreState.title = null;
 
     const { queryByRole, getByLabelText } = render(
       <ScreenHeader {...headerProps} />,
@@ -203,5 +201,48 @@ describe('ScreenHeader', () => {
       '/(main)/profile',
       'profile/index',
     );
+  });
+
+  it('calls clearTitle when going back with headerStoreTitle set', () => {
+    mockCanGoBack.mockReturnValue(true);
+    mockHeaderStoreState.title = 'Dynamic Title';
+    mockIsScreenPathname.mockReturnValue(false);
+
+    const { getByLabelText } = render(<ScreenHeader {...headerProps} />);
+
+    const backButton = getByLabelText('Go back');
+    fireEvent.press(backButton);
+
+    expect(mockClearTitle).toHaveBeenCalledTimes(1);
+    expect(mockBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders custom leftIcon when provided', () => {
+    const MockLeftIcon = () => <Text>CustomLeftIcon</Text>;
+
+    const { getByText } = render(
+      <ScreenHeader leftIcon={MockLeftIcon} {...headerProps} />,
+    );
+
+    expect(getByText('CustomLeftIcon')).toBeTruthy();
+  });
+
+  it('renders custom rightIcon when provided', () => {
+    const MockRightIcon = () => <Text>CustomRightIcon</Text>;
+
+    const { getByText } = render(
+      <ScreenHeader rightIcon={MockRightIcon} {...headerProps} />,
+    );
+
+    expect(getByText('CustomRightIcon')).toBeTruthy();
+  });
+
+  it('applies custom topInset', () => {
+    const { getByLabelText } = render(
+      <ScreenHeader topInset={100} {...headerProps} />,
+    );
+
+    // Component renders with custom inset - we verify it renders without crashing
+    expect(getByLabelText('Go back')).toBeTruthy();
   });
 });
