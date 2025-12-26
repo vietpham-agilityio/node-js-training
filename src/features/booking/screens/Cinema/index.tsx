@@ -153,14 +153,15 @@ const CinemaScreen = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ gap: 16, paddingRight: 24 }}
           >
-            {DATE_LABELS.map(({ id, label }) => {
+            {DATE_LABELS.map(({ id, label, dayNumber }) => {
               const isSelected = selectedDate === id;
               const handleSelectDate = () => handleDateSelect(id);
 
               return (
-                <View key={id} className="w-17.5">
+                <View key={id}>
                   <SelectBox
                     value={label}
+                    date={dayNumber}
                     isPrimary={isSelected}
                     onPress={handleSelectDate}
                     accessibilityLabel={`Select date ${label}`}
@@ -169,7 +170,7 @@ const CinemaScreen = () => {
                         ? `${label} is currently selected`
                         : `Select ${label} as the show date`
                     }
-                    className="py-5 px-3 min-w-17.5"
+                    className="py-5 px-1 min-w-17.5"
                   />
                 </View>
               );
