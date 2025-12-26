@@ -27,7 +27,7 @@ export const TopUpAmountButton = memo(
         accessibilityRole="button"
         accessibilityLabel={`Select amount ${formatIDR(amount)}`}
         className={cn(
-          'flex-1 min-w-[45%] py-2.5 px-11 rounded-lg border-none',
+          'flex-1 min-w-[45%] py-2.5 px-8 rounded-lg border-none',
           isSelected ? 'bg-primary' : 'bg-bg-quaternary',
         )}
       >

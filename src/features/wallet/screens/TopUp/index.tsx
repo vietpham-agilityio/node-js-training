@@ -1,10 +1,6 @@
 import { Href, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-// Unwind
-import { withUniwind } from 'uniwind';
+import { View } from 'react-native';
 
 // Components
 import { Button } from '@/components/Button';
@@ -31,8 +27,8 @@ import { formatIDR } from '@/utils/formats';
 // Stores
 import { useToastStore } from '@/stores/toast';
 
-const StyledSafeAreaView = withUniwind(SafeAreaView);
-const StyledScrollView = withUniwind(ScrollView);
+// Layouts
+import { KeyboardLayout } from '@/layouts/KeyboardLayout';
 
 const TopUpScreen = () => {
   const router = useRouter();
@@ -105,15 +101,8 @@ const TopUpScreen = () => {
   }, [parsedAmount, topUp, showError, router]);
 
   return (
-    <StyledSafeAreaView
-      edges={['bottom']}
-      accessibilityLabel="Top up wallet screen"
-      className="flex-1 bg-dark-blue"
-    >
-      <StyledScrollView
-        contentContainerClassName="flex-1 px-6 py-6"
-        showsVerticalScrollIndicator={false}
-      >
+    <KeyboardLayout>
+      <View className="flex-1 mt-8 pb-20">
         {/* Amount Input */}
         <View className={cn(error ? 'mb-4.5' : 'mb-9.5')}>
           <Input
@@ -153,8 +142,8 @@ const TopUpScreen = () => {
           disabled={isPending || !parsedAmount || parsedAmount === 0 || !!error}
           size={Size.LARGE}
         />
-      </StyledScrollView>
-    </StyledSafeAreaView>
+      </View>
+    </KeyboardLayout>
   );
 };
 
