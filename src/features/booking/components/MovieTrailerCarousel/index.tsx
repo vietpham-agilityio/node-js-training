@@ -60,7 +60,7 @@ export const MovieTrailerCarousel = memo(
                 accessibilityTraits: ['button'],
               })}
             >
-              <MovieTrailer />
+              <MovieTrailer videoUrl={item} />
             </Animated.View>
           )}
         />

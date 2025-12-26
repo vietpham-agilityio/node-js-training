@@ -349,7 +349,7 @@ describe('useSearchMovies', () => {
   });
 
   it('should not fetch when query length is 2 or less', () => {
-    renderHook(() => useSearchMovies('te'), {
+    renderHook(() => useSearchMovies(''), {
       wrapper: createWrapper(),
     });
 

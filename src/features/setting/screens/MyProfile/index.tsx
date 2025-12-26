@@ -48,6 +48,7 @@ enum SettingKey {
 const MyProfileScreen = () => {
   const { data: profile, isLoading: isProfileLoading } = useProfile();
   const { signOut } = useAuth();
+  const { user: userInfo } = useAuth();
   const toast = useToastAlert();
 
   const { sendTestNotification } = usePushNotifications();
@@ -69,6 +70,18 @@ const MyProfileScreen = () => {
       }
     }
   };
+
+  const visibleSettings = useMemo(() => {
+    const isOAuthUser = userInfo?.app_metadata.provider !== 'email';
+
+    return SETTING_ITEMS.filter(setting => {
+      // Hide ChangePassword for OAuth users
+      if (setting.TEST_ID === SettingKey.ChangePassword && isOAuthUser) {
+        return false;
+      }
+      return true;
+    });
+  }, [userInfo?.app_metadata.provider]);
 
   const SETTING_ACTIONS: Record<SettingKey, () => void> = useMemo(
     () => ({
@@ -147,7 +160,7 @@ const MyProfileScreen = () => {
         </View>
 
         <View className="mt-8 gap-5">
-          {SETTING_ITEMS.map(item => (
+          {visibleSettings.map(item => (
             <SettingItem
               key={item.TEST_ID}
               title={item.TITLE}

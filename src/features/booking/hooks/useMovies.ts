@@ -61,7 +61,7 @@ export const useSearchMovies = (query: string) => {
   return useQuery({
     queryKey: queryKeys.movies.search(query),
     queryFn: () => moviesService.searchMovies(query),
-    enabled: query.length > 2,
+    enabled: query.length > 0,
     staleTime: API_CONFIG.MOVIE_STALE_TIME,
   });
 };
