@@ -79,3 +79,17 @@ const screenToRegex = (screen: string) =>
 export const isScreenPathname = (pathname: string, screen: string): boolean => {
   return screenToRegex(screen).test(normalizePathname(pathname));
 };
+
+/**
+ * Capitalizes the first letter of a string.
+ * @example
+ * capitalize('hello') // 'Hello'
+ * capitalize('WORLD') // 'WORLD'
+ * capitalize('active') // 'Active'
+ * @param {string | undefined | null} str - The string to capitalize.
+ * @returns {string} The capitalized string, or empty string if input is falsy.
+ */
+export const capitalize = (str: string | undefined | null): string => {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
