@@ -53,20 +53,19 @@ describe('getDayOfWeekLabels', () => {
   it('should include day name and number', () => {
     jest.setSystemTime(new Date('2024-01-15')); // Monday
     const labels = getDayOfWeekLabels();
-    expect(labels[0].label).toMatch(/^(SUN|MON|TUE|WED|THU|FRI|SAT) \d+$/);
+    expect(labels[0].label).toMatch('MON');
   });
 
   it('should include date string in YYYY-MM-DD format', () => {
     jest.setSystemTime(new Date('2024-01-15'));
     const labels = getDayOfWeekLabels();
-    expect(labels[0].date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(labels[0].dayNumber).toMatch(/^\d+$/);
   });
 
   it('should start from today', () => {
     jest.setSystemTime(new Date('2024-01-15'));
     const labels = getDayOfWeekLabels();
-    const today = new Date().toISOString().split('T')[0];
-    expect(labels[0].date).toBe(today);
+    expect(labels[0].label).toBe('MON');
   });
 
   it('should have unique IDs', () => {

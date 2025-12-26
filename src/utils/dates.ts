@@ -24,8 +24,8 @@ export const getDayOfWeekLabels = () => {
 
     result.push({
       id: dateString,
-      label: `${dayName} ${dayNumber}`,
-      date: dateString,
+      label: dayName,
+      dayNumber: dayNumber.toString(),
     });
   }
 

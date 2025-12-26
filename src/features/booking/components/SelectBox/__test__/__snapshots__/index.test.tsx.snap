@@ -40,11 +40,11 @@ exports[`SelectBox Component Rendering should render matching snapshot 1`] = `
   testID="test-select-box"
 >
   <View
-    className="items-center justify-center rounded-lg bg-secondary"
+    className="items-center justify-center gap-2 rounded-lg bg-secondary"
   >
     <Text
       accessibilityRole="text"
-      className="text-white text-base font-montserrat-medium text-center"
+      className="text-white text-base font-montserrat-medium text-center max-w-15.5 leading-5"
     >
       Test Value
     </Text>

@@ -9,6 +9,7 @@ import { Typo } from '@/components/Typo';
 
 export interface SelectBoxProps extends TouchableOpacityProps {
   value: string;
+  date?: string;
   isPrimary?: boolean;
   disabled?: boolean;
   testID?: string;
@@ -18,6 +19,7 @@ export interface SelectBoxProps extends TouchableOpacityProps {
 export const SelectBox = memo(
   ({
     value,
+    date,
     testID,
     isPrimary = true,
     disabled,
@@ -26,7 +28,7 @@ export const SelectBox = memo(
     ...rest
   }: SelectBoxProps) => {
     const SelectBoxClassName = useMemo(() => {
-      const baseClasses = 'items-center justify-center rounded-lg';
+      const baseClasses = 'items-center justify-center gap-2 rounded-lg';
 
       return disabled
         ? `${baseClasses} bg-light-navy`
@@ -34,6 +36,10 @@ export const SelectBox = memo(
           ? `${baseClasses} bg-secondary`
           : `${baseClasses} bg-dark-navy`;
     }, [disabled, isPrimary]);
+
+    const fontWeight = useMemo(() => {
+      return isPrimary ? 'medium' : 'regular';
+    }, [isPrimary]);
 
     const accessibilityHint = useMemo(() => {
       if (disabled) {
@@ -58,9 +64,17 @@ export const SelectBox = memo(
         {...rest}
       >
         <View className={cn(SelectBoxClassName, className)}>
-          <Typo weight="medium" className="text-center">
+          <Typo
+            weight={fontWeight}
+            className="text-center max-w-15.5 leading-5"
+          >
             {value}
           </Typo>
+          {date && (
+            <Typo weight={fontWeight} className="text-center leading-5">
+              {date}
+            </Typo>
+          )}
         </View>
       </TouchableOpacity>
     );
