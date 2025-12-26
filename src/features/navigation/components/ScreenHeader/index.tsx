@@ -1,5 +1,6 @@
 import { ComponentType } from 'react';
 import { TouchableOpacity, View } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 import { SvgProps } from 'react-native-svg';
 
 // Expo
@@ -42,7 +43,9 @@ export const ScreenHeader = ({
   const pathname = usePathname();
 
   // Dynamic header title from store
-  const headerStoreTitle = useHeaderStore(state => state.title);
+  const { title: headerStoreTitle, clearTitle } = useHeaderStore(
+    useShallow(state => ({ title: state.title, clearTitle: state.clearTitle })),
+  );
 
   // Map pathname to header title from HEADER_TITLE_MAP
   const headerTitle = title || getHeaderTitle(pathname) || headerStoreTitle;
@@ -52,6 +55,8 @@ export const ScreenHeader = ({
     if (isProfileScreen) {
       return router.replace(ROUTES.HOME);
     }
+
+    if (headerStoreTitle) clearTitle();
 
     router.back();
   };
