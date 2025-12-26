@@ -11,6 +11,7 @@ import { withUniwind } from 'uniwind';
 import { Size, UNACTIVE_MESSAGE } from '@/constants';
 
 // Utils
+import { capitalize } from '@/utils/convert';
 import { formatDate, formatIDR, formatTime } from '@/utils/formats';
 
 // Hooks
@@ -99,7 +100,7 @@ const TicketDetailScreen = () => {
       },
       {
         label: 'Status',
-        value: ticketDetail?.status || '',
+        value: capitalize(ticketDetail?.status),
         testID: 'ticket-status',
       },
     ],

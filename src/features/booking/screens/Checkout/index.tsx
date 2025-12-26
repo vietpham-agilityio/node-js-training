@@ -23,7 +23,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useToastAlert } from '@/hooks/useToast';
 
 // Utils
-import { formatIDR } from '@/utils/formats';
+import { formatIDR, formatTime } from '@/utils/formats';
 
 // Store
 import { useAuthStore } from '@/features/auth/store/auth';
@@ -96,7 +96,10 @@ const CheckoutScreen = () => {
       },
       {
         label: 'Date & Time',
-        value: selectedShowtime?.showDate + ' ' + selectedShowtime?.showTime,
+        value:
+          selectedShowtime?.showDate +
+          ' ' +
+          formatTime(selectedShowtime?.showTime || ''),
         testID: 'order-datetime',
       },
       {

@@ -66,6 +66,7 @@ export const MovieCard = memo(
     transactionType,
     className = '',
     justifyContent = 'end',
+    onPress,
     ...rest
   }: MovieCardProps) => {
     const imageSizeClassName = useMemo(
@@ -88,6 +89,8 @@ export const MovieCard = memo(
     return (
       <TouchableOpacity
         testID="movie-card"
+        activeOpacity={onPress ? 0.8 : 1}
+        onPress={onPress}
         accessibilityLabel={title}
         accessibilityHint="Tap to view movie details"
         className={cn('w-full flex-row rounded-xl pr-4 gap-4', className)}
