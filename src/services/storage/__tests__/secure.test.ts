@@ -1,7 +1,21 @@
-import { STORAGE_KEYS } from '@/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { SecureStorageService, secureStorage } from '../secure';
+
+// Mock constants
+jest.mock('@/constants', () => ({
+  STORAGE_KEYS: {
+    ACCESS_TOKEN: 'access_token',
+    REFRESH_TOKEN: 'refresh_token',
+    AUTH_KEYS: 'auth_keys',
+    AUTH_REFRESH_TOKEN: 'auth_refresh_token',
+    USER_PIN: 'user_pin',
+    BIOMETRIC_KEY: 'biometric_key',
+    USER_SESSION: 'user_session',
+  },
+  SECURE_STORE_SIZE_LIMIT: 2048,
+  SENSITIVE_SESSION_FIELDS: ['token', 'password', 'key', 'secret', 'auth'],
+}));
 
 jest.mock('expo-secure-store', () => ({
   setItemAsync: jest.fn(() => Promise.resolve()),
@@ -15,6 +29,9 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   getAllKeys: jest.fn(() => Promise.resolve([])),
 }));
 
+// Get the mocked constants
+const { STORAGE_KEYS } = require('@/constants');
+
 describe('SecureStorageService', () => {
   let service: SecureStorageService;
   const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
@@ -22,6 +39,16 @@ describe('SecureStorageService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Reset mocks to their default implementations
+    (SecureStore.setItemAsync as jest.Mock).mockResolvedValue(undefined);
+    (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
+    (SecureStore.deleteItemAsync as jest.Mock).mockResolvedValue(undefined);
+    (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+    (AsyncStorage.removeItem as jest.Mock).mockResolvedValue(undefined);
+    (AsyncStorage.getAllKeys as jest.Mock).mockResolvedValue([]);
+
     service = SecureStorageService.getInstance();
     global.Blob = jest.fn(
       parts =>
@@ -121,6 +148,11 @@ describe('SecureStorageService', () => {
       );
     });
 
+    it('should remove from AsyncStorage for a non-secure key', async () => {
+      await service.removeItem('some_other_key');
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith('some_other_key');
+    });
+
     it('should throw and log error on failure', async () => {
       (SecureStore.deleteItemAsync as jest.Mock).mockRejectedValue(
         new Error('Failed'),
@@ -132,9 +164,319 @@ describe('SecureStorageService', () => {
     });
   });
 
+  describe('setSession', () => {
+    it('should warn and return early if sessionData is null', async () => {
+      await service.setSession(null);
+      expect(console.warn).toHaveBeenCalledWith(
+        'Attempting to set null/undefined session',
+      );
+      expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
+      expect(AsyncStorage.setItem).not.toHaveBeenCalled();
+    });
+
+    it('should warn and return early if sessionData is undefined', async () => {
+      await service.setSession(undefined);
+      expect(console.warn).toHaveBeenCalledWith(
+        'Attempting to set null/undefined session',
+      );
+    });
+
+    it('should store sensitive data in SecureStore and non-sensitive in AsyncStorage', async () => {
+      const sessionData = {
+        access_token: 'secret-token', // sensitive: contains 'token'
+        refresh_token: 'secret-refresh', // sensitive: contains 'token'
+        userId: '123', // non-sensitive
+        userName: 'John Doe', // non-sensitive
+      };
+
+      await service.setSession(sessionData);
+
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+        `${STORAGE_KEYS.USER_SESSION}_sensitive`,
+        expect.stringContaining('access_token'),
+      );
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        STORAGE_KEYS.USER_SESSION,
+        expect.stringContaining('userId'),
+      );
+    });
+
+    it('should only store sensitive data if no non-sensitive data exists', async () => {
+      const sessionData = {
+        access_token: 'secret-token', // sensitive: contains 'token'
+        refresh_token: 'secret-refresh', // sensitive: contains 'token'
+      };
+
+      await service.setSession(sessionData);
+
+      expect(SecureStore.setItemAsync).toHaveBeenCalled();
+      // AsyncStorage should not be called for non-sensitive session data
+      const asyncCalls = (AsyncStorage.setItem as jest.Mock).mock.calls;
+      const regularSessionCall = asyncCalls.find(
+        call => call[0] === STORAGE_KEYS.USER_SESSION,
+      );
+      expect(regularSessionCall).toBeUndefined();
+    });
+
+    it('should only store non-sensitive data if no sensitive data exists', async () => {
+      const sessionData = {
+        userId: '123',
+        userName: 'John Doe',
+      };
+
+      await service.setSession(sessionData);
+
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        STORAGE_KEYS.USER_SESSION,
+        JSON.stringify(sessionData),
+      );
+      expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
+    });
+
+    it('should fall back to AsyncStorage if sensitive data is too large', async () => {
+      const sessionData = {
+        access_token: 'a'.repeat(3000), // sensitive but too large
+        userId: '123',
+      };
+
+      await service.setSession(sessionData);
+
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Sensitive session data too large'),
+      );
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        `${STORAGE_KEYS.USER_SESSION}_sensitive`,
+        expect.any(String),
+      );
+    });
+
+    it('should throw and log error on storage failure', async () => {
+      const error = new Error('Storage failed');
+      // Mock SecureStore to fail for this test
+      (SecureStore.setItemAsync as jest.Mock).mockRejectedValueOnce(error);
+
+      const sessionData = {
+        access_token: 'token', // sensitive field
+      };
+
+      await expect(service.setSession(sessionData)).rejects.toThrow(error);
+      expect(console.error).toHaveBeenCalledWith(
+        'Error storing session:',
+        error,
+      );
+    });
+  });
+
+  describe('getSession', () => {
+    it('should retrieve and merge sensitive and non-sensitive session data', async () => {
+      const sensitiveData = { access_token: 'secret' };
+      const nonSensitiveData = { userId: '123' };
+
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(
+        JSON.stringify(sensitiveData),
+      );
+      (AsyncStorage.getItem as jest.Mock).mockImplementation(key => {
+        if (key === STORAGE_KEYS.USER_SESSION) {
+          return Promise.resolve(JSON.stringify(nonSensitiveData));
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await service.getSession();
+
+      expect(result).toEqual({ ...nonSensitiveData, ...sensitiveData });
+    });
+
+    it('should return only sensitive data if non-sensitive does not exist', async () => {
+      const sensitiveData = { access_token: 'secret' };
+
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(
+        JSON.stringify(sensitiveData),
+      );
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+
+      const result = await service.getSession();
+
+      expect(result).toEqual(sensitiveData);
+    });
+
+    it('should return only non-sensitive data if sensitive does not exist', async () => {
+      const nonSensitiveData = { userId: '123' };
+
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
+      (AsyncStorage.getItem as jest.Mock).mockImplementation(key => {
+        if (key === STORAGE_KEYS.USER_SESSION) {
+          return Promise.resolve(JSON.stringify(nonSensitiveData));
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await service.getSession();
+
+      expect(result).toEqual(nonSensitiveData);
+    });
+
+    it('should return null if both sensitive and non-sensitive are null', async () => {
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+
+      const result = await service.getSession();
+
+      expect(result).toBeNull();
+    });
+
+    it('should handle error parsing sensitive data', async () => {
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue('invalid-json');
+      (AsyncStorage.getItem as jest.Mock).mockImplementation(key => {
+        if (key === STORAGE_KEYS.USER_SESSION) {
+          return Promise.resolve(JSON.stringify({ userId: '123' }));
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await service.getSession();
+
+      expect(console.error).toHaveBeenCalledWith(
+        'Error parsing sensitive session data:',
+        expect.any(Error),
+      );
+      expect(result).toEqual({ userId: '123' });
+    });
+
+    it('should handle error parsing non-sensitive data', async () => {
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(
+        JSON.stringify({ access_token: 'token' }),
+      );
+      (AsyncStorage.getItem as jest.Mock).mockImplementation(key => {
+        if (key === STORAGE_KEYS.USER_SESSION) {
+          return Promise.resolve('invalid-json');
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await service.getSession();
+
+      expect(console.error).toHaveBeenCalledWith(
+        'Error parsing non-sensitive session data:',
+        expect.any(Error),
+      );
+      expect(result).toEqual({ access_token: 'token' });
+    });
+
+    it('should return null and log error on retrieval failure', async () => {
+      (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(
+        new Error('Failed'),
+      );
+
+      const result = await service.getSession();
+
+      expect(result).toBeNull();
+      expect(console.error).toHaveBeenCalledWith(
+        'Error getting item \"user_session\":',
+        expect.any(Error),
+      );
+    });
+
+    it('should try AsyncStorage fallback if SecureStore returns null', async () => {
+      const sensitiveData = { access_token: 'secret' };
+
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
+      (AsyncStorage.getItem as jest.Mock).mockImplementation(key => {
+        if (key === `${STORAGE_KEYS.USER_SESSION}_sensitive`) {
+          return Promise.resolve(JSON.stringify(sensitiveData));
+        }
+        if (key === STORAGE_KEYS.USER_SESSION) {
+          return Promise.resolve(JSON.stringify({ userId: '123' }));
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await service.getSession();
+
+      expect(result).toEqual({ userId: '123', ...sensitiveData });
+    });
+
+    it('should return null and log error on retrieval failure', async () => {
+      (SecureStore.getItemAsync as jest.Mock).mockRejectedValue(
+        new Error('Failed'),
+      );
+
+      const result = await service.getSession();
+
+      expect(result).toBeNull();
+      expect(console.error).toHaveBeenCalledWith(
+        'Error getting sensitive session:',
+        expect.any(Error),
+      );
+    });
+
+    it('should try AsyncStorage fallback if SecureStore returns null', async () => {
+      const sensitiveData = { accessToken: 'secret' };
+
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
+      (AsyncStorage.getItem as jest.Mock).mockImplementation(key => {
+        if (key === `${STORAGE_KEYS.USER_SESSION}_sensitive`) {
+          return Promise.resolve(JSON.stringify(sensitiveData));
+        }
+        if (key === STORAGE_KEYS.USER_SESSION) {
+          return Promise.resolve(JSON.stringify({ userId: '123' }));
+        }
+        return Promise.resolve(null);
+      });
+
+      const result = await service.getSession();
+
+      expect(result).toEqual({ userId: '123', ...sensitiveData });
+    });
+  });
+
+  describe('removeSession', () => {
+    it('should remove both sensitive and non-sensitive session data', async () => {
+      await service.removeSession();
+
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
+        `${STORAGE_KEYS.USER_SESSION}_sensitive`,
+      );
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
+        STORAGE_KEYS.USER_SESSION,
+      );
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith(
+        `${STORAGE_KEYS.USER_SESSION}_sensitive`,
+      );
+    });
+
+    it('should warn but not fail if SecureStore deletion fails', async () => {
+      (SecureStore.deleteItemAsync as jest.Mock).mockRejectedValue(
+        new Error('Not found'),
+      );
+
+      await service.removeSession();
+
+      expect(console.warn).toHaveBeenCalledWith(
+        'Note: No sensitive session in SecureStore',
+        expect.any(Error),
+      );
+      expect(AsyncStorage.removeItem).toHaveBeenCalled();
+    });
+
+    it('should throw and log error if AsyncStorage removal fails', async () => {
+      (AsyncStorage.removeItem as jest.Mock).mockRejectedValue(
+        new Error('Failed'),
+      );
+
+      await expect(service.removeSession()).rejects.toThrow('Failed');
+      expect(console.error).toHaveBeenCalledWith(
+        'Error removing session:',
+        expect.any(Error),
+      );
+    });
+  });
+
   describe('clearSensitiveData', () => {
     it('should remove all known sensitive keys', async () => {
-      const removeItemSpy = jest.spyOn(service, 'removeItem');
+      const removeItemSpy = jest
+        .spyOn(service, 'removeItem')
+        .mockResolvedValue();
       await service.clearSensitiveData();
       const sensitiveKeys = [
         STORAGE_KEYS.ACCESS_TOKEN,
@@ -149,41 +491,106 @@ describe('SecureStorageService', () => {
       sensitiveKeys.forEach(key => {
         expect(removeItemSpy).toHaveBeenCalledWith(key);
       });
+      removeItemSpy.mockRestore();
+    });
+
+    it('should warn but not fail if a key does not exist', async () => {
+      jest
+        .spyOn(service, 'removeItem')
+        .mockRejectedValue(new Error('Not found'));
+
+      // Should not throw, just warn
+      await service.clearSensitiveData();
+
+      expect(console.warn).toHaveBeenCalled();
+    });
+
+    it('should throw and log error on failure', async () => {
+      const error = new Error('Complete failure');
+      // Make the entire Promise.all fail by making removeItem throw synchronously
+      jest.spyOn(service, 'removeItem').mockImplementation(() => {
+        throw error;
+      });
+
+      await expect(service.clearSensitiveData()).rejects.toThrow();
+      expect(console.error).toHaveBeenCalledWith(
+        'Error clearing sensitive data:',
+        expect.any(Error),
+      );
+    });
+  });
+
+  describe('clear', () => {
+    it('should warn but not fail if a key does not exist', async () => {
+      jest.spyOn(service, 'removeSession').mockResolvedValue();
+      jest
+        .spyOn(service, 'removeItem')
+        .mockRejectedValue(new Error('Not found'));
+
+      await service.clear();
+
+      expect(console.warn).toHaveBeenCalled();
+    });
+
+    it('should throw and log error on failure', async () => {
+      const error = new Error('Failed');
+      jest.spyOn(service, 'removeSession').mockRejectedValue(error);
+
+      await expect(service.clear()).rejects.toThrow(error);
+      expect(console.error).toHaveBeenCalledWith(
+        'Error clearing authentication data:',
+        error,
+      );
     });
   });
 
   describe('getItemWithTimeout', () => {
-    jest.useFakeTimers();
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('should return value if getItem resolves before timeout', async () => {
-      (service.getItem as jest.Mock) = jest
-        .fn()
-        .mockResolvedValue('test-value');
+      jest.spyOn(service, 'getItem').mockResolvedValue('test-value');
+
       const promise = service.getItemWithTimeout('some-key', 1000);
       jest.runAllTimers();
       const result = await promise;
+
       expect(result).toBe('test-value');
     });
 
-    it('should return null if getItem does not resolve before timeout', async () => {
-      (service.getItem as jest.Mock) = jest.fn(
-        () => new Promise(resolve => setTimeout(() => resolve('value'), 2000)),
-      );
+    it('should return null and warn if timeout occurs', async () => {
+      jest
+        .spyOn(service, 'getItem')
+        .mockImplementation(
+          () =>
+            new Promise(resolve => setTimeout(() => resolve('value'), 10000)),
+        );
+
       const promise = service.getItemWithTimeout('some-key', 1000);
-      jest.runAllTimers();
+      jest.advanceTimersByTime(1000);
       const result = await promise;
+
       expect(result).toBeNull();
-      expect(console.warn).toHaveBeenCalled();
+      expect(console.warn).toHaveBeenCalledWith(
+        'Timeout getting item "some-key" after 1000ms',
+      );
     });
   });
 
   describe('hasItem', () => {
     it('should return true if item exists', async () => {
-      (service.getItem as jest.Mock) = jest.fn().mockResolvedValue('value');
+      jest.spyOn(service, 'getItem').mockResolvedValue('value');
       const result = await service.hasItem('key');
       expect(result).toBe(true);
     });
+
     it('should return false if item does not exist', async () => {
-      (service.getItem as jest.Mock) = jest.fn().mockResolvedValue(null);
+      jest.spyOn(service, 'getItem').mockResolvedValue(null);
       const result = await service.hasItem('key');
       expect(result).toBe(false);
     });
@@ -191,16 +598,66 @@ describe('SecureStorageService', () => {
 
   describe('hasSession', () => {
     it('should return true if session exists', async () => {
-      (service.getSession as jest.Mock) = jest
-        .fn()
-        .mockResolvedValue({ user: 'test' });
+      jest.spyOn(service, 'getSession').mockResolvedValue({ user: 'test' });
       const result = await service.hasSession();
       expect(result).toBe(true);
     });
+
     it('should return false if session does not exist', async () => {
-      (service.getSession as jest.Mock) = jest.fn().mockResolvedValue(null);
+      jest.spyOn(service, 'getSession').mockResolvedValue(null);
       const result = await service.hasSession();
       expect(result).toBe(false);
+    });
+  });
+
+  describe('getStorageInfo', () => {
+    it('should return storage information with session', async () => {
+      const sessionData = {
+        access_token: 'secret', // sensitive: contains 'token'
+        userId: '123',
+      };
+
+      (AsyncStorage.getAllKeys as jest.Mock).mockResolvedValue([
+        STORAGE_KEYS.USER_SESSION,
+        'other_key',
+      ]);
+      jest.spyOn(service, 'getSession').mockResolvedValue(sessionData);
+
+      const result = await service.getStorageInfo();
+
+      expect(result.hasSession).toBe(true);
+      expect(result.sessionFields).toBeDefined();
+      expect(result.sessionFields?.sensitive).toContain('access_token');
+      expect(result.sessionFields?.nonSensitive).toContain('userId');
+    });
+
+    it('should return storage information without session', async () => {
+      (AsyncStorage.getAllKeys as jest.Mock).mockResolvedValue([]);
+      jest.spyOn(service, 'getSession').mockResolvedValue(null);
+
+      const result = await service.getStorageInfo();
+
+      expect(result.hasSession).toBe(false);
+      expect(result.sessionFields).toBeNull();
+    });
+
+    it('should return default values on error', async () => {
+      (AsyncStorage.getAllKeys as jest.Mock).mockRejectedValue(
+        new Error('Failed'),
+      );
+
+      const result = await service.getStorageInfo();
+
+      expect(result).toEqual({
+        secureStoreKeys: [],
+        asyncStorageKeys: [],
+        hasSession: false,
+        sessionFields: null,
+      });
+      expect(console.error).toHaveBeenCalledWith(
+        'Error getting storage info:',
+        expect.any(Error),
+      );
     });
   });
 
@@ -212,31 +669,44 @@ describe('SecureStorageService', () => {
     });
 
     it('should return false if new format already exists', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue('old-session');
-      jest
-        .spyOn(service as any, 'getSessionSensitive')
-        .mockResolvedValue('new-session');
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify({ user: 'test' }),
+      );
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue('new-session');
+
       const result = await service.migrateSessionStorage();
       expect(result).toBe(false);
     });
 
     it('should migrate session and return true', async () => {
-      const oldSession = { user: 'test', token: 'abc' };
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
-        JSON.stringify(oldSession),
-      );
-      jest.spyOn(service as any, 'getSessionSensitive').mockResolvedValue(null);
-      const setSessionSpy = jest.spyOn(service, 'setSession');
+      const oldSession = { user: 'test', access_token: 'abc' }; // use access_token for sensitive field
+      (AsyncStorage.getItem as jest.Mock).mockImplementation(key => {
+        if (key === STORAGE_KEYS.USER_SESSION) {
+          return Promise.resolve(JSON.stringify(oldSession));
+        }
+        return Promise.resolve(null);
+      });
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(null);
+
+      const setSessionSpy = jest
+        .spyOn(service, 'setSession')
+        .mockResolvedValue();
+
       const result = await service.migrateSessionStorage();
+
       expect(setSessionSpy).toHaveBeenCalledWith(oldSession);
-      expect(result).toBe(false);
+      expect(result).toBe(true);
+      setSessionSpy.mockRestore();
     });
 
     it('should return false on migration error', async () => {
       (AsyncStorage.getItem as jest.Mock).mockRejectedValue(new Error('fail'));
       const result = await service.migrateSessionStorage();
       expect(result).toBe(false);
-      expect(console.error).toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalledWith(
+        'Error during session migration:',
+        expect.any(Error),
+      );
     });
   });
 });

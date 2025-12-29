@@ -1,0 +1,90 @@
+
+import React from 'react';
+import { render, fireEvent } from '@testing-library/react-native';
+import { Text, View } from 'react-native';
+
+import { AccessLayout } from '..';
+
+jest.mock('uniwind', () => ({
+  withUniwind: (Component: any) => (props: any) => <Component {...props} />,
+  useResolveClassNames: () => 'style',
+}));
+
+describe('AccessLayout', () => {
+  it('renders children correctly', () => {
+    const { getByText } = render(
+      <AccessLayout mode="signin">
+        <Text>Child Component</Text>
+      </AccessLayout>,
+    );
+    expect(getByText('Child Component')).toBeTruthy();
+  });
+
+  it('displays a loading overlay when loading is true', () => {
+    const { getByLabelText } = render(
+      <AccessLayout mode="signin" loading>
+        <Text>Child Component</Text>
+      </AccessLayout>,
+    );
+    expect(getByLabelText('Logging you in')).toBeTruthy();
+  });
+
+  it('displays correct accessibility labels for each mode', () => {
+    const { rerender, getByLabelText } = render(
+      <AccessLayout mode="signin">
+        <View />
+      </AccessLayout>,
+    );
+    expect(getByLabelText('Sign in screen')).toBeTruthy();
+
+    rerender(
+      <AccessLayout mode="signup">
+        <View />
+      </AccessLayout>,
+    );
+    expect(getByLabelText('Sign up screen')).toBeTruthy();
+
+    rerender(
+      <AccessLayout mode="onboarding">
+        <View />
+      </AccessLayout>,
+    );
+    expect(getByLabelText('Onboarding screen')).toBeTruthy();
+
+    rerender(
+      <AccessLayout mode="confirmation">
+        <View />
+      </AccessLayout>,
+    );
+    expect(getByLabelText('Confirmation screen')).toBeTruthy();
+  });
+
+  it('shows correct loading message for signup', () => {
+    const { getByText, getByLabelText } = render(
+      <AccessLayout mode="signup" loading>
+        <Text>Child Component</Text>
+      </AccessLayout>,
+    );
+    expect(getByText('Creating your account...')).toBeTruthy();
+    expect(getByLabelText('Creating your account')).toBeTruthy();
+  });
+
+  it('shows correct loading message for signin', () => {
+    const { getByText, getByLabelText } = render(
+      <AccessLayout mode="signin" loading>
+        <Text>Child Component</Text>
+      </AccessLayout>,
+    );
+    expect(getByText('Logging you in...')).toBeTruthy();
+    expect(getByLabelText('Logging you in')).toBeTruthy();
+  });
+
+  it('renders without loading overlay when loading is false', () => {
+    const { queryByLabelText } = render(
+      <AccessLayout mode="signin" loading={false}>
+        <Text>Child Component</Text>
+      </AccessLayout>,
+    );
+    expect(queryByLabelText('Logging you in')).toBeNull();
+  });
+});
