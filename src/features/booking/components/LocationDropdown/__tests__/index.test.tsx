@@ -227,7 +227,7 @@ describe('LocationDropdown Component', () => {
         expect(() => getByTestId('location-dropdown-modal')).toThrow();
       });
 
-      // Second open - should NOT request permission again (covers lines 104-106)
+      // Second open - should NOT request permission again
       fireEvent.press(button);
 
       await waitFor(() => {
@@ -380,7 +380,6 @@ describe('LocationDropdown Component', () => {
       });
 
       // Get the modal element and verify it contains a View with onStartShouldSetResponder
-      // This covers line 229 by ensuring the prop is set
       const modal = getByTestId('location-dropdown-modal');
 
       // The modal should be rendered (which includes the View with onStartShouldSetResponder on line 229)

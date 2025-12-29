@@ -358,7 +358,7 @@ describe('CinemaScreen', () => {
   });
 
   describe('Navigation', () => {
-    it('should not navigate when showtime is not selected (covers line 92)', () => {
+    it('should not navigate when showtime is not selected', () => {
       const { queryByLabelText } = render(<CinemaScreen />, {
         wrapper: createWrapper(),
       });
@@ -411,7 +411,7 @@ describe('CinemaScreen', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should return null from renderEmpty when data exists (covers line 278)', () => {
+    it('should return null from renderEmpty when data exists', () => {
       // When not loading and cinemasWithShowtimes.length > 0, renderEmpty should return null
       mockIsLoading = false;
       mockShowtimesData = [
