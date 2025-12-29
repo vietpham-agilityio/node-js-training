@@ -216,7 +216,6 @@ yarn lint
 
 ## 🎯 Project Goals
 
-- ✅ Handle platform differences between Android and iOS
 - ✅ Handle platform differences between Android, iOS
 - ✅ Unit test coverage should be greater than 80%
 - ✅ Configure the AppIcon and SplashScreen that match the Expo app.
@@ -225,6 +224,9 @@ yarn lint
 - ✅ Must have a screen using Camera and Image Picker
 - ✅ Apply Linking and Deep Linking
 - ✅ Push Notifications
+- ✅ Social authentications (Facebook, Google)
+- ✅ Integrate Expo Application Services (EAS)
+- ✅ CI/CD
 
 ## 📝 Design
 
