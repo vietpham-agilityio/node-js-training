@@ -66,7 +66,7 @@ export const SelectBox = memo(
         <View className={cn(SelectBoxClassName, className)}>
           <Typo
             weight={fontWeight}
-            className="text-center max-w-15.5 leading-5"
+            className="text-center max-w-15.5 min-w-13 leading-5"
           >
             {value}
           </Typo>

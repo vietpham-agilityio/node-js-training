@@ -29,6 +29,7 @@ import { formatIDR, formatTime } from '@/utils/formats';
 import { useAuthStore } from '@/features/auth/store/auth';
 import { useBookingStore } from '@/features/booking/store/booking';
 import { useLoadingStore } from '@/stores/loading';
+import { useHeaderStore } from '@/stores/header';
 
 // Utils
 import { cn } from '@/utils/cn';
@@ -47,6 +48,8 @@ const CheckoutScreen = () => {
       hideLoading: state.hideLoading,
     })),
   );
+
+  const clearHeaderTitle = useHeaderStore(state => state.clearTitle);
 
   // Push notification hook
   const { scheduleTicketExpiration, scheduleShowReminder } =
@@ -205,6 +208,8 @@ const CheckoutScreen = () => {
         // Schedule push notifications
         await scheduleNotifications(booking);
 
+        clearHeaderTitle();
+
         // Show success message
         toast.success(
           'Booking confirmed! You will receive reminders before the show.',
@@ -232,6 +237,7 @@ const CheckoutScreen = () => {
     showLoading,
     hideLoading,
     scheduleNotifications,
+    clearHeaderTitle,
   ]);
 
   return (

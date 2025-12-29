@@ -44,7 +44,7 @@ exports[`SelectBox Component Rendering should render matching snapshot 1`] = `
   >
     <Text
       accessibilityRole="text"
-      className="text-white text-base font-montserrat-medium text-center max-w-15.5 leading-5"
+      className="text-white text-base font-montserrat-medium text-center max-w-15.5 min-w-13 leading-5"
     >
       Test Value
     </Text>

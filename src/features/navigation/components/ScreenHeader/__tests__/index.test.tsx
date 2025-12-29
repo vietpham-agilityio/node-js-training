@@ -47,6 +47,8 @@ jest.mock('@/constants', () => ({
   SCREENS: {
     MAIN: {
       PROFILE: 'profile/index',
+      CINEMA: 'cinema/index',
+      SEATS: 'seats/index',
     },
   },
   ROUTES: {
@@ -203,10 +205,13 @@ describe('ScreenHeader', () => {
     );
   });
 
-  it('calls clearTitle when going back with headerStoreTitle set', () => {
+  it('calls clearTitle when going back from Cinema screen with headerStoreTitle set', () => {
     mockCanGoBack.mockReturnValue(true);
-    mockHeaderStoreState.title = 'Dynamic Title';
-    mockIsScreenPathname.mockReturnValue(false);
+    mockHeaderStoreState.title = 'Movie Title';
+    // Simulate being on Cinema screen (second call to isScreenPathname returns true for CINEMA)
+    mockIsScreenPathname.mockImplementation(
+      (_pathname: string, screen: string) => screen === 'cinema/index',
+    );
 
     const { getByLabelText } = render(<ScreenHeader {...headerProps} />);
 
@@ -215,6 +220,36 @@ describe('ScreenHeader', () => {
 
     expect(mockClearTitle).toHaveBeenCalledTimes(1);
     expect(mockBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call clearTitle when going back from Seats screen', () => {
+    mockCanGoBack.mockReturnValue(true);
+    mockHeaderStoreState.title = 'Movie Title';
+    // Simulate being on Seats screen
+    mockIsScreenPathname.mockImplementation(
+      (_pathname: string, screen: string) => screen === 'seats/index',
+    );
+
+    const { getByLabelText } = render(<ScreenHeader {...headerProps} />);
+
+    const backButton = getByLabelText('Go back');
+    fireEvent.press(backButton);
+
+    expect(mockClearTitle).not.toHaveBeenCalled();
+    expect(mockBack).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not show headerStoreTitle in header on Seats screen', () => {
+    mockGetHeaderTitle.mockReturnValue(undefined);
+    mockHeaderStoreState.title = 'Movie Title';
+    // Simulate being on Seats screen
+    mockIsScreenPathname.mockImplementation(
+      (_pathname: string, screen: string) => screen === 'seats/index',
+    );
+
+    const { queryByText } = render(<ScreenHeader {...headerProps} />);
+
+    expect(queryByText('Movie Title')).toBeNull();
   });
 
   it('renders custom leftIcon when provided', () => {
