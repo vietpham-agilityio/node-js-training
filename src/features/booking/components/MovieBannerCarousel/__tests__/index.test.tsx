@@ -380,7 +380,7 @@ describe('MovieBannerCarousel Component', () => {
       const movieBanner = screen.getByTestId('movie-banner');
       fireEvent.press(movieBanner);
 
-      // Verify navigation was called with correct route (covers line 71)
+      // Verify navigation was called with correct route
       expect(mockPush).toHaveBeenCalledTimes(1);
       expect(mockPush).toHaveBeenCalledWith('/(main)/movies/1');
     });

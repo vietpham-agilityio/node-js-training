@@ -1,29 +1,48 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { useAuthStore } from '../auth';
 
-// Mock dependencies
-const mockGetSession = jest.fn();
-const mockSignOut = jest.fn();
-const mockClear = jest.fn();
+// Import the mocked modules to get references to the mock functions
+import { authService } from '@/features/auth/services/auth';
+import { secureStorage } from '@/services/storage/secure';
+
+// Mock dependencies - declare but don't initialize yet
+let mockGetSession: jest.Mock;
+let mockSignOut: jest.Mock;
+let mockClear: jest.Mock;
 
 jest.mock('@/features/auth/services/auth', () => ({
   authService: {
-    getSession: mockGetSession,
-    signOut: mockSignOut,
+    getSession: jest.fn(),
+    signOut: jest.fn(),
   },
 }));
 
 jest.mock('@/services/storage/secure', () => ({
   secureStorage: {
-    clear: mockClear,
+    clear: jest.fn(),
   },
 }));
 
 describe('useAuthStore', () => {
   beforeEach(() => {
+    // Get references to the mocked functions
+    mockGetSession = authService.getSession as jest.Mock;
+    mockSignOut = authService.signOut as jest.Mock;
+    mockClear = secureStorage.clear as jest.Mock;
+
+    // Clear all mocks
     jest.clearAllMocks();
-    // Reset store to initial state
-    useAuthStore.getState().reset();
+
+    // Reset store state
+    const store = useAuthStore.getState();
+    store.reset();
+    useAuthStore.setState({
+      user: null,
+      session: null,
+      isLoading: false,
+      isAuthenticated: false,
+      isSigningUp: false,
+    });
   });
 
   describe('setSigningUp', () => {
@@ -130,18 +149,114 @@ describe('useAuthStore', () => {
       expect(result.current.user).toBe(null);
       expect(result.current.isAuthenticated).toBe(false);
     });
+
+    it('should successfully initialize with valid session', async () => {
+      const mockUser = { id: '1', email: 'test@example.com' } as any;
+      const mockSession = {
+        user: mockUser,
+        access_token: 'token',
+      } as any;
+
+      mockGetSession.mockResolvedValue(mockSession);
+
+      const { result } = renderHook(() => useAuthStore());
+
+      await act(async () => {
+        await result.current.initialize();
+      });
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.session).toEqual(mockSession);
+      expect(result.current.user).toEqual(mockUser);
+      expect(result.current.isAuthenticated).toBe(true);
+      expect(mockGetSession).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle initialization error and reset state', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      mockGetSession.mockRejectedValue(new Error('Session fetch failed'));
+
+      const { result } = renderHook(() => useAuthStore());
+
+      await act(async () => {
+        await result.current.initialize();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.session).toBe(null);
+      expect(result.current.user).toBe(null);
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Auth initialization error:',
+        expect.any(Error),
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('signOut', () => {
+    it('should successfully sign out and clear state', async () => {
+      const mockUser = { id: '1', email: 'test@example.com' } as any;
+      const mockSession = {
+        user: mockUser,
+        access_token: 'token',
+      } as any;
+
+      mockSignOut.mockResolvedValue(undefined);
+      mockClear.mockResolvedValue(undefined);
+
+      act(() => {
+        useAuthStore.getState().setSession(mockSession);
+      });
+
+      expect(useAuthStore.getState().isAuthenticated).toBe(true);
+
+      await act(async () => {
+        await useAuthStore.getState().signOut();
+      });
+
+      const finalState = useAuthStore.getState();
+      expect(mockSignOut).toHaveBeenCalledTimes(1);
+      expect(mockClear).toHaveBeenCalledTimes(1);
+      expect(finalState.user).toBe(null);
+      expect(finalState.session).toBe(null);
+      expect(finalState.isAuthenticated).toBe(false);
+    });
+
+    it('should handle sign out error and throw', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const signOutError = new Error('Sign out failed');
+
+      mockSignOut.mockRejectedValue(signOutError);
+
+      await act(async () => {
+        await expect(useAuthStore.getState().signOut()).rejects.toThrow(
+          'Sign out failed',
+        );
+      });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Sign out error:',
+        signOutError,
+      );
+      expect(mockSignOut).toHaveBeenCalledTimes(1);
+
+      consoleErrorSpy.mockRestore();
+    });
   });
 
   describe('reset', () => {
     it('should reset all state to initial values', () => {
-      // Set some state first
       act(() => {
         useAuthStore.getState().setUser({ id: '1' } as any);
         useAuthStore.getState().setSession({ access_token: 'token' } as any);
         useAuthStore.getState().setLoading(false);
       });
 
-      // Reset
       act(() => {
         useAuthStore.getState().reset();
       });

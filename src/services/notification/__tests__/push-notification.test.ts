@@ -42,6 +42,10 @@ jest.mock('expo-constants', () => ({
   },
 }));
 
+// Mock console methods
+const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
 describe('PushNotificationService', () => {
   let service: PushNotificationService;
 
@@ -51,6 +55,11 @@ describe('PushNotificationService', () => {
     Platform.OS = 'ios';
     (Device.isDevice as boolean) = true;
     (Constants.expoConfig!.extra!.eas!.projectId as any) = 'test-project-id';
+  });
+
+  afterAll(() => {
+    consoleWarnSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 
   it('should be a singleton', () => {
@@ -91,6 +100,9 @@ describe('PushNotificationService', () => {
       });
       const token = await service.registerForPushNotifications();
       expect(token).toBeNull();
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Push notification permission not granted',
+      );
     });
 
     it('should set notification channel on Android', async () => {
@@ -107,8 +119,12 @@ describe('PushNotificationService', () => {
 
     it('should return null if projectId is missing', async () => {
       (Constants.expoConfig!.extra!.eas!.projectId as any) = undefined;
+      (Notifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+        status: 'granted',
+      });
       const token = await service.registerForPushNotifications();
       expect(token).toBeNull();
+      expect(consoleErrorSpy).toHaveBeenCalledWith('EAS Project ID not found');
     });
 
     it('should return null on any exception', async () => {
@@ -219,28 +235,55 @@ describe('PushNotificationService', () => {
 
   describe('Listeners', () => {
     it('should add a notification received listener', () => {
-      const callback = () => {};
-      service.addNotificationReceivedListener(callback);
+      const callback = jest.fn();
+      const mockSubscription = { remove: jest.fn() };
+      (
+        Notifications.addNotificationReceivedListener as jest.Mock
+      ).mockReturnValue(mockSubscription);
+
+      const subscription = service.addNotificationReceivedListener(callback);
+
       expect(
         Notifications.addNotificationReceivedListener,
       ).toHaveBeenCalledWith(callback);
+      expect(subscription).toBe(mockSubscription);
     });
 
     it('should add a notification response received listener', () => {
-      const callback = () => {};
-      service.addNotificationResponseReceivedListener(callback);
+      const callback = jest.fn();
+      const mockSubscription = { remove: jest.fn() };
+      (
+        Notifications.addNotificationResponseReceivedListener as jest.Mock
+      ).mockReturnValue(mockSubscription);
+
+      const subscription =
+        service.addNotificationResponseReceivedListener(callback);
+
       expect(
         Notifications.addNotificationResponseReceivedListener,
       ).toHaveBeenCalledWith(callback);
+      expect(subscription).toBe(mockSubscription);
     });
   });
 
   describe('scheduleTicketExpirationNotification', () => {
-    const now = new Date('2025-01-01T12:00:00.000Z');
-    jest.useFakeTimers().setSystemTime(now);
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
 
     it('should send immediately if less than 1 hour to expiration', async () => {
+      const now = new Date('2025-01-01T12:00:00.000Z');
+      jest.setSystemTime(now);
+
       const expirationDate = new Date('2025-01-01T12:30:00.000Z'); // 30 mins from now
+      (Notifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+        'notification-id',
+      );
+
       const id = await service.scheduleTicketExpirationNotification(
         't1',
         'Movie',
@@ -248,11 +291,25 @@ describe('PushNotificationService', () => {
         '12:30',
         expirationDate,
       );
-      expect(id).toBe('');
+
+      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          trigger: null, // immediate notification
+          content: expect.objectContaining({
+            title: 'Ticket Expiring Soon! ⏰',
+            body: expect.stringContaining('expires soon'),
+          }),
+        }),
+      );
+      expect(id).toBe('notification-id');
     });
 
     it('should not schedule if already expired', async () => {
+      const now = new Date('2025-01-01T12:00:00.000Z');
+      jest.setSystemTime(now);
+
       const expirationDate = new Date('2025-01-01T11:00:00.000Z'); // 1 hour ago
+
       const id = await service.scheduleTicketExpirationNotification(
         't1',
         'Movie',
@@ -260,16 +317,84 @@ describe('PushNotificationService', () => {
         '11:00',
         expirationDate,
       );
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Ticket already expired, not scheduling notification',
+      );
       expect(id).toBe('');
+      expect(Notifications.scheduleNotificationAsync).not.toHaveBeenCalled();
+    });
+
+    it('should schedule notification 1 hour before expiration', async () => {
+      const now = new Date('2025-01-01T12:00:00.000Z');
+      jest.setSystemTime(now);
+
+      const expirationDate = new Date('2025-01-01T15:00:00.000Z'); // 3 hours from now
+      (Notifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+        'scheduled-notification-id',
+      );
+
+      const id = await service.scheduleTicketExpirationNotification(
+        't1',
+        'Movie',
+        'Today',
+        '15:00',
+        expirationDate,
+      );
+
+      const expectedTriggerSeconds = 3 * 60 * 60 - 60 * 60; // 3 hours - 1 hour = 2 hours
+
+      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          trigger: expect.objectContaining({
+            seconds: expectedTriggerSeconds,
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          }),
+          content: expect.objectContaining({
+            title: 'Ticket Expiring Soon! ⏰',
+            body: expect.stringContaining('will expire in 1 hour'),
+          }),
+        }),
+      );
+      expect(id).toBe('scheduled-notification-id');
+    });
+
+    it('should throw error on failure', async () => {
+      const now = new Date('2025-01-01T12:00:00.000Z');
+      jest.setSystemTime(now);
+
+      const expirationDate = new Date('2025-01-01T15:00:00.000Z');
+      (Notifications.scheduleNotificationAsync as jest.Mock).mockRejectedValue(
+        new Error('Scheduling failed'),
+      );
+
+      await expect(
+        service.scheduleTicketExpirationNotification(
+          't1',
+          'Movie',
+          'Today',
+          '15:00',
+          expirationDate,
+        ),
+      ).rejects.toThrow('Scheduling failed');
     });
   });
 
   describe('scheduleShowReminderNotification', () => {
-    const now = new Date('2025-01-01T18:00:00.000Z');
-    jest.useFakeTimers().setSystemTime(now);
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
 
     it('should not schedule if show has already started', async () => {
+      const now = new Date('2025-01-01T18:00:00.000Z');
+      jest.setSystemTime(now);
+
       const showDateTime = new Date('2025-01-01T17:00:00.000Z'); // 1 hour ago
+
       const id = await service.scheduleShowReminderNotification(
         't1',
         'Movie',
@@ -277,7 +402,95 @@ describe('PushNotificationService', () => {
         '17:00',
         showDateTime,
       );
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Show already started, not scheduling reminder',
+      );
       expect(id).toBe('');
+      expect(Notifications.scheduleNotificationAsync).not.toHaveBeenCalled();
+    });
+
+    it('should send immediately if less than 1 hour until show', async () => {
+      const now = new Date('2025-01-01T18:00:00.000Z');
+      jest.setSystemTime(now);
+
+      const showDateTime = new Date('2025-01-01T18:30:00.000Z'); // 30 mins from now
+      (Notifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+        'notification-id',
+      );
+
+      const id = await service.scheduleShowReminderNotification(
+        't1',
+        'Movie',
+        'Today',
+        '18:30',
+        showDateTime,
+      );
+
+      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          trigger: null, // immediate notification
+          content: expect.objectContaining({
+            title: 'Show Starting Soon! 🎬',
+            body: expect.stringContaining('starts soon'),
+          }),
+        }),
+      );
+      expect(id).toBe('notification-id');
+    });
+
+    it('should schedule notification 1 hour before show', async () => {
+      const now = new Date('2025-01-01T18:00:00.000Z');
+      jest.setSystemTime(now);
+
+      const showDateTime = new Date('2025-01-01T21:00:00.000Z'); // 3 hours from now
+      (Notifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+        'scheduled-notification-id',
+      );
+
+      const id = await service.scheduleShowReminderNotification(
+        't1',
+        'Movie',
+        'Today',
+        '21:00',
+        showDateTime,
+      );
+
+      const expectedTriggerSeconds = 3 * 60 * 60 - 60 * 60; // 3 hours - 1 hour = 2 hours
+
+      expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          trigger: expect.objectContaining({
+            seconds: expectedTriggerSeconds,
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          }),
+          content: expect.objectContaining({
+            title: 'Show Starting Soon! 🎬',
+            body: expect.stringContaining('starts in 1 hour'),
+          }),
+        }),
+      );
+      expect(id).toBe('scheduled-notification-id');
+    });
+
+    it('should throw error on failure', async () => {
+      const now = new Date('2025-01-01T18:00:00.000Z');
+      jest.setSystemTime(now);
+
+      const showDateTime = new Date('2025-01-01T21:00:00.000Z');
+      (Notifications.scheduleNotificationAsync as jest.Mock).mockRejectedValue(
+        new Error('Scheduling failed'),
+      );
+
+      await expect(
+        service.scheduleShowReminderNotification(
+          't1',
+          'Movie',
+          'Today',
+          '21:00',
+          showDateTime,
+        ),
+      ).rejects.toThrow('Scheduling failed');
     });
   });
 });
