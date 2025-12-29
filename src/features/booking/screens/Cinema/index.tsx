@@ -55,7 +55,6 @@ const CinemaScreen = () => {
 
   const showToast = useToastStore(state => state.showError);
   const setShowtime = useBookingStore(state => state.setShowtime);
-  const clearHeaderTitle = useHeaderStore(state => state.clearTitle);
 
   const iconColorConfig = useResolveClassNames('text-white');
 
@@ -91,9 +90,8 @@ const CinemaScreen = () => {
   const handleNavigateToSeatSelection = useCallback(() => {
     if (!selectedShowtime) return;
 
-    clearHeaderTitle();
     router.push(ROUTES.SEATS as Href);
-  }, [selectedShowtime, clearHeaderTitle]);
+  }, [selectedShowtime]);
 
   const handleDateSelect = useCallback((dateId: string) => {
     setSelectedDate(dateId);

@@ -1,7 +1,7 @@
 import { ComponentType } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { useShallow } from 'zustand/react/shallow';
 import { SvgProps } from 'react-native-svg';
+import { useShallow } from 'zustand/react/shallow';
 
 // Expo
 import { NativeStackHeaderProps } from '@react-navigation/native-stack';
@@ -22,6 +22,7 @@ import { getHeaderTitle, isScreenPathname } from '@/utils/convert';
 import { STATUS_BAR_HEIGHT } from '@/utils/platform';
 
 // Stores
+import { useBookingStore } from '@/features/booking/store/booking';
 import { useHeaderStore } from '@/stores/header';
 
 export interface ScreenHeaderProps extends NativeStackHeaderProps {
@@ -47,16 +48,38 @@ export const ScreenHeader = ({
     useShallow(state => ({ title: state.title, clearTitle: state.clearTitle })),
   );
 
-  // Map pathname to header title from HEADER_TITLE_MAP
-  const headerTitle = title || getHeaderTitle(pathname) || headerStoreTitle;
+  const { selectedSeats, removeSeat } = useBookingStore(
+    useShallow(state => ({
+      selectedSeats: state.selectedSeats,
+      removeSeat: state.removeSeat,
+    })),
+  );
+
+  // Screen type checks
   const isProfileScreen = isScreenPathname(pathname, SCREENS.MAIN.PROFILE);
+  const isCinemaScreen = isScreenPathname(pathname, SCREENS.MAIN.CINEMA);
+  const isSeatScreen = isScreenPathname(pathname, SCREENS.MAIN.SEATS);
+
+  const headerTitle =
+    title || getHeaderTitle(pathname) || (!isSeatScreen && headerStoreTitle);
 
   const handleGoBack = () => {
+    // Profile screen: Replace navigation to home instead of going back
+    // This prevents returning to auth screens after login
     if (isProfileScreen) {
       return router.replace(ROUTES.HOME);
     }
 
-    if (headerStoreTitle) clearTitle();
+    // Clear dynamic header title only when leaving Cinema screen
+    // This ensures the movie title persists through the booking flow (Cinema → Seats → Checkout)
+    // but clears when user exits the booking flow by going back from Cinema
+    if (headerStoreTitle && isCinemaScreen) clearTitle();
+
+    // Seats screen: Clear all selected seats when user navigates away
+    // This resets the booking state to avoid stale seat selections
+    if (selectedSeats && isSeatScreen) {
+      selectedSeats.forEach(seat => removeSeat(seat));
+    }
 
     router.back();
   };
