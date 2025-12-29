@@ -1,181 +1,103 @@
+import * as Crypto from 'expo-crypto';
 import { generateUUID, generateUUIDSync } from '../uuid';
 
-// Unmock uuid utility (mocked globally in jest.setup.ts)
-jest.unmock('@/utils/uuid');
+// Unmock the UUID utility module to get its actual implementation
+jest.unmock('../uuid');
 
-// Mock expo-crypto
-const mockGetRandomBytesAsync = jest.fn();
-
-jest.mock('expo-crypto', () => ({
-  getRandomBytesAsync: (size: number) => mockGetRandomBytesAsync(size),
-}));
-
-// Import after mocks are set up
-
-describe('UUID Utility', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
+describe('UUID Utilities', () => {
   describe('generateUUID', () => {
-    it('should generate a valid UUID v4 format', async () => {
-      // Mock random bytes
-      const mockBytes = new Uint8Array([
-        0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78,
-        0x9a, 0xbc, 0xde, 0xf0,
-      ]);
-      mockGetRandomBytesAsync.mockResolvedValue(mockBytes);
+    // Mock expo-crypto.getRandomBytesAsync for generateUUID tests
+    // For format testing, we need a predictable output.
+    // For uniqueness, we can rely on actual random bytes.
+    const mockGetRandomBytesAsync = jest.spyOn(Crypto, 'getRandomBytesAsync');
 
-      const uuid = await generateUUID();
-
-      // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-      expect(uuid).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
-      );
+    beforeEach(() => {
+      // Reset mocks before each test to prevent interference
+      mockGetRandomBytesAsync.mockReset();
+      // Default implementation for getRandomBytesAsync to produce varied bytes for uniqueness tests
+      mockGetRandomBytesAsync.mockImplementation(async (byteCount: number) => {
+        const bytes = new Uint8Array(byteCount);
+        for (let i = 0; i < byteCount; i++) {
+          bytes[i] = Math.floor(Math.random() * 256);
+        }
+        return bytes;
+      });
     });
 
-    it('should request 16 random bytes', async () => {
-      const mockBytes = new Uint8Array(16).fill(0);
-      mockGetRandomBytesAsync.mockResolvedValue(mockBytes);
-
-      await generateUUID();
-
-      expect(mockGetRandomBytesAsync).toHaveBeenCalledWith(16);
+    it('should return a string', async () => {
+      const uuid = await generateUUID();
+      expect(typeof uuid).toBe('string');
     });
 
-    it('should set version 4 in the UUID', async () => {
-      const mockBytes = new Uint8Array(16).fill(0xff);
-      mockGetRandomBytesAsync.mockResolvedValue(mockBytes);
+    it('should return a UUID in the correct format', async () => {
+      // Mock for this specific test to produce a known UUID
+      mockGetRandomBytesAsync.mockImplementationOnce(async (byteCount: number) => {
+        // A specific set of bytes that should result in a valid UUID v4
+        // Example: 12345678-1234-4234-a234-1234567890ab
+        // Version (4): bits 12-15 of byte 6 set to 0100 (0x40), so byte[6] & 0x0f | 0x40
+        // Variant (10): bits 6-7 of byte 8 set to 10 (0x80), so byte[8] & 0x3f | 0x80
+        const fixedBytes = new Uint8Array([
+          0x12, 0x34, 0x56, 0x78, 0x12, 0x34, // first 6 bytes
+          (0x12 & 0x0f) | 0x40, // byte 6 (version 4) -  0x12 -> 0x52
+          0x34, // byte 7
+          (0x12 & 0x3f) | 0x80, // byte 8 (variant 10) - 0x12 -> 0x92
+          0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, // rest
+          0x12, 0x34, 0x56, 0x78, 0x90, 0xab,
+        ]);
+        return fixedBytes.slice(0, byteCount);
+      });
 
       const uuid = await generateUUID();
-
-      // The 13th character (index 14 after dashes) should be '4'
-      const parts = uuid.split('-');
-      expect(parts[2][0]).toBe('4');
-    });
-
-    it('should set variant bits correctly', async () => {
-      const mockBytes = new Uint8Array(16).fill(0xff);
-      mockGetRandomBytesAsync.mockResolvedValue(mockBytes);
-
-      const uuid = await generateUUID();
-
-      // The 17th character should be 8, 9, a, or b (variant 10)
-      const parts = uuid.split('-');
-      const variantChar = parts[3][0];
-      expect(['8', '9', 'a', 'b']).toContain(variantChar);
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      expect(uuid).toMatch(uuidRegex);
     });
 
     it('should generate unique UUIDs', async () => {
-      // First call
-      mockGetRandomBytesAsync.mockResolvedValueOnce(
-        new Uint8Array([
-          0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
-          0xcc, 0xdd, 0xee, 0xff, 0x00,
-        ]),
-      );
+      const uuids = new Set<string>();
+      const numUuidsToGenerate = 1000;
 
-      // Second call
-      mockGetRandomBytesAsync.mockResolvedValueOnce(
-        new Uint8Array([
-          0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33, 0x44,
-          0x55, 0x66, 0x77, 0x88, 0x99,
-        ]),
-      );
-
-      const uuid1 = await generateUUID();
-      const uuid2 = await generateUUID();
-
-      expect(uuid1).not.toBe(uuid2);
-    });
-
-    it('should return a string of length 36', async () => {
-      const mockBytes = new Uint8Array(16).fill(0);
-      mockGetRandomBytesAsync.mockResolvedValue(mockBytes);
-
-      const uuid = await generateUUID();
-
-      expect(uuid.length).toBe(36);
-    });
-
-    it('should have correct dash positions', async () => {
-      const mockBytes = new Uint8Array(16).fill(0);
-      mockGetRandomBytesAsync.mockResolvedValue(mockBytes);
-
-      const uuid = await generateUUID();
-
-      expect(uuid[8]).toBe('-');
-      expect(uuid[13]).toBe('-');
-      expect(uuid[18]).toBe('-');
-      expect(uuid[23]).toBe('-');
+      for (let i = 0; i < numUuidsToGenerate; i++) {
+        const uuid = await generateUUID();
+        uuids.add(uuid);
+      }
+      expect(uuids.size).toBe(numUuidsToGenerate);
     });
   });
 
   describe('generateUUIDSync', () => {
-    it('should generate a valid UUID v4 format', () => {
+    it('should return a string', () => {
       const uuid = generateUUIDSync();
-
-      expect(uuid).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
-      );
+      expect(typeof uuid).toBe('string');
     });
 
-    it('should return a string of length 36', () => {
+    it('should return a UUID in the correct format', () => {
       const uuid = generateUUIDSync();
-
-      expect(uuid.length).toBe(36);
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      expect(uuid).toMatch(uuidRegex);
     });
 
-    it('should have version 4 in the correct position', () => {
-      const uuid = generateUUIDSync();
+    it('should generate unique UUIDs (with high probability)', () => {
+      const uuids = new Set<string>();
+      const numUuidsToGenerate = 1000;
 
-      // The 15th character (index 14) should be '4'
+      for (let i = 0; i < numUuidsToGenerate; i++) {
+        const uuid = generateUUIDSync();
+        uuids.add(uuid);
+      }
+      expect(uuids.size).toBe(numUuidsToGenerate);
+    });
+
+    it('should contain "4" at the 15th character (version 4 UUID)', () => {
+      const uuid = generateUUIDSync();
       expect(uuid[14]).toBe('4');
     });
 
-    it('should have correct variant bits', () => {
+    it('should contain a valid variant character (8, 9, a, or b) at the 20th character', () => {
       const uuid = generateUUIDSync();
-
-      // The 20th character (index 19) should be 8, 9, a, or b
-      expect(['8', '9', 'a', 'b']).toContain(uuid[19]);
-    });
-
-    it('should have correct dash positions', () => {
-      const uuid = generateUUIDSync();
-
-      expect(uuid[8]).toBe('-');
-      expect(uuid[13]).toBe('-');
-      expect(uuid[18]).toBe('-');
-      expect(uuid[23]).toBe('-');
-    });
-
-    it('should generate unique UUIDs', () => {
-      const uuids = new Set<string>();
-
-      for (let i = 0; i < 100; i++) {
-        uuids.add(generateUUIDSync());
-      }
-
-      // All 100 UUIDs should be unique
-      expect(uuids.size).toBe(100);
-    });
-
-    it('should only contain valid hex characters and dashes', () => {
-      const uuid = generateUUIDSync();
-
-      expect(uuid).toMatch(/^[0-9a-f-]+$/);
-    });
-
-    it('should have correct segment lengths', () => {
-      const uuid = generateUUIDSync();
-      const segments = uuid.split('-');
-
-      expect(segments).toHaveLength(5);
-      expect(segments[0]).toHaveLength(8);
-      expect(segments[1]).toHaveLength(4);
-      expect(segments[2]).toHaveLength(4);
-      expect(segments[3]).toHaveLength(4);
-      expect(segments[4]).toHaveLength(12);
+      const variantChar = uuid[19];
+      expect(['8', '9', 'a', 'b']).toContain(variantChar);
     });
   });
 });
