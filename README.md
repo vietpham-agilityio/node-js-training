@@ -45,7 +45,7 @@ This document provides information about React Native Expo big practice.
 - [**Zustand**](https://zustand-demo.pmnd.rs/)
 - [**React Query**](https://tanstack.com/)
 - [**React Hook Form**](https://react-hook-form.com/)
-- [**React Native Unistyles**](https://www.unistyl.es/v3/start/introduction)
+- [**Uniwind - Tailwind bindings for React Native**](https://docs.uniwind.dev/quickstart)
 - [**Storybook**](https://storybook.js.org/)
 - [**Jest & React Native Testing Library**](https://jestjs.io/)
 - [**ESLint & Prettier**](https://eslint.org/)
@@ -91,7 +91,6 @@ movea-app/
 ├── metro.config.js             # Metro bundler configuration
 ├── package.json                # Dependencies
 ├── tsconfig.json               # TypeScript configuration
-├── unistyles.ts                # Unistyles configuration
 ├── pnpm-lock.yaml              # PNPM lock file
 └── README.md                   # Project documentation
 ```
