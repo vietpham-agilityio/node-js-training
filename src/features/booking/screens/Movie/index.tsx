@@ -41,7 +41,7 @@ import { useMovie } from '@/features/booking/hooks/useMovies';
 
 // Stores
 import { useBookingStore } from '@/features/booking/store/booking';
-import { useHeaderStore } from '@/stores/header';
+import { useMovieStore } from '@/stores/movie';
 
 // Types
 
@@ -85,7 +85,7 @@ const MovieScreen = () => {
 
   const { data: movie, isLoading, refetch: refetchMovie } = useMovie(id);
 
-  const setHeaderTitle = useHeaderStore(state => state.setTitle);
+  const setSelectedMovie = useMovieStore(state => state.setSelectedMovie);
 
   const {
     title = '',
@@ -133,14 +133,14 @@ const MovieScreen = () => {
 
   const handleNavigateToSelectCinema = useCallback(() => {
     setMovie(movie!);
-    setHeaderTitle(title);
+    setSelectedMovie(movie!);
     router.push({
       pathname: ROUTES.CINEMA,
       params: {
         movieId: id,
       },
     });
-  }, [title, id, movie, setHeaderTitle, setMovie]);
+  }, [id, movie, setSelectedMovie, setMovie]);
 
   const handleGoBack = useCallback(() => {
     router.back();

@@ -1,40 +1,74 @@
 import { act } from '@testing-library/react-native';
-import { useHeaderStore } from '../header';
+
+// Store
+import { useMovieStore } from '../movie';
+
+// Types
+import { Movie, MovieStatus } from '@/features/booking/types/movie';
+
+const MOCK_MOVIE: Movie = {
+  id: '1',
+  title: 'Test Title',
+  posterUrl: 'https://example.com/poster.jpg',
+  genre: ['Action'],
+  durationMinutes: 120,
+  rating: 8.5,
+  status: MovieStatus.NOW_PLAYING,
+  releaseDate: '2024-01-01',
+  synopsis: 'Test synopsis',
+  trailerUrl: ['https://example.com/trailer.mp4'],
+  castCrew: { actors: [], directors: [], producers: [], writers: [] },
+  createdAt: '2024-01-01',
+  updatedAt: '2024-01-01',
+};
 
 describe('useHeaderStore', () => {
   // Reset the store to its initial state before each test
   beforeEach(() => {
     act(() => {
-      useHeaderStore.setState({ title: null });
+      useMovieStore.setState({ selectedMovie: null });
     });
   });
 
   it('should return the initial state', () => {
-    const { title } = useHeaderStore.getState();
-    expect(title).toBeNull();
+    const { selectedMovie } = useMovieStore.getState();
+    expect(selectedMovie).toBeNull();
   });
 
   it('should set the title correctly', () => {
     const newTitle = 'Test Title';
     act(() => {
-      useHeaderStore.getState().setTitle(newTitle);
+      useMovieStore.getState().setSelectedMovie({
+        ...MOCK_MOVIE,
+        title: newTitle,
+      });
     });
-    const { title } = useHeaderStore.getState();
-    expect(title).toBe(newTitle);
+    const { selectedMovie } = useMovieStore.getState();
+    expect(selectedMovie).toStrictEqual({
+      ...MOCK_MOVIE,
+      title: newTitle,
+    });
   });
 
   it('should clear the title correctly', () => {
     // First, set a title
     act(() => {
-      useHeaderStore.getState().setTitle('Some Title');
+      useMovieStore.getState().setSelectedMovie({
+        ...MOCK_MOVIE,
+        title: 'Some Title',
+      });
     });
-    expect(useHeaderStore.getState().title).toBe('Some Title');
 
-    // Then, clear it
-    act(() => {
-      useHeaderStore.getState().clearTitle();
+    expect(useMovieStore.getState().selectedMovie).toStrictEqual({
+      ...MOCK_MOVIE,
+      title: 'Some Title',
     });
-    const { title } = useHeaderStore.getState();
-    expect(title).toBeNull();
+  });
+
+  it('should clear the selected movie correctly', () => {
+    act(() => {
+      useMovieStore.getState().clearSelectedMovie();
+    });
+    expect(useMovieStore.getState().selectedMovie).toBeNull();
   });
 });

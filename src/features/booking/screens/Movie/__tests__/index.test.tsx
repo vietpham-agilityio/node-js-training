@@ -8,7 +8,7 @@ import MovieScreen from '../index';
 const mockPush = jest.fn();
 const mockBack = jest.fn();
 const mockSetMovie = jest.fn();
-const mockSetHeaderTitle = jest.fn();
+const mockSetSelectedMovie = jest.fn();
 const mockRefetchMovie = jest.fn();
 
 let mockParams: { id?: string } = {
@@ -64,14 +64,14 @@ jest.mock('@/features/booking/store/booking', () => ({
   useBookingStore: (selector: any) => mockUseBookingStore(selector),
 }));
 
-const mockUseHeaderStore = jest.fn((selector: any) =>
+const mockUseMovieStore = jest.fn((selector: any) =>
   selector({
-    setTitle: mockSetHeaderTitle,
+    setSelectedMovie: mockSetSelectedMovie,
   }),
 );
 
-jest.mock('@/stores/header', () => ({
-  useHeaderStore: (selector: any) => mockUseHeaderStore(selector),
+jest.mock('@/stores/movie', () => ({
+  useMovieStore: (selector: any) => mockUseMovieStore(selector),
 }));
 
 jest.mock('@/components/Tabs', () => {

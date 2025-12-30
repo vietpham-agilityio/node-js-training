@@ -6,7 +6,7 @@ import CinemaScreen from '../index';
 // Mock dependencies
 const mockPush = jest.fn();
 const mockSetShowtime = jest.fn();
-const mockClearHeaderTitle = jest.fn();
+const mockClearSelectedMovie = jest.fn();
 const mockShowToast = jest.fn();
 
 let mockParams: { movieId?: string; movieTitle: string } = {
@@ -44,14 +44,14 @@ jest.mock('@/features/booking/store/booking', () => ({
   useBookingStore: (selector: any) => mockUseBookingStore(selector),
 }));
 
-const mockUseHeaderStore = jest.fn((selector: any) =>
+const mockUseMovieStore = jest.fn((selector: any) =>
   selector({
-    clearTitle: mockClearHeaderTitle,
+    clearSelectedMovie: mockClearSelectedMovie,
   }),
 );
 
-jest.mock('@/stores/header', () => ({
-  useHeaderStore: (selector: any) => mockUseHeaderStore(selector),
+jest.mock('@/stores/movie', () => ({
+  useMovieStore: (selector: any) => mockUseMovieStore(selector),
 }));
 
 const mockUseToastStore = jest.fn((selector: any) =>
