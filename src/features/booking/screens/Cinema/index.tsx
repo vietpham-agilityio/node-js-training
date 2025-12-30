@@ -1,5 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ActivityIndicator,
   ScrollView,
@@ -11,7 +12,7 @@ import {
 import { Href, router, useLocalSearchParams } from 'expo-router';
 
 // Unwind
-import { useResolveClassNames } from 'uniwind';
+import { useResolveClassNames, withUniwind } from 'uniwind';
 
 // Components
 import { Typo } from '@/components/Typo';
@@ -33,11 +34,12 @@ import { formatTime } from '@/utils/formats';
 
 // Store
 import { useBookingStore } from '@/features/booking/store/booking';
-import { useHeaderStore } from '@/stores/header';
 import { useToastStore } from '@/stores/toast';
 
 // Types
 import { CinemaWithShowtimes, Showtime } from '@/features/booking/types/cinema';
+
+const StyledSafeAreaView = withUniwind(SafeAreaView);
 
 const CinemaScreen = () => {
   const params = useLocalSearchParams<{
@@ -93,10 +95,13 @@ const CinemaScreen = () => {
     router.push(ROUTES.SEATS as Href);
   }, [selectedShowtime]);
 
-  const handleDateSelect = useCallback((dateId: string) => {
-    setSelectedDate(dateId);
-    setSelectedShowtime(null);
-  }, []);
+  const handleDateSelect = useCallback(
+    (dateId: string) => {
+      selectedDate && dateId !== selectedDate && setSelectedShowtime(null);
+      setSelectedDate(dateId);
+    },
+    [selectedDate],
+  );
 
   const handleShowtimeSelect = useCallback(
     (cinemaId: string, showtimeId: string) => {
@@ -294,36 +299,43 @@ const CinemaScreen = () => {
   }, [isLoading, cinemasWithShowtimes.length]);
 
   return (
-    <View className="flex-1 bg-dark-blue">
-      <FlashList
-        data={cinemasWithShowtimes}
-        renderItem={renderCinema}
-        keyExtractor={keyExtractor}
-        ListHeaderComponent={ListHeaderComponent}
-        ItemSeparatorComponent={ItemSeparator}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={renderEmpty}
-      />
+    <StyledSafeAreaView
+      edges={['bottom']}
+      accessibilityLabel="Cinema screen"
+      accessibilityHint="Cinema screen"
+      className="flex-1 bg-dark-blue"
+    >
+      <View className="flex-1 bg-dark-blue">
+        <FlashList
+          data={cinemasWithShowtimes}
+          renderItem={renderCinema}
+          keyExtractor={keyExtractor}
+          ListHeaderComponent={ListHeaderComponent}
+          ItemSeparatorComponent={ItemSeparator}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={renderEmpty}
+        />
 
-      {/* Circular Navigation Button */}
-      {!isLoading && !isError && cinemasWithShowtimes.length > 0 && (
-        <View className="absolute bottom-10 left-0 right-0 items-center">
-          <TouchableOpacity
-            onPress={handleNavigateToSeatSelection}
-            disabled={!isDisabled}
-            accessibilityRole="button"
-            accessibilityLabel="Continue to seat selection"
-            className={`w-14 h-14 rounded-full items-center justify-center ${
-              isDisabled
-                ? 'bg-linear-to-r from-secondary to-primary'
-                : 'bg-bg-quaternary'
-            }`}
-          >
-            <ArrowRightIcon color={iconColorConfig.color} />
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
+        {/* Circular Navigation Button */}
+        {!isLoading && !isError && cinemasWithShowtimes.length > 0 && (
+          <View className="absolute bottom-2 left-0 right-0 items-center">
+            <TouchableOpacity
+              onPress={handleNavigateToSeatSelection}
+              disabled={!isDisabled}
+              accessibilityRole="button"
+              accessibilityLabel="Continue to seat selection"
+              className={`w-14 h-14 rounded-full items-center justify-center ${
+                isDisabled
+                  ? 'bg-linear-to-r from-secondary to-primary'
+                  : 'bg-bg-quaternary'
+              }`}
+            >
+              <ArrowRightIcon color={iconColorConfig.color} />
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </StyledSafeAreaView>
   );
 };
 
