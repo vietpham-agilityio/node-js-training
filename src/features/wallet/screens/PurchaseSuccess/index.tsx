@@ -1,9 +1,9 @@
-import { useRouter } from 'expo-router';
-import { useCallback } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useMemo } from 'react';
 import { Pressable, View } from 'react-native';
 
 // Constants
-import { MESSAGES, ROUTES } from '@/constants';
+import { MESSAGES, PARAMS, ROUTES } from '@/constants';
 
 // Components
 import { Button } from '@/components/Button';
@@ -15,6 +15,15 @@ import { CardCheckedIcon } from '@/icons/CardCheckedIcon';
 
 const PurchaseSuccessScreen = () => {
   const router = useRouter();
+  const { fromCheckout } = useLocalSearchParams<{
+    [PARAMS.FROM_CHECKOUT]?: string;
+  }>();
+
+  const isFromCheckout = useMemo(() => fromCheckout === 'true', [fromCheckout]);
+
+  const handleNavigateToCheckout = useCallback(() => {
+    router.replace(ROUTES.CHECKOUT);
+  }, [router]);
 
   const handleNavigateToMyWallet = useCallback(() => {
     router.replace(ROUTES.MY_WALLET);
@@ -33,14 +42,20 @@ const PurchaseSuccessScreen = () => {
       />
       <View className="w-full px-11 gap-4">
         <Button
-          title="My Wallet"
-          testID="my-wallet"
+          title={isFromCheckout ? 'Checkout Now' : 'My Wallet'}
+          testID={isFromCheckout ? 'checkout-now' : 'my-wallet'}
           isPrimary
-          onPress={handleNavigateToMyWallet}
+          onPress={
+            isFromCheckout ? handleNavigateToCheckout : handleNavigateToMyWallet
+          }
           accessible
           accessibilityRole="button"
-          accessibilityLabel="My Wallet"
-          accessibilityHint="Go to my wallet screen"
+          accessibilityLabel={isFromCheckout ? 'Checkout Now' : 'My Wallet'}
+          accessibilityHint={
+            isFromCheckout
+              ? 'Go back to checkout screen'
+              : 'Go to my wallet screen'
+          }
         />
         <View className="flex-row justify-center items-center gap-1">
           <Typo weight="regular" size="sm">

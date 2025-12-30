@@ -1,4 +1,4 @@
-import { Href, useRouter } from 'expo-router';
+import { Href, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 
@@ -10,6 +10,7 @@ import { TopUpAmountButton } from './TopUpAmountButton';
 // Constants
 import {
   ERROR_MESSAGES,
+  PARAMS,
   ROUTES,
   Size,
   TOP_UP_AMOUNTS,
@@ -32,6 +33,9 @@ import { KeyboardLayout } from '@/layouts/KeyboardLayout';
 
 const TopUpScreen = () => {
   const router = useRouter();
+  const { fromCheckout } = useLocalSearchParams<{
+    [PARAMS.FROM_CHECKOUT]?: string;
+  }>();
 
   const { mutate: topUp, isPending } = useTopUp();
   const showError = useToastStore(state => state.showError);
@@ -92,13 +96,17 @@ const TopUpScreen = () => {
         setSelectedAmount(null);
 
         router.dismissAll();
-        router.push(ROUTES.PURCHASE_SUCCESS as Href);
+        // Pass fromCheckout param to PurchaseSuccess if user came from checkout
+        const successRoute = fromCheckout
+          ? `${ROUTES.PURCHASE_SUCCESS}?${PARAMS.FROM_CHECKOUT}=true`
+          : ROUTES.PURCHASE_SUCCESS;
+        router.push(successRoute as Href);
       },
       onError: (error: Error) => {
         showError(error.message || ERROR_MESSAGES.TOP_UP_FAILED);
       },
     });
-  }, [parsedAmount, topUp, showError, router]);
+  }, [parsedAmount, topUp, showError, router, fromCheckout]);
 
   return (
     <KeyboardLayout>
