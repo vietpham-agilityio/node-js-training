@@ -67,6 +67,7 @@ export const Button = memo(
 
     return (
       <TouchableOpacity
+        accessible
         disabled={disabled}
         testID={testID}
         activeOpacity={0.8}
@@ -78,6 +79,10 @@ export const Button = memo(
       >
         <View className={cn(buttonClassName, className)}>
           <Text
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel={title}
+            maxFontSizeMultiplier={1.2}
             className={cn(
               'font-montserrat-medium text-white text-center',
               TEXT_SIZE_CLASSES[size],

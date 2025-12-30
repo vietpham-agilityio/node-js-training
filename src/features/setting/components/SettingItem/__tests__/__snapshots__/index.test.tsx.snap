@@ -42,8 +42,9 @@ exports[`SettingItem Component Snapshot should match snapshot 1`] = `
     className="flex-row justify-start items-center"
   >
     <Text
-      accessibilityRole="text"
+      accessible={true}
       className="text-white text-base font-montserrat-regular ml-3"
+      maxFontSizeMultiplier={1.2}
     >
       Edit Profile
     </Text>
@@ -143,8 +144,9 @@ exports[`SettingItem Component Snapshot should match snapshot with icon 1`] = `
       </RNSVGGroup>
     </RNSVGSvgView>
     <Text
-      accessibilityRole="text"
+      accessible={true}
       className="text-white text-base font-montserrat-regular ml-3"
+      maxFontSizeMultiplier={1.2}
     >
       Edit Profile
     </Text>

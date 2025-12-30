@@ -32,14 +32,16 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
           className="gap-1 items-center"
         >
           <Text
-            accessibilityRole="text"
+            accessible={true}
             className="text-white text-lg font-montserrat-medium"
+            maxFontSizeMultiplier={1.2}
           >
             John Doe
           </Text>
           <Text
-            accessibilityRole="text"
+            accessible={true}
             className="text-base font-montserrat-regular text-overlay-soft"
+            maxFontSizeMultiplier={1.2}
           >
             john@example.com
           </Text>
@@ -49,8 +51,9 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
         className="flex-row items-center justify-between mt-8"
       >
         <Text
-          accessibilityRole="text"
+          accessible={true}
           className="text-white text-base font-montserrat-medium"
+          maxFontSizeMultiplier={1.2}
         >
           Notifications
         </Text>
@@ -255,8 +258,9 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              accessibilityRole="text"
+              accessible={true}
               className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
             >
               Edit
             </Text>
@@ -436,8 +440,9 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              accessibilityRole="text"
+              accessible={true}
               className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
             >
               My Wallet
             </Text>
@@ -586,8 +591,9 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              accessibilityRole="text"
+              accessible={true}
               className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
             >
               Change Language
             </Text>
@@ -753,8 +759,9 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              accessibilityRole="text"
+              accessible={true}
               className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
             >
               Help Center
             </Text>
@@ -920,8 +927,9 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              accessibilityRole="text"
+              accessible={true}
               className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
             >
               Rate Movea App
             </Text>
@@ -1025,8 +1033,9 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              accessibilityRole="text"
+              accessible={true}
               className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
             >
               Change Password
             </Text>
@@ -1130,8 +1139,9 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
               </RNSVGGroup>
             </RNSVGSvgView>
             <Text
-              accessibilityRole="text"
+              accessible={true}
               className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
             >
               Logout
             </Text>

@@ -202,14 +202,16 @@ export const LocationDropdown = memo(
 
         {/* Error Message */}
         {errorMsg && (
-          <Text
+          <Typo
             accessibilityRole="alert"
             accessibilityLabel={errorMsg}
-            className="text-red text-xs mt-1 ml-4"
+            size="xs"
+            weight="regular"
+            className="text-red mt-1 ml-4"
             testID={`${testID}-error`}
           >
             {errorMsg}
-          </Text>
+          </Typo>
         )}
 
         {/* Options Modal */}

@@ -281,7 +281,7 @@ describe('MovieScreen', () => {
       const { getByTestId } = render(<MovieScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('expandable-text')).toBeTruthy();
+      expect(getByTestId('expandable-container')).toBeTruthy();
     });
 
     it('should render cast and crew when available', () => {
@@ -373,7 +373,7 @@ describe('MovieScreen', () => {
       });
 
       // All valid content types should render something
-      expect(getByTestId('expandable-text')).toBeTruthy(); // SYNOPSIS
+      expect(getByTestId('expandable-container')).toBeTruthy(); // SYNOPSIS
       expect(getAllByTestId('user-card').length).toBeTruthy(); // CAST_CREW
       expect(getByTestId('movie-trailer-carousel')).toBeTruthy(); // TRAILER
 
@@ -389,7 +389,7 @@ describe('MovieScreen', () => {
         wrapper: createWrapper(),
       });
       // Initially should show content for "About Movie" tab
-      expect(getByTestId('expandable-text')).toBeTruthy();
+      expect(getByTestId('expandable-container')).toBeTruthy();
 
       // Press review tab to trigger handleTabChange (line 131)
       const reviewTab = getByTestId('tab-review');
@@ -398,7 +398,7 @@ describe('MovieScreen', () => {
       // After pressing review tab, activeTab should change to 'review'
       // This causes contentItems to return empty array (line 127)
       // Content should not be visible for review tab
-      expect(queryByTestId('expandable-text')).toBeNull();
+      expect(queryByTestId('expandable-container')).toBeNull();
     });
 
     it('should show content when "About Movie" tab is active', () => {
@@ -406,7 +406,7 @@ describe('MovieScreen', () => {
         wrapper: createWrapper(),
       });
       // Should show content for first tab (about_movie)
-      expect(getByTestId('expandable-text')).toBeTruthy();
+      expect(getByTestId('expandable-container')).toBeTruthy();
     });
 
     it('should return empty array when tab is not "About Movie" (line 127)', () => {
@@ -414,7 +414,7 @@ describe('MovieScreen', () => {
         wrapper: createWrapper(),
       });
       // Initially should show content
-      expect(getByTestId('expandable-text')).toBeTruthy();
+      expect(getByTestId('expandable-container')).toBeTruthy();
 
       // Change to review tab - this triggers setActiveTab (line 131)
       const reviewTab = getByTestId('tab-review');
@@ -422,7 +422,7 @@ describe('MovieScreen', () => {
 
       // After state update, contentItems should return empty array (line 127)
       // because activeTab !== DETAIL_MOVIE_TABS[0].id
-      expect(queryByTestId('expandable-text')).toBeNull();
+      expect(queryByTestId('expandable-container')).toBeNull();
     });
   });
 
@@ -503,7 +503,7 @@ describe('MovieScreen', () => {
       const { getByTestId } = render(<MovieScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('expandable-text')).toBeTruthy();
+      expect(getByTestId('expandable-container')).toBeTruthy();
     });
 
     it('should handle actor with null imageUrl', () => {

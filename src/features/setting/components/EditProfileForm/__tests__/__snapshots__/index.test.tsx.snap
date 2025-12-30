@@ -136,12 +136,16 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             <Text
               accessibilityLabel="Full Name"
               accessibilityRole="text"
+              accessible={true}
+              allowFontScaling={false}
               collapsable={false}
               onPress={[Function]}
             >
               <Text
-                accessibilityRole="text"
+                accessible={true}
+                allowFontScaling={false}
                 className="text-sm font-montserrat-regular text-overlay-soft"
+                maxFontSizeMultiplier={1.2}
               >
                 Full Name
               </Text>
@@ -151,6 +155,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             accessibilityLabel="Full Name input field"
             accessibilityRole="text"
             accessible={true}
+            allowFontScaling={false}
             autoCapitalize="words"
             autoCorrect={false}
             className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -192,12 +197,16 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             <Text
               accessibilityLabel="Email Address"
               accessibilityRole="text"
+              accessible={true}
+              allowFontScaling={false}
               collapsable={false}
               onPress={[Function]}
             >
               <Text
-                accessibilityRole="text"
+                accessible={true}
+                allowFontScaling={false}
                 className="text-sm font-montserrat-regular text-overlay-soft"
+                maxFontSizeMultiplier={1.2}
               >
                 Email Address
               </Text>
@@ -207,6 +216,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             accessibilityLabel="Email Address input field"
             accessibilityRole="text"
             accessible={true}
+            allowFontScaling={false}
             autoCapitalize="none"
             autoCorrect={false}
             className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -249,12 +259,16 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             <Text
               accessibilityLabel="Address"
               accessibilityRole="text"
+              accessible={true}
+              allowFontScaling={false}
               collapsable={false}
               onPress={[Function]}
             >
               <Text
-                accessibilityRole="text"
+                accessible={true}
+                allowFontScaling={false}
                 className="text-sm font-montserrat-regular text-overlay-soft"
+                maxFontSizeMultiplier={1.2}
               >
                 Address
               </Text>
@@ -264,6 +278,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             accessibilityLabel="Address input field"
             accessibilityRole="text"
             accessible={true}
+            allowFontScaling={false}
             autoCapitalize="none"
             autoCorrect={false}
             className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -305,12 +320,16 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             <Text
               accessibilityLabel="Phone Number"
               accessibilityRole="text"
+              accessible={true}
+              allowFontScaling={false}
               collapsable={false}
               onPress={[Function]}
             >
               <Text
-                accessibilityRole="text"
+                accessible={true}
+                allowFontScaling={false}
                 className="text-sm font-montserrat-regular text-overlay-soft"
+                maxFontSizeMultiplier={1.2}
               >
                 Phone Number
               </Text>
@@ -320,6 +339,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             accessibilityLabel="Phone Number input field"
             accessibilityRole="text"
             accessible={true}
+            allowFontScaling={false}
             autoCapitalize="none"
             autoCorrect={false}
             className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -380,7 +400,11 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
         className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
       >
         <Text
+          accessibilityLabel="Update My Profile"
+          accessibilityRole="text"
+          accessible={true}
           className="font-montserrat-medium text-white text-center text-lg leading-6"
+          maxFontSizeMultiplier={1.2}
           testID="update-my-profile-submit-button-text"
         >
           Update My Profile
@@ -951,12 +975,16 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             <Text
               accessibilityLabel="Full Name"
               accessibilityRole="text"
+              accessible={true}
+              allowFontScaling={false}
               collapsable={false}
               onPress={[Function]}
             >
               <Text
-                accessibilityRole="text"
+                accessible={true}
+                allowFontScaling={false}
                 className="text-sm font-montserrat-regular text-overlay-soft"
+                maxFontSizeMultiplier={1.2}
               >
                 Full Name
               </Text>
@@ -966,6 +994,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             accessibilityLabel="Full Name input field"
             accessibilityRole="text"
             accessible={true}
+            allowFontScaling={false}
             autoCapitalize="words"
             autoCorrect={false}
             className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -1007,12 +1036,16 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             <Text
               accessibilityLabel="Email Address"
               accessibilityRole="text"
+              accessible={true}
+              allowFontScaling={false}
               collapsable={false}
               onPress={[Function]}
             >
               <Text
-                accessibilityRole="text"
+                accessible={true}
+                allowFontScaling={false}
                 className="text-sm font-montserrat-regular text-overlay-soft"
+                maxFontSizeMultiplier={1.2}
               >
                 Email Address
               </Text>
@@ -1022,6 +1055,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             accessibilityLabel="Email Address input field"
             accessibilityRole="text"
             accessible={true}
+            allowFontScaling={false}
             autoCapitalize="none"
             autoCorrect={false}
             className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -1064,12 +1098,16 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             <Text
               accessibilityLabel="Address"
               accessibilityRole="text"
+              accessible={true}
+              allowFontScaling={false}
               collapsable={false}
               onPress={[Function]}
             >
               <Text
-                accessibilityRole="text"
+                accessible={true}
+                allowFontScaling={false}
                 className="text-sm font-montserrat-regular text-overlay-soft"
+                maxFontSizeMultiplier={1.2}
               >
                 Address
               </Text>
@@ -1079,6 +1117,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             accessibilityLabel="Address input field"
             accessibilityRole="text"
             accessible={true}
+            allowFontScaling={false}
             autoCapitalize="none"
             autoCorrect={false}
             className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -1120,12 +1159,16 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             <Text
               accessibilityLabel="Phone Number"
               accessibilityRole="text"
+              accessible={true}
+              allowFontScaling={false}
               collapsable={false}
               onPress={[Function]}
             >
               <Text
-                accessibilityRole="text"
+                accessible={true}
+                allowFontScaling={false}
                 className="text-sm font-montserrat-regular text-overlay-soft"
+                maxFontSizeMultiplier={1.2}
               >
                 Phone Number
               </Text>
@@ -1135,6 +1178,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             accessibilityLabel="Phone Number input field"
             accessibilityRole="text"
             accessible={true}
+            allowFontScaling={false}
             autoCapitalize="none"
             autoCorrect={false}
             className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -1195,7 +1239,11 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
         className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
       >
         <Text
+          accessibilityLabel="Update My Profile"
+          accessibilityRole="text"
+          accessible={true}
           className="font-montserrat-medium text-white text-center text-lg leading-6"
+          maxFontSizeMultiplier={1.2}
           testID="update-my-profile-submit-button-text"
         >
           Update My Profile

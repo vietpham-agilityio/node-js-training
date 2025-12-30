@@ -42,7 +42,11 @@ exports[`Button Component Rendering should render matching snapshot 1`] = `
     className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-primary"
   >
     <Text
+      accessibilityLabel="Test Button"
+      accessibilityRole="text"
+      accessible={true}
       className="font-montserrat-medium text-white text-center text-lg leading-6"
+      maxFontSizeMultiplier={1.2}
       testID="test-button-text"
     >
       Test Button

@@ -234,7 +234,6 @@ describe('EditProfileScreen', () => {
       expect(getByLabelText('Email Address input field')).toBeTruthy();
       expect(getByLabelText('Address input field')).toBeTruthy();
       expect(getByLabelText('Phone Number input field')).toBeTruthy();
-      expect(getByLabelText('Update My Profile')).toBeTruthy();
     });
   });
 

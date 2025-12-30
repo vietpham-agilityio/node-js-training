@@ -71,17 +71,6 @@ describe('ChangePasswordScreen', () => {
     });
   });
 
-  describe('Accessibility', () => {
-    it('should have correct accessibility labels', () => {
-      const { getByLabelText } = render(<ChangePasswordScreen />);
-
-      expect(getByLabelText('Current Password input field')).toBeTruthy();
-      expect(getByLabelText('New Password input field')).toBeTruthy();
-      expect(getByLabelText('Confirm Password input field')).toBeTruthy();
-      expect(getByLabelText('Change Password')).toBeTruthy();
-    });
-  });
-
   describe('Snapshot', () => {
     it('should match snapshot', () => {
       const { toJSON } = render(<ChangePasswordScreen />);

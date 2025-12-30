@@ -431,12 +431,14 @@ describe('ChangePasswordForm Component', () => {
 
   describe('Accessibility', () => {
     it('should have correct accessibility labels', () => {
-      const { getByLabelText } = render(<ChangePasswordForm />);
+      const { getByLabelText, getAllByLabelText } = render(
+        <ChangePasswordForm />,
+      );
 
       expect(getByLabelText('Current Password input field')).toBeTruthy();
       expect(getByLabelText('New Password input field')).toBeTruthy();
       expect(getByLabelText('Confirm Password input field')).toBeTruthy();
-      expect(getByLabelText('Change Password')).toBeTruthy();
+      expect(getAllByLabelText('Change Password')).toBeTruthy();
     });
   });
 

@@ -152,11 +152,18 @@ export const Input = memo(
               }}
             >
               <Animated.Text
+                accessible
                 accessibilityRole="text"
                 accessibilityLabel={label}
+                allowFontScaling={false}
                 onPress={handleLabelPress}
               >
-                <Typo size="sm" weight="regular" className={labelColor}>
+                <Typo
+                  size="sm"
+                  allowFontScaling={false}
+                  weight="regular"
+                  className={labelColor}
+                >
                   {label}
                 </Typo>
               </Animated.Text>
@@ -175,6 +182,7 @@ export const Input = memo(
               accessible
               accessibilityRole="text"
               accessibilityLabel={`${label} input field`}
+              allowFontScaling={false}
               value={value}
               secureTextEntry={secureTextEntry && !isPasswordVisible}
               testID={`${testID}-input`}

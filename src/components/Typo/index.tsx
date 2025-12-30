@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Text } from 'react-native';
+import { AccessibilityRole, Text, TextProps } from 'react-native';
 
 // Utils
 import { cn } from '@/utils/cn';
@@ -17,15 +17,9 @@ export type FontSize =
 
 export type FontWeight = 'light' | 'regular' | 'medium' | 'semibold';
 
-export interface TypoProps {
-  children: React.ReactNode;
+export interface TypoProps extends TextProps {
   size?: FontSize;
   weight?: FontWeight;
-  className?: string;
-  testID?: string;
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
-  accessibilityRole?: string;
 }
 
 const FONT_SIZE_MAP: Record<FontSize, string> = {
@@ -53,17 +47,18 @@ export const Typo = memo(
     size = 'base',
     weight = 'regular',
     className = '',
-    testID,
+    ...rest
   }: TypoProps) => (
     <Text
-      accessibilityRole="text"
+      accessible
+      maxFontSizeMultiplier={1.2}
       className={cn(
         'text-white',
         FONT_SIZE_MAP[size],
         FONT_WEIGHT_MAP[weight],
         className,
       )}
-      testID={testID}
+      {...rest}
     >
       {children}
     </Text>

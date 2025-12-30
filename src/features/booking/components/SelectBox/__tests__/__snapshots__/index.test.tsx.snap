@@ -43,8 +43,10 @@ exports[`SelectBox Component Rendering should render matching snapshot 1`] = `
     className="items-center justify-center gap-2 rounded-lg bg-secondary"
   >
     <Text
-      accessibilityRole="text"
+      accessible={true}
+      allowFontScaling={false}
       className="text-white text-base font-montserrat-medium text-center max-w-15.5 min-w-13 leading-5"
+      maxFontSizeMultiplier={1.2}
     >
       Test Value
     </Text>
