@@ -66,12 +66,17 @@ export const SelectBox = memo(
         <View className={cn(SelectBoxClassName, className)}>
           <Typo
             weight={fontWeight}
+            allowFontScaling={false}
             className="text-center max-w-15.5 min-w-13 leading-5"
           >
             {value}
           </Typo>
           {date && (
-            <Typo weight={fontWeight} className="text-center leading-5">
+            <Typo
+              weight={fontWeight}
+              allowFontScaling={false}
+              className="text-center leading-5"
+            >
               {date}
             </Typo>
           )}

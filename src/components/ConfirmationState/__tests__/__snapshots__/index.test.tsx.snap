@@ -311,14 +311,20 @@ exports[`ConfirmationState Component Snapshot should match snapshot with default
     </RNSVGSvgView>
   </View>
   <Text
-    accessibilityRole="text"
+    accessibilityLabel="confirmation state title: Test Title"
+    accessibilityRole="header"
+    accessible={true}
     className="text-white text-2xl font-montserrat-medium"
+    maxFontSizeMultiplier={1.2}
   >
     Test Title
   </Text>
   <Text
+    accessibilityLabel="confirmation state description: Test Description"
     accessibilityRole="text"
+    accessible={true}
     className="text-white text-base font-montserrat-light max-w-48 text-center mt-4"
+    maxFontSizeMultiplier={1.2}
   >
     Test Description
   </Text>

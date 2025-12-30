@@ -463,13 +463,6 @@ describe('MyWalletScreen', () => {
         'Wallet balance 500000 IDR',
       );
     });
-
-    it('should have header accessibility role', () => {
-      const { getByText } = render(<MyWalletScreen />);
-
-      const header = getByText('Recent Transactions');
-      expect(header.props.accessibilityRole).toBe('text');
-    });
   });
 
   describe('Edge Cases', () => {

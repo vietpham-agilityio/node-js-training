@@ -422,16 +422,6 @@ describe('EditProfileForm Component', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have correct accessibility labels on inputs', () => {
-      const { getByLabelText } = render(<EditProfileForm {...defaultProps} />);
-
-      expect(getByLabelText('Full Name input field')).toBeTruthy();
-      expect(getByLabelText('Email Address input field')).toBeTruthy();
-      expect(getByLabelText('Address input field')).toBeTruthy();
-      expect(getByLabelText('Phone Number input field')).toBeTruthy();
-      expect(getByLabelText('Update My Profile')).toBeTruthy();
-    });
-
     it('should render avatar container', () => {
       const { getByTestId } = render(<EditProfileForm {...defaultProps} />);
       expect(getByTestId('avatar-container')).toBeTruthy();

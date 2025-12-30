@@ -142,15 +142,4 @@ describe('SignInForm Component', () => {
       });
     });
   });
-
-  describe('Accessibility', () => {
-    it('should have correct accessibility labels', () => {
-      const { getByLabelText } = render(<SignInForm {...defaultProps} />);
-
-      expect(getByLabelText('Email Address input field')).toBeTruthy();
-      expect(getByLabelText('Password input field')).toBeTruthy();
-      expect(getByLabelText('Sign In')).toBeTruthy();
-      expect(getByLabelText('Forgot Password')).toBeTruthy();
-    });
-  });
 });

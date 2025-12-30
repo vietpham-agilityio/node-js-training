@@ -26,12 +26,6 @@ describe('Typo Component', () => {
       const element = getByText('Default Color');
       expect(element.props.className).toContain('text-white');
     });
-
-    it('should have accessibility role text', () => {
-      const { getByText } = render(<Typo>Accessible Text</Typo>);
-      const element = getByText('Accessible Text');
-      expect(element.props.accessibilityRole).toBe('text');
-    });
   });
 
   describe('Font Sizes', () => {

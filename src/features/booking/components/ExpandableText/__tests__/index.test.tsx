@@ -118,15 +118,15 @@ describe('ExpandableText Component', () => {
     });
 
     it('should apply custom container className', () => {
-      const { getByTestId } = render(
+      const { getAllByTestId } = render(
         <ExpandableText
           text={shortText}
           containerClassName="px-4 py-2"
           testID="expandable-container"
         />,
       );
-      const container = getByTestId('expandable-container');
-      expect(container.props.className).toContain('px-4 py-2');
+      const container = getAllByTestId('expandable-container');
+      expect(container[0].props.className).toContain('px-4 py-2');
     });
   });
 });

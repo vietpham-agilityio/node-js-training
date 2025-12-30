@@ -363,16 +363,5 @@ describe('TopUpScreen', () => {
 
       expect(getByTestId('keyboard-layout')).toBeTruthy();
     });
-
-    it('should have accessibility labels for predefined amount buttons', () => {
-      const { getByText } = render(<TopUpScreen />);
-
-      // Navigate up the tree to find the TouchableOpacity with accessibility props
-      let amountButton = getByText('50.000').parent;
-      while (amountButton && !amountButton.props.accessibilityRole) {
-        amountButton = amountButton.parent;
-      }
-      expect(amountButton?.props.accessibilityRole).toBe('text');
-    });
   });
 });

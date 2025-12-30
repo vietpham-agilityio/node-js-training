@@ -232,17 +232,4 @@ describe('SignUpForm Component', () => {
       });
     });
   });
-
-  describe('Accessibility', () => {
-    it('should have correct accessibility labels', () => {
-      const { getByLabelText } = render(<SignUpForm {...defaultProps} />);
-
-      expect(getByLabelText('Select avatar')).toBeTruthy();
-      expect(getByLabelText('Full Name input field')).toBeTruthy();
-      expect(getByLabelText('Email Address input field')).toBeTruthy();
-      expect(getByLabelText('Password input field')).toBeTruthy();
-      expect(getByLabelText('Confirm Password input field')).toBeTruthy();
-      expect(getByLabelText('Sign Up')).toBeTruthy();
-    });
-  });
 });

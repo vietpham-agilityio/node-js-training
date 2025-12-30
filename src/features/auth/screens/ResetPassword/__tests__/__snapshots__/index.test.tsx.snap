@@ -64,12 +64,16 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   <Text
                     accessibilityLabel="New Password"
                     accessibilityRole="text"
+                    accessible={true}
+                    allowFontScaling={false}
                     collapsable={false}
                     onPress={[Function]}
                   >
                     <Text
-                      accessibilityRole="text"
+                      accessible={true}
+                      allowFontScaling={false}
                       className="text-sm font-montserrat-regular text-overlay-soft"
+                      maxFontSizeMultiplier={1.2}
                     >
                       New Password
                     </Text>
@@ -79,6 +83,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   accessibilityLabel="New Password input field"
                   accessibilityRole="text"
                   accessible={true}
+                  allowFontScaling={false}
                   autoCapitalize="none"
                   autoCorrect={false}
                   className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -227,12 +232,16 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   <Text
                     accessibilityLabel="Confirm Password"
                     accessibilityRole="text"
+                    accessible={true}
+                    allowFontScaling={false}
                     collapsable={false}
                     onPress={[Function]}
                   >
                     <Text
-                      accessibilityRole="text"
+                      accessible={true}
+                      allowFontScaling={false}
                       className="text-sm font-montserrat-regular text-overlay-soft"
+                      maxFontSizeMultiplier={1.2}
                     >
                       Confirm Password
                     </Text>
@@ -242,6 +251,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   accessibilityLabel="Confirm Password input field"
                   accessibilityRole="text"
                   accessible={true}
+                  allowFontScaling={false}
                   autoCapitalize="none"
                   autoCorrect={false}
                   className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
@@ -404,7 +414,11 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
             className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-primary"
           >
             <Text
+              accessibilityLabel="Reset Password"
+              accessibilityRole="text"
+              accessible={true}
               className="font-montserrat-medium text-white text-center text-lg leading-6"
+              maxFontSizeMultiplier={1.2}
               testID="reset-password-submit-button-text"
             >
               Reset Password

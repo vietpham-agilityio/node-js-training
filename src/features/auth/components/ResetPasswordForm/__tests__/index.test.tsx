@@ -592,11 +592,13 @@ describe('ResetPasswordForm Component', () => {
 
   describe('Accessibility', () => {
     it('should have correct accessibility labels', () => {
-      const { getByLabelText } = render(<ResetPasswordForm />);
+      const { getByLabelText, getAllByLabelText } = render(
+        <ResetPasswordForm />,
+      );
 
       expect(getByLabelText('New Password input field')).toBeTruthy();
       expect(getByLabelText('Confirm Password input field')).toBeTruthy();
-      expect(getByLabelText('Reset Password')).toBeTruthy();
+      expect(getAllByLabelText('Reset Password')).toBeTruthy();
     });
 
     it('should have correct accessibility roles', () => {

@@ -48,6 +48,8 @@ export const SearchInput = memo(
           <TextInput
             accessible
             accessibilityLabel={placeholder}
+            accessibilityRole="text"
+            allowFontScaling={false}
             value={value}
             testID={`${testID}-input`}
             className={cn(
