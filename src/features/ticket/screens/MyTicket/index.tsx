@@ -26,7 +26,7 @@ import { Ticket, TicketStatus } from '@/features/booking/types/booking';
 
 // Components
 import { Button } from '@/components/Button';
-import { MovieCard } from '@/components/MovieCard';
+import { HorizontalCard } from '@/components/HorizontalCard';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
 
@@ -129,7 +129,7 @@ const MyTicketScreen = () => {
       if (!movie || !cinema) return null;
 
       return (
-        <MovieCard
+        <HorizontalCard
           title={movie.title}
           posterUrl={movie.posterUrl}
           showtime={showTime}

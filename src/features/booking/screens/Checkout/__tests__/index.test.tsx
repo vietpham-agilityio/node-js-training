@@ -70,7 +70,7 @@ const mockUseBookingStore = jest.fn((selector: any) =>
       title: 'Test Movie',
       posterUrl: 'https://example.com/poster.jpg',
       rating: 4.5,
-      genre: 'Action',
+      genre: ['Action'],
       durationMinutes: 120,
     },
     selectedShowtime: {
@@ -109,23 +109,6 @@ jest.mock('@/stores/loading', () => ({
     }),
 }));
 
-// Mock components
-jest.mock('@/components/MovieCard', () => {
-  const React = require('react');
-  const { View, Text } = require('react-native');
-  return {
-    MovieCard: ({ title, posterUrl, rating, genre, durationMinutes }: any) =>
-      React.createElement(
-        View,
-        { testID: 'movie-card' },
-        React.createElement(Text, null, title),
-        React.createElement(Text, null, `Rating: ${rating}`),
-        React.createElement(Text, null, `Genre: ${genre}`),
-        React.createElement(Text, null, `Duration: ${durationMinutes} min`),
-      ),
-  };
-});
-
 const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -158,11 +141,11 @@ describe('CheckoutScreen', () => {
       expect(getByTestId('checkout-button')).toBeTruthy();
     });
 
-    it('should render movie card', () => {
+    it('should render horizontal card', () => {
       const { getByTestId } = render(<CheckoutScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('movie-card')).toBeTruthy();
+      expect(getByTestId('horizontal-card')).toBeTruthy();
     });
 
     it('should render all order detail rows', () => {
@@ -202,7 +185,7 @@ describe('CheckoutScreen', () => {
             title: 'Test Movie',
             posterUrl: 'https://example.com/poster.jpg',
             rating: 4.5,
-            genre: 'Action',
+            genre: ['Action'],
             durationMinutes: 120,
           },
           selectedShowtime: {
@@ -266,7 +249,7 @@ describe('CheckoutScreen', () => {
             title: 'Test Movie',
             posterUrl: 'https://example.com/poster.jpg',
             rating: 4.5,
-            genre: 'Action',
+            genre: ['Action'],
             durationMinutes: 120,
           },
           selectedShowtime: {
@@ -321,7 +304,7 @@ describe('CheckoutScreen', () => {
             title: 'Test Movie',
             posterUrl: 'https://example.com/poster.jpg',
             rating: 4.5,
-            genre: 'Action',
+            genre: ['Action'],
             durationMinutes: 120,
           },
           selectedShowtime: {
@@ -600,7 +583,7 @@ describe('CheckoutScreen', () => {
             title: 'Test Movie',
             posterUrl: 'https://example.com/poster.jpg',
             rating: 4.5,
-            genre: 'Action',
+            genre: ['Action'],
             durationMinutes: 120,
           },
           selectedShowtime: null,
@@ -635,7 +618,7 @@ describe('CheckoutScreen', () => {
             title: 'Test Movie',
             posterUrl: 'https://example.com/poster.jpg',
             rating: 4.5,
-            genre: 'Action',
+            genre: ['Action'],
             durationMinutes: 120,
           },
           selectedShowtime: {

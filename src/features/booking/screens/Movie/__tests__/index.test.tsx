@@ -74,24 +74,6 @@ jest.mock('@/stores/header', () => ({
   useHeaderStore: (selector: any) => mockUseHeaderStore(selector),
 }));
 
-jest.mock('@/components/MovieCard', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View, Text } = require('react-native');
-  return {
-    MovieCard: ({ title, posterUrl, durationMinutes, genre, rating }: any) => (
-      <View testID="movie-card">
-        <Text testID="movie-card-title">{title}</Text>
-        <Text testID="movie-card-poster">{posterUrl}</Text>
-        <Text testID="movie-card-duration">{durationMinutes}</Text>
-        <Text testID="movie-card-genre">{genre?.join(', ')}</Text>
-        <Text testID="movie-card-rating">{rating}</Text>
-      </View>
-    ),
-  };
-});
-
 jest.mock('@/components/Tabs', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react');
@@ -139,6 +121,32 @@ jest.mock('expo-image', () => {
   const { Image } = require('react-native');
   return {
     Image: (props: any) => <Image {...props} />,
+  };
+});
+
+jest.mock('@/components/HorizontalCard', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require('react');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { View, Text } = require('react-native');
+  return {
+    HorizontalCard: ({
+      title,
+      posterUrl,
+      durationMinutes,
+      genre,
+      rating,
+    }: any) => (
+      <View testID="horizontal-card">
+        <Text testID="horizontal-card-title">{title ?? ''}</Text>
+        <Text testID="horizontal-card-image">{posterUrl ?? ''}</Text>
+        <Text testID="horizontal-card-duration">{durationMinutes ?? ''}</Text>
+        <Text testID="horizontal-card-genre">
+          {genre ? genre.join(', ') : ''}
+        </Text>
+        {rating && <Text testID="horizontal-card-rating">{rating}</Text>}
+      </View>
+    ),
   };
 });
 
@@ -237,28 +245,30 @@ describe('MovieScreen', () => {
       expect(getByTestId('movie-banner-container')).toBeTruthy();
     });
 
-    it('should render movie card container', () => {
+    it('should render horizontal card container', () => {
       const { getByTestId } = render(<MovieScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('movie-card-container')).toBeTruthy();
+      expect(getByTestId('horizontal-card-container')).toBeTruthy();
     });
 
-    it('should render movie card with correct props', () => {
+    it('should render horizontal card with correct props', () => {
       const { getByTestId } = render(<MovieScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('movie-card')).toBeTruthy();
-      expect(getByTestId('movie-card-title')).toBeTruthy();
-      expect(getByTestId('movie-card-title').props.children).toBe('Test Movie');
-      expect(getByTestId('movie-card-poster').props.children).toBe(
+      expect(getByTestId('horizontal-card')).toBeTruthy();
+      expect(getByTestId('horizontal-card-title')).toBeTruthy();
+      expect(getByTestId('horizontal-card-title').props.children).toBe(
+        'Test Movie',
+      );
+      expect(getByTestId('horizontal-card-image').props.children).toBe(
         'https://example.com/poster.jpg',
       );
-      expect(getByTestId('movie-card-duration').props.children).toBe(120);
-      expect(getByTestId('movie-card-genre').props.children).toBe(
+      expect(getByTestId('horizontal-card-duration').props.children).toBe(120);
+      expect(getByTestId('horizontal-card-genre').props.children).toBe(
         'Action, Drama',
       );
-      expect(getByTestId('movie-card-rating').props.children).toBe(4.5);
+      expect(getByTestId('horizontal-card-rating').props.children).toBe(4.5);
     });
 
     it('should render tabs', () => {
@@ -458,8 +468,8 @@ describe('MovieScreen', () => {
         wrapper: createWrapper(),
       });
       // Should render with default values
-      expect(getByTestId('movie-card')).toBeTruthy();
-      expect(getByTestId('movie-card-title').props.children).toBe('');
+      expect(getByTestId('horizontal-card')).toBeTruthy();
+      expect(getByTestId('horizontal-card-title').props.children).toBe('');
     });
 
     it('should handle missing title', () => {
@@ -470,7 +480,7 @@ describe('MovieScreen', () => {
       const { getByTestId } = render(<MovieScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('movie-card-title').props.children).toBe('');
+      expect(getByTestId('horizontal-card-title').props.children).toBe('');
     });
 
     it('should handle missing posterUrl', () => {
@@ -481,7 +491,7 @@ describe('MovieScreen', () => {
       const { getByTestId } = render(<MovieScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('movie-card-poster').props.children).toBe('');
+      expect(getByTestId('horizontal-card-image').props.children).toBe('');
     });
 
     it('should handle missing genre', () => {
@@ -492,7 +502,7 @@ describe('MovieScreen', () => {
       const { getByTestId } = render(<MovieScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByTestId('movie-card-genre').props.children).toBe('');
+      expect(getByTestId('horizontal-card-genre').props.children).toBe('');
     });
 
     it('should handle missing synopsis', () => {

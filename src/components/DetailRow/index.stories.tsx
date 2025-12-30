@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
 
 // Components
-import { OrderDetailRow } from './';
+import { DetailRow } from './';
 
 const meta = {
-  title: 'OrderDetailRow',
-  component: OrderDetailRow,
+  title: 'DetailRow',
+  component: DetailRow,
   decorators: [
     Story => (
       <View className="p-4 bg-dark-blue w-full">
@@ -28,7 +28,7 @@ const meta = {
       description: 'Additional CSS classes for the value text',
     },
   },
-} satisfies Meta<typeof OrderDetailRow>;
+} satisfies Meta<typeof DetailRow>;
 
 export default meta;
 

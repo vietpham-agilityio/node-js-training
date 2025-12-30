@@ -4,15 +4,15 @@ import { View } from 'react-native';
 // Components
 import { Typo } from '../Typo';
 
-interface OrderDetailRowProps {
+interface DetailRowProps {
   label: string;
   value: string;
   valueClassName?: string;
   testID?: string;
 }
 
-export const OrderDetailRow = memo(
-  ({ label, value, valueClassName = '', testID }: OrderDetailRowProps) => (
+export const DetailRow = memo(
+  ({ label, value, valueClassName = '', testID }: DetailRowProps) => (
     <View className="flex-row justify-between items-center" testID={testID}>
       <Typo size="base" weight="regular" className="text-gradient-light">
         {label}
@@ -28,4 +28,4 @@ export const OrderDetailRow = memo(
   ),
 );
 
-OrderDetailRow.displayName = 'OrderDetailRow';
+DetailRow.displayName = 'DetailRow';

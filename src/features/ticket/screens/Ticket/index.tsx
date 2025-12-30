@@ -23,8 +23,8 @@ import { TicketStatus } from '@/features/booking/types/booking';
 // Components
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
-import { MovieCard } from '@/components/MovieCard';
-import { OrderDetailRow } from '@/components/OrderDetailRow';
+import { HorizontalCard } from '@/components/HorizontalCard';
+import { DetailRow } from '@/components/DetailRow';
 import { Typo } from '@/components/Typo';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
@@ -146,12 +146,12 @@ const TicketDetailScreen = () => {
         ) : (
           <View className="bg-deep-blue px-4 py-6 rounded-xl gap-3.5">
             {/* Movie Details Section */}
-            <MovieCard justifyContent="center" {...ticketDetail?.movie!} />
+            <HorizontalCard justifyContent="center" {...ticketDetail?.movie!} />
 
             {/* Order Details Section */}
             <View className="gap-4 pt-6.5">
               {orderRows.map(row => (
-                <OrderDetailRow
+                <DetailRow
                   key={row.testID}
                   label={row.label}
                   value={row.value}
