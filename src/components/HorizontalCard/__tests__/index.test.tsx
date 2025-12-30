@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 
 // Component
-import { MovieCard } from '..';
+import { HorizontalCard } from '..';
 
 // Constants
 import { Size } from '@/constants';
@@ -15,7 +15,7 @@ jest.mock('uniwind', () => ({
   useResolveClassNames: jest.fn(() => ({})),
 }));
 
-describe('MovieCard Component', () => {
+describe('HorizontalCard Component', () => {
   const defaultProps = {
     title: 'Test Movie',
     posterUrl: 'https://example.com/poster.jpg',
@@ -25,71 +25,77 @@ describe('MovieCard Component', () => {
 
   describe('Rendering', () => {
     it('should render without crashing', () => {
-      const { toJSON } = render(<MovieCard {...defaultProps} />);
+      const { toJSON } = render(<HorizontalCard {...defaultProps} />);
       expect(toJSON()).toBeTruthy();
     });
 
     it('should display the movie title', () => {
-      render(<MovieCard {...defaultProps} />);
+      render(<HorizontalCard {...defaultProps} />);
       expect(screen.getByText('Test Movie')).toBeTruthy();
     });
 
-    it('should display the movie poster', () => {
-      render(<MovieCard {...defaultProps} />);
-      expect(screen.getByTestId('movie-card-poster')).toBeTruthy();
+    it('should display the card image', () => {
+      render(<HorizontalCard {...defaultProps} />);
+      expect(screen.getByTestId('horizontal-card-image')).toBeTruthy();
     });
   });
 
   describe('Detailed Info Mode (Default)', () => {
     it('should display rating when provided', () => {
-      render(<MovieCard {...defaultProps} rating={4.5} />);
-      expect(screen.getByTestId('movie-card-rating')).toBeTruthy();
+      render(<HorizontalCard {...defaultProps} rating={4.5} />);
+      expect(screen.getByTestId('horizontal-card-rating')).toBeTruthy();
     });
 
     it('should display genres', () => {
-      render(<MovieCard {...defaultProps} />);
+      render(<HorizontalCard {...defaultProps} />);
       expect(screen.getByText('Action, Comedy')).toBeTruthy();
     });
 
     it('should display duration', () => {
-      render(<MovieCard {...defaultProps} durationMinutes={120} />);
+      render(<HorizontalCard {...defaultProps} durationMinutes={120} />);
       expect(screen.getByText('2h')).toBeTruthy();
     });
 
     it('should not display rating when not provided', () => {
-      render(<MovieCard {...defaultProps} />);
-      expect(screen.queryByTestId('movie-card-rating')).toBeNull();
+      render(<HorizontalCard {...defaultProps} />);
+      expect(screen.queryByTestId('horizontal-card-rating')).toBeNull();
     });
 
     it('should not display booking info when not provided', () => {
-      render(<MovieCard {...defaultProps} />);
-      expect(screen.queryByTestId('movie-card-showtime')).toBeNull();
-      expect(screen.queryByTestId('movie-card-price')).toBeNull();
-      expect(screen.queryByTestId('movie-card-cinema')).toBeNull();
+      render(<HorizontalCard {...defaultProps} />);
+      expect(screen.queryByTestId('horizontal-card-showtime')).toBeNull();
+      expect(screen.queryByTestId('horizontal-card-price')).toBeNull();
+      expect(screen.queryByTestId('horizontal-card-cinema')).toBeNull();
     });
   });
 
   describe('Booking Info Mode', () => {
     it('should display showtime and date when provided', () => {
       render(
-        <MovieCard {...defaultProps} showtime="16:40" showDate="2025-12-18" />,
+        <HorizontalCard
+          {...defaultProps}
+          showtime="16:40"
+          showDate="2025-12-18"
+        />,
       );
       expect(screen.getByText('16:40, Thu Dec 18')).toBeTruthy();
     });
 
     it('should display price when provided', () => {
-      render(<MovieCard {...defaultProps} price="150.000" />);
+      render(<HorizontalCard {...defaultProps} price="150.000" />);
       expect(screen.getByText('IDR 150.000')).toBeTruthy();
     });
 
     it('should display cinema location when provided', () => {
-      render(<MovieCard {...defaultProps} cinemaLocation="FX Sudirman XXI" />);
+      render(
+        <HorizontalCard {...defaultProps} cinemaLocation="FX Sudirman XXI" />,
+      );
       expect(screen.getByText('FX Sudirman XXI')).toBeTruthy();
     });
 
     it('should display all booking info together', () => {
       render(
-        <MovieCard
+        <HorizontalCard
           {...defaultProps}
           showtime="16:40"
           showDate="2025-12-18"
@@ -104,19 +110,23 @@ describe('MovieCard Component', () => {
 
     it('should not display rating when booking info is present', () => {
       render(
-        <MovieCard
+        <HorizontalCard
           {...defaultProps}
           rating={4.5}
           showtime="16:40"
           showDate="2025-12-18"
         />,
       );
-      expect(screen.queryByTestId('movie-card-rating')).toBeNull();
+      expect(screen.queryByTestId('horizontal-card-rating')).toBeNull();
     });
 
     it('should not display genres and duration when booking info is present', () => {
       render(
-        <MovieCard {...defaultProps} showtime="16:40" showDate="2025-12-18" />,
+        <HorizontalCard
+          {...defaultProps}
+          showtime="16:40"
+          showDate="2025-12-18"
+        />,
       );
       expect(screen.queryByText('Action, Comedy')).toBeNull();
       expect(screen.queryByText('2h')).toBeNull();
@@ -126,21 +136,21 @@ describe('MovieCard Component', () => {
   describe('Image Sizes', () => {
     it('should render with small image size', () => {
       const { toJSON } = render(
-        <MovieCard {...defaultProps} imageSize={Size.SMALL} />,
+        <HorizontalCard {...defaultProps} imageSize={Size.SMALL} />,
       );
       expect(toJSON()).toBeTruthy();
     });
 
     it('should render with medium image size', () => {
       const { toJSON } = render(
-        <MovieCard {...defaultProps} imageSize={Size.MEDIUM} />,
+        <HorizontalCard {...defaultProps} imageSize={Size.MEDIUM} />,
       );
       expect(toJSON()).toBeTruthy();
     });
 
     it('should render with large image size', () => {
       const { toJSON } = render(
-        <MovieCard {...defaultProps} imageSize={Size.LARGE} />,
+        <HorizontalCard {...defaultProps} imageSize={Size.LARGE} />,
       );
       expect(toJSON()).toBeTruthy();
     });
@@ -148,37 +158,37 @@ describe('MovieCard Component', () => {
 
   describe('Edge Cases', () => {
     it('should handle empty genre array', () => {
-      render(<MovieCard {...defaultProps} genre={[]} />);
+      render(<HorizontalCard {...defaultProps} genre={[]} />);
       expect(screen.getByText('Test Movie')).toBeTruthy();
     });
 
     it('should handle zero duration', () => {
-      render(<MovieCard {...defaultProps} durationMinutes={0} />);
+      render(<HorizontalCard {...defaultProps} durationMinutes={0} />);
       expect(screen.getByText('Test Movie')).toBeTruthy();
     });
 
     it('should handle showtime only without date', () => {
-      render(<MovieCard {...defaultProps} showtime="16:40" />);
+      render(<HorizontalCard {...defaultProps} showtime="16:40" />);
       expect(screen.getByText('16:40')).toBeTruthy();
     });
 
     it('should handle date only without showtime', () => {
-      render(<MovieCard {...defaultProps} showDate="2025-12-18" />);
+      render(<HorizontalCard {...defaultProps} showDate="2025-12-18" />);
       expect(screen.getByText('Thu Dec 18')).toBeTruthy();
     });
 
     it('should handle only price without other booking info', () => {
-      render(<MovieCard {...defaultProps} price="150.000" />);
+      render(<HorizontalCard {...defaultProps} price="150.000" />);
       expect(screen.getByText('IDR 150.000')).toBeTruthy();
-      expect(screen.queryByTestId('movie-card-showtime')).toBeNull();
-      expect(screen.queryByTestId('movie-card-cinema')).toBeNull();
+      expect(screen.queryByTestId('horizontal-card-showtime')).toBeNull();
+      expect(screen.queryByTestId('horizontal-card-cinema')).toBeNull();
     });
   });
 
   describe('Accessibility', () => {
     it('should have correct accessibility label', () => {
-      render(<MovieCard {...defaultProps} />);
-      const card = screen.getByTestId('movie-card');
+      render(<HorizontalCard {...defaultProps} />);
+      const card = screen.getByTestId('horizontal-card');
       expect(card.props.accessibilityLabel).toBe('Test Movie');
     });
   });

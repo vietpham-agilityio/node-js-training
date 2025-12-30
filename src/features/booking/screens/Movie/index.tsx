@@ -19,7 +19,7 @@ import { withUniwind } from 'uniwind';
 
 // Components
 import { Button } from '@/components/Button';
-import { MovieCard } from '@/components/MovieCard';
+import { HorizontalCard } from '@/components/HorizontalCard';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
 import { ExpandableText } from '@/features/booking/components/ExpandableText';
@@ -259,9 +259,9 @@ const MovieScreen = () => {
           />
           <View className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-bg-quaternary to-bg-quaternary/0" />
         </View>
-        {/* Movie Card */}
-        <View className="px-6 -mt-20" testID="movie-card-container">
-          <MovieCard
+        {/* Horizontal Card */}
+        <View className="px-6 -mt-20" testID="horizontal-card-container">
+          <HorizontalCard
             title={title}
             posterUrl={posterUrl}
             durationMinutes={durationMinutes}

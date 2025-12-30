@@ -31,7 +31,7 @@ import { Movie } from '@/features/booking/types/movie';
 
 // Components
 import { Button } from '@/components/Button';
-import { MovieCard } from '@/components/MovieCard';
+import { HorizontalCard } from '@/components/HorizontalCard';
 import { SearchInput } from '@/components/SearchInput';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
@@ -133,7 +133,7 @@ const SearchScreen = () => {
 
   const renderMovie = useCallback(
     ({ item }: { item: Movie }) => (
-      <MovieCard
+      <HorizontalCard
         {...item}
         onPress={() => handleMoviePress(item.id)}
         className="mb-4"

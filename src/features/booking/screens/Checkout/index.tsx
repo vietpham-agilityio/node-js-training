@@ -10,8 +10,8 @@ import { withUniwind } from 'uniwind';
 // Components
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
-import { MovieCard } from '@/components/MovieCard';
-import { OrderDetailRow } from '@/components/OrderDetailRow';
+import { HorizontalCard } from '@/components/HorizontalCard';
+import { DetailRow } from '@/components/DetailRow';
 
 // Constants
 import { ERROR_MESSAGES, ROUTES, Size } from '@/constants';
@@ -254,7 +254,7 @@ const CheckoutScreen = () => {
         <View>
           {/* Movie Details Section */}
           <View className="mb-8">
-            <MovieCard
+            <HorizontalCard
               title={selectedMovie?.title || ''}
               posterUrl={selectedMovie?.posterUrl || ''}
               rating={selectedMovie?.rating}
@@ -268,7 +268,7 @@ const CheckoutScreen = () => {
           {/* Order Details Section */}
           <View className="my-8 gap-4">
             {orderRows.map(row => (
-              <OrderDetailRow
+              <DetailRow
                 key={row.testID}
                 label={row.label}
                 value={row.value}
@@ -281,7 +281,7 @@ const CheckoutScreen = () => {
 
           {/* Wallet Information */}
           <View className="my-6">
-            <OrderDetailRow
+            <DetailRow
               label="Your Wallet"
               value={formatIDR(wallet?.balance || 0)}
               valueClassName={cn(

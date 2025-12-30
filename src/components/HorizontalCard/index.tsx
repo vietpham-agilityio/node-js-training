@@ -25,7 +25,7 @@ import {
   formatShowtimeDate,
 } from '@/utils/formats';
 
-interface MovieCardProps extends Omit<TouchableOpacityProps, 'children'> {
+interface HorizontalCardProps extends Omit<TouchableOpacityProps, 'children'> {
   title: string;
   posterUrl: string;
   durationMinutes?: number;
@@ -50,7 +50,7 @@ const WalletTransactionColor: Record<WalletTransactionType, string> = {
   [WalletTransactionType.REFUND]: 'text-text-primary',
 };
 
-export const MovieCard = memo(
+export const HorizontalCard = memo(
   ({
     title,
     posterUrl,
@@ -68,7 +68,7 @@ export const MovieCard = memo(
     justifyContent = 'end',
     onPress,
     ...rest
-  }: MovieCardProps) => {
+  }: HorizontalCardProps) => {
     const imageSizeClassName = useMemo(
       () => IMAGE_SIZE_MAP[imageSize as keyof typeof IMAGE_SIZE_MAP],
       [imageSize],
@@ -88,15 +88,15 @@ export const MovieCard = memo(
 
     return (
       <TouchableOpacity
-        testID="movie-card"
+        testID="horizontal-card"
         activeOpacity={onPress ? 0.8 : 1}
         onPress={onPress}
         accessibilityLabel={title}
-        accessibilityHint="Tap to view movie details"
+        accessibilityHint="Tap to view details"
         className={cn('w-full flex-row rounded-xl pr-4 gap-4', className)}
         {...rest}
       >
-        {/* Left Section - Movie Poster */}
+        {/* Left Section - Image */}
         <View className="relative">
           <StyledImage
             source={{ uri: posterUrl }}
@@ -104,7 +104,7 @@ export const MovieCard = memo(
             transition={200}
             accessibilityIgnoresInvertColors
             className={`${imageSizeClassName} rounded-lg`}
-            testID="movie-card-poster"
+            testID="horizontal-card-image"
             placeholder={{
               blurhash: BLUR_HASH,
             }}
@@ -113,7 +113,7 @@ export const MovieCard = memo(
           />
         </View>
 
-        {/* Right Section - Movie Details */}
+        {/* Right Section - Details */}
         <View
           className={cn(
             'flex-1 justify-end gap-3',
@@ -125,7 +125,7 @@ export const MovieCard = memo(
             size="base"
             weight={imageSize === Size.SMALL ? 'medium' : 'semibold'}
             className="leading-5"
-            testID="movie-card-title"
+            testID="horizontal-card-title"
             accessibilityRole="text"
             accessibilityLabel={title}
           >
@@ -144,7 +144,7 @@ export const MovieCard = memo(
                     'text-white',
                     transactionType && WalletTransactionColor[transactionType],
                   )}
-                  testID="movie-card-price"
+                  testID="horizontal-card-price"
                 >
                   {formatIDR(price)}
                 </Typo>
@@ -156,7 +156,7 @@ export const MovieCard = memo(
                   size="sm"
                   weight="regular"
                   className="text-white"
-                  testID="movie-card-showtime"
+                  testID="horizontal-card-showtime"
                 >
                   {showtimeDateText}
                 </Typo>
@@ -168,19 +168,19 @@ export const MovieCard = memo(
                   size="sm"
                   weight="light"
                   className="text-white"
-                  testID="movie-card-cinema"
+                  testID="horizontal-card-location"
                 >
                   {cinemaLocation}
                 </Typo>
               )}
 
-              {/* Cinema Location */}
+              {/* Cinema Name */}
               {cinemaName && (
                 <Typo
                   size="sm"
                   weight="light"
                   className="text-white"
-                  testID="movie-card-cinema"
+                  testID="horizontal-card-cinema"
                 >
                   {cinemaName}
                 </Typo>
@@ -190,7 +190,7 @@ export const MovieCard = memo(
             <>
               {/* Rating */}
               {rating && (
-                <View testID="movie-card-rating">
+                <View testID="horizontal-card-rating">
                   <Rating rating={rating} size={12} spacing={1} />
                 </View>
               )}
@@ -204,7 +204,7 @@ export const MovieCard = memo(
                       size="xs"
                       weight="light"
                       className="text-gradient-light"
-                      testID="movie-card-genres"
+                      testID="horizontal-card-genres"
                     >
                       {genresText}
                     </Typo>
@@ -216,7 +216,7 @@ export const MovieCard = memo(
                       size="xs"
                       weight="light"
                       className="text-gradient-light"
-                      testID="movie-card-duration"
+                      testID="horizontal-card-duration"
                     >
                       {formatMovieDuration(durationMinutes)}
                     </Typo>
@@ -231,4 +231,4 @@ export const MovieCard = memo(
   },
 );
 
-MovieCard.displayName = 'MovieCard';
+HorizontalCard.displayName = 'HorizontalCard';

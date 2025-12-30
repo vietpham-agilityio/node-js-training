@@ -321,8 +321,8 @@ describe('MyWalletScreen', () => {
 
       // First transaction without booking should render as Transaction component
       expect(getAllByTestId('transaction').length).toBeGreaterThan(0);
-      // Second transaction with booking should render as MovieCard
-      expect(getByTestId('movie-card')).toBeTruthy();
+      // Second transaction with booking should render as HorizontalCard
+      expect(getByTestId('horizontal-card')).toBeTruthy();
     });
 
     it('should render movie card for transactions with booking', () => {

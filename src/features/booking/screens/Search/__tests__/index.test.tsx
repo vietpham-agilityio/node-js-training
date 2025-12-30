@@ -149,11 +149,11 @@ describe('SearchScreen', () => {
       expect(getByTestId('tabs-container')).toBeTruthy();
     });
 
-    it('should render movie cards', () => {
+    it('should render horizontal cards', () => {
       const { getAllByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getAllByTestId('movie-card').length).toBe(2);
+      expect(getAllByTestId('horizontal-card').length).toBe(2);
     });
   });
 
@@ -207,7 +207,7 @@ describe('SearchScreen', () => {
       const { getAllByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getAllByTestId('movie-card').length).toBe(2);
+      expect(getAllByTestId('horizontal-card').length).toBe(2);
     });
 
     it('should display search results when search query is active', () => {
@@ -232,15 +232,15 @@ describe('SearchScreen', () => {
       });
 
       // Should show search results
-      expect(getAllByTestId('movie-card').length).toBe(2);
+      expect(getAllByTestId('horizontal-card').length).toBe(2);
     });
 
-    it('should navigate to movie details when movie is pressed', () => {
+    it('should navigate to movie details when card is pressed', () => {
       const { getAllByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
-      const movieCards = getAllByTestId('movie-card');
-      fireEvent.press(movieCards[0]);
+      const horizontalCards = getAllByTestId('horizontal-card');
+      fireEvent.press(horizontalCards[0]);
 
       expect(mockPush).toHaveBeenCalledWith('/(main)/movies/1');
     });
@@ -257,7 +257,7 @@ describe('SearchScreen', () => {
       fireEvent.press(highRatingTab);
 
       // Only Movie 1 with rating >= 4 should be shown
-      expect(getAllByTestId('movie-card').length).toBe(1);
+      expect(getAllByTestId('horizontal-card').length).toBe(1);
     });
 
     it('should show all movies when "All" rating is selected', () => {
@@ -269,7 +269,7 @@ describe('SearchScreen', () => {
       fireEvent.press(allTab);
 
       // All movies should be shown
-      expect(getAllByTestId('movie-card').length).toBe(2);
+      expect(getAllByTestId('horizontal-card').length).toBe(2);
     });
   });
 
@@ -406,7 +406,7 @@ describe('SearchScreen', () => {
         wrapper: createWrapper(),
       });
 
-      expect(getAllByTestId('movie-card').length).toBe(1);
+      expect(getAllByTestId('horizontal-card').length).toBe(1);
     });
 
     it('should handle empty pages array', () => {

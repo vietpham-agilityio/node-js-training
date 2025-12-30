@@ -2,14 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
 
 // Components
-import { MovieCard } from './';
+import { HorizontalCard } from './';
 
 // Constants
 import { Size } from '@/constants';
 
 const meta = {
-  title: 'MovieCard',
-  component: MovieCard,
+  title: 'HorizontalCard',
+  component: HorizontalCard,
   decorators: [
     Story => (
       <View className="p-4 bg-dark-blue">
@@ -28,7 +28,7 @@ const meta = {
       description: 'Movie rating from 0 to 5',
     },
   },
-} satisfies Meta<typeof MovieCard>;
+} satisfies Meta<typeof HorizontalCard>;
 
 export default meta;
 

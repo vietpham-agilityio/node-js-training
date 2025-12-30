@@ -27,7 +27,7 @@ import { WalletTransaction } from '@/features/wallet/types/wallet';
 
 // Components
 import { Button } from '@/components/Button';
-import { MovieCard } from '@/components/MovieCard';
+import { HorizontalCard } from '@/components/HorizontalCard';
 import { Typo } from '@/components/Typo';
 import { WalletCard } from '@/features/wallet/components/WalletCard';
 
@@ -103,7 +103,7 @@ const MyWalletScreen = () => {
       if (!movie || !cinema) return null;
 
       return (
-        <MovieCard
+        <HorizontalCard
           title={movie.title}
           posterUrl={movie.posterUrl}
           showtime={showTime}
