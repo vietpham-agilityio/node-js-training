@@ -1,6 +1,6 @@
 import { Href, useRouter } from 'expo-router';
 import { useCallback, useMemo } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -14,7 +14,7 @@ import { MovieCard } from '@/components/MovieCard';
 import { OrderDetailRow } from '@/components/OrderDetailRow';
 
 // Constants
-import { ERROR_MESSAGES, ROUTES, Size } from '@/constants';
+import { ERROR_MESSAGES, PARAMS, ROUTES, Size } from '@/constants';
 
 // Hooks
 import { useCreateBooking } from '@/features/booking/hooks/useBookings';
@@ -28,12 +28,18 @@ import { formatIDR, formatTime } from '@/utils/formats';
 // Store
 import { useAuthStore } from '@/features/auth/store/auth';
 import { useBookingStore } from '@/features/booking/store/booking';
-import { useLoadingStore } from '@/stores/loading';
 import { useHeaderStore } from '@/stores/header';
+import { useLoadingStore } from '@/stores/loading';
 
 // Utils
 import { cn } from '@/utils/cn';
+
+// Type
 import { Booking } from '@/features/booking/types/booking';
+
+// Icons
+import { Typo } from '@/components/Typo';
+import { Wallet } from '@/icons/Wallet';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
@@ -191,6 +197,11 @@ const CheckoutScreen = () => {
     ],
   );
 
+  const handleTopUp = useCallback(() => {
+    // Pass fromCheckout param to indicate user came from checkout flow
+    router.push(`${ROUTES.TOP_UP}?${PARAMS.FROM_CHECKOUT}=true` as Href);
+  }, [router]);
+
   const handleCheckout = useCallback(() => {
     const bookingData = {
       userId: user?.id || '',
@@ -301,6 +312,28 @@ const CheckoutScreen = () => {
           disabled={isBooking || !isEnoughBalance}
         />
       </StyledScrollView>
+      {!isEnoughBalance && (
+        <View className="absolute bottom-36 right-6">
+          <View className="items-center">
+            <TouchableOpacity
+              onPress={handleTopUp}
+              className="justify-center p-2.5 items-center rounded-full bg-linear-to-r from-gradient-blue-start to-gradient-blue-end"
+              accessibilityRole="button"
+              accessibilityLabel="Top up wallet"
+              accessibilityHint="Navigate to top up wallet screen"
+            >
+              <Wallet />
+            </TouchableOpacity>
+          </View>
+          <Typo
+            size="sm"
+            weight="semibold"
+            className="text-white whitespace-nowrap mt-1"
+          >
+            Top Up Now!
+          </Typo>
+        </View>
+      )}
     </StyledSafeAreaView>
   );
 };

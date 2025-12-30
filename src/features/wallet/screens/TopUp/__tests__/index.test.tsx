@@ -8,6 +8,7 @@ const mockPush = jest.fn();
 const mockDismissAll = jest.fn();
 const mockTopUp = jest.fn();
 const mockShowError = jest.fn();
+const mockUseLocalSearchParams = jest.fn();
 
 jest.mock('expo-router', () => ({
   Href: {},
@@ -15,6 +16,7 @@ jest.mock('expo-router', () => ({
     push: mockPush,
     dismissAll: mockDismissAll,
   }),
+  useLocalSearchParams: () => mockUseLocalSearchParams(),
 }));
 
 let mockIsPending = false;
@@ -66,6 +68,9 @@ jest.mock('@/constants', () => ({
   ROUTES: {
     PURCHASE_SUCCESS: '/(main)/purchase/purchase-success',
   },
+  PARAMS: {
+    FROM_CHECKOUT: 'fromCheckout',
+  },
   TOP_UP_AMOUNTS: [
     50000, 100000, 150000, 200000, 250000, 500000, 750000, 1000000,
   ],
@@ -93,6 +98,8 @@ describe('TopUpScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsPending = false;
+    // Default: not from checkout
+    mockUseLocalSearchParams.mockReturnValue({});
   });
 
   describe('Rendering', () => {
@@ -248,7 +255,7 @@ describe('TopUpScreen', () => {
       expect(mockTopUp).toHaveBeenCalledWith(50000, expect.any(Object));
     });
 
-    it('should navigate to purchase success on success', async () => {
+    it('should navigate to purchase success on success (not from checkout)', async () => {
       mockTopUp.mockImplementation((amount: number, options: any) => {
         options.onSuccess();
       });
@@ -265,6 +272,28 @@ describe('TopUpScreen', () => {
         expect(mockDismissAll).toHaveBeenCalled();
         expect(mockPush).toHaveBeenCalledWith(
           '/(main)/purchase/purchase-success',
+        );
+      });
+    });
+
+    it('should navigate to purchase success with fromCheckout param when from checkout', async () => {
+      mockUseLocalSearchParams.mockReturnValue({ fromCheckout: 'true' });
+      mockTopUp.mockImplementation((amount: number, options: any) => {
+        options.onSuccess();
+      });
+
+      const { getByTestId } = render(<TopUpScreen />);
+
+      const input = getByTestId('top-up-amount-input');
+      fireEvent.changeText(input, '50000');
+
+      const button = getByTestId('top-up-button');
+      fireEvent.press(button);
+
+      await waitFor(() => {
+        expect(mockDismissAll).toHaveBeenCalled();
+        expect(mockPush).toHaveBeenCalledWith(
+          '/(main)/purchase/purchase-success?fromCheckout=true',
         );
       });
     });

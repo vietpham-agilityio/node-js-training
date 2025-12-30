@@ -10,3 +10,4 @@ export * from './images';
 export * from './spacing';
 export * from './tabs';
 export * from './titles';
+export * from './params';
