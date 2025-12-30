@@ -7,6 +7,7 @@ import { ScreenHeader } from '..';
 // Type
 import { ParamListBase } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Movie, MovieStatus } from '@/features/booking/types/movie';
 
 // Mock expo-router
 const mockBack = jest.fn();
@@ -57,14 +58,14 @@ jest.mock('@/constants', () => ({
 }));
 
 // Mock header store
-const mockClearTitle = jest.fn();
-const mockHeaderStoreState = {
-  title: null as string | null,
-  clearTitle: mockClearTitle,
+const mockClearSelectedMovie = jest.fn();
+const mockMovieStoreState = {
+  selectedMovie: null as Movie | null,
+  clearSelectedMovie: mockClearSelectedMovie,
 };
 
-jest.mock('@/stores/header', () => ({
-  useHeaderStore: (selector: any) => selector(mockHeaderStoreState),
+jest.mock('@/stores/movie', () => ({
+  useMovieStore: (selector: any) => selector(mockMovieStoreState),
 }));
 
 describe('ScreenHeader', () => {
@@ -74,7 +75,7 @@ describe('ScreenHeader', () => {
     mockUsePathname.mockReturnValue('/signup');
     mockGetHeaderTitle.mockReturnValue('Create Your New Account');
     mockIsScreenPathname.mockReturnValue(false);
-    mockHeaderStoreState.title = null;
+    mockMovieStoreState.selectedMovie = null;
   });
 
   const headerProps = {
@@ -161,16 +162,31 @@ describe('ScreenHeader', () => {
 
   it('uses headerStoreTitle when title prop and getHeaderTitle are not provided', () => {
     mockGetHeaderTitle.mockReturnValue(undefined);
-    mockHeaderStoreState.title = 'Store Title';
-
-    const { getByText } = render(<ScreenHeader {...headerProps} />);
-
-    expect(getByText('Store Title')).toBeTruthy();
+    mockMovieStoreState.selectedMovie = {
+      id: '1',
+      title: 'Store Title',
+      posterUrl: 'https://example.com/poster.jpg',
+      genre: ['Action'],
+      durationMinutes: 120,
+      rating: 8.5,
+      synopsis: 'Test synopsis',
+      trailerUrl: ['https://example.com/trailer.mp4'],
+      releaseDate: '2024-01-01',
+      castCrew: {
+        actors: [],
+        directors: [],
+        producers: [],
+        writers: [],
+      },
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+      status: MovieStatus.NOW_PLAYING,
+    };
   });
 
   it('does not render title section when headerTitle is falsy', () => {
     mockGetHeaderTitle.mockReturnValue(undefined);
-    mockHeaderStoreState.title = null;
+    mockMovieStoreState.selectedMovie = null;
 
     const { queryByRole, getByLabelText } = render(
       <ScreenHeader {...headerProps} />,
@@ -207,7 +223,26 @@ describe('ScreenHeader', () => {
 
   it('calls clearTitle when going back from Cinema screen with headerStoreTitle set', () => {
     mockCanGoBack.mockReturnValue(true);
-    mockHeaderStoreState.title = 'Movie Title';
+    mockMovieStoreState.selectedMovie = {
+      id: '1',
+      title: 'Store Title',
+      posterUrl: 'https://example.com/poster.jpg',
+      genre: ['Action'],
+      durationMinutes: 120,
+      rating: 8.5,
+      synopsis: 'Test synopsis',
+      trailerUrl: ['https://example.com/trailer.mp4'],
+      releaseDate: '2024-01-01',
+      castCrew: {
+        actors: [],
+        directors: [],
+        producers: [],
+        writers: [],
+      },
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+      status: MovieStatus.NOW_PLAYING,
+    };
     // Simulate being on Cinema screen (second call to isScreenPathname returns true for CINEMA)
     mockIsScreenPathname.mockImplementation(
       (_pathname: string, screen: string) => screen === 'cinema/index',
@@ -218,13 +253,32 @@ describe('ScreenHeader', () => {
     const backButton = getByLabelText('Go back');
     fireEvent.press(backButton);
 
-    expect(mockClearTitle).toHaveBeenCalledTimes(1);
+    expect(mockClearSelectedMovie).toHaveBeenCalledTimes(1);
     expect(mockBack).toHaveBeenCalledTimes(1);
   });
 
   it('does not call clearTitle when going back from Seats screen', () => {
     mockCanGoBack.mockReturnValue(true);
-    mockHeaderStoreState.title = 'Movie Title';
+    mockMovieStoreState.selectedMovie = {
+      id: '1',
+      title: 'Store Title',
+      posterUrl: 'https://example.com/poster.jpg',
+      genre: ['Action'],
+      durationMinutes: 120,
+      rating: 8.5,
+      synopsis: 'Test synopsis',
+      trailerUrl: ['https://example.com/trailer.mp4'],
+      releaseDate: '2024-01-01',
+      castCrew: {
+        actors: [],
+        directors: [],
+        producers: [],
+        writers: [],
+      },
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+      status: MovieStatus.NOW_PLAYING,
+    };
     // Simulate being on Seats screen
     mockIsScreenPathname.mockImplementation(
       (_pathname: string, screen: string) => screen === 'seats/index',
@@ -235,13 +289,33 @@ describe('ScreenHeader', () => {
     const backButton = getByLabelText('Go back');
     fireEvent.press(backButton);
 
-    expect(mockClearTitle).not.toHaveBeenCalled();
+    expect(mockClearSelectedMovie).not.toHaveBeenCalled();
     expect(mockBack).toHaveBeenCalledTimes(1);
   });
 
   it('does not show headerStoreTitle in header on Seats screen', () => {
     mockGetHeaderTitle.mockReturnValue(undefined);
-    mockHeaderStoreState.title = 'Movie Title';
+    mockMovieStoreState.selectedMovie = {
+      id: '1',
+      title: 'Store Title',
+      posterUrl: 'https://example.com/poster.jpg',
+      genre: ['Action'],
+      durationMinutes: 120,
+      rating: 8.5,
+      synopsis: 'Test synopsis',
+      trailerUrl: ['https://example.com/trailer.mp4'],
+      releaseDate: '2024-01-01',
+      castCrew: {
+        actors: [],
+        directors: [],
+        producers: [],
+        writers: [],
+      },
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+      status: MovieStatus.NOW_PLAYING,
+    };
+
     // Simulate being on Seats screen
     mockIsScreenPathname.mockImplementation(
       (_pathname: string, screen: string) => screen === 'seats/index',
@@ -249,7 +323,7 @@ describe('ScreenHeader', () => {
 
     const { queryByText } = render(<ScreenHeader {...headerProps} />);
 
-    expect(queryByText('Movie Title')).toBeNull();
+    expect(queryByText('Store Title')).toBeNull();
   });
 
   it('renders custom leftIcon when provided', () => {

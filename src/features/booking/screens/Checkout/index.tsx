@@ -8,6 +8,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { withUniwind } from 'uniwind';
 
 // Components
+import { Typo } from '@/components/Typo';
 import { Button } from '@/components/Button';
 import { Divider } from '@/components/Divider';
 import { HorizontalCard } from '@/components/HorizontalCard';
@@ -28,17 +29,16 @@ import { formatIDR, formatTime } from '@/utils/formats';
 // Store
 import { useAuthStore } from '@/features/auth/store/auth';
 import { useBookingStore } from '@/features/booking/store/booking';
-import { useHeaderStore } from '@/stores/header';
 import { useLoadingStore } from '@/stores/loading';
 
+// Type
+import { useMovieStore } from '@/stores/movie';
+
 // Utils
+import { Booking } from '@/features/booking/types/booking';
 import { cn } from '@/utils/cn';
 
-// Type
-import { Booking } from '@/features/booking/types/booking';
-
 // Icons
-import { Typo } from '@/components/Typo';
 import { Wallet } from '@/icons/Wallet';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
@@ -55,7 +55,7 @@ const CheckoutScreen = () => {
     })),
   );
 
-  const clearHeaderTitle = useHeaderStore(state => state.clearTitle);
+  const clearSelectedMovie = useMovieStore(state => state.clearSelectedMovie);
 
   // Push notification hook
   const { scheduleTicketExpiration, scheduleShowReminder } =
@@ -219,7 +219,7 @@ const CheckoutScreen = () => {
         // Schedule push notifications
         await scheduleNotifications(booking);
 
-        clearHeaderTitle();
+        clearSelectedMovie();
 
         // Show success message
         toast.success(
@@ -248,7 +248,7 @@ const CheckoutScreen = () => {
     showLoading,
     hideLoading,
     scheduleNotifications,
-    clearHeaderTitle,
+    clearSelectedMovie,
   ]);
 
   return (

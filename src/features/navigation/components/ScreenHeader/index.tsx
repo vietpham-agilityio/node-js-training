@@ -23,7 +23,7 @@ import { STATUS_BAR_HEIGHT } from '@/utils/platform';
 
 // Stores
 import { useBookingStore } from '@/features/booking/store/booking';
-import { useHeaderStore } from '@/stores/header';
+import { useMovieStore } from '@/stores/movie';
 
 export interface ScreenHeaderProps extends NativeStackHeaderProps {
   title?: string;
@@ -44,8 +44,11 @@ export const ScreenHeader = ({
   const pathname = usePathname();
 
   // Dynamic header title from store
-  const { title: headerStoreTitle, clearTitle } = useHeaderStore(
-    useShallow(state => ({ title: state.title, clearTitle: state.clearTitle })),
+  const { selectedMovie, clearSelectedMovie } = useMovieStore(
+    useShallow(state => ({
+      selectedMovie: state.selectedMovie,
+      clearSelectedMovie: state.clearSelectedMovie,
+    })),
   );
 
   const { selectedSeats, removeSeat } = useBookingStore(
@@ -61,7 +64,9 @@ export const ScreenHeader = ({
   const isSeatScreen = isScreenPathname(pathname, SCREENS.MAIN.SEATS);
 
   const headerTitle =
-    title || getHeaderTitle(pathname) || (!isSeatScreen && headerStoreTitle);
+    title ||
+    getHeaderTitle(pathname) ||
+    (!isSeatScreen && selectedMovie?.title);
 
   const handleGoBack = () => {
     // Profile screen: Replace navigation to home instead of going back
@@ -73,7 +78,7 @@ export const ScreenHeader = ({
     // Clear dynamic header title only when leaving Cinema screen
     // This ensures the movie title persists through the booking flow (Cinema → Seats → Checkout)
     // but clears when user exits the booking flow by going back from Cinema
-    if (headerStoreTitle && isCinemaScreen) clearTitle();
+    if (selectedMovie?.title && isCinemaScreen) clearSelectedMovie();
 
     // Seats screen: Clear all selected seats when user navigates away
     // This resets the booking state to avoid stale seat selections
