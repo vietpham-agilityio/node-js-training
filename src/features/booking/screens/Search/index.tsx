@@ -46,7 +46,7 @@ const SearchScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRating, setSelectedRating] = useState('all');
-  const debouncedQuery = useDebounce(searchQuery, 300);
+  const debouncedQuery = useDebounce(searchQuery, 500);
 
   // Fetch movies with infinite scroll
   const {

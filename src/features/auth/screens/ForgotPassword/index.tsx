@@ -1,9 +1,16 @@
+import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { useCallback } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { View } from 'react-native';
 
 // Constants
-import { ROUTES, ToastType } from '@/constants';
+import {
+  ForgotPasswordFormData,
+  forgotPasswordSchema,
+  ROUTES,
+  ToastType,
+} from '@/constants';
 
 // Hooks
 import { useResetPassword } from '@/hooks/useSession';
@@ -14,36 +21,49 @@ import { Input } from '@/components/Input';
 import { Typo } from '@/components/Typo';
 
 // Layout
+import { Button } from '@/components/Button';
 import { AccessLayout } from '@/layouts/AccessLayout';
 
 const ForgotPasswordScreen = () => {
   const toast = useToastAlert();
   const router = useRouter();
-  const [email, setEmail] = useState('');
   const { mutate: resetPassword, isPending } = useResetPassword();
 
-  const handleSubmit = () => {
-    if (!email) {
-      Alert.alert('Error', 'Please enter your email');
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<ForgotPasswordFormData>({
+    resolver: valibotResolver(forgotPasswordSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    defaultValues: {
+      email: '',
+    },
+  });
 
-    resetPassword(email, {
-      onSuccess: () => {
-        toast.withAction(
-          'Password reset link has been sent to your email.',
-          {
-            label: 'OK',
-            onPress: () => router.replace(ROUTES.LOGIN),
-          },
-          ToastType.SUCCESS,
-        );
-      },
-      onError: () => {
-        toast.error('Failed to send reset link');
-      },
-    });
-  };
+  const isDisabled = isSubmitting || isPending || !isDirty;
+
+  const handleSubmitForm = useCallback(
+    (data: ForgotPasswordFormData) => {
+      resetPassword(data.email, {
+        onSuccess: () => {
+          toast.withAction(
+            'Password reset link has been sent to your email.',
+            {
+              label: 'OK',
+              onPress: () => router.replace(ROUTES.LOGIN),
+            },
+            ToastType.SUCCESS,
+          );
+        },
+        onError: () => {
+          toast.error('Failed to send reset link');
+        },
+      });
+    },
+    [resetPassword, router, toast],
+  );
 
   return (
     <AccessLayout mode="signup" loading={isPending}>
@@ -59,49 +79,52 @@ const ForgotPasswordScreen = () => {
           password.
         </Typo>
 
-        <View>
-          <Input
-            accessibilityRole="text"
-            accessibilityLabel="Email address input field"
-            accessibilityHint="Enter the email address associated with your account"
-            label="Email Address"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            returnKeyType="done"
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="emailAddress"
-            autoComplete="email"
+        <View className={errors.email ? 'mb-0' : 'mb-5'}>
+          <Controller
+            control={control}
+            name="email"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <Input
+                accessibilityRole="text"
+                accessibilityLabel="Email address input field"
+                accessibilityHint="Enter the email address associated with your account"
+                label="Email Address"
+                value={value}
+                error={error?.message}
+                testID="signup-email-input"
+                keyboardType="email-address"
+                returnKeyType="next"
+                autoCapitalize="none"
+                autoCorrect={false}
+                onChangeText={onChange}
+                onBlur={onBlur}
+              />
+            )}
           />
         </View>
 
-        <Pressable
-          onPress={handleSubmit}
-          disabled={isPending}
+        <Button
           accessible
           accessibilityRole="button"
           accessibilityLabel="Send password reset link"
           accessibilityHint="Sends an email with password reset instructions"
-          className="bg-primary rounded-xl p-4 items-center mt-4"
-        >
-          <Typo weight="medium" className="text-white">
-            {isPending ? 'Sending...' : 'Send Reset Link'}
-          </Typo>
-        </Pressable>
+          disabled={isDisabled}
+          title={isPending ? 'Sending...' : 'Send Reset Link'}
+          onPress={handleSubmit(handleSubmitForm)}
+        />
 
-        <Pressable
-          onPress={() => router.back()}
+        <Button
           accessible
           accessibilityRole="button"
           accessibilityLabel="Back to login"
           accessibilityHint="Navigate back to the Login screen"
-          className="items-center mt-4"
-        >
-          <Typo size="sm" className="text-primary">
-            Back to Login
-          </Typo>
-        </Pressable>
+          title="Back to Login"
+          isPrimary={false}
+          onPress={() => router.back()}
+        />
       </View>
     </AccessLayout>
   );

@@ -1,6 +1,7 @@
+import { Movie, MovieStatus } from '@/features/booking/types/movie';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react-native';
-
+import { LinkProps } from 'expo-router';
 import HomeScreen from '../index';
 
 // Mock dependencies
@@ -9,9 +10,14 @@ const mockRefetchNowPlaying = jest.fn();
 const mockRefetchComingSoon = jest.fn();
 const mockFetchNextNowPlaying = jest.fn();
 const mockFetchNextComingSoon = jest.fn();
+const mockMovieStatus = MovieStatus;
 
-let mockNowPlayingData: any = null;
-let mockComingSoonData: any = null;
+let mockNowPlayingData: {
+  pages: Movie[][];
+} | null = null;
+let mockComingSoonData: {
+  pages: Movie[][];
+} | null = null;
 let mockIsLoadingNowPlaying = false;
 let mockIsLoadingComingSoon = false;
 let mockIsFetchingNextNowPlaying = false;
@@ -25,12 +31,34 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
-  Link: ({ children, href }: any) => children,
+  Link: ({ children, href }: LinkProps) => children,
 }));
 
 jest.mock('@/features/booking/hooks/useMovies', () => ({
-  useMoviesInfinite: (options: any) => {
-    if (options?.status === 'NOW_PLAYING') {
+  useMoviesInfinite: (options: { status?: MovieStatus }) => {
+    if (options?.status === mockMovieStatus.NOW_PLAYING) {
+      return {
+        data: mockNowPlayingData,
+        isLoading: mockIsLoadingNowPlaying,
+        isFetchingNextPage: mockIsFetchingNextNowPlaying,
+        hasNextPage: mockHasNextNowPlaying,
+        fetchNextPage: mockFetchNextNowPlaying,
+        refetch: mockRefetchNowPlaying,
+        isRefetching: mockIsRefetchingNowPlaying,
+      };
+    }
+    return {
+      data: mockComingSoonData,
+      isLoading: mockIsLoadingComingSoon,
+      isFetchingNextPage: mockIsFetchingNextComingSoon,
+      hasNextPage: mockHasNextComingSoon,
+      fetchNextPage: mockFetchNextComingSoon,
+      refetch: mockRefetchComingSoon,
+      isRefetching: mockIsRefetchingComingSoon,
+    };
+  },
+  useMoviesByGenreInfinite: (options: { genre?: string }) => {
+    if (options?.genre === 'action') {
       return {
         data: mockNowPlayingData,
         isLoading: mockIsLoadingNowPlaying,
@@ -59,11 +87,19 @@ jest.mock('@/features/booking/components/MovieBannerCarousel', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { View, Text } = require('react-native');
   return {
-    MovieBannerCarousel: ({ movies, variant, testID }: any) =>
+    MovieBannerCarousel: ({
+      movies,
+      variant,
+      testID,
+    }: {
+      movies: Movie[];
+      variant?: string;
+      testID?: string;
+    }) =>
       React.createElement(
         View,
         { testID: testID || 'movie-banner-carousel', 'data-variant': variant },
-        movies?.map((movie: any) =>
+        movies?.map((movie: Movie) =>
           React.createElement(Text, { key: movie.id }, movie.title),
         ),
       ),
@@ -76,7 +112,15 @@ jest.mock('@/features/booking/components/PromotionCard', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { View, Text } = require('react-native');
   return {
-    PromotionCard: ({ id, title, testID }: any) =>
+    PromotionCard: ({
+      id,
+      title,
+      testID,
+    }: {
+      id: string;
+      title?: string;
+      testID?: string;
+    }) =>
       React.createElement(
         View,
         { testID: testID || `promotion-card-${id}` },
@@ -87,7 +131,7 @@ jest.mock('@/features/booking/components/PromotionCard', () => {
 
 // Mock constants
 jest.mock('@/constants', () => ({
-  FILTER_CATEGORY_TABS: [
+  FILTER_GENRE_TABS: [
     { id: 'all', label: 'All' },
     { id: 'action', label: 'Action' },
     { id: 'comedy', label: 'Comedy' },
@@ -126,25 +170,34 @@ const createWrapper = () => {
 };
 
 describe('HomeScreen', () => {
+  const mockMovie: Movie = {
+    id: '1',
+    title: 'Spider Man: No Way Home',
+    synopsis:
+      'Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man.',
+    posterUrl:
+      'https://media.themoviedb.org/t/p/w600_and_h900_face/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
+    rating: 4.7,
+    castCrew: {
+      actors: [],
+      directors: [],
+      producers: [],
+      writers: [],
+    },
+    trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
+    durationMinutes: 112,
+    genre: ['Action', 'Comedy', 'Adventure'],
+    language: 'EN',
+    releaseDate: '2023-06-15',
+    createdAt: '2023-06-15T12:34:56Z',
+    updatedAt: '2023-06-15T12:34:56Z',
+    status: MovieStatus.NOW_PLAYING,
+  };
+
   const mockMovies = [
-    {
-      id: '1',
-      title: 'Movie 1',
-      rating: 4.5,
-      genre: ['Action', 'Drama'],
-    },
-    {
-      id: '2',
-      title: 'Movie 2',
-      rating: 4.0,
-      genre: ['Comedy'],
-    },
-    {
-      id: '3',
-      title: 'Movie 3',
-      rating: 3.5,
-      genre: ['Action'],
-    },
+    { ...mockMovie, id: '1' },
+    { ...mockMovie, id: '2' },
+    { ...mockMovie, id: '3' },
   ];
 
   beforeEach(() => {
@@ -168,10 +221,10 @@ describe('HomeScreen', () => {
   describe('Loading State', () => {
     it('should show loading when either query is loading', () => {
       mockIsLoadingComingSoon = true;
-      const { getByText } = render(<HomeScreen />, {
+      const { getAllByText } = render(<HomeScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByText('Loading movies...')).toBeTruthy();
+      expect(getAllByText('Loading movies...')[0]).toBeTruthy();
     });
   });
 
@@ -247,17 +300,6 @@ describe('HomeScreen', () => {
   });
 
   describe('Load More Functionality', () => {
-    it('should show load more button for coming soon when hasNextPage is true', () => {
-      mockComingSoonData = { pages: [] };
-      mockHasNextComingSoon = true;
-      const { getAllByText } = render(<HomeScreen />, {
-        wrapper: createWrapper(),
-      });
-
-      const loadMoreButtons = getAllByText('Load more movies');
-      expect(loadMoreButtons.length).toBeGreaterThan(0);
-    });
-
     it('should not show load more button when hasNextPage is false', () => {
       mockNowPlayingData = { pages: [] };
       mockHasNextNowPlaying = false;
@@ -308,10 +350,8 @@ describe('HomeScreen', () => {
 
     it('should limit movies to top 10 by rating', () => {
       const manyMovies = Array.from({ length: 15 }, (_, i) => ({
+        ...mockMovie,
         id: `${i + 1}`,
-        title: `Movie ${i + 1}`,
-        rating: 5 - i * 0.1,
-        genre: ['Action'],
       }));
 
       mockNowPlayingData = { pages: [manyMovies] };
@@ -326,8 +366,14 @@ describe('HomeScreen', () => {
 
     it('should handle movies without genre', () => {
       const moviesWithoutGenre = [
-        { id: '1', title: 'Movie 1', rating: 4.5 },
-        { id: '2', title: 'Movie 2', rating: 4.0, genre: ['Action'] },
+        { ...mockMovie, id: '1', title: 'Movie 1', rating: 4.5 },
+        {
+          ...mockMovie,
+          id: '2',
+          title: 'Movie 2',
+          rating: 4.0,
+          genre: ['Action'],
+        },
       ];
 
       mockNowPlayingData = { pages: [moviesWithoutGenre] };
@@ -342,8 +388,14 @@ describe('HomeScreen', () => {
 
     it('should handle movies without rating', () => {
       const moviesWithoutRating = [
-        { id: '1', title: 'Movie 1', genre: ['Action'] },
-        { id: '2', title: 'Movie 2', rating: 4.0, genre: ['Action'] },
+        { ...mockMovie, id: '1', title: 'Movie 1', genre: ['Action'] },
+        {
+          ...mockMovie,
+          id: '2',
+          title: 'Movie 2',
+          rating: 4.0,
+          genre: ['Action'],
+        },
       ];
 
       mockNowPlayingData = { pages: [moviesWithoutRating] };

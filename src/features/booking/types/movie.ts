@@ -9,6 +9,29 @@ export enum PromoCodeStatus {
   FIXED_AMOUNT = 'fixed_amount',
 }
 
+export enum GenreMovie {
+  ALL = 'all',
+  ACTION = 'action',
+  ADVENTURE = 'adventure',
+  ANIMATION = 'animation',
+  COMEDY = 'comedy',
+  CRIME = 'crime',
+  DOCUMENTARY = 'documentary',
+  DRAMA = 'drama',
+  FAMILY = 'family',
+  FANTASY = 'fantasy',
+  HISTORY = 'history',
+  HORROR = 'horror',
+  MUSIC = 'music',
+  MYSTERY = 'mystery',
+  ROMANCE = 'romance',
+  SCI_FI = 'science_fiction',
+  TV_MOVIE = 'tv_movie',
+  THRILLER = 'thriller',
+  WAR = 'war',
+  WESTERN = 'western',
+}
+
 export interface CastMember {
   character?: string;
   name: string;
@@ -35,7 +58,7 @@ export interface Movie {
   durationMinutes: number;
   releaseDate: string;
   rating: number;
-  genre: string[];
+  genre: GenreMovie[];
   castCrew: CastCrew;
   language?: string;
   status: MovieStatus;

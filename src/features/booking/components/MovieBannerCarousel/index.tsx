@@ -1,5 +1,5 @@
-import { memo, useCallback, useMemo } from 'react';
-import { Dimensions, View } from 'react-native';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Dimensions, FlexStyle, View } from 'react-native';
 import Animated, { useSharedValue } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
 
@@ -21,6 +21,9 @@ import { isAndroid, isIOS } from '@/utils/platform';
 interface MovieBannerCarouselProps {
   variant?: Variant;
   movies: Movie[];
+  onReachEnd?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 const VARIANTS_MAP: Record<
@@ -30,6 +33,7 @@ const VARIANTS_MAP: Record<
     offset: number;
     width: number;
     height: number;
+    justifyContent: FlexStyle['justifyContent'];
   }
 > = {
   vertical: {
@@ -37,27 +41,43 @@ const VARIANTS_MAP: Record<
     offset: -24,
     width: 103,
     height: 147,
+    justifyContent: 'flex-start',
   },
   horizontal: {
     scale: 0.9,
     offset: 35,
     width: 300,
     height: 220,
+    justifyContent: 'center',
   },
 };
 
+// Threshold: fetch when user reaches this percentage of total items
+const FETCH_THRESHOLD = 0.8; // 80%
+
 export const MovieBannerCarousel = memo(
-  ({ variant = 'horizontal', movies }: MovieBannerCarouselProps) => {
+  ({
+    variant = 'horizontal',
+    movies,
+    onReachEnd,
+    hasNextPage = false,
+    isFetchingNextPage = false,
+  }: MovieBannerCarouselProps) => {
     const navigate = useRouter();
 
     const progress = useSharedValue<number>(0);
     const width = Dimensions.get('screen').width;
+    const hasFetchedRef = useRef(false);
 
     // Generate unique key based on movies IDs
-    // This forces carousel to remount when movies change
     const carouselKey = useMemo(() => {
       return movies.map(m => m.id).join('-');
     }, [movies]);
+
+    // Reset fetch flag when movies change (new data loaded)
+    useEffect(() => {
+      hasFetchedRef.current = false;
+    }, [movies.length]);
 
     const variantLabel = variant === 'horizontal' ? 'horizontal' : 'vertical';
 
@@ -66,6 +86,33 @@ export const MovieBannerCarousel = memo(
         navigate.push(ROUTES.MOVIE_DETAILS(movieId));
       },
       [navigate],
+    );
+
+    const handleProgressChange = useCallback(
+      (offsetProgress: number, absoluteProgress: number) => {
+        progress.value = offsetProgress;
+
+        // Calculate current index based on absolute progress
+        const currentIndex = Math.round(absoluteProgress);
+        const threshold = Math.floor(movies.length * FETCH_THRESHOLD);
+
+        // Trigger fetch when:
+        // 1. User scrolled past threshold
+        // 2. Haven't fetched yet for this batch
+        // 3. There's more data to fetch
+        // 4. Not currently fetching
+        if (
+          currentIndex >= threshold &&
+          !hasFetchedRef.current &&
+          hasNextPage &&
+          !isFetchingNextPage &&
+          onReachEnd
+        ) {
+          hasFetchedRef.current = true;
+          onReachEnd();
+        }
+      },
+      [movies.length, hasNextPage, isFetchingNextPage, onReachEnd, progress],
     );
 
     if (movies.length === 0) {
@@ -83,7 +130,7 @@ export const MovieBannerCarousel = memo(
         })}
       >
         <Carousel
-          key={carouselKey} // Forces remount when movies change
+          key={carouselKey}
           autoPlayInterval={2000}
           data={movies}
           height={VARIANTS_MAP[variant].height}
@@ -93,15 +140,16 @@ export const MovieBannerCarousel = memo(
           width={VARIANTS_MAP[variant].width}
           style={{
             width: width,
-            justifyContent: 'center',
+            justifyContent: VARIANTS_MAP[variant].justifyContent,
             alignItems: 'center',
+            marginLeft: variant === 'vertical' ? 24 : 0,
           }}
           mode="parallax"
           modeConfig={{
             parallaxScrollingScale: VARIANTS_MAP[variant].scale,
             parallaxScrollingOffset: VARIANTS_MAP[variant].offset,
           }}
-          onProgressChange={progress}
+          onProgressChange={handleProgressChange}
           renderItem={({ item, index }) => (
             <Animated.View
               key={item.id}

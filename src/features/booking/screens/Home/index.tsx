@@ -8,15 +8,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import {
-  FILTER_CATEGORY_TABS,
-  ROUTES,
-  Size,
-  TABS_FOOTER_HEIGHT,
-} from '@/constants';
+import { FILTER_GENRE_TABS, ROUTES, TABS_FOOTER_HEIGHT } from '@/constants';
 
 // Components
-import { Button } from '@/components/Button';
 import { SearchInput } from '@/components/SearchInput';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
@@ -24,11 +18,13 @@ import { MovieBannerCarousel } from '@/features/booking/components/MovieBannerCa
 import { PromotionCard } from '@/features/booking/components/PromotionCard';
 
 // Hooks
-import { useMoviesInfinite } from '@/features/booking/hooks/useMovies';
+import {
+  useMoviesByGenreInfinite,
+  useMoviesInfinite,
+} from '@/features/booking/hooks/useMovies';
 
 // Types
-
-import { MovieStatus } from '@/features/booking/types/movie';
+import { GenreMovie, MovieStatus } from '@/features/booking/types/movie';
 
 // Mock
 import { MOCK_PROMOTIONS } from '@/mocks';
@@ -36,85 +32,131 @@ import { MOCK_PROMOTIONS } from '@/mocks';
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
 const HomeScreen = () => {
-  const [activeCategory, setActiveCategory] = useState<string>(
-    FILTER_CATEGORY_TABS[0].id,
+  const [activeGenre, setActiveGenre] = useState<string>(
+    FILTER_GENRE_TABS[0].id,
   );
 
-  // Fetch movies with infinite scroll
+  const isAllCategory = activeGenre === FILTER_GENRE_TABS[0].id;
+
+  // Fetch all movies when "All" is selected
   const {
-    data: nowPlayingData,
-    isLoading: isLoadingNowPlaying,
-    isFetchingNextPage: isFetchingNextNowPlaying,
-    hasNextPage: hasNextNowPlaying,
-    fetchNextPage: fetchNextNowPlaying,
-    refetch: refetchNowPlaying,
-    isRefetching: isRefetchingNowPlaying,
+    data: allNowPlayingData,
+    isLoading: isLoadingAllNowPlaying,
+    isFetchingNextPage: isFetchingNextAllNowPlaying,
+    hasNextPage: hasNextAllNowPlaying,
+    fetchNextPage: fetchNextAllNowPlaying,
+    refetch: refetchAllNowPlaying,
+    isRefetching: isRefetchingAllNowPlaying,
   } = useMoviesInfinite({
     status: MovieStatus.NOW_PLAYING,
+    enabled: isAllCategory,
   });
 
   const {
-    data: comingSoonData,
-    isLoading: isLoadingComingSoon,
-    isFetchingNextPage: isFetchingNextComingSoon,
-    hasNextPage: hasNextComingSoon,
-    fetchNextPage: fetchNextComingSoon,
-    refetch: refetchComingSoon,
-    isRefetching: isRefetchingComingSoon,
+    data: allComingSoonData,
+    isLoading: isLoadingAllComingSoon,
+    isFetchingNextPage: isFetchingNextAllComingSoon,
+    hasNextPage: hasNextAllComingSoon,
+    fetchNextPage: fetchNextAllComingSoon,
+    refetch: refetchAllComingSoon,
+    isRefetching: isRefetchingAllComingSoon,
   } = useMoviesInfinite({
     status: MovieStatus.COMING_SOON,
+    enabled: isAllCategory,
   });
 
-  // Flatten paginated data
+  // Fetch movies by genre when specific genre is selected
+  const {
+    data: genreNowPlayingData,
+    isLoading: isLoadingGenreNowPlaying,
+    isFetchingNextPage: isFetchingNextGenreNowPlaying,
+    hasNextPage: hasNextGenreNowPlaying,
+    fetchNextPage: fetchNextGenreNowPlaying,
+    refetch: refetchGenreNowPlaying,
+    isRefetching: isRefetchingGenreNowPlaying,
+  } = useMoviesByGenreInfinite({
+    genre: activeGenre as GenreMovie,
+    status: MovieStatus.NOW_PLAYING,
+    enabled: !isAllCategory,
+  });
+
+  const {
+    data: genreComingSoonData,
+    isLoading: isLoadingGenreComingSoon,
+    isFetchingNextPage: isFetchingNextGenreComingSoon,
+    hasNextPage: hasNextGenreComingSoon,
+    fetchNextPage: fetchNextGenreComingSoon,
+    refetch: refetchGenreComingSoon,
+    isRefetching: isRefetchingGenreComingSoon,
+  } = useMoviesByGenreInfinite({
+    genre: activeGenre as GenreMovie,
+    status: MovieStatus.COMING_SOON,
+    enabled: !isAllCategory,
+  });
+
+  // Select the appropriate data based on active category
+  const nowPlayingData = isAllCategory
+    ? allNowPlayingData
+    : genreNowPlayingData;
+  const comingSoonData = isAllCategory
+    ? allComingSoonData
+    : genreComingSoonData;
+
+  const isLoadingNowPlaying = isAllCategory
+    ? isLoadingAllNowPlaying
+    : isLoadingGenreNowPlaying;
+  const isLoadingComingSoon = isAllCategory
+    ? isLoadingAllComingSoon
+    : isLoadingGenreComingSoon;
+
+  const isFetchingNextNowPlaying = isAllCategory
+    ? isFetchingNextAllNowPlaying
+    : isFetchingNextGenreNowPlaying;
+  const isFetchingNextComingSoon = isAllCategory
+    ? isFetchingNextAllComingSoon
+    : isFetchingNextGenreComingSoon;
+
+  const hasNextNowPlaying = isAllCategory
+    ? hasNextAllNowPlaying
+    : hasNextGenreNowPlaying;
+  const hasNextComingSoon = isAllCategory
+    ? hasNextAllComingSoon
+    : hasNextGenreComingSoon;
+
+  const fetchNextNowPlaying = isAllCategory
+    ? fetchNextAllNowPlaying
+    : fetchNextGenreNowPlaying;
+  const fetchNextComingSoon = isAllCategory
+    ? fetchNextAllComingSoon
+    : fetchNextGenreComingSoon;
+
+  const refetchNowPlaying = isAllCategory
+    ? refetchAllNowPlaying
+    : refetchGenreNowPlaying;
+  const refetchComingSoon = isAllCategory
+    ? refetchAllComingSoon
+    : refetchGenreComingSoon;
+
+  const isRefetchingNowPlaying = isAllCategory
+    ? isRefetchingAllNowPlaying
+    : isRefetchingGenreNowPlaying;
+  const isRefetchingComingSoon = isAllCategory
+    ? isRefetchingAllComingSoon
+    : isRefetchingGenreComingSoon;
+
+  // Flatten paginated data and take top 10 sorted by rating
   const nowPlayingMovies = useMemo(() => {
     if (!nowPlayingData?.pages) return [];
-    return nowPlayingData.pages.flat();
+    return nowPlayingData.pages
+      .flat()
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .slice(0, 10);
   }, [nowPlayingData]);
 
   const comingSoonMovies = useMemo(() => {
     if (!comingSoonData?.pages) return [];
-    return comingSoonData.pages.flat();
+    return comingSoonData.pages.flat().slice(0, 10);
   }, [comingSoonData]);
-
-  // Filter by category and sort by rating
-  const filteredNowPlayingMovies = useMemo(() => {
-    if (!nowPlayingMovies.length) return [];
-
-    let filtered = nowPlayingMovies;
-
-    // Filter by genre if not 'All'
-    if (activeCategory !== FILTER_CATEGORY_TABS[0].id) {
-      filtered = nowPlayingMovies.filter(movie =>
-        movie.genre?.some(
-          (g: string) => g.toLowerCase() === activeCategory.toLowerCase(),
-        ),
-      );
-    }
-
-    // Sort by rating and take top 10
-    return filtered
-      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-      .slice(0, 10);
-  }, [nowPlayingMovies, activeCategory]);
-
-  const filteredComingSoonMovies = useMemo(() => {
-    if (!comingSoonMovies.length) return [];
-
-    let filtered = comingSoonMovies;
-
-    if (activeCategory !== FILTER_CATEGORY_TABS[0].id) {
-      filtered = comingSoonMovies.filter(movie =>
-        movie.genre?.some(
-          (g: string) => g.toLowerCase() === activeCategory.toLowerCase(),
-        ),
-      );
-    }
-
-    return filtered.slice(0, 10);
-  }, [comingSoonMovies, activeCategory]);
-
-  const isRefreshing = isRefetchingNowPlaying || isRefetchingComingSoon;
-  const isLoading = isLoadingNowPlaying || isLoadingComingSoon;
 
   const handleRefresh = useCallback(async () => {
     await Promise.all([refetchNowPlaying(), refetchComingSoon()]);
@@ -124,79 +166,99 @@ const HomeScreen = () => {
     router.push(ROUTES.SEARCH);
   }, []);
 
-  const ListHeader = useCallback(
+  const renderNowPlaying = useCallback(
     () => (
-      <View className="pt-3">
-        <View className="gap-2">
-          <View className="px-6 flex-row items-center justify-between">
-            <Typo size="xl" weight="semibold" accessibilityRole="header">
-              Now Playing
-            </Typo>
-            {isFetchingNextNowPlaying && <ActivityIndicator size="small" />}
-          </View>
-
-          {filteredNowPlayingMovies.length > 0 ? (
-            <MovieBannerCarousel movies={filteredNowPlayingMovies} />
-          ) : (
-            <View className="px-6 py-8 gap-2">
-              <Typo className="text-text-secondary text-center">
-                No movies available in this category
-              </Typo>
-              {hasNextNowPlaying && (
-                <Button
-                  size={Size.EXTRA_SMALL}
-                  title="Load more movies"
-                  onPress={() => fetchNextNowPlaying()}
-                  accessibilityRole="button"
-                  accessibilityLabel="Load more movies"
-                />
-              )}
-            </View>
-          )}
+      <View className="gap-2">
+        <View className="px-6 flex-row items-center justify-between">
+          <Typo size="xl" weight="semibold" accessibilityRole="header">
+            Now Playing
+          </Typo>
         </View>
 
-        <View className="gap-7">
-          <View className="px-6 flex-row items-center justify-between">
-            <Typo size="xl" weight="semibold" accessibilityRole="header">
-              Coming Soon
-            </Typo>
-            {isFetchingNextComingSoon && <ActivityIndicator size="small" />}
+        {isLoadingNowPlaying ||
+        isRefetchingNowPlaying ||
+        isFetchingNextNowPlaying ? (
+          <View className="px-6 h-[220px] justify-center items-center">
+            <ActivityIndicator size="large" />
+            <Typo className="text-text-secondary mt-2">Loading movies...</Typo>
           </View>
-
-          {filteredComingSoonMovies.length > 0 ? (
-            <MovieBannerCarousel
-              movies={filteredComingSoonMovies}
-              variant="vertical"
-            />
-          ) : (
-            <View className="px-6 py-8 gap-2">
-              <Typo className="text-text-secondary text-center">
-                No upcoming movies in this category
-              </Typo>
-              {hasNextComingSoon && (
-                <Button
-                  size={Size.EXTRA_SMALL}
-                  title="Load more movies"
-                  onPress={() => fetchNextComingSoon()}
-                  accessibilityRole="button"
-                  accessibilityLabel="Load more movies"
-                />
-              )}
-            </View>
-          )}
-        </View>
+        ) : nowPlayingMovies.length > 0 ? (
+          <MovieBannerCarousel
+            movies={nowPlayingMovies}
+            onReachEnd={fetchNextNowPlaying}
+            hasNextPage={hasNextNowPlaying}
+            isFetchingNextPage={isFetchingNextNowPlaying}
+          />
+        ) : (
+          <View className="px-6 h-[200px] justify-center">
+            <Typo className="text-text-secondary text-center">
+              No movies available in this category
+            </Typo>
+          </View>
+        )}
       </View>
     ),
     [
-      filteredNowPlayingMovies,
-      filteredComingSoonMovies,
-      isFetchingNextNowPlaying,
-      isFetchingNextComingSoon,
-      hasNextNowPlaying,
-      hasNextComingSoon,
       fetchNextNowPlaying,
-      fetchNextComingSoon,
+      hasNextNowPlaying,
+      isFetchingNextNowPlaying,
+      isLoadingNowPlaying,
+      isRefetchingNowPlaying,
+      nowPlayingMovies,
     ],
+  );
+
+  const renderCommingSoon = useCallback(
+    () => (
+      <View className="gap-7">
+        <View className="px-6 flex-row items-center justify-between">
+          <Typo size="xl" weight="semibold" accessibilityRole="header">
+            Coming Soon
+          </Typo>
+        </View>
+
+        {isLoadingComingSoon ||
+        isRefetchingComingSoon ||
+        isFetchingNextComingSoon ? (
+          <View className="px-6 h-[147px] justify-center items-center">
+            <ActivityIndicator size="large" />
+            <Typo className="text-text-secondary mt-2">Loading movies...</Typo>
+          </View>
+        ) : comingSoonMovies.length > 0 ? (
+          <MovieBannerCarousel
+            movies={comingSoonMovies}
+            variant="vertical"
+            onReachEnd={fetchNextComingSoon}
+            hasNextPage={hasNextComingSoon}
+            isFetchingNextPage={isFetchingNextComingSoon}
+          />
+        ) : (
+          <View className="px-6 h-[150px] justify-center">
+            <Typo className="text-text-secondary text-center">
+              No upcoming movies in this category
+            </Typo>
+          </View>
+        )}
+      </View>
+    ),
+    [
+      comingSoonMovies,
+      fetchNextComingSoon,
+      hasNextComingSoon,
+      isFetchingNextComingSoon,
+      isLoadingComingSoon,
+      isRefetchingComingSoon,
+    ],
+  );
+
+  const ListHeader = useCallback(
+    () => (
+      <View className="pt-3">
+        {renderNowPlaying()}
+        {renderCommingSoon()}
+      </View>
+    ),
+    [renderNowPlaying, renderCommingSoon],
   );
 
   const ListFooter = useCallback(
@@ -230,19 +292,6 @@ const HomeScreen = () => {
     [],
   );
 
-  if (isLoading) {
-    return (
-      <StyledSafeAreaView
-        edges={[]}
-        accessibilityLabel="Loading home screen"
-        className="h-full bg-bg-primary items-center justify-center"
-      >
-        <ActivityIndicator size="large" />
-        <Typo className="text-text-secondary mt-4">Loading movies...</Typo>
-      </StyledSafeAreaView>
-    );
-  }
-
   return (
     <StyledSafeAreaView
       edges={[]}
@@ -264,9 +313,9 @@ const HomeScreen = () => {
       {/* Category Tabs */}
       <View className="pl-6 mb-3">
         <Tabs
-          tabs={FILTER_CATEGORY_TABS}
-          activeTab={activeCategory}
-          onTabChange={setActiveCategory}
+          tabs={FILTER_GENRE_TABS}
+          activeTab={activeGenre}
+          onTabChange={setActiveGenre}
         />
       </View>
 
@@ -280,7 +329,7 @@ const HomeScreen = () => {
         }}
         refreshControl={
           <RefreshControl
-            refreshing={isRefreshing}
+            refreshing={isRefetchingNowPlaying || isRefetchingComingSoon}
             onRefresh={handleRefresh}
             accessibilityLabel="Pull to refresh movies"
           />

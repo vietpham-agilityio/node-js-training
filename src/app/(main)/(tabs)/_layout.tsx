@@ -15,6 +15,9 @@ import { HomeIcon } from '@/icons/HomeIcon';
 import { TicketIcon } from '@/icons/TicketIcon';
 import { WalletIcon } from '@/icons/WalletIcon';
 
+// Error Boundary
+export { ErrorBoundary } from '@/components/ErrorBoundary';
+
 const BOTTOM_TAB = [
   {
     title: TABS.HOME.TITLE,

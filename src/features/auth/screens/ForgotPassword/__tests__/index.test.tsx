@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import ForgotPasswordScreen from '../index';
 
@@ -96,19 +96,6 @@ describe('ForgotPasswordScreen', () => {
   });
 
   describe('Form Validation', () => {
-    it('should show alert when email is empty', () => {
-      const { getByLabelText } = render(<ForgotPasswordScreen />);
-      const submitButton = getByLabelText('Send password reset link');
-
-      fireEvent.press(submitButton);
-
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Error',
-        'Please enter your email',
-      );
-      expect(mockMutate).not.toHaveBeenCalled();
-    });
-
     it('should not show alert when email is provided', () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
       const emailInput = getByLabelText('Email address input field');
@@ -122,37 +109,53 @@ describe('ForgotPasswordScreen', () => {
   });
 
   describe('Form Submission', () => {
-    it('should call resetPassword mutation with email when form is submitted', () => {
+    it('should call resetPassword mutation with email when form is submitted', async () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
       const emailInput = getByLabelText('Email address input field');
       const submitButton = getByLabelText('Send password reset link');
 
       fireEvent.changeText(emailInput, 'test@example.com');
+
+      // Wait for form to be valid and button to be enabled
+      await waitFor(() => {
+        expect(submitButton.props.disabled).toBe(undefined);
+      });
+
       fireEvent.press(submitButton);
 
-      expect(mockMutate).toHaveBeenCalledWith(
-        'test@example.com',
-        expect.objectContaining({
-          onSuccess: expect.any(Function),
-          onError: expect.any(Function),
-        }),
-      );
+      await waitFor(() => {
+        expect(mockMutate).toHaveBeenCalledWith(
+          'test@example.com',
+          expect.objectContaining({
+            onSuccess: expect.any(Function),
+            onError: expect.any(Function),
+          }),
+        );
+      });
     });
 
-    it('should show success toast and navigate to login on success', () => {
+    it('should show success toast and navigate to login on success', async () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
       const emailInput = getByLabelText('Email address input field');
       const submitButton = getByLabelText('Send password reset link');
 
       fireEvent.changeText(emailInput, 'test@example.com');
+
+      // Wait for form to be valid and button to be enabled
+      await waitFor(() => {
+        expect(submitButton.props.disabled).toBe(undefined);
+      });
+
       fireEvent.press(submitButton);
 
-      // Get the onSuccess callback from the mutate call
-      const mutateCall = mockMutate.mock.calls[0];
-      const onSuccessCallback = mutateCall[1].onSuccess;
+      await waitFor(() => {
+        // Get the onSuccess callback from the mutate call
+        const mutateCall = mockMutate.mock.calls[0];
+        const onSuccessCallback = mutateCall[1].onSuccess;
 
-      // Execute the success callback
-      onSuccessCallback();
+        // Execute the success callback
+        onSuccessCallback();
+      });
 
       expect(mockToastWithAction).toHaveBeenCalledWith(
         'Password reset link has been sent to your email.',
@@ -170,20 +173,28 @@ describe('ForgotPasswordScreen', () => {
       expect(mockReplace).toHaveBeenCalledWith('/(auth)/signin');
     });
 
-    it('should show error toast on error', () => {
+    it('should show error toast on error', async () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
       const emailInput = getByLabelText('Email address input field');
       const submitButton = getByLabelText('Send password reset link');
 
       fireEvent.changeText(emailInput, 'test@example.com');
+
+      // Wait for form to be valid and button to be enabled
+      await waitFor(() => {
+        expect(submitButton.props.disabled).toBe(undefined);
+      });
+
       fireEvent.press(submitButton);
 
-      // Get the onError callback from the mutate call
-      const mutateCall = mockMutate.mock.calls[0];
-      const onErrorCallback = mutateCall[1].onError;
+      await waitFor(() => {
+        // Get the onError callback from the mutate call
+        const mutateCall = mockMutate.mock.calls[0];
+        const onErrorCallback = mutateCall[1].onError;
 
-      // Execute the error callback
-      onErrorCallback();
+        // Execute the error callback
+        onErrorCallback();
+      });
 
       expect(mockToastError).toHaveBeenCalledWith('Failed to send reset link');
     });

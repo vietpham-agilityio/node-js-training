@@ -34,6 +34,9 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { Loading } from '@/components/Loading';
 import { Toast } from '@/components/Toast';
 
+// Error Boundary
+export { ErrorBoundary } from '@/components/ErrorBoundary';
+
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
