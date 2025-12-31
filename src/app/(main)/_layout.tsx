@@ -6,6 +6,9 @@ import { SCREENS } from '@/constants';
 // Components
 import { ScreenHeader } from '@/features/navigation/components/ScreenHeader';
 
+// Error Boundary
+export { ErrorBoundary } from '@/components/ErrorBoundary';
+
 const MainLayout = () => (
   <Stack
     screenOptions={{

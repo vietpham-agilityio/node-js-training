@@ -32,7 +32,7 @@ export const NavigationTabBar = memo(
         accessibilityLabel="Main navigation tabs"
         accessibilityHint="Tap to select a tab"
         style={{
-          paddingBottom: bottomInset,
+          paddingBottom: bottomInset + 16,
         }}
       >
         {state.routes.map((route, index) => {

@@ -184,7 +184,7 @@ describe('NavigationTabBar', () => {
       );
 
       const tabBar = getByLabelText('Main navigation tabs');
-      expect(tabBar.props.style.paddingBottom).toBe(32);
+      expect(tabBar.props.style.paddingBottom).toBe(48);
     });
 
     it('should render with default bottomInset when not provided', () => {
@@ -192,7 +192,7 @@ describe('NavigationTabBar', () => {
       const { getByLabelText } = render(<NavigationTabBar {...props} />);
 
       const tabBar = getByLabelText('Main navigation tabs');
-      expect(tabBar.props.style.paddingBottom).toBe(24);
+      expect(tabBar.props.style.paddingBottom).toBe(40);
     });
 
     it('should show active indicator for focused tab', () => {

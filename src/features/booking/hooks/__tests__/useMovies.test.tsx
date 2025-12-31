@@ -422,7 +422,7 @@ describe('useMoviesByGenre', () => {
     ];
     mockGetMoviesByGenre.mockResolvedValue(mockMovies);
 
-    const { result } = renderHook(() => useMoviesByGenre('Action'), {
+    const { result } = renderHook(() => useMoviesByGenre('action'), {
       wrapper: createWrapper(),
     });
 
@@ -430,20 +430,12 @@ describe('useMoviesByGenre', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMoviesByGenre).toHaveBeenCalledWith('Action');
+    expect(mockGetMoviesByGenre).toHaveBeenCalledWith('action');
     expect(result.current.data).toEqual(mockMovies);
   });
 
   it('should not fetch when genre is "All"', () => {
-    renderHook(() => useMoviesByGenre('All'), {
-      wrapper: createWrapper(),
-    });
-
-    expect(mockGetMoviesByGenre).not.toHaveBeenCalled();
-  });
-
-  it('should not fetch when genre is empty', () => {
-    renderHook(() => useMoviesByGenre(''), {
+    renderHook(() => useMoviesByGenre('all'), {
       wrapper: createWrapper(),
     });
 
@@ -454,7 +446,7 @@ describe('useMoviesByGenre', () => {
     const mockError = new Error('Failed to fetch movies by genre');
     mockGetMoviesByGenre.mockRejectedValue(mockError);
 
-    const { result } = renderHook(() => useMoviesByGenre('Action'), {
+    const { result } = renderHook(() => useMoviesByGenre('action'), {
       wrapper: createWrapper(),
     });
 

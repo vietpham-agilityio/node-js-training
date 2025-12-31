@@ -1,8 +1,7 @@
-
-import { MoviesService, moviesService } from '../movies';
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
-import { MovieStatus } from '../../types/movie';
+import { GenreMovie, MovieStatus } from '../../types/movie';
+import { MoviesService, moviesService } from '../movies';
 
 const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
@@ -105,9 +104,9 @@ describe('MoviesService', () => {
       (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
         resolve({ data: mockData, error: null }),
       );
-      const movies = await service.getMoviesByGenre('Action');
+      const movies = await service.getMoviesByGenre(GenreMovie.ACTION);
       expect(mockQueryBuilder.contains).toHaveBeenCalledWith('genre', [
-        'Action',
+        'action',
       ]);
       expect(movies).toEqual(keysToCamel(mockData));
     });
@@ -122,7 +121,10 @@ describe('MoviesService', () => {
       const showtimes = await service.getShowtimes('movie1', '2025-12-25');
       expect(from).toHaveBeenCalledWith('showtimes');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('movie_id', 'movie1');
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith('show_date', '2025-12-25');
+      expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
+        'show_date',
+        '2025-12-25',
+      );
       expect(showtimes).toEqual(keysToCamel(mockData));
     });
   });

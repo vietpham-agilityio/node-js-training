@@ -18,23 +18,9 @@ const meta: Meta<typeof Avatar> = {
         defaultValue: { summary: '92' },
       },
     },
-    variant: {
-      control: { type: 'select' },
-      options: ['default', 'picker'],
-      description:
-        'Variant of the avatar - "default" shows static avatar, "picker" allows image selection and removal',
-      table: {
-        defaultValue: { summary: 'default' },
-      },
-    },
     source: {
       control: { type: 'text' },
       description: 'URI of the image to display',
-    },
-    onChangeImage: {
-      action: 'onChangeImage',
-      description:
-        'Callback function called when image is selected or removed. Receives the image URI as parameter (empty string when removed).',
     },
     accessibilityLabel: {
       control: { type: 'text' },
@@ -42,10 +28,6 @@ const meta: Meta<typeof Avatar> = {
       table: {
         defaultValue: { summary: 'Profile picture' },
       },
-    },
-    accessibilityHint: {
-      control: { type: 'text' },
-      description: 'Accessibility hint for the picker button',
     },
   },
   decorators: [
@@ -65,7 +47,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     size: 92,
-    variant: 'default',
     accessibilityLabel: 'User profile picture',
   },
   parameters: {
@@ -82,7 +63,6 @@ export const Default: Story = {
 export const Small: Story = {
   args: {
     size: 48,
-    variant: 'default',
     accessibilityLabel: 'Small profile picture',
   },
   parameters: {
@@ -98,7 +78,6 @@ export const Small: Story = {
 export const Medium: Story = {
   args: {
     size: 92,
-    variant: 'default',
     accessibilityLabel: 'Medium profile picture',
   },
   parameters: {
@@ -114,7 +93,6 @@ export const Medium: Story = {
 export const LargeSize: Story = {
   args: {
     size: 132,
-    variant: 'default',
     accessibilityLabel: 'Large profile picture',
   },
   parameters: {
@@ -130,7 +108,6 @@ export const LargeSize: Story = {
 export const ExtraLarge: Story = {
   args: {
     size: 160,
-    variant: 'default',
     accessibilityLabel: 'Extra large profile picture',
   },
   parameters: {
@@ -146,7 +123,6 @@ export const ExtraLarge: Story = {
 export const WithImage: Story = {
   args: {
     size: 92,
-    variant: 'default',
     source: 'https://i.pravatar.cc/300',
     accessibilityLabel: 'Profile picture with image',
   },
@@ -155,86 +131,6 @@ export const WithImage: Story = {
       description: {
         story:
           'Avatar displaying an actual image from a URI. The image is cropped to fit the circular frame.',
-      },
-    },
-  },
-};
-
-// Picker variant without image (allows adding)
-export const PickerEmpty: Story = {
-  args: {
-    size: 92,
-    variant: 'picker',
-    onChangeImage: (uri: string) => {
-      console.log('Image selected:', uri);
-    },
-    accessibilityLabel: 'Profile picture picker',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Picker variant without an image. Displays an add button that opens a modal with options to take a photo or choose from gallery.',
-      },
-    },
-  },
-};
-
-// Picker variant with image (allows removing)
-export const PickerWithImage: Story = {
-  args: {
-    size: 132,
-    variant: 'picker',
-    source: 'https://i.pravatar.cc/300?img=1',
-    onChangeImage: (uri: string) => {
-      console.log('Image changed:', uri);
-    },
-    accessibilityLabel: 'Profile picture with remove option',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Picker variant with an existing image. Displays a remove button (red X) that clears the image when pressed.',
-      },
-    },
-  },
-};
-
-// Custom accessibility
-export const CustomAccessibility: Story = {
-  args: {
-    size: 92,
-    variant: 'picker',
-    accessibilityLabel: 'Team member avatar',
-    accessibilityHint: 'Tap to change team member photo',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Avatar with custom accessibility labels and hints for better screen reader support.',
-      },
-    },
-  },
-};
-
-// Interactive demo
-export const InteractiveDemo: Story = {
-  args: {
-    size: 132,
-    variant: 'picker',
-    source: 'https://i.pravatar.cc/300?img=5',
-    onChangeImage: (uri: string) => {
-      console.log('Image changed to:', uri || 'removed');
-    },
-    accessibilityLabel: 'Interactive avatar demo',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Interactive demo where you can test the image picker functionality. Check the console for onChangeImage callbacks.',
       },
     },
   },

@@ -161,6 +161,16 @@ export const resetPasswordSchema = v.pipe(
   ),
 );
 
+export const forgotPasswordSchema = v.pipe(
+  v.object({
+    email: v.pipe(
+      v.string(),
+      v.minLength(1, ERROR_MESSAGES.EMAIL_REQUIRED),
+      v.email(ERROR_MESSAGES.EMAIL_INVALID),
+    ),
+  }),
+);
+
 export type ResetPasswordFormData = v.InferOutput<typeof resetPasswordSchema>;
 
 export type ChangePasswordFormData = v.InferOutput<typeof changePasswordSchema>;
@@ -170,3 +180,5 @@ export type SignUpFormData = v.InferOutput<typeof signUpSchema>;
 export type SignInFormData = v.InferInput<typeof signInSchema>;
 
 export type EditProfileFormData = v.InferInput<typeof editProfileSchema>;
+
+export type ForgotPasswordFormData = v.InferInput<typeof forgotPasswordSchema>;

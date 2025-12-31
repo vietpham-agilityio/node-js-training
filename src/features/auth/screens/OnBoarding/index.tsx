@@ -1,5 +1,5 @@
-import { View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { View } from 'react-native';
 
 // Uniwind
 import { useResolveClassNames } from 'uniwind';
@@ -8,8 +8,8 @@ import { useResolveClassNames } from 'uniwind';
 import { ROUTES } from '@/constants';
 
 // Components
-import { Typo } from '@/components/Typo';
 import { Button } from '@/components/Button';
+import { Typo } from '@/components/Typo';
 
 // Layout
 import { AccessLayout } from '@/layouts/AccessLayout';

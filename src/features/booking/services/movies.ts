@@ -2,7 +2,7 @@ import { PAGINATION } from '@/constants';
 
 // Types
 import { Showtime, ShowtimeStatus } from '@/features/booking/types/cinema';
-import { Movie, MovieStatus } from '../types/movie';
+import { GenreMovie, Movie, MovieStatus } from '../types/movie';
 
 // Utils
 import { supabase } from '@/services/supabase/client';
@@ -60,12 +60,39 @@ export class MoviesService {
     return keysToCamel(data) as Movie[];
   }
 
-  async getMoviesByGenre(genre: string): Promise<Movie[]> {
+  async getMoviesByGenre(genre: GenreMovie): Promise<Movie[]> {
     const { data, error } = await supabase
       .from('movies')
       .select('*')
       .contains('genre', [genre])
       .in('status', [MovieStatus.NOW_PLAYING, MovieStatus.COMING_SOON]);
+    if (error) throw error;
+    return keysToCamel(data) as Movie[];
+  }
+
+  async getMoviesByGenrePaginated(
+    genre: GenreMovie,
+    status?: MovieStatus,
+    page = PAGINATION.PAGE_OFFSET,
+    limit = PAGINATION.PAGE_LIMIT,
+  ): Promise<Movie[]> {
+    let query = supabase
+      .from('movies')
+      .select('*')
+      .contains('genre', [genre])
+      .order('release_date', { ascending: false })
+      .range(page * limit, (page + 1) * limit - 1);
+
+    if (status) {
+      query = query.eq('status', status);
+    } else {
+      query = query.in('status', [
+        MovieStatus.NOW_PLAYING,
+        MovieStatus.COMING_SOON,
+      ]);
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     return keysToCamel(data) as Movie[];
   }
