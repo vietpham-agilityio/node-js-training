@@ -102,6 +102,7 @@ export const ScreenHeader = ({
               accessible
               accessibilityRole="button"
               accessibilityLabel="Go back"
+              accessibilityHint="Navigate to the previous screen"
               onPress={handleGoBack}
             >
               {LeftIcon ? (
@@ -115,16 +116,14 @@ export const ScreenHeader = ({
 
         {/* Center Section - Title */}
         {headerTitle && (
-          <View
-            accessible
-            className="w-46 items-center"
-            accessibilityRole="header"
-            accessibilityLabel={headerTitle}
-          >
+          <View accessible className="w-46 items-center">
             <Typo
               size="2xl"
               weight="semibold"
               className="leading-7 text-center"
+              accessibilityRole="header"
+              accessibilityLabel={headerTitle}
+              accessibilityHint={headerTitle}
             >
               {headerTitle}
             </Typo>

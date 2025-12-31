@@ -305,6 +305,7 @@ const HomeScreen = () => {
           editable={false}
           accessibilityRole="button"
           accessibilityLabel="Search movies"
+          accessibilityHint="Search for movies"
           onPress={handleSearchPress}
         />
       </View>

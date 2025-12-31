@@ -35,7 +35,13 @@ export const PromotionCard = memo(
     );
 
     return (
-      <View className="w-full h-21 rounded-xl">
+      <View
+        className="w-full h-21 rounded-xl"
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel="Promotion card"
+        accessibilityHint="Apply promotion code"
+      >
         <ImageBackground
           source={PromotionImage}
           contentFit="cover"

@@ -118,6 +118,8 @@ const TopUpScreen = () => {
             value={amount}
             onChangeText={handleAmountChange}
             keyboardType="numeric"
+            accessibilityLabel="Top up amount input"
+            accessibilityHint="Type the amount you want to top up"
             error={error}
             testID="top-up-amount-input"
             containerClassName="mb-6"
@@ -146,6 +148,8 @@ const TopUpScreen = () => {
         <Button
           testID="top-up-button"
           title="Top Up Now"
+          accessibilityLabel="Top up button"
+          accessibilityHint="Tap to top up your wallet"
           onPress={handleTopUp}
           disabled={isPending || !parsedAmount || parsedAmount === 0 || !!error}
           size={Size.LARGE}

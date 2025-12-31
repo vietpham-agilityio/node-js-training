@@ -59,6 +59,9 @@ const SeatsScreen = () => {
     })),
   );
 
+  const movieTitle = selectedMovie?.title;
+  const cinemaName = selectedShowtime?.cinemaHall?.cinema?.name;
+
   const [seats] = useState<Seat[]>(() => generateSeats());
 
   // Update seat status based on selected seats
@@ -116,11 +119,26 @@ const SeatsScreen = () => {
       <View className="flex-1 bg-dark-blue">
         {/* Movie Title and Cinema Name */}
         <View className="pr-6 pb-2">
-          <Typo size="lg" weight="semibold">
-            {selectedMovie?.title}
+          <Typo
+            size="lg"
+            weight="semibold"
+            accessible
+            accessibilityRole="header"
+            accessibilityLabel="Movie title"
+            accessibilityHint={movieTitle}
+          >
+            {movieTitle}
           </Typo>
-          <Typo size="sm" weight="light" className="text-gradient-light">
-            {selectedShowtime?.cinemaHall?.cinema?.name}
+          <Typo
+            size="sm"
+            weight="light"
+            className="text-gradient-light"
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel="Cinema name"
+            accessibilityHint={cinemaName}
+          >
+            {cinemaName}
           </Typo>
         </View>
 

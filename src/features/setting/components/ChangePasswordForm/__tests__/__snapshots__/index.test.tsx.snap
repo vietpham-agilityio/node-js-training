@@ -67,6 +67,7 @@ exports[`ChangePasswordForm Component Snapshot should match snapshot 1`] = `
             value=""
           />
           <View
+            accessibilityHint="Toggle password visibility"
             accessibilityLabel="Toggle password visibility"
             accessibilityRole="button"
             accessibilityState={
@@ -235,6 +236,7 @@ exports[`ChangePasswordForm Component Snapshot should match snapshot 1`] = `
             value=""
           />
           <View
+            accessibilityHint="Toggle password visibility"
             accessibilityLabel="Toggle password visibility"
             accessibilityRole="button"
             accessibilityState={
@@ -402,6 +404,7 @@ exports[`ChangePasswordForm Component Snapshot should match snapshot 1`] = `
             value=""
           />
           <View
+            accessibilityHint="Toggle password visibility"
             accessibilityLabel="Toggle password visibility"
             accessibilityRole="button"
             accessibilityState={
@@ -555,10 +558,9 @@ exports[`ChangePasswordForm Component Snapshot should match snapshot 1`] = `
         className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
       >
         <Text
-          accessibilityLabel="Change Password"
-          accessibilityRole="text"
-          accessible={true}
+          accessible={false}
           className="font-montserrat-medium text-white text-center text-lg leading-6"
+          importantForAccessibility="no"
           maxFontSizeMultiplier={1.2}
           testID="change-password-submit-button-text"
         >

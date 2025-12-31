@@ -48,8 +48,6 @@ export const AccessLayout = memo(
         )
       : 'flex-1';
 
-    const accessibilityLabel = ACCESSIBILITY_LABEL[mode];
-
     const containerStyles = useResolveClassNames('flex-1 bg-bg-primary');
 
     const handleKeyboardDismiss = () => {
@@ -58,18 +56,24 @@ export const AccessLayout = memo(
 
     return (
       <SafeAreaView
+        accessible={false}
         edges={isSignin ? ['top', 'bottom'] : ['bottom']} // SignIn mode needs top edge for keyboard offset
         style={containerStyles}
-        accessibilityLabel={accessibilityLabel}
-        accessibilityHint={accessibilityLabel}
+        importantForAccessibility="no"
       >
         <StyledKeyboardAvoidingView
           behavior="padding"
           className="flex-1"
           keyboardVerticalOffset={0}
         >
-          <TouchableWithoutFeedback onPress={handleKeyboardDismiss}>
+          <TouchableWithoutFeedback
+            accessible={false}
+            importantForAccessibility="no"
+            onPress={handleKeyboardDismiss}
+          >
             <StyledScrollView
+              accessible={false}
+              importantForAccessibility="no"
               contentContainerClassName={cn('px-4', withKeyboardHandlingStyles)}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"

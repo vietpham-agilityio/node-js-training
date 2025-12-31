@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { render, act, fireEvent } from '@testing-library/react-native';
 import { Text, Keyboard, EmitterSubscription } from 'react-native';
@@ -29,17 +28,19 @@ describe('KeyboardLayout', () => {
   };
 
   beforeAll(() => {
-    jest.spyOn(Keyboard, 'addListener').mockImplementation((eventName, callback) => {
-      keyboardListeners[eventName]?.push(callback);
-      return {
-        remove: () => {
-          const index = keyboardListeners[eventName]?.indexOf(callback);
-          if (index !== -1 && index !== undefined) {
-            keyboardListeners[eventName]?.splice(index, 1);
-          }
-        },
-      } as EmitterSubscription;
-    });
+    jest
+      .spyOn(Keyboard, 'addListener')
+      .mockImplementation((eventName, callback) => {
+        keyboardListeners[eventName]?.push(callback);
+        return {
+          remove: () => {
+            const index = keyboardListeners[eventName]?.indexOf(callback);
+            if (index !== -1 && index !== undefined) {
+              keyboardListeners[eventName]?.splice(index, 1);
+            }
+          },
+        } as EmitterSubscription;
+      });
   });
 
   beforeEach(() => {
@@ -76,16 +77,6 @@ describe('KeyboardLayout', () => {
     expect(getByTestId('child')).toBeTruthy();
   });
 
-  it('sets accessibility labels and hints', () => {
-    const { getByLabelText, getByAccessibilityHint } = render(
-      <KeyboardLayout accessibilityLabel="Test Label" accessibilityHint="Test Hint">
-        <Text>Child</Text>
-      </KeyboardLayout>,
-    );
-    expect(getByLabelText('Test Label')).toBeTruthy();
-    expect(getByAccessibilityHint('Test Hint')).toBeTruthy();
-  });
-
   // TODO: Add a testID to the TouchableWithoutFeedback in the component to make this test more robust.
   it('dismisses keyboard on press outside', () => {
     const dismissSpy = jest.spyOn(Keyboard, 'dismiss');
@@ -102,7 +93,6 @@ describe('KeyboardLayout', () => {
     dismissSpy.mockRestore();
   });
 
-
   it('adjusts padding when keyboard is shown on iOS', () => {
     mockIsIOS.mockReturnValue(true);
     const { UNSAFE_getByProps } = render(
@@ -115,14 +105,20 @@ describe('KeyboardLayout', () => {
       emitKeyboardEvent('keyboardWillShow');
     });
 
-    const scrollView = UNSAFE_getByProps({ showsVerticalScrollIndicator: false });
-    expect(scrollView.props.contentContainerStyle).toEqual({ paddingBottom: 50 });
+    const scrollView = UNSAFE_getByProps({
+      showsVerticalScrollIndicator: false,
+    });
+    expect(scrollView.props.contentContainerStyle).toEqual({
+      paddingBottom: 50,
+    });
 
     act(() => {
       emitKeyboardEvent('keyboardWillHide');
     });
 
-    expect(scrollView.props.contentContainerStyle).toEqual({ paddingBottom: 0 });
+    expect(scrollView.props.contentContainerStyle).toEqual({
+      paddingBottom: 0,
+    });
   });
 
   it('adjusts padding when keyboard is shown on Android', () => {
@@ -137,13 +133,19 @@ describe('KeyboardLayout', () => {
       emitKeyboardEvent('keyboardDidShow');
     });
 
-    const scrollView = UNSAFE_getByProps({ showsVerticalScrollIndicator: false });
-    expect(scrollView.props.contentContainerStyle).toEqual({ paddingBottom: 50 });
+    const scrollView = UNSAFE_getByProps({
+      showsVerticalScrollIndicator: false,
+    });
+    expect(scrollView.props.contentContainerStyle).toEqual({
+      paddingBottom: 50,
+    });
 
     act(() => {
       emitKeyboardEvent('keyboardDidHide');
     });
 
-    expect(scrollView.props.contentContainerStyle).toEqual({ paddingBottom: 0 });
+    expect(scrollView.props.contentContainerStyle).toEqual({
+      paddingBottom: 0,
+    });
   });
 });

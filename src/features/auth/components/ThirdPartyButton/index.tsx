@@ -25,7 +25,7 @@ export const ThirdPartyButton = memo(
       activeOpacity={0.8}
       accessibilityRole="button"
       accessibilityLabel={`login with ${type}`}
-      accessibilityHint={`Authenticate using ${type}}`}
+      accessibilityHint={`Authenticate using ${type}`}
       className="w-16 h-16 bg-bg-quaternary rounded-full p-3.5 items-center justify-center"
       testID={testID}
     >

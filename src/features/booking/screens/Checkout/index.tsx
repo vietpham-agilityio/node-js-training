@@ -308,6 +308,8 @@ const CheckoutScreen = () => {
           title="Checkout"
           onPress={handleCheckout}
           testID="checkout-button"
+          accessibilityLabel="Checkout button"
+          accessibilityHint="Tap to checkout your ticket"
           size={Size.LARGE}
           disabled={isBooking || !isEnoughBalance}
         />

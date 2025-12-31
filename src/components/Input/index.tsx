@@ -201,8 +201,10 @@ export const Input = memo(
             {secureTextEntry && (
               <TouchableOpacity
                 activeOpacity={0.8}
+                accessible
                 accessibilityRole="button"
                 accessibilityLabel="Toggle password visibility"
+                accessibilityHint="Toggle password visibility"
                 className="absolute right-4 top-3"
                 testID={`${testID}-password-toggle`}
                 onPress={togglePasswordVisibility}

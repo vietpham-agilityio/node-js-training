@@ -29,8 +29,6 @@ type KeyboardLayoutProps = {
   children: ReactNode;
   contentPadding?: string;
   keyboardBottomPadding?: number;
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
 };
 
 export const KeyboardLayout = memo(
@@ -38,8 +36,6 @@ export const KeyboardLayout = memo(
     children,
     contentPadding = 'px-6',
     keyboardBottomPadding = KEYBOARD_BOTTOM_PADDING,
-    accessibilityLabel,
-    accessibilityHint,
   }: KeyboardLayoutProps) => {
     const insets = useSafeAreaInsets();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -80,16 +76,22 @@ export const KeyboardLayout = memo(
     return (
       <StyledSafeAreaView
         edges={['bottom']}
+        accessible={false}
+        importantForAccessibility="no"
         className="flex-1 bg-bg-primary"
-        accessibilityLabel={accessibilityLabel}
-        accessibilityHint={accessibilityHint}
       >
         <StyledKeyboardAvoidingView
           className="flex-1"
           behavior="padding"
+          accessible={false}
+          importantForAccessibility="no"
           keyboardVerticalOffset={keyboardVerticalOffset}
         >
-          <TouchableWithoutFeedback onPress={handleKeyboardDismiss}>
+          <TouchableWithoutFeedback
+            accessible={false}
+            importantForAccessibility="no"
+            onPress={handleKeyboardDismiss}
+          >
             <StyledScrollView
               contentContainerClassName={cn('flex-grow', contentPadding)}
               contentContainerStyle={{ paddingBottom: bottomPadding }}
@@ -97,6 +99,8 @@ export const KeyboardLayout = memo(
               keyboardShouldPersistTaps="handled"
               bounces={false}
               scrollEnabled={true}
+              accessible={false}
+              importantForAccessibility="no"
             >
               {children}
             </StyledScrollView>

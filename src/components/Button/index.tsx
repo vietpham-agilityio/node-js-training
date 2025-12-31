@@ -79,9 +79,8 @@ export const Button = memo(
       >
         <View className={cn(buttonClassName, className)}>
           <Text
-            accessible
-            accessibilityRole="text"
-            accessibilityLabel={title}
+            accessible={false}
+            importantForAccessibility="no"
             maxFontSizeMultiplier={1.2}
             className={cn(
               'font-montserrat-medium text-white text-center',

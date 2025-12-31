@@ -406,10 +406,9 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
         className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
       >
         <Text
-          accessibilityLabel="Update My Profile"
-          accessibilityRole="text"
-          accessible={true}
+          accessible={false}
           className="font-montserrat-medium text-white text-center text-lg leading-6"
+          importantForAccessibility="no"
           maxFontSizeMultiplier={1.2}
           testID="update-my-profile-submit-button-text"
         >
@@ -1002,10 +1001,9 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
         className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
       >
         <Text
-          accessibilityLabel="Update My Profile"
-          accessibilityRole="text"
-          accessible={true}
+          accessible={false}
           className="font-montserrat-medium text-white text-center text-lg leading-6"
+          importantForAccessibility="no"
           maxFontSizeMultiplier={1.2}
           testID="update-my-profile-submit-button-text"
         >
