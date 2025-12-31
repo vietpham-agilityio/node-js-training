@@ -2,17 +2,19 @@
 
 exports[`EditProfileScreen Snapshot should match snapshot 1`] = `
 <View
-  accessibilityHint="Edit Profile screen"
-  accessibilityLabel="Edit Profile screen"
+  accessible={false}
   className="flex-1 bg-bg-primary"
   edges={
     [
       "bottom",
     ]
   }
+  importantForAccessibility="no"
 >
   <View
+    accessible={false}
     className="flex-1"
+    importantForAccessibility="no"
     onLayout={[Function]}
     style={
       {
@@ -30,7 +32,7 @@ exports[`EditProfileScreen Snapshot should match snapshot 1`] = `
           "selected": undefined,
         }
       }
-      accessible={true}
+      accessible={false}
       bounces={false}
       contentContainerClassName="flex-grow px-6"
       contentContainerStyle={
@@ -39,6 +41,7 @@ exports[`EditProfileScreen Snapshot should match snapshot 1`] = `
         }
       }
       focusable={true}
+      importantForAccessibility="no"
       keyboardShouldPersistTaps="handled"
       onClick={[Function]}
       onResponderGrant={[Function]}
@@ -456,10 +459,9 @@ exports[`EditProfileScreen Snapshot should match snapshot 1`] = `
                 className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
               >
                 <Text
-                  accessibilityLabel="Update My Profile"
-                  accessibilityRole="text"
-                  accessible={true}
+                  accessible={false}
                   className="font-montserrat-medium text-white text-center text-lg leading-6"
+                  importantForAccessibility="no"
                   maxFontSizeMultiplier={1.2}
                   testID="update-my-profile-submit-button-text"
                 >

@@ -44,14 +44,19 @@ const OnboardingScreen = () => {
         <Typo
           size="2xl"
           weight="medium"
-          accessibilityRole="header"
           testID="on-boarding-title"
+          accessible
+          accessibilityRole="header"
+          accessibilityLabel="New Experience"
         >
           New Experience
         </Typo>
         <Typo
           size="lg"
           weight="light"
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel="Watch a new movie much easier than any before"
           className="max-w-60 text-center mt-4"
           testID="on-boarding-description"
         >

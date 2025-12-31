@@ -98,6 +98,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
               ref={fullNameRef}
               accessibilityRole="text"
               accessibilityLabel="Full Name input field"
+              accessibilityHint="Type your full name"
               label="Full Name"
               value={value}
               error={error?.message}
@@ -125,6 +126,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
               ref={emailRef}
               accessibilityRole="text"
               accessibilityLabel="Email Address input field"
+              accessibilityHint="Type your email address"
               label="Email Address"
               value={value}
               error={error?.message}
@@ -153,6 +155,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
               ref={passwordRef}
               accessibilityRole="text"
               accessibilityLabel="Password input field"
+              accessibilityHint="Type your password"
               secureTextEntry
               label="Password"
               value={value}
@@ -181,6 +184,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
               ref={confirmPasswordRef}
               accessibilityRole="text"
               accessibilityLabel="Confirm Password input field"
+              accessibilityHint="Type your confirm password"
               secureTextEntry
               label="Confirm Password"
               value={value}
@@ -204,6 +208,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
         testID="signup-submit-button"
         title="Sign Up"
         accessibilityLabel="Sign Up"
+        accessibilityHint="Sign up to your account"
         onPress={handleSubmit(handleSubmitForm)}
       />
     </View>

@@ -28,36 +28,6 @@ describe('AccessLayout', () => {
     expect(getByLabelText('Logging you in')).toBeTruthy();
   });
 
-  it('displays correct accessibility labels for each mode', () => {
-    const { rerender, getByLabelText } = render(
-      <AccessLayout mode="signin">
-        <View />
-      </AccessLayout>,
-    );
-    expect(getByLabelText('Sign in screen')).toBeTruthy();
-
-    rerender(
-      <AccessLayout mode="signup">
-        <View />
-      </AccessLayout>,
-    );
-    expect(getByLabelText('Sign up screen')).toBeTruthy();
-
-    rerender(
-      <AccessLayout mode="onboarding">
-        <View />
-      </AccessLayout>,
-    );
-    expect(getByLabelText('Onboarding screen')).toBeTruthy();
-
-    rerender(
-      <AccessLayout mode="confirmation">
-        <View />
-      </AccessLayout>,
-    );
-    expect(getByLabelText('Confirmation screen')).toBeTruthy();
-  });
-
   it('shows correct loading message for signup', () => {
     const { getByText, getByLabelText } = render(
       <AccessLayout mode="signup" loading>

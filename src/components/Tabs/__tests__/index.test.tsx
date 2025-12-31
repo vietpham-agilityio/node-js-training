@@ -128,37 +128,6 @@ describe('Tabs Component', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have correct accessibility role for container', () => {
-      const { getByTestId } = render(
-        <Tabs tabs={mockTabs} activeTab="tab1" onTabChange={mockOnTabChange} />,
-      );
-
-      const container = getByTestId('tabs-container');
-      expect(container.props.accessibilityRole).toBe('tablist');
-    });
-
-    it('should have correct accessibility label for container', () => {
-      const { getByTestId } = render(
-        <Tabs tabs={mockTabs} activeTab="tab1" onTabChange={mockOnTabChange} />,
-      );
-
-      const container = getByTestId('tabs-container');
-      expect(container.props.accessibilityLabel).toBe(
-        'Tab navigation with 3 tabs',
-      );
-    });
-
-    it('should have correct accessibility hint for active tab', () => {
-      const { getByTestId } = render(
-        <Tabs tabs={mockTabs} activeTab="tab2" onTabChange={mockOnTabChange} />,
-      );
-
-      const container = getByTestId('tabs-container');
-      expect(container.props.accessibilityHint).toBe(
-        'Currently on Tab 2 tab, 2 of 3',
-      );
-    });
-
     it('should mark tabs with correct accessibility role', () => {
       const { getByTestId } = render(
         <Tabs tabs={mockTabs} activeTab="tab1" onTabChange={mockOnTabChange} />,
@@ -238,19 +207,6 @@ describe('Tabs Component', () => {
 
       expect(screen.getByTestId('tab-only')).toBeTruthy();
       expect(screen.getByText('Only Tab')).toBeTruthy();
-    });
-
-    it('should handle activeTab not in tabs array', () => {
-      const { getByTestId } = render(
-        <Tabs
-          tabs={mockTabs}
-          activeTab="nonexistent"
-          onTabChange={mockOnTabChange}
-        />,
-      );
-
-      const container = getByTestId('tabs-container');
-      expect(container.props.accessibilityHint).toContain('Currently on  tab');
     });
 
     it('should handle tabs with special characters in labels', () => {

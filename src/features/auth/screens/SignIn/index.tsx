@@ -93,6 +93,10 @@ const LoginScreen = () => {
         <AppIcon
           width={88}
           height={88}
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel="App logo"
+          accessibilityHint="Movea app logo"
           color={appIconColorConfig.color}
           stopColor={appIconColorConfig.backgroundColor}
         />

@@ -61,6 +61,7 @@ export const SignInForm = memo(
                 ref={emailRef}
                 accessibilityRole="text"
                 accessibilityLabel="Email Address input field"
+                accessibilityHint="Type your email address"
                 label="Email Address"
                 value={value}
                 error={error?.message}
@@ -88,6 +89,7 @@ export const SignInForm = memo(
                 ref={passwordRef}
                 accessibilityRole="text"
                 accessibilityLabel="Password input field"
+                accessibilityHint="type your password"
                 secureTextEntry
                 label="Password"
                 value={value}
@@ -109,6 +111,7 @@ export const SignInForm = memo(
             onPress={onForgotPassword}
             accessibilityRole="button"
             accessibilityLabel="Forgot Password"
+            accessibilityHint="Navigate to the forgot password screen"
             className="w-auto"
           >
             <Typo size="xs" weight="regular" className="text-right mb-7">
@@ -121,6 +124,7 @@ export const SignInForm = memo(
         <Button
           onPress={handleSubmit(handleSubmitForm)}
           disabled={isDisabled}
+          accessibilityHint="Sign in to your account"
           testID="signin-submit-button"
           title="Sign In"
           accessibilityLabel="Sign In"

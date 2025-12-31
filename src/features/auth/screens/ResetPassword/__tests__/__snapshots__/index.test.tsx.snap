@@ -97,6 +97,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   value=""
                 />
                 <View
+                  accessibilityHint="Toggle password visibility"
                   accessibilityLabel="Toggle password visibility"
                   accessibilityRole="button"
                   accessibilityState={
@@ -264,6 +265,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   value=""
                 />
                 <View
+                  accessibilityHint="Toggle password visibility"
                   accessibilityLabel="Toggle password visibility"
                   accessibilityRole="button"
                   accessibilityState={
@@ -414,10 +416,9 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
             className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-primary"
           >
             <Text
-              accessibilityLabel="Reset Password"
-              accessibilityRole="text"
-              accessible={true}
+              accessible={false}
               className="font-montserrat-medium text-white text-center text-lg leading-6"
+              importantForAccessibility="no"
               maxFontSizeMultiplier={1.2}
               testID="reset-password-submit-button-text"
             >

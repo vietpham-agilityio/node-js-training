@@ -18,8 +18,6 @@ interface TabsProps {
 
 export const Tabs = memo(
   ({ tabs, activeTab, onTabChange, variant = 'primary' }: TabsProps) => {
-    const activeTabLabel = tabs.find(tab => tab.id === activeTab)?.label || '';
-    const activeTabIndex = tabs.findIndex(tab => tab.id === activeTab);
     const contentContainerStyles = useResolveClassNames(
       `gap-3 ${(variant === 'secondary' || variant === 'tertiary') && 'flex-1'}`,
     );
@@ -28,12 +26,6 @@ export const Tabs = memo(
       <View
         testID="tabs-container"
         className={cn('bg-transparent', VARIANTS_MAP[variant].container)}
-        accessibilityRole="tablist"
-        accessibilityLabel={`Tab navigation with ${tabs.length} tabs`}
-        accessibilityHint={`Currently on ${activeTabLabel} tab, ${
-          activeTabIndex + 1
-        } of ${tabs.length}`}
-        accessible
         {...(isAndroid() && {
           accessibilityLiveRegion: 'polite',
         })}
