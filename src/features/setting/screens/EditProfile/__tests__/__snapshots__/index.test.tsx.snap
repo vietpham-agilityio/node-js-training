@@ -61,13 +61,17 @@ exports[`EditProfileScreen Snapshot should match snapshot 1`] = `
               className="items-center mt-4 mb-12"
             >
               <View
-                accessibilityLabel="Select avatar"
-                accessibilityRole="image"
-                accessible={true}
-                className="relative w-23 h-23"
-                testID="avatar-container"
+                className="relative items-center justify-center"
               >
-                Image
+                <View
+                  accessibilityLabel="Select avatar"
+                  accessibilityRole="image"
+                  accessible={true}
+                  className="relative w-23 h-23"
+                  testID="avatar-container"
+                >
+                  Image
+                </View>
                 <View
                   accessibilityHint="Tap to remove your profile picture"
                   accessibilityLabel="Remove profile picture"

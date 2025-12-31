@@ -2,7 +2,7 @@
 import { Stack } from 'expo-router';
 
 // Constants
-import { SCREENS } from '@/constants';
+import { SCREEN_COLOR_PRIMARY, SCREENS } from '@/constants';
 
 // Components
 import { ScreenHeader } from '@/features/navigation/components/ScreenHeader';
@@ -14,6 +14,7 @@ const AuthLayout = () => (
   <Stack
     screenOptions={{
       header: ScreenHeader,
+      contentStyle: { backgroundColor: SCREEN_COLOR_PRIMARY },
     }}
   >
     <Stack.Screen

@@ -1,4 +1,4 @@
-import { Platform, TouchableOpacity } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
 
 // Utils
 import { cn } from '@/utils/cn';
@@ -38,29 +38,29 @@ const BUTTON_SIZE_MAP: Record<
 > = {
   48: {
     button: 'w-6 h-6',
-    buttonPosition: 'bottom-0 left-1/2 -translate-x-1/2',
+    buttonPosition: 'bottom-0',
     iconSize: 24,
   },
   92: {
     button: 'w-7 h-7',
-    buttonPosition: '-bottom-3.5 left-1/2 -translate-x-1/2',
+    buttonPosition: '-bottom-3.5',
     iconSize: 24,
   },
   132: {
     button: 'w-10 h-10',
-    buttonPosition: 'bottom-0 left-1/2 -translate-x-1/2',
+    buttonPosition: 'bottom-0',
     iconSize: 24,
   },
   160: {
     button: 'w-12 h-12',
-    buttonPosition: 'bottom-0 left-1/2 -translate-x-1/2',
+    buttonPosition: 'bottom-0',
     iconSize: 24,
   },
 };
 
 /**
  * Base EditableAvatar component with picker button
- * This receives injected props from HOCs
+ * Wraps Avatar component with an overlay button
  */
 const EditableAvatarBase = ({
   size = 92,
@@ -101,7 +101,10 @@ const EditableAvatarBase = ({
   };
 
   return (
-    <Avatar {...avatarProps} size={size} source={avatarUri}>
+    <View className="relative items-center justify-center">
+      {/* Pure Avatar Component */}
+      <Avatar {...avatarProps} size={size} source={avatarUri} />
+
       {/* Picker Button Overlay */}
       <TouchableOpacity
         onPress={handleButtonPress}
@@ -142,7 +145,7 @@ const EditableAvatarBase = ({
           />
         )}
       </TouchableOpacity>
-    </Avatar>
+    </View>
   );
 };
 

@@ -1,4 +1,4 @@
-import { ComponentType, memo, ReactNode } from 'react';
+import { ComponentType, memo } from 'react';
 import { View } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 
@@ -22,7 +22,6 @@ export interface AvatarProps {
   defaultAvatar?: ComponentType<SvgProps>;
   accessibilityLabel?: string;
   className?: string;
-  children?: ReactNode;
 }
 
 // Size configurations mapping
@@ -52,7 +51,6 @@ export const Avatar = memo(
     defaultAvatar,
     accessibilityLabel,
     className = '',
-    children,
   }: AvatarProps) => {
     const config = SIZE_MAP[size];
     const DefaultAvatar = defaultAvatar || PhotoProfileIcon;
@@ -103,9 +101,6 @@ export const Avatar = memo(
             </View>
           </View>
         )}
-
-        {/* Children (e.g., picker button overlay) */}
-        {children}
       </View>
     );
   },

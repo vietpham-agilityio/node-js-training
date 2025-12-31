@@ -11,13 +11,17 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
       className="items-center mt-4 mb-12"
     >
       <View
-        accessibilityLabel="Select avatar"
-        accessibilityRole="image"
-        accessible={true}
-        className="relative w-23 h-23"
-        testID="avatar-container"
+        className="relative items-center justify-center"
       >
-        Image
+        <View
+          accessibilityLabel="Select avatar"
+          accessibilityRole="image"
+          accessible={true}
+          className="relative w-23 h-23"
+          testID="avatar-container"
+        >
+          Image
+        </View>
         <View
           accessibilityHint="Tap to remove your profile picture"
           accessibilityLabel="Remove profile picture"
@@ -428,186 +432,190 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
       className="items-center mt-4 mb-12"
     >
       <View
-        accessibilityLabel="Select avatar"
-        accessibilityRole="image"
-        accessible={true}
-        className="relative w-23 h-23"
-        testID="avatar-container"
+        className="relative items-center justify-center"
       >
         <View
-          accessibilityHint="Default avatar placeholder"
           accessibilityLabel="Select avatar"
           accessibilityRole="image"
           accessible={true}
-          className="w-23 h-23 rounded-full items-center justify-center overflow-hidden"
-          testID="default-avatar-icon"
+          className="relative w-23 h-23"
+          testID="avatar-container"
         >
           <View
-            className="items-center justify-center w-full h-full"
-            importantForAccessibility="no-hide-descendants"
+            accessibilityHint="Default avatar placeholder"
+            accessibilityLabel="Select avatar"
+            accessibilityRole="image"
+            accessible={true}
+            className="w-23 h-23 rounded-full items-center justify-center overflow-hidden"
+            testID="default-avatar-icon"
           >
-            <RNSVGSvgView
-              align="xMidYMid"
-              bbHeight={92}
-              bbWidth={92}
-              fill="none"
-              focusable={false}
-              height={92}
-              meetOrSlice={0}
-              minX={0}
-              minY={0}
-              style={
-                [
-                  {
-                    "backgroundColor": "transparent",
-                    "borderWidth": 0,
-                  },
-                  {
-                    "flex": 0,
-                    "height": 92,
-                    "width": 92,
-                  },
-                ]
-              }
-              vbHeight={92}
-              vbWidth={92}
-              width={92}
+            <View
+              className="items-center justify-center w-full h-full"
+              importantForAccessibility="no-hide-descendants"
             >
-              <RNSVGGroup
-                fill={null}
-                propList={
+              <RNSVGSvgView
+                align="xMidYMid"
+                bbHeight={92}
+                bbWidth={92}
+                fill="none"
+                focusable={false}
+                height={92}
+                meetOrSlice={0}
+                minX={0}
+                minY={0}
+                style={
                   [
-                    "fill",
+                    {
+                      "backgroundColor": "transparent",
+                      "borderWidth": 0,
+                    },
+                    {
+                      "flex": 0,
+                      "height": 92,
+                      "width": 92,
+                    },
                   ]
                 }
+                vbHeight={92}
+                vbWidth={92}
+                width={92}
               >
-                <RNSVGMask
-                  fill={
-                    {
-                      "payload": 4278190080,
-                      "type": 0,
-                    }
-                  }
-                  height={92}
-                  maskContentUnits={1}
-                  maskType={1}
-                  maskUnits={1}
-                  name="a"
-                  width={92}
-                  x={0}
-                  y={0}
-                >
-                  <RNSVGCircle
-                    cx={46}
-                    cy={46}
-                    fill={
-                      {
-                        "payload": 4293059565,
-                        "type": 0,
-                      }
-                    }
-                    propList={
-                      [
-                        "fill",
-                      ]
-                    }
-                    r={46}
-                  />
-                </RNSVGMask>
                 <RNSVGGroup
-                  fill={
-                    {
-                      "payload": 4278190080,
-                      "type": 0,
-                    }
+                  fill={null}
+                  propList={
+                    [
+                      "fill",
+                    ]
                   }
-                  mask="a"
                 >
-                  <RNSVGCircle
-                    cx={46}
-                    cy={46}
+                  <RNSVGMask
                     fill={
                       {
-                        "payload": 4291486975,
+                        "payload": 4278190080,
                         "type": 0,
                       }
                     }
-                    propList={
-                      [
-                        "fill",
-                      ]
-                    }
-                    r={46}
-                  />
-                  <RNSVGCircle
-                    cx={46}
-                    cy={33}
+                    height={92}
+                    maskContentUnits={1}
+                    maskType={1}
+                    maskUnits={1}
+                    name="a"
+                    width={92}
+                    x={0}
+                    y={0}
+                  >
+                    <RNSVGCircle
+                      cx={46}
+                      cy={46}
+                      fill={
+                        {
+                          "payload": 4293059565,
+                          "type": 0,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                      r={46}
+                    />
+                  </RNSVGMask>
+                  <RNSVGGroup
                     fill={
                       {
-                        "brushRef": "b",
-                        "type": 1,
+                        "payload": 4278190080,
+                        "type": 0,
                       }
                     }
-                    propList={
-                      [
-                        "fill",
-                      ]
-                    }
-                    r={15}
-                  />
-                  <RNSVGPath
-                    d="M15 76c0-11.046 8.954-20 20-20h22c11.046 0 20 8.954 20 20v16H15V76Z"
-                    fill={
-                      {
-                        "brushRef": "c",
-                        "type": 1,
+                    mask="a"
+                  >
+                    <RNSVGCircle
+                      cx={46}
+                      cy={46}
+                      fill={
+                        {
+                          "payload": 4291486975,
+                          "type": 0,
+                        }
                       }
-                    }
-                    propList={
-                      [
-                        "fill",
-                      ]
-                    }
-                  />
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                      r={46}
+                    />
+                    <RNSVGCircle
+                      cx={46}
+                      cy={33}
+                      fill={
+                        {
+                          "brushRef": "b",
+                          "type": 1,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                      r={15}
+                    />
+                    <RNSVGPath
+                      d="M15 76c0-11.046 8.954-20 20-20h22c11.046 0 20 8.954 20 20v16H15V76Z"
+                      fill={
+                        {
+                          "brushRef": "c",
+                          "type": 1,
+                        }
+                      }
+                      propList={
+                        [
+                          "fill",
+                        ]
+                      }
+                    />
+                  </RNSVGGroup>
+                  <RNSVGDefs>
+                    <RNSVGLinearGradient
+                      gradient={
+                        [
+                          0,
+                          -12689159,
+                          1,
+                          -12757768,
+                        ]
+                      }
+                      gradientTransform={null}
+                      gradientUnits={1}
+                      name="b"
+                      x1={22.316}
+                      x2={73.758}
+                      y1={-13.875}
+                      y2={-4.478}
+                    />
+                    <RNSVGLinearGradient
+                      gradient={
+                        [
+                          0,
+                          -12689159,
+                          1,
+                          -12757768,
+                        ]
+                      }
+                      gradientTransform={null}
+                      gradientUnits={1}
+                      name="c"
+                      x1={-2.947}
+                      x2={97.021}
+                      y1={17.75}
+                      y2={49.198}
+                    />
+                  </RNSVGDefs>
                 </RNSVGGroup>
-                <RNSVGDefs>
-                  <RNSVGLinearGradient
-                    gradient={
-                      [
-                        0,
-                        -12689159,
-                        1,
-                        -12757768,
-                      ]
-                    }
-                    gradientTransform={null}
-                    gradientUnits={1}
-                    name="b"
-                    x1={22.316}
-                    x2={73.758}
-                    y1={-13.875}
-                    y2={-4.478}
-                  />
-                  <RNSVGLinearGradient
-                    gradient={
-                      [
-                        0,
-                        -12689159,
-                        1,
-                        -12757768,
-                      ]
-                    }
-                    gradientTransform={null}
-                    gradientUnits={1}
-                    name="c"
-                    x1={-2.947}
-                    x2={97.021}
-                    y1={17.75}
-                    y2={49.198}
-                  />
-                </RNSVGDefs>
-              </RNSVGGroup>
-            </RNSVGSvgView>
+              </RNSVGSvgView>
+            </View>
           </View>
         </View>
         <View

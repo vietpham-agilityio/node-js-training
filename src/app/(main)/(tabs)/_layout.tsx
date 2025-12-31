@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
 
 // Constants
-import { TABS } from '@/constants';
+import { SCREEN_COLOR_PRIMARY, TABS } from '@/constants';
 
 // Components
 import { MainHeader } from '@/features/navigation/components/MainHeader';
@@ -45,6 +45,9 @@ const TabLayout = () => {
         <NavigationTabBar bottomInset={insets.bottom} {...props} />
       )}
       screenOptions={{
+        sceneStyle: {
+          backgroundColor: SCREEN_COLOR_PRIMARY,
+        },
         header: props => (
           <MainHeader
             isLeftTitle={props.route.name !== TABS.WALLET.NAME}
