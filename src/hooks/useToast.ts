@@ -1,30 +1,30 @@
 import { ToastType } from '@/constants';
 import { useToastStore } from '@/stores/toast';
 
+type AlertButton = {
+  text?: string;
+  onPress?: () => void;
+  style?: 'default' | 'cancel' | 'destructive';
+};
+
+type AlertMode = 'auto' | 'manual';
+
+type AlertOptions = {
+  type?: ToastType;
+  mode?: AlertMode;
+  delay?: number;
+};
+
 /**
  * Alert replacement using Toast
- * Drop-in replacement for React Native Alert.alert()
+ * Supports both AUTO and MANUAL action modes
  */
 export class ToastAlert {
-  /**
-   * Show an alert with title and message
-   * @param title - Alert title (used as message)
-   * @param message - Alert message (optional, appended to title)
-   * @param buttons - Array of buttons (only first 2 are supported)
-   * @param options - Alert options (type determines toast style)
-   */
   static alert(
     title: string,
     message?: string,
-    buttons?: {
-      text?: string;
-      onPress?: () => void;
-      style?: 'default' | 'cancel' | 'destructive';
-    }[],
-    options?: {
-      cancelable?: boolean;
-      type?: ToastType;
-    },
+    buttons?: AlertButton[],
+    options?: AlertOptions,
   ) {
     const {
       show,
@@ -35,74 +35,64 @@ export class ToastAlert {
       showWithAction,
     } = useToastStore.getState();
 
-    // Combine title and message
     const fullMessage = message ? `${title}\n${message}` : title;
+    const type = options?.type ?? this.getTypeFromButtons(buttons);
+    const mode: AlertMode = options?.mode ?? 'manual';
+    const delay = options?.delay ?? 700;
 
-    // Determine toast type
-    const type = options?.type || this.getTypeFromButtons(buttons);
-
-    // Check if we have an action button
     const actionButton = buttons?.find(
       btn => btn.style !== 'cancel' && btn.onPress,
     );
 
-    if (actionButton && actionButton.onPress) {
-      // Show toast with action
+    if (actionButton) {
       showWithAction(
         fullMessage,
         type,
         {
-          label: actionButton.text || 'OK',
-          onPress: actionButton.onPress,
+          label: actionButton.text ?? 'OK',
+          onPress:
+            mode === 'manual' && actionButton.onPress
+              ? actionButton.onPress
+              : () => null,
         },
-        5000,
+        delay,
       );
-    } else {
-      // Show regular toast
-      switch (type) {
-        case ToastType.SUCCESS:
-          showSuccess(fullMessage);
-          break;
-        case ToastType.ERROR:
-          showError(fullMessage);
-          break;
-        case ToastType.WARNING:
-          showWarning(fullMessage);
-          break;
-        case ToastType.INFO:
-          showInfo(fullMessage);
-          break;
-        default:
-          show(fullMessage, type);
+
+      if (mode === 'auto') {
+        setTimeout(() => {
+          actionButton.onPress?.();
+        }, delay);
       }
+
+      return;
     }
 
-    // Call the first button's onPress if provided
-    const defaultButton = buttons?.find(btn => btn.style !== 'cancel');
-    if (defaultButton?.onPress) {
-      // Delay execution to allow toast to show
-      setTimeout(() => {
-        defaultButton.onPress?.();
-      }, 100);
+    switch (type) {
+      case ToastType.SUCCESS:
+        showSuccess(fullMessage);
+        break;
+      case ToastType.ERROR:
+        showError(fullMessage);
+        break;
+      case ToastType.WARNING:
+        showWarning(fullMessage);
+        break;
+      case ToastType.INFO:
+        showInfo(fullMessage);
+        break;
+      default:
+        show(fullMessage, type);
     }
   }
 
   /**
-   * Determine toast type from button styles
+   * Infer toast type from button styles
    */
-  private static getTypeFromButtons(
-    buttons?: {
-      text?: string;
-      onPress?: () => void;
-      style?: 'default' | 'cancel' | 'destructive';
-    }[],
-  ): ToastType {
+  private static getTypeFromButtons(buttons?: AlertButton[]): ToastType {
     if (!buttons) return ToastType.INFO;
-
-    const hasDestructive = buttons.some(btn => btn.style === 'destructive');
-    if (hasDestructive) return ToastType.ERROR;
-
-    return ToastType.INFO;
+    return buttons.some(btn => btn.style === 'destructive')
+      ? ToastType.ERROR
+      : ToastType.INFO;
   }
 }
 
@@ -119,60 +109,33 @@ export const useToastAlert = () => {
     hideAll,
   } = useToastStore();
 
-  /**
-   * Show success toast
-   */
-  const success = (message: string, duration?: number) => {
+  const success = (message: string, duration?: number) =>
     showSuccess(message, duration);
-  };
 
-  /**
-   * Show error toast
-   */
-  const error = (message: string, duration?: number) => {
+  const error = (message: string, duration?: number) =>
     showError(message, duration);
-  };
 
-  /**
-   * Show warning toast
-   */
-  const warning = (message: string, duration?: number) => {
+  const warning = (message: string, duration?: number) =>
     showWarning(message, duration);
-  };
 
-  /**
-   * Show info toast
-   */
-  const info = (message: string, duration?: number) => {
+  const info = (message: string, duration?: number) =>
     showInfo(message, duration);
-  };
 
-  /**
-   * Show toast with action button
-   */
   const withAction = (
     message: string,
     action: { label: string; onPress: () => void },
     type: ToastType = ToastType.INFO,
     duration?: number,
-  ) => {
-    showWithAction(message, type, action, duration);
-  };
+  ) => showWithAction(message, type, action, duration);
 
   /**
-   * Show alert (replaces Alert.alert)
+   * Alert (Alert.alert replacement)
    */
   const alert = (
     title: string,
     message?: string,
-    buttons?: {
-      text?: string;
-      onPress?: () => void;
-      style?: 'default' | 'cancel' | 'destructive';
-    }[],
-    options?: {
-      type?: ToastType;
-    },
+    buttons?: AlertButton[],
+    options?: AlertOptions,
   ) => {
     ToastAlert.alert(title, message, buttons, options);
   };

@@ -33,6 +33,18 @@ jest.mock('@/hooks/useToast', () => ({
   }),
 }));
 
+// Mock react-native-safe-area-context
+jest.mock('react-native-safe-area-context', () => {
+  const { View } = require('react-native');
+
+  return {
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+    SafeAreaView: ({ children, ...props }: any) => (
+      <View {...props}>{children}</View>
+    ),
+  };
+});
+
 describe('SignupScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();

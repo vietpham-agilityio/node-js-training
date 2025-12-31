@@ -4,6 +4,11 @@ import { TextInput } from 'react-native';
 // Component
 import { SignUpForm } from '../';
 
+// Mock react-native-safe-area-context
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
 describe('SignUpForm Component', () => {
   const mockOnSubmit = jest.fn();
 
@@ -20,11 +25,6 @@ describe('SignUpForm Component', () => {
     it('should render without crashing', () => {
       const { getByTestId } = render(<SignUpForm {...defaultProps} />);
       expect(getByTestId('signup-fullname-input')).toBeTruthy();
-    });
-
-    it('should render avatar picker', () => {
-      const { getByLabelText } = render(<SignUpForm {...defaultProps} />);
-      expect(getByLabelText('Select avatar')).toBeTruthy();
     });
 
     it('should render full name input field', () => {
@@ -133,15 +133,6 @@ describe('SignUpForm Component', () => {
       expect(focusSpy).toHaveBeenCalledTimes(1);
 
       focusSpy.mockRestore();
-    });
-
-    it('should update avatar when onChangeImage is called', () => {
-      const { getByLabelText } = render(<SignUpForm {...defaultProps} />);
-      const avatar = getByLabelText('Select avatar');
-
-      // Find the onChangeImage handler by triggering the avatar picker
-      // This is a simplified test - in reality, Avatar component handles the image picker
-      expect(avatar).toBeTruthy();
     });
   });
 

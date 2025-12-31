@@ -132,7 +132,6 @@ const MyProfileScreen = () => {
         <View className="justify-center items-center gap-6">
           <Avatar
             size={132}
-            variant="default"
             source={profile?.avatarUrl}
             defaultAvatar={UserProfileIcon}
             accessibilityLabel="Profile avatar"

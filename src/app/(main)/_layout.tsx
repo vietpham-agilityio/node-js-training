@@ -10,8 +10,6 @@ const MainLayout = () => (
   <Stack
     screenOptions={{
       header: ScreenHeader,
-      animation: 'slide_from_right',
-      animationTypeForReplace: 'push',
     }}
   >
     <Stack.Screen

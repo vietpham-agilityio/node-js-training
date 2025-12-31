@@ -4,9 +4,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { TextInput, View } from 'react-native';
 
 // Components
-import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { EditableAvatar } from '@/features/camera/components/EditableAvatar';
 
 // Types
 import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
@@ -83,8 +83,8 @@ export const EditProfileForm = memo(
             name="avatarUrl"
             render={({ field: { value, onChange } }) => (
               <View className="items-center mt-4 mb-12">
-                <Avatar
-                  variant="picker"
+                <EditableAvatar
+                  initialSource={value}
                   source={value}
                   accessibilityLabel="Select avatar"
                   onChangeImage={uri => onChange(uri)}

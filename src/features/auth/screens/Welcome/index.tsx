@@ -42,7 +42,6 @@ const WelcomeScreen = () => {
         <View className="mb-8">
           <Avatar
             size={160}
-            variant="default"
             source={profile?.avatarUrl}
             accessibilityLabel="Profile picture preview"
           />

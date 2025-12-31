@@ -82,7 +82,6 @@ export const MainHeader = ({
             <Avatar
               size={48}
               source={user?.avatarUrl}
-              variant="default"
               defaultAvatar={UserProfileIcon}
               accessibilityLabel="User profile picture"
             />

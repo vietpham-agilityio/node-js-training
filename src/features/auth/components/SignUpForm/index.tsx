@@ -4,9 +4,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { TextInput, View } from 'react-native';
 
 // Components
-import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { EditableAvatar } from '@/features/camera/components/EditableAvatar';
 
 // Types
 import { SignUpData } from '@/features/auth/types/auth';
@@ -76,8 +76,7 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
         name="avatarUrl"
         render={({ field: { value, onChange } }) => (
           <View className="items-center mb-12">
-            <Avatar
-              variant="picker"
+            <EditableAvatar
               source={value}
               accessibilityLabel="Select avatar"
               onChangeImage={uri => onChange(uri)}

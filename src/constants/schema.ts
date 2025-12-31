@@ -94,12 +94,15 @@ export const editProfileSchema = v.pipe(
       v.union([v.string(), v.null()]),
       v.transform(val => val ?? ''),
       v.check(
-        val => val.length === 0 || /^\+?[1-9]\d{1,14}$/.test(val),
+        val =>
+          val.length === 0 ||
+          (/^\+?[1-9]\d{1,14}$/.test(val) &&
+            val.replace(/\D/g, '').length >= 9),
         ERROR_MESSAGES.INVALID_PHONE_NUMBER,
       ),
     ),
 
-    avatarUrl: v.optional(v.string()),
+    avatarUrl: v.pipe(v.union([v.string(), v.null()])),
   }),
 );
 
