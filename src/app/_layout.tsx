@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
 // Uniwind
@@ -23,7 +24,7 @@ import {
 } from '@expo-google-fonts/montserrat';
 
 // Constants
-import { ROUTES, SCREENS } from '@/constants';
+import { ROUTES, SCREEN_COLOR_PRIMARY, SCREENS } from '@/constants';
 
 // Hooks
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -39,6 +40,7 @@ export { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
+SystemUI.setBackgroundColorAsync(SCREEN_COLOR_PRIMARY);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -148,8 +150,7 @@ const RootLayout = () => {
         <Stack
           screenOptions={{
             headerShown: false,
-            animation: 'slide_from_right',
-            animationTypeForReplace: 'push',
+            contentStyle: { backgroundColor: SCREEN_COLOR_PRIMARY },
           }}
         >
           {/* Storybook - Only accessible when enabled */}

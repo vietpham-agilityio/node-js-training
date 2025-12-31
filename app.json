@@ -10,6 +10,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "assetBundlePatterns": ["**/*"],
+    "backgroundColor": "#0B0F2F",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.movieticketbooking",

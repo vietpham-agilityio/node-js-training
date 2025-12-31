@@ -1,11 +1,11 @@
 // Icons
-import { LogoutIcon } from '@/icons/LogoutIcon';
-import { LockIcon } from '@/icons/LockIcon';
-import { EditProfileIcon } from '@/icons/EditProfileIcon';
-import { MyWalletIcon } from '@/icons/MyWalletIcon';
 import { ChangeLanguageIcon } from '@/icons/ChangeLanguageIcon';
+import { EditProfileIcon } from '@/icons/EditProfileIcon';
 import { HelpCenterIcon } from '@/icons/HelpCenterIcon';
 import { LikeIcon } from '@/icons/LikeIcon';
+import { LockIcon } from '@/icons/LockIcon';
+import { LogoutIcon } from '@/icons/LogoutIcon';
+import { MyWalletIcon } from '@/icons/MyWalletIcon';
 
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
@@ -61,6 +61,8 @@ export const TAB_BAR_THEME = {
   },
   ICON_SIZE: 24,
 } as const;
+
+export const SCREEN_COLOR_PRIMARY = '#0B0F2F';
 
 export const TOAST_DURATION = 3000;
 
