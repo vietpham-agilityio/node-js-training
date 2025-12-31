@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { useShallow } from 'zustand/react/shallow';
 
 // Constants
 import { ERROR_MESSAGES, MESSAGES, ROUTES, ToastType } from '@/constants';
@@ -20,6 +21,9 @@ import { EditProfileForm } from '@/features/setting/components/EditProfileForm';
 // Layout
 import { KeyboardLayout } from '@/layouts/KeyboardLayout';
 
+// Store
+import { useLoadingStore } from '@/stores/loading';
+
 const EditProfileScreen = () => {
   const toast = useToastAlert();
   const router = useRouter();
@@ -28,6 +32,13 @@ const EditProfileScreen = () => {
     useUpdateProfile();
   const { mutateAsync: uploadAvatar, isPending: isUploading } =
     useUploadAvatar();
+
+  const { showLoading, hideLoading } = useLoadingStore(
+    useShallow(state => ({
+      showLoading: state.showLoading,
+      hideLoading: state.hideLoading,
+    })),
+  );
 
   const isLoading = isProfileLoading || isUpdating || isUploading;
 
@@ -55,7 +66,11 @@ const EditProfileScreen = () => {
         ...(avatarUploadUrl ? { avatarUrl: avatarUploadUrl } : {}),
       };
 
-      await updateProfile(updatePayload);
+      showLoading();
+
+      await updateProfile(updatePayload, {
+        onSettled: hideLoading,
+      });
 
       toast.alert(
         MESSAGES.UPDATE_SUCCESS,
