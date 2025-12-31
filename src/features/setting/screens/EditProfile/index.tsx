@@ -63,6 +63,7 @@ const EditProfileScreen = () => {
         [{ onPress: () => router.push(ROUTES.PROFILE) }],
         {
           type: ToastType.SUCCESS,
+          mode: 'auto',
         },
       );
     } catch (error) {

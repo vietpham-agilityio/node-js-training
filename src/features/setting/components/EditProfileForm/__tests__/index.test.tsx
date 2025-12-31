@@ -10,6 +10,11 @@ import { UserProfile } from '@/features/auth/types/auth';
 // Mock dependencies
 const mockOnSubmit = jest.fn();
 
+// Mock react-native-safe-area-context
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
 describe('EditProfileForm Component', () => {
   const mockUserInfo: UserProfile = {
     id: 'user-123',

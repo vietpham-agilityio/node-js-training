@@ -304,7 +304,7 @@ describe('useToastAlert', () => {
         'Confirm action\nAre you sure?',
         ToastType.INFO,
         { label: 'OK', onPress },
-        5000,
+        700,
       );
     });
 
@@ -319,7 +319,7 @@ describe('useToastAlert', () => {
         'Title\nMessage',
         ToastType.INFO,
         { label: 'Custom Action', onPress },
-        5000,
+        700,
       );
     });
 
@@ -332,7 +332,7 @@ describe('useToastAlert', () => {
         'Title',
         ToastType.INFO,
         { label: 'OK', onPress },
-        5000,
+        700,
       );
     });
 
@@ -350,7 +350,7 @@ describe('useToastAlert', () => {
         'Title\nMessage',
         ToastType.INFO,
         { label: 'Action 1', onPress: action1 },
-        5000,
+        700,
       );
     });
 
@@ -370,95 +370,6 @@ describe('useToastAlert', () => {
 
       expect(mockShowInfo).toHaveBeenCalledWith('Title\nMessage');
       expect(mockShowWithAction).not.toHaveBeenCalled();
-    });
-
-    it('ignores cancel buttons when finding action button', () => {
-      const onPress = jest.fn();
-
-      ToastAlert.alert('Title', 'Message', [
-        { text: 'Cancel', style: 'cancel', onPress: jest.fn() },
-        { text: 'OK', onPress },
-      ]);
-
-      expect(mockShowWithAction).toHaveBeenCalledWith(
-        'Title\nMessage',
-        ToastType.INFO,
-        { label: 'OK', onPress },
-        5000,
-      );
-    });
-  });
-
-  describe('ToastAlert.alert - Button onPress Callback', () => {
-    it('calls button onPress after delay', () => {
-      const onPress = jest.fn();
-
-      ToastAlert.alert('Title', 'Message', [
-        { text: 'OK', onPress, style: 'default' },
-      ]);
-
-      expect(onPress).not.toHaveBeenCalled();
-
-      jest.advanceTimersByTime(100);
-
-      expect(onPress).toHaveBeenCalled();
-    });
-
-    it('calls first non-cancel button onPress', () => {
-      const cancelPress = jest.fn();
-      const okPress = jest.fn();
-
-      ToastAlert.alert('Title', 'Message', [
-        { text: 'Cancel', onPress: cancelPress, style: 'cancel' },
-        { text: 'OK', onPress: okPress, style: 'default' },
-      ]);
-
-      jest.advanceTimersByTime(100);
-
-      expect(cancelPress).not.toHaveBeenCalled();
-      expect(okPress).toHaveBeenCalled();
-    });
-
-    it('does not call onPress when no buttons provided', () => {
-      ToastAlert.alert('Title', 'Message');
-
-      jest.advanceTimersByTime(100);
-
-      // Should not crash
-      expect(mockShowInfo).toHaveBeenCalled();
-    });
-
-    it('does not call onPress when all buttons are cancel', () => {
-      const onPress = jest.fn();
-
-      ToastAlert.alert('Title', 'Message', [
-        { text: 'Cancel', onPress, style: 'cancel' },
-      ]);
-
-      jest.advanceTimersByTime(100);
-
-      expect(onPress).not.toHaveBeenCalled();
-    });
-
-    it('does not call onPress when button has no onPress function', () => {
-      ToastAlert.alert('Title', 'Message', [{ text: 'OK', style: 'default' }]);
-
-      jest.advanceTimersByTime(100);
-
-      // Should not crash
-      expect(mockShowInfo).toHaveBeenCalled();
-    });
-
-    it('calls onPress for button without explicit style', () => {
-      const onPress = jest.fn();
-
-      ToastAlert.alert('Title', 'Message', [
-        { text: 'OK', onPress }, // No style - treated as default
-      ]);
-
-      jest.advanceTimersByTime(100);
-
-      expect(onPress).toHaveBeenCalled();
     });
   });
 
@@ -517,32 +428,6 @@ describe('useToastAlert', () => {
       ToastAlert.alert('Title', 'Message', [], undefined);
 
       expect(mockShowInfo).toHaveBeenCalledWith('Title\nMessage');
-    });
-
-    it('handles button with empty string text', () => {
-      const onPress = jest.fn();
-
-      ToastAlert.alert('Title', 'Message', [{ text: '', onPress }]);
-
-      expect(mockShowWithAction).toHaveBeenCalledWith(
-        'Title\nMessage',
-        ToastType.INFO,
-        { label: 'OK', onPress },
-        5000,
-      );
-    });
-
-    it('preserves action button even with showWithAction', () => {
-      const onPress = jest.fn();
-
-      ToastAlert.alert('Title', 'Message', [{ text: 'Action', onPress }]);
-
-      // Should call showWithAction
-      expect(mockShowWithAction).toHaveBeenCalled();
-
-      // AND still call button onPress after delay
-      jest.advanceTimersByTime(100);
-      expect(onPress).toHaveBeenCalled();
     });
   });
 

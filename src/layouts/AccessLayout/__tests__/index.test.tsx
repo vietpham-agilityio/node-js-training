@@ -1,6 +1,5 @@
-
+import { render } from '@testing-library/react-native';
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
 import { Text, View } from 'react-native';
 
 import { AccessLayout } from '..';
