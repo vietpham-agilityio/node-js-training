@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react-native';
 
 // Components
-import { HorizontalCardSkeleton } from '../../Skeletons/HorizontalCardSkeleton';
+import { HorizontalCardSkeleton } from '../';
 
 // Constants
 import { Size } from '@/constants';

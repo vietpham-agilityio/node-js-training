@@ -11,6 +11,7 @@ export const WalletIcon = ({
 
   return (
     <Svg
+      testID="wallet-icon"
       width={width}
       height={height}
       fill="none"

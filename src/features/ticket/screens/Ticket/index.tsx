@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -22,10 +22,11 @@ import { TicketStatus } from '@/features/booking/types/booking';
 
 // Components
 import { Button } from '@/components/Button';
+import { DetailRow } from '@/components/DetailRow';
 import { Divider } from '@/components/Divider';
 import { HorizontalCard } from '@/components/HorizontalCard';
-import { DetailRow } from '@/components/DetailRow';
 import { Typo } from '@/components/Typo';
+import { TicketDetailSkeleton } from '@/features/ticket/components/TicketDetailSkeleton';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
@@ -110,20 +111,6 @@ const TicketDetailScreen = () => {
   const unActiveMessage =
     UNACTIVE_MESSAGE[ticketDetail?.status as TicketStatus] || '';
 
-  if (isLoading) {
-    return (
-      <StyledSafeAreaView
-        edges={['bottom']}
-        accessibilityLabel="Loading ticket"
-        accessibilityHint="Loading ticket"
-        className="flex-1 bg-bg-primary items-center justify-center"
-      >
-        <ActivityIndicator size="large" />
-        <Typo className="text-text-secondary mt-4">Loading ticket...</Typo>
-      </StyledSafeAreaView>
-    );
-  }
-
   return (
     <StyledSafeAreaView
       edges={['bottom']}
@@ -135,7 +122,9 @@ const TicketDetailScreen = () => {
         contentContainerClassName="flex-1 px-6 justify-between"
         showsVerticalScrollIndicator={false}
       >
-        {isError || !ticketDetail ? (
+        {isLoading ? (
+          <TicketDetailSkeleton />
+        ) : isError || !ticketDetail ? (
           <Button
             size={Size.EXTRA_SMALL}
             title="Retry"

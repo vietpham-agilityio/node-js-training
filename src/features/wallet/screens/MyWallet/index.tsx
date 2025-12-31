@@ -28,12 +28,14 @@ import { WalletTransaction } from '@/features/wallet/types/wallet';
 // Components
 import { Button } from '@/components/Button';
 import { HorizontalCard } from '@/components/HorizontalCard';
+import { HorizontalCardSkeleton } from '@/components/Skeletons/HorizontalCardSkeleton';
 import { Typo } from '@/components/Typo';
+import { WalletCardSkeleton } from '@/features/wallet/components/Skeletons/WalletCardSkeleton';
+import { Transaction } from '@/features/wallet/components/Transaction';
 import { WalletCard } from '@/features/wallet/components/WalletCard';
 
 // Icons
-import { Transaction } from '@/features/wallet/components/Transaction';
-import { TopUpIcon } from '@/icons/TopUpIcon';
+import { WalletIcon } from '@/icons/WalletIcon';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
@@ -143,7 +145,18 @@ const MyWalletScreen = () => {
   }, [isFetchingNextPage]);
 
   const renderEmpty = useCallback(() => {
-    if (isLoadingTransactions) return null;
+    if (isLoadingTransactions) {
+      return (
+        <View className="gap-6">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <HorizontalCardSkeleton
+              key={`skeleton-${index}`}
+              imageSize={Size.SMALL}
+            />
+          ))}
+        </View>
+      );
+    }
 
     if (isTransactionsError) {
       return (
@@ -217,6 +230,8 @@ const MyWalletScreen = () => {
             accessibilityRole="button"
             accessibilityLabel="Retry loading tickets"
           />
+        ) : isLoadingWallet || isLoadingProfile ? (
+          <WalletCardSkeleton />
         ) : wallet ? (
           <WalletCard
             balance={wallet.balance}
@@ -233,21 +248,16 @@ const MyWalletScreen = () => {
         </Typo>
       </View>
     ),
-    [isWalletError, refetchWallet, wallet, profile?.fullName, handleTopUp],
+    [
+      isWalletError,
+      refetchWallet,
+      isLoadingWallet,
+      isLoadingProfile,
+      wallet,
+      profile?.fullName,
+      handleTopUp,
+    ],
   );
-
-  if (isLoadingProfile || isLoadingWallet || isLoadingTransactions) {
-    return (
-      <StyledSafeAreaView
-        edges={[]}
-        className="flex-1 bg-bg-primary items-center justify-center"
-        accessibilityLabel="Loading wallet"
-      >
-        <ActivityIndicator size="large" />
-        <Typo className="text-text-secondary mt-4">Loading wallet...</Typo>
-      </StyledSafeAreaView>
-    );
-  }
 
   return (
     <StyledSafeAreaView
@@ -291,7 +301,7 @@ const MyWalletScreen = () => {
           accessibilityLabel="Top up wallet"
           accessibilityHint="Navigate to top up wallet screen"
         >
-          <TopUpIcon />
+          <WalletIcon />
         </TouchableOpacity>
       </View>
     </StyledSafeAreaView>

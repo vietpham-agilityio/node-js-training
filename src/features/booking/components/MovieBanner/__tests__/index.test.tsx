@@ -2,7 +2,11 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import React from 'react';
 
 // Types
-import { MovieStatus, type Movie } from '@/features/booking/types/movie';
+import {
+  GenreMovie,
+  MovieStatus,
+  type Movie,
+} from '@/features/booking/types/movie';
 
 // Components
 import { MovieBanner } from '..';
@@ -41,7 +45,7 @@ describe('MovieBanner Component', () => {
     },
     trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
     durationMinutes: 112,
-    genre: ['Action', 'Comedy', 'Adventure'],
+    genre: [GenreMovie.ACTION, GenreMovie.COMEDY, GenreMovie.ADVENTURE],
     language: 'EN',
     releaseDate: '2023-06-15',
     createdAt: '2023-06-15T12:34:56Z',

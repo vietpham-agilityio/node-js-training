@@ -20,9 +20,9 @@ interface WalletCardProps {
   onPress?: () => void;
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('screen');
-const CARD_WIDTH = Math.min(SCREEN_WIDTH - 48, 400);
-const CARD_HEIGHT = (CARD_WIDTH * 195) / 327;
+export const { width: SCREEN_WIDTH } = Dimensions.get('screen');
+export const CARD_WIDTH = Math.min(SCREEN_WIDTH - 48, 400);
+export const CARD_HEIGHT = (CARD_WIDTH * 195) / 327;
 
 export const WalletCard = memo(
   ({

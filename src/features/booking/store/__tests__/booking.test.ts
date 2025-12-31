@@ -1,5 +1,5 @@
 import { Showtime, ShowtimeStatus } from '@/features/booking/types/cinema';
-import { Movie, MovieStatus } from '@/features/booking/types/movie';
+import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
 import { act } from '@testing-library/react-native';
 import { useBookingStore } from '../booking';
 
@@ -8,7 +8,7 @@ describe('useBookingStore', () => {
     id: 'movie1',
     title: 'Test Movie',
     posterUrl: 'https://example.com/poster.jpg',
-    genre: ['Action', 'Drama'],
+    genre: [GenreMovie.ACTION, GenreMovie.DRAMA],
     durationMinutes: 120,
     rating: 8.5,
     status: MovieStatus.NOW_PLAYING,

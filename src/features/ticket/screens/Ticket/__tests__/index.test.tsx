@@ -9,6 +9,7 @@ import {
   Ticket,
   TicketStatus,
 } from '@/features/booking/types/booking';
+import { GenreMovie } from '@/features/booking/types/movie';
 
 // Mock expo-router
 let mockTicketId = 'ticket-123';
@@ -159,7 +160,7 @@ const createMockTicket = (status: TicketStatus = TicketStatus.ACTIVE): Ticket =>
           id: 'movie-1',
           title: 'Test Movie',
           posterUrl: 'https://example.com/poster.jpg',
-          genre: ['Action', 'Adventure'],
+          genre: [GenreMovie.ACTION, GenreMovie.ADVENTURE],
           durationMinutes: 120,
           rating: 8.5,
         },
@@ -188,20 +189,30 @@ describe('TicketDetailScreen', () => {
   });
 
   describe('Loading State', () => {
-    it('should show loading indicator when loading', () => {
+    it('should show ticket detail skeleton when loading', () => {
       mockIsLoading = true;
 
-      const { getByText } = render(<TicketDetailScreen />);
+      const { getByTestId } = render(<TicketDetailScreen />);
 
-      expect(getByText('Loading ticket...')).toBeTruthy();
+      expect(getByTestId('ticket-detail-skeleton')).toBeTruthy();
     });
 
-    it('should have loading accessibility label', () => {
+    it('should render all skeleton elements when loading', () => {
+      mockIsLoading = true;
+
+      const { getByTestId } = render(<TicketDetailScreen />);
+
+      expect(getByTestId('ticket-detail-skeleton')).toBeTruthy();
+      expect(getByTestId('horizontal-card-skeleton')).toBeTruthy();
+      expect(getByTestId('ticket-detail-skeleton-qr')).toBeTruthy();
+    });
+
+    it('should have correct accessibility label for skeleton', () => {
       mockIsLoading = true;
 
       const { getByLabelText } = render(<TicketDetailScreen />);
 
-      expect(getByLabelText('Loading ticket')).toBeTruthy();
+      expect(getByLabelText('Loading ticket details')).toBeTruthy();
     });
   });
 

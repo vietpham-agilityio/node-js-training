@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 // Types
-import { Movie, MovieStatus } from '@/features/booking/types/movie';
+import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
 
 // Components
 import { MovieBannerCarousel } from '..';
@@ -23,7 +23,7 @@ const MOVIES_MOCK: Movie[] = [
     },
     trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
     durationMinutes: 112,
-    genre: ['Action', 'Comedy', 'Adventure'],
+    genre: [GenreMovie.ACTION, GenreMovie.COMEDY, GenreMovie.ADVENTURE],
     language: 'EN',
     releaseDate: '2023-06-15',
     createdAt: '2023-06-15T12:34:56Z',

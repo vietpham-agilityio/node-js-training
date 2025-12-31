@@ -147,7 +147,7 @@ export const Input = memo(
             <Animated.View
               className="bg-dark-blue px-1 z-1 left-4 absolute"
               style={{
-                top: isAndroid() ? 14 : 16,
+                top: 14,
                 transform: labelTransform,
               }}
             >

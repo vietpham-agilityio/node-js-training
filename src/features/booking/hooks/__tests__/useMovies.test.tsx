@@ -12,7 +12,7 @@ import {
 } from '../useMovies';
 
 // Types
-import { MovieStatus } from '@/features/booking/types/movie';
+import { GenreMovie, MovieStatus } from '@/features/booking/types/movie';
 
 // Mock dependencies
 const mockGetMovies = jest.fn();
@@ -422,7 +422,7 @@ describe('useMoviesByGenre', () => {
     ];
     mockGetMoviesByGenre.mockResolvedValue(mockMovies);
 
-    const { result } = renderHook(() => useMoviesByGenre('action'), {
+    const { result } = renderHook(() => useMoviesByGenre(GenreMovie.ACTION), {
       wrapper: createWrapper(),
     });
 
@@ -430,12 +430,12 @@ describe('useMoviesByGenre', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMoviesByGenre).toHaveBeenCalledWith('action');
+    expect(mockGetMoviesByGenre).toHaveBeenCalledWith(GenreMovie.ACTION);
     expect(result.current.data).toEqual(mockMovies);
   });
 
   it('should not fetch when genre is "All"', () => {
-    renderHook(() => useMoviesByGenre('all'), {
+    renderHook(() => useMoviesByGenre(GenreMovie.ALL), {
       wrapper: createWrapper(),
     });
 
@@ -446,7 +446,7 @@ describe('useMoviesByGenre', () => {
     const mockError = new Error('Failed to fetch movies by genre');
     mockGetMoviesByGenre.mockRejectedValue(mockError);
 
-    const { result } = renderHook(() => useMoviesByGenre('action'), {
+    const { result } = renderHook(() => useMoviesByGenre(GenreMovie.ACTION), {
       wrapper: createWrapper(),
     });
 

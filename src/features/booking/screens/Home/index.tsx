@@ -15,8 +15,8 @@ import { SearchInput } from '@/components/SearchInput';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
 import { MovieBannerCarousel } from '@/features/booking/components/MovieBannerCarousel';
-import { MovieBannerCarouselSkeleton } from '@/features/booking/components/MovieBannerCarousel/MovieBannerCarouselSkeleton';
 import { PromotionCard } from '@/features/booking/components/PromotionCard';
+import { MovieBannerCarouselSkeleton } from '@/features/booking/components/Skeletons/MovieBannerCarouselSkeleton';
 
 // Hooks
 import {

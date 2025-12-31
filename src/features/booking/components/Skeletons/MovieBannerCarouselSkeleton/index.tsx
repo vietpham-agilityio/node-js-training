@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { Skeleton } from '@/components/Skeleton';
 
 // Types
-import { type Variant } from './CarouseItem';
+import { type Variant } from '../../MovieBannerCarousel/CarouseItem';
 
 // Utils
 import { cn } from '@/utils/cn';
@@ -29,7 +29,7 @@ const VARIANTS_MAP: Record<
   },
   horizontal: {
     width: 300,
-    height: 180,
+    height: 188,
     borderRadius: 8,
   },
 };
