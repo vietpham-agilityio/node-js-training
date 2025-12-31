@@ -22,6 +22,8 @@ const mockToastAlert = jest.fn();
 const mockToastError = jest.fn();
 const mockUpdateProfile = jest.fn();
 const mockUploadAvatar = jest.fn();
+const mockShowLoading = jest.fn();
+const mockHideLoading = jest.fn();
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({
@@ -51,6 +53,18 @@ jest.mock('@/features/setting/hooks/useProfile', () => ({
   }),
 }));
 
+jest.mock('zustand/react/shallow', () => ({
+  useShallow: (fn: any) => fn,
+}));
+
+jest.mock('@/stores/loading', () => ({
+  useLoadingStore: (selector: any) =>
+    selector({
+      showLoading: mockShowLoading,
+      hideLoading: mockHideLoading,
+    }),
+}));
+
 // Mock react-native-safe-area-context
 jest.mock('react-native-safe-area-context', () => {
   const { View } = require('react-native');
@@ -66,8 +80,15 @@ jest.mock('react-native-safe-area-context', () => {
 describe('EditProfileScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUpdateProfile.mockResolvedValue({});
     mockUploadAvatar.mockResolvedValue('https://example.com/new-avatar.jpg');
+    // Mock updateProfile to call onSettled callback by default
+    mockUpdateProfile.mockImplementation(async (data, options) => {
+      const result = await Promise.resolve({});
+      if (options?.onSettled) {
+        options.onSettled();
+      }
+      return result;
+    });
   });
 
   describe('Rendering', () => {
@@ -129,7 +150,34 @@ describe('EditProfileScreen', () => {
           expect.objectContaining({
             fullName: 'Jane Doe',
           }),
+          expect.any(Object),
         );
+      });
+    });
+
+    it('should call showLoading before updating profile', async () => {
+      const { getByTestId } = render(<EditProfileScreen />);
+      const fullNameInput = getByTestId('signup-fullname-input-input');
+      const submitButton = getByTestId('update-my-profile-submit-button');
+
+      fireEvent.changeText(fullNameInput, 'Jane Doe');
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(mockShowLoading).toHaveBeenCalled();
+      });
+    });
+
+    it('should call hideLoading after profile update completes', async () => {
+      const { getByTestId } = render(<EditProfileScreen />);
+      const fullNameInput = getByTestId('signup-fullname-input-input');
+      const submitButton = getByTestId('update-my-profile-submit-button');
+
+      fireEvent.changeText(fullNameInput, 'Jane Doe');
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(mockHideLoading).toHaveBeenCalled();
       });
     });
 
@@ -155,7 +203,12 @@ describe('EditProfileScreen', () => {
 
     it('should show error toast on failed update', async () => {
       const mockError = new Error('Update failed');
-      mockUpdateProfile.mockRejectedValue(mockError);
+      mockUpdateProfile.mockImplementation(async (data, options) => {
+        if (options?.onSettled) {
+          options.onSettled();
+        }
+        throw mockError;
+      });
 
       const { getByTestId } = render(<EditProfileScreen />);
       const fullNameInput = getByTestId('signup-fullname-input-input');
@@ -171,6 +224,27 @@ describe('EditProfileScreen', () => {
           [],
           expect.objectContaining({ type: 'error' }),
         );
+      });
+    });
+
+    it('should call hideLoading even when profile update fails', async () => {
+      const mockError = new Error('Update failed');
+      mockUpdateProfile.mockImplementation(async (data, options) => {
+        if (options?.onSettled) {
+          options.onSettled();
+        }
+        throw mockError;
+      });
+
+      const { getByTestId } = render(<EditProfileScreen />);
+      const fullNameInput = getByTestId('signup-fullname-input-input');
+      const submitButton = getByTestId('update-my-profile-submit-button');
+
+      fireEvent.changeText(fullNameInput, 'Jane Doe');
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(mockHideLoading).toHaveBeenCalled();
       });
     });
 
@@ -242,6 +316,25 @@ describe('EditProfileScreen', () => {
       // The loading state is handled by the form component
       const { getByTestId } = render(<EditProfileScreen />);
       expect(getByTestId('update-my-profile-submit-button')).toBeTruthy();
+    });
+
+    it('should call showLoading before update and hideLoading after update', async () => {
+      const { getByTestId } = render(<EditProfileScreen />);
+      const fullNameInput = getByTestId('signup-fullname-input-input');
+      const submitButton = getByTestId('update-my-profile-submit-button');
+
+      fireEvent.changeText(fullNameInput, 'Jane Doe');
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(mockShowLoading).toHaveBeenCalled();
+        expect(mockHideLoading).toHaveBeenCalled();
+      });
+
+      // Verify showLoading is called before hideLoading
+      const showLoadingCallOrder = mockShowLoading.mock.invocationCallOrder[0];
+      const hideLoadingCallOrder = mockHideLoading.mock.invocationCallOrder[0];
+      expect(showLoadingCallOrder).toBeLessThan(hideLoadingCallOrder);
     });
   });
 
