@@ -28,7 +28,7 @@ export const UserCard = memo(
       accessibilityRole="image"
       accessibilityLabel={`User profile picture: ${fullName}`}
       testID="user-card"
-      className={`items-center w-18 gap-1.6 ${className}`}
+      className={`items-center w-18 gap-2 ${className}`}
     >
       {/* Profile Picture */}
       <View className="relative">

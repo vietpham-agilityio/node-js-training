@@ -82,7 +82,7 @@ export const HorizontalCard = memo(
     );
 
     const hasBookingInfo = useMemo(
-      () => showtimeDateText || price || cinemaLocation || cinemaName,
+      () => !!(showtimeDateText || price || cinemaLocation || cinemaName),
       [showtimeDateText, price, cinemaLocation, cinemaName],
     );
 

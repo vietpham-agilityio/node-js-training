@@ -1,4 +1,4 @@
-import { Movie, MovieStatus } from '@/features/booking/types/movie';
+import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react-native';
 import { LinkProps } from 'expo-router';
@@ -186,7 +186,7 @@ describe('HomeScreen', () => {
     },
     trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
     durationMinutes: 112,
-    genre: ['Action', 'Comedy', 'Adventure'],
+    genre: [GenreMovie.ACTION, GenreMovie.COMEDY, GenreMovie.ADVENTURE],
     language: 'EN',
     releaseDate: '2023-06-15',
     createdAt: '2023-06-15T12:34:56Z',
@@ -219,12 +219,22 @@ describe('HomeScreen', () => {
   });
 
   describe('Loading State', () => {
-    it('should show loading when either query is loading', () => {
+    it('should show skeleton when coming soon is loading', () => {
       mockIsLoadingComingSoon = true;
-      const { getAllByText } = render(<HomeScreen />, {
+      const { getAllByTestId } = render(<HomeScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getAllByText('Loading movies...')[0]).toBeTruthy();
+      expect(getAllByTestId('movie-banner-carousel-skeleton')).toBeTruthy();
+    });
+
+    it('should show skeleton for both sections when both are loading', () => {
+      mockIsLoadingNowPlaying = true;
+      mockIsLoadingComingSoon = true;
+      const { getAllByTestId } = render(<HomeScreen />, {
+        wrapper: createWrapper(),
+      });
+      const skeletons = getAllByTestId('movie-banner-carousel-skeleton');
+      expect(skeletons.length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -372,7 +382,7 @@ describe('HomeScreen', () => {
           id: '2',
           title: 'Movie 2',
           rating: 4.0,
-          genre: ['Action'],
+          genre: [GenreMovie.ACTION],
         },
       ];
 
@@ -388,13 +398,13 @@ describe('HomeScreen', () => {
 
     it('should handle movies without rating', () => {
       const moviesWithoutRating = [
-        { ...mockMovie, id: '1', title: 'Movie 1', genre: ['Action'] },
+        { ...mockMovie, id: '1', title: 'Movie 1', genre: [GenreMovie.ACTION] },
         {
           ...mockMovie,
           id: '2',
           title: 'Movie 2',
           rating: 4.0,
-          genre: ['Action'],
+          genre: [GenreMovie.ACTION],
         },
       ];
 

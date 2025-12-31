@@ -8,6 +8,12 @@ if (process.env.NODE_ENV === 'test') {
 jest.mock('react-native-reanimated', () => ({
   ...jest.requireActual('react-native-reanimated/mock'),
   useSharedValue: jest.fn(() => ({ value: 0 })),
+  useAnimatedStyle: jest.fn(fn => {
+    const style = fn();
+    return style;
+  }),
+  withRepeat: jest.fn(value => value),
+  withTiming: jest.fn(value => value),
 }));
 
 // Mock uniwind

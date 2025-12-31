@@ -21,6 +21,7 @@ import { useProfile } from '@/features/setting/hooks/useProfile';
 // Utils
 import { cn } from '@/utils/cn';
 import { STATUS_BAR_HEIGHT } from '@/utils/platform';
+import { Skeleton } from '@/components/Skeleton';
 
 export interface MainHeaderProps extends BottomTabHeaderProps {
   isLeftTitle?: boolean;
@@ -70,23 +71,28 @@ export const MainHeader = ({
         </View>
 
         {/* Right Section */}
-        {isRenderUserProfile && !isLoading && (
-          <TouchableOpacity
-            accessible
-            accessibilityRole="button"
-            accessibilityHint="Tap to open user profile"
-            accessibilityLabel="Right section"
-            className="flex-1 items-end"
-            onPress={handleProfilePress}
-          >
-            <Avatar
-              size={48}
-              source={user?.avatarUrl}
-              defaultAvatar={UserProfileIcon}
-              accessibilityLabel="User profile picture"
-            />
-          </TouchableOpacity>
-        )}
+        {isRenderUserProfile &&
+          (isLoading ? (
+            <View className="flex-1 items-end">
+              <Skeleton width={48} height={48} borderRadius={50} />
+            </View>
+          ) : (
+            <TouchableOpacity
+              accessible
+              accessibilityRole="button"
+              accessibilityHint="Tap to open user profile"
+              accessibilityLabel="Right section"
+              className="flex-1 items-end"
+              onPress={handleProfilePress}
+            >
+              <Avatar
+                size={48}
+                source={user?.avatarUrl}
+                defaultAvatar={UserProfileIcon}
+                accessibilityLabel="User profile picture"
+              />
+            </TouchableOpacity>
+          ))}
       </View>
     </View>
   );
