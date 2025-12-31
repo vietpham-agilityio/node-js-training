@@ -216,20 +216,6 @@ describe('MovieScreen', () => {
     mockError = null;
   });
 
-  describe('Loading State', () => {
-    it('should show loading indicator when loading', () => {
-      mockIsLoading = true;
-      const { UNSAFE_getByType, getByText } = render(<MovieScreen />, {
-        wrapper: createWrapper(),
-      });
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { ActivityIndicator } = require('react-native');
-      const activityIndicator = UNSAFE_getByType(ActivityIndicator);
-      expect(activityIndicator).toBeTruthy();
-      expect(getByText('Movie Loading...')).toBeTruthy();
-    });
-  });
-
   describe('Rendering', () => {
     it('should render without crashing', () => {
       const { getByTestId } = render(<MovieScreen />, {

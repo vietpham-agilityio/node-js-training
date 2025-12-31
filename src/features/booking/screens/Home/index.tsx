@@ -1,7 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { Link, router } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, RefreshControl, View } from 'react-native';
+import { RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Unwind
@@ -15,6 +15,7 @@ import { SearchInput } from '@/components/SearchInput';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
 import { MovieBannerCarousel } from '@/features/booking/components/MovieBannerCarousel';
+import { MovieBannerCarouselSkeleton } from '@/features/booking/components/MovieBannerCarousel/MovieBannerCarouselSkeleton';
 import { PromotionCard } from '@/features/booking/components/PromotionCard';
 
 // Hooks
@@ -168,34 +169,35 @@ const HomeScreen = () => {
 
   const renderNowPlaying = useCallback(
     () => (
-      <View className="gap-2">
-        <View className="px-6 flex-row items-center justify-between">
-          <Typo size="xl" weight="semibold" accessibilityRole="header">
-            Now Playing
-          </Typo>
-        </View>
-
-        {isLoadingNowPlaying ||
-        isRefetchingNowPlaying ||
-        isFetchingNextNowPlaying ? (
-          <View className="px-6 h-[220px] justify-center items-center">
-            <ActivityIndicator size="large" />
-            <Typo className="text-text-secondary mt-2">Loading movies...</Typo>
-          </View>
-        ) : nowPlayingMovies.length > 0 ? (
-          <MovieBannerCarousel
-            movies={nowPlayingMovies}
-            onReachEnd={fetchNextNowPlaying}
-            hasNextPage={hasNextNowPlaying}
-            isFetchingNextPage={isFetchingNextNowPlaying}
-          />
-        ) : (
-          <View className="px-6 h-[200px] justify-center">
-            <Typo className="text-text-secondary text-center">
-              No movies available in this category
+      <View className="pt-3">
+        <View className="gap-2">
+          <View className="px-6 flex-row items-center justify-between">
+            <Typo size="xl" weight="semibold" accessibilityRole="header">
+              Now Playing
             </Typo>
           </View>
-        )}
+
+          {isLoadingNowPlaying ||
+          isRefetchingNowPlaying ||
+          isFetchingNextNowPlaying ? (
+            <View className="my-4">
+              <MovieBannerCarouselSkeleton variant="horizontal" count={3} />
+            </View>
+          ) : nowPlayingMovies.length > 0 ? (
+            <MovieBannerCarousel
+              movies={nowPlayingMovies}
+              onReachEnd={fetchNextNowPlaying}
+              hasNextPage={hasNextNowPlaying}
+              isFetchingNextPage={isFetchingNextNowPlaying}
+            />
+          ) : (
+            <View className="px-6 py-8 gap-2">
+              <Typo className="text-text-secondary text-center">
+                No movies available in this category
+              </Typo>
+            </View>
+          )}
+        </View>
       </View>
     ),
     [
@@ -208,7 +210,7 @@ const HomeScreen = () => {
     ],
   );
 
-  const renderCommingSoon = useCallback(
+  const renderComingSoon = useCallback(
     () => (
       <View className="gap-7">
         <View className="px-6 flex-row items-center justify-between">
@@ -220,10 +222,7 @@ const HomeScreen = () => {
         {isLoadingComingSoon ||
         isRefetchingComingSoon ||
         isFetchingNextComingSoon ? (
-          <View className="px-6 h-[147px] justify-center items-center">
-            <ActivityIndicator size="large" />
-            <Typo className="text-text-secondary mt-2">Loading movies...</Typo>
-          </View>
+          <MovieBannerCarouselSkeleton variant="vertical" count={4} />
         ) : comingSoonMovies.length > 0 ? (
           <MovieBannerCarousel
             movies={comingSoonMovies}
@@ -255,10 +254,10 @@ const HomeScreen = () => {
     () => (
       <View className="pt-3">
         {renderNowPlaying()}
-        {renderCommingSoon()}
+        {renderComingSoon()}
       </View>
     ),
-    [renderNowPlaying, renderCommingSoon],
+    [renderNowPlaying, renderComingSoon],
   );
 
   const ListFooter = useCallback(

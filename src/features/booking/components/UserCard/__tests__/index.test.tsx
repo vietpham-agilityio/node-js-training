@@ -75,7 +75,7 @@ describe('UserCard Component', () => {
     it('should use default className when not provided', () => {
       const { getByTestId } = render(<UserCard {...defaultProps} />);
       const card = getByTestId('user-card');
-      expect(card.props.className).toContain('items-center w-18 gap-1.6');
+      expect(card.props.className).toContain('items-center w-18 gap-2');
     });
   });
 

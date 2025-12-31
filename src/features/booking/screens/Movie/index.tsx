@@ -1,10 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  RefreshControl,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { RefreshControl, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Shopify
@@ -20,10 +15,14 @@ import { withUniwind } from 'uniwind';
 // Components
 import { Button } from '@/components/Button';
 import { HorizontalCard } from '@/components/HorizontalCard';
+import { HorizontalCardSkeleton } from '@/components/HorizontalCard/HorizontalCardSkeleton';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
+import { CastCrewSkeleton } from '@/features/booking/components/Skeletons/CastCrewSkeleton';
 import { ExpandableText } from '@/features/booking/components/ExpandableText';
+import { MovieContentSkeleton } from '@/features/booking/components/Skeletons/MovieContentSkeleton';
 import { MovieTrailerCarousel } from '@/features/booking/components/MovieTrailerCarousel';
+import { MovieTrailerCarouselSkeleton } from '@/features/booking/components/MovieTrailerCarousel/MovieTrailerCarouselSkeleton';
 import { UserCard } from '@/features/booking/components/UserCard';
 
 // Constants
@@ -83,7 +82,11 @@ const MovieScreen = () => {
 
   const [activeTab, setActiveTab] = useState<string>(DETAIL_MOVIE_TABS[0].id);
 
-  const { data: movie, isLoading, refetch: refetchMovie } = useMovie(id);
+  const {
+    data: movie,
+    isLoading: isMovieLoading,
+    refetch: refetchMovie,
+  } = useMovie(id);
 
   const setSelectedMovie = useMovieStore(state => state.setSelectedMovie);
 
@@ -148,6 +151,28 @@ const MovieScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: ContentItem }) => {
+      if (isMovieLoading) {
+        // Show skeleton for content sections when loading
+        switch (item.type) {
+          case ContentType.SYNOPSIS:
+            return <MovieContentSkeleton />;
+          case ContentType.CAST_CREW:
+            return (
+              <View className="ml-6">
+                <CastCrewSkeleton count={4} />
+              </View>
+            );
+          case ContentType.TRAILER:
+            return (
+              <View className="ml-6">
+                <MovieTrailerCarouselSkeleton count={2} />
+              </View>
+            );
+          default:
+            return null;
+        }
+      }
+
       switch (item.type) {
         case ContentType.SYNOPSIS:
           return (
@@ -203,22 +228,20 @@ const MovieScreen = () => {
           return null;
       }
     },
-    [synopsis],
+    [synopsis, isMovieLoading],
   );
 
-  if (isLoading) {
-    // TODO: Will handle global loading
-    return (
-      <StyledSafeAreaView
-        edges={['bottom']}
-        accessibilityLabel="Loading home screen"
-        className="h-full bg-bg-primary items-center justify-center"
-      >
-        <ActivityIndicator size="large" className="text-primary" />
-        <Typo className="text-text-secondary mt-4">Movie Loading...</Typo>
-      </StyledSafeAreaView>
-    );
-  }
+  // Create skeleton content items for loading state
+  const skeletonContentItems = useMemo<ContentItem[]>(() => {
+    if (isMovieLoading && activeTab === DETAIL_MOVIE_TABS[0].id) {
+      return [
+        { type: ContentType.SYNOPSIS, data: '' },
+        { type: ContentType.CAST_CREW, data: [] },
+        { type: ContentType.TRAILER, data: [] },
+      ];
+    }
+    return [];
+  }, [isMovieLoading, activeTab]);
 
   return (
     <StyledSafeAreaView
@@ -261,14 +284,18 @@ const MovieScreen = () => {
         </View>
         {/* Horizontal Card */}
         <View className="px-6 -mt-20" testID="horizontal-card-container">
-          <HorizontalCard
-            title={title}
-            posterUrl={posterUrl}
-            durationMinutes={durationMinutes}
-            genre={genre}
-            rating={rating}
-            imageSize={Size.MEDIUM}
-          />
+          {isMovieLoading ? (
+            <HorizontalCardSkeleton imageSize={Size.MEDIUM} />
+          ) : (
+            <HorizontalCard
+              title={title}
+              posterUrl={posterUrl}
+              durationMinutes={durationMinutes}
+              genre={genre}
+              rating={rating}
+              imageSize={Size.MEDIUM}
+            />
+          )}
         </View>
         {/* Tabs */}
         <View className="px-6 mt-7.5 mb-7">
@@ -284,7 +311,7 @@ const MovieScreen = () => {
         testID="vertical-flash-list"
         accessibilityLabel="Movie content list"
         accessibilityHint="Movie content list"
-        data={contentItems}
+        data={isMovieLoading ? skeletonContentItems : contentItems}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item, index) => `${item.type}-${index}`}
@@ -294,17 +321,19 @@ const MovieScreen = () => {
         refreshControl={
           <RefreshControl
             testID="refresh-control"
-            refreshing={isLoading}
+            refreshing={isMovieLoading}
             onRefresh={refetchMovie}
             accessibilityLabel="Pull to refresh movie"
           />
         }
         ListEmptyComponent={
-          <View className="flex-1 items-center justify-center py-20">
-            <Typo size="base" weight="medium">
-              This feature will be available soon
-            </Typo>
-          </View>
+          !isMovieLoading ? (
+            <View className="flex-1 items-center justify-center py-20">
+              <Typo size="base" weight="medium">
+                This feature will be available soon
+              </Typo>
+            </View>
+          ) : null
         }
       />
 
