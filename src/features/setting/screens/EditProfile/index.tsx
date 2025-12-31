@@ -94,10 +94,7 @@ const EditProfileScreen = () => {
   };
 
   return (
-    <KeyboardLayout
-      accessibilityLabel="Edit Profile screen"
-      accessibilityHint="Edit Profile screen"
-    >
+    <KeyboardLayout>
       <EditProfileForm
         userInfo={profile}
         isPending={isLoading}

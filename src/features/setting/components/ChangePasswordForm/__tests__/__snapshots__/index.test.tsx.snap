@@ -22,7 +22,7 @@ exports[`ChangePasswordForm Component Snapshot should match snapshot 1`] = `
             collapsable={false}
             style={
               {
-                "top": 16,
+                "top": 14,
                 "transform": [
                   {
                     "translateY": 0,
@@ -191,7 +191,7 @@ exports[`ChangePasswordForm Component Snapshot should match snapshot 1`] = `
             collapsable={false}
             style={
               {
-                "top": 16,
+                "top": 14,
                 "transform": [
                   {
                     "translateY": 0,
@@ -360,7 +360,7 @@ exports[`ChangePasswordForm Component Snapshot should match snapshot 1`] = `
             collapsable={false}
             style={
               {
-                "top": 16,
+                "top": 14,
                 "transform": [
                   {
                     "translateY": 0,

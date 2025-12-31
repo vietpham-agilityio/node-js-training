@@ -15,14 +15,14 @@ import { withUniwind } from 'uniwind';
 // Components
 import { Button } from '@/components/Button';
 import { HorizontalCard } from '@/components/HorizontalCard';
-import { HorizontalCardSkeleton } from '@/components/HorizontalCard/HorizontalCardSkeleton';
+import { HorizontalCardSkeleton } from '@/components/Skeletons/HorizontalCardSkeleton';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
-import { CastCrewSkeleton } from '@/features/booking/components/Skeletons/CastCrewSkeleton';
 import { ExpandableText } from '@/features/booking/components/ExpandableText';
-import { MovieContentSkeleton } from '@/features/booking/components/Skeletons/MovieContentSkeleton';
 import { MovieTrailerCarousel } from '@/features/booking/components/MovieTrailerCarousel';
-import { MovieTrailerCarouselSkeleton } from '@/features/booking/components/MovieTrailerCarousel/MovieTrailerCarouselSkeleton';
+import { CastCrewSkeleton } from '@/features/booking/components/Skeletons/CastCrewSkeleton';
+import { MovieContentSkeleton } from '@/features/booking/components/Skeletons/MovieContentSkeleton';
+import { MovieTrailerCarouselSkeleton } from '@/features/booking/components/Skeletons/MovieTrailerCarouselSkeleton';
 import { UserCard } from '@/features/booking/components/UserCard';
 
 // Constants

@@ -7,7 +7,7 @@ import { ScreenHeader } from '..';
 // Type
 import { ParamListBase } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Movie, MovieStatus } from '@/features/booking/types/movie';
+import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
 
 // Mock expo-router
 const mockBack = jest.fn();
@@ -166,7 +166,7 @@ describe('ScreenHeader', () => {
       id: '1',
       title: 'Store Title',
       posterUrl: 'https://example.com/poster.jpg',
-      genre: ['Action'],
+      genre: [GenreMovie.ACTION],
       durationMinutes: 120,
       rating: 8.5,
       synopsis: 'Test synopsis',
@@ -227,7 +227,7 @@ describe('ScreenHeader', () => {
       id: '1',
       title: 'Store Title',
       posterUrl: 'https://example.com/poster.jpg',
-      genre: ['Action'],
+      genre: [GenreMovie.ACTION],
       durationMinutes: 120,
       rating: 8.5,
       synopsis: 'Test synopsis',
@@ -263,7 +263,7 @@ describe('ScreenHeader', () => {
       id: '1',
       title: 'Store Title',
       posterUrl: 'https://example.com/poster.jpg',
-      genre: ['Action'],
+      genre: [GenreMovie.ACTION],
       durationMinutes: 120,
       rating: 8.5,
       synopsis: 'Test synopsis',
@@ -299,7 +299,7 @@ describe('ScreenHeader', () => {
       id: '1',
       title: 'Store Title',
       posterUrl: 'https://example.com/poster.jpg',
-      genre: ['Action'],
+      genre: [GenreMovie.ACTION],
       durationMinutes: 120,
       rating: 8.5,
       synopsis: 'Test synopsis',

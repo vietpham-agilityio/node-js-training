@@ -9,7 +9,7 @@ import { ROUTES } from '@/constants';
 // Types
 import { BookingStatus, PaymentStatus } from '@/features/booking/types/booking';
 import { ShowtimeStatus } from '@/features/booking/types/cinema';
-import { MovieStatus } from '@/features/booking/types/movie';
+import { GenreMovie, MovieStatus } from '@/features/booking/types/movie';
 import {
   Wallet,
   WalletTransaction,
@@ -126,7 +126,7 @@ const mockTransactions: WalletTransaction[] = [
           releaseDate: '2024-01-01',
           status: MovieStatus.NOW_PLAYING,
           rating: 4.5,
-          genre: ['Action', 'Drama'],
+          genre: [GenreMovie.ACTION, GenreMovie.DRAMA],
           castCrew: {
             actors: [],
             directors: [],
@@ -230,37 +230,44 @@ describe('MyWalletScreen', () => {
   });
 
   describe('Loading State', () => {
-    it('should show loading indicator when wallet is loading', () => {
+    it('should show wallet card skeleton when wallet is loading', () => {
       mockIsLoadingWallet = true;
+      mockWalletData = undefined;
 
-      const { getByText, UNSAFE_getByType } = render(<MyWalletScreen />);
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { ActivityIndicator } = require('react-native');
+      const { getByTestId } = render(<MyWalletScreen />);
 
-      expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
-      expect(getByText('Loading wallet...')).toBeTruthy();
+      expect(getByTestId('wallet-card-skeleton')).toBeTruthy();
     });
 
-    it('should show loading indicator when profile is loading', () => {
+    it('should show wallet card skeleton when profile is loading', () => {
       mockIsLoadingProfile = true;
 
-      const { getByText, UNSAFE_getByType } = render(<MyWalletScreen />);
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { ActivityIndicator } = require('react-native');
+      const { getByTestId } = render(<MyWalletScreen />);
 
-      expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
-      expect(getByText('Loading wallet...')).toBeTruthy();
+      expect(getByTestId('wallet-card-skeleton')).toBeTruthy();
     });
 
-    it('should show loading indicator when transactions are loading', () => {
+    it('should show transaction skeletons when transactions are loading', () => {
       mockIsLoadingTransactions = true;
+      mockTransactionsData = { pages: [] };
 
-      const { getByText, UNSAFE_getByType } = render(<MyWalletScreen />);
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { ActivityIndicator } = require('react-native');
+      const { getAllByTestId } = render(<MyWalletScreen />);
 
-      expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
-      expect(getByText('Loading wallet...')).toBeTruthy();
+      const skeletons = getAllByTestId('horizontal-card-skeleton');
+      expect(skeletons.length).toBeGreaterThan(0);
+    });
+
+    it('should show both wallet and transaction skeletons when all are loading', () => {
+      mockIsLoadingWallet = true;
+      mockIsLoadingTransactions = true;
+      mockWalletData = undefined;
+      mockTransactionsData = { pages: [] };
+
+      const { getByTestId, getAllByTestId } = render(<MyWalletScreen />);
+
+      expect(getByTestId('wallet-card-skeleton')).toBeTruthy();
+      const skeletons = getAllByTestId('horizontal-card-skeleton');
+      expect(skeletons.length).toBeGreaterThan(0);
     });
   });
 
@@ -438,13 +445,13 @@ describe('MyWalletScreen', () => {
     it('should render floating top up button', () => {
       const { getByTestId } = render(<MyWalletScreen />);
 
-      expect(getByTestId('top-up-icon')).toBeTruthy();
+      expect(getByTestId('wallet-icon')).toBeTruthy();
     });
 
     it('should navigate to top up when floating button is pressed', () => {
       const { getByTestId } = render(<MyWalletScreen />);
 
-      const topUpIcon = getByTestId('top-up-icon');
+      const topUpIcon = getByTestId('wallet-icon');
       const topUpButton = topUpIcon.parent;
       if (topUpButton) {
         fireEvent.press(topUpButton);

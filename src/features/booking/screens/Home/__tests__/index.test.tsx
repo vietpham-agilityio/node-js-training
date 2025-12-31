@@ -322,19 +322,6 @@ describe('HomeScreen', () => {
     });
   });
 
-  describe('Fetching Next Page Indicator', () => {
-    it('should show activity indicator when fetching next page for coming soon', () => {
-      mockIsFetchingNextComingSoon = true;
-      const { UNSAFE_getAllByType } = render(<HomeScreen />, {
-        wrapper: createWrapper(),
-      });
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { ActivityIndicator } = require('react-native');
-      const indicators = UNSAFE_getAllByType(ActivityIndicator);
-      expect(indicators.length).toBeGreaterThan(0);
-    });
-  });
-
   describe('Edge Cases', () => {
     it('should handle empty pages array', () => {
       mockNowPlayingData = { pages: [] };

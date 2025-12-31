@@ -9,6 +9,7 @@ import {
   Ticket,
   TicketStatus,
 } from '@/features/booking/types/booking';
+import { GenreMovie } from '@/features/booking/types/movie';
 
 // Mock expo-router
 const mockPush = jest.fn();
@@ -166,7 +167,7 @@ const createMockTicket = (
           id: 'movie-1',
           title: `Test Movie ${id}`,
           posterUrl: 'https://example.com/poster.jpg',
-          genre: ['Action'],
+          genre: [GenreMovie.ACTION],
           durationMinutes: 120,
           rating: 8.5,
         },
@@ -198,20 +199,24 @@ describe('MyTicketScreen', () => {
   });
 
   describe('Loading State', () => {
-    it('should show loading indicator when loading', () => {
+    it('should show skeleton cards when loading', () => {
       mockIsLoading = true;
+      mockTicketsData = { pages: [] };
 
-      const { getByText } = render(<MyTicketScreen />);
+      const { getAllByTestId } = render(<MyTicketScreen />);
 
-      expect(getByText('Loading tickets...')).toBeTruthy();
+      const skeletons = getAllByTestId('horizontal-card-skeleton');
+      expect(skeletons.length).toBeGreaterThan(0);
     });
 
-    it('should have loading accessibility label', () => {
+    it('should render multiple skeleton cards when loading', () => {
       mockIsLoading = true;
+      mockTicketsData = { pages: [] };
 
-      const { getByLabelText } = render(<MyTicketScreen />);
+      const { getAllByTestId } = render(<MyTicketScreen />);
 
-      expect(getByLabelText('Loading tickets')).toBeTruthy();
+      const skeletons = getAllByTestId('horizontal-card-skeleton');
+      expect(skeletons.length).toBe(3);
     });
   });
 

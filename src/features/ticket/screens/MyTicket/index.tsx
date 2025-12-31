@@ -27,6 +27,7 @@ import { Ticket, TicketStatus } from '@/features/booking/types/booking';
 // Components
 import { Button } from '@/components/Button';
 import { HorizontalCard } from '@/components/HorizontalCard';
+import { HorizontalCardSkeleton } from '@/components/Skeletons/HorizontalCardSkeleton';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
 
@@ -167,7 +168,18 @@ const MyTicketScreen = () => {
   }, [isFetchingNextPage]);
 
   const renderEmpty = useCallback(() => {
-    if (isLoading) return null;
+    if (isLoading) {
+      return (
+        <View className="gap-6">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <HorizontalCardSkeleton
+              key={`skeleton-${index}`}
+              imageSize={Size.SMALL}
+            />
+          ))}
+        </View>
+      );
+    }
 
     if (isError) {
       return (
@@ -255,19 +267,6 @@ const MyTicketScreen = () => {
     ),
     [activeTab],
   );
-
-  if (isLoading) {
-    return (
-      <StyledSafeAreaView
-        edges={[]}
-        className="flex-1 bg-bg-primary items-center justify-center"
-        accessibilityLabel="Loading tickets"
-      >
-        <ActivityIndicator size="large" />
-        <Typo className="text-text-secondary mt-4">Loading tickets...</Typo>
-      </StyledSafeAreaView>
-    );
-  }
 
   return (
     <StyledSafeAreaView

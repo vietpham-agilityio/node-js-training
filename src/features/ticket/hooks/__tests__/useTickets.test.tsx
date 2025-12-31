@@ -11,6 +11,7 @@ import {
 
 // Types
 import { Ticket, TicketStatus } from '@/features/booking/types/booking';
+import { GenreMovie } from '@/features/booking/types/movie';
 
 // Mock services
 const mockGetTickets = jest.fn();
@@ -117,7 +118,7 @@ const mockTicket: Ticket = {
         id: 'movie-1',
         title: 'Test Movie',
         posterUrl: 'https://example.com/poster.jpg',
-        genre: ['Action'],
+        genre: [GenreMovie.ACTION],
         durationMinutes: 120,
         rating: 8.5,
       },

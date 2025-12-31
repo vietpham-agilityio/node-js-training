@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 
 // Components
-import { MovieTrailerCarouselSkeleton } from '../MovieTrailerCarouselSkeleton';
+import { MovieTrailerCarouselSkeleton } from '../';
 
 describe('MovieTrailerCarouselSkeleton', () => {
   describe('Rendering', () => {

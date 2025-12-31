@@ -52,7 +52,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   collapsable={false}
                   style={
                     {
-                      "top": 16,
+                      "top": 14,
                       "transform": [
                         {
                           "translateY": 0,
@@ -221,7 +221,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   collapsable={false}
                   style={
                     {
-                      "top": 16,
+                      "top": 14,
                       "transform": [
                         {
                           "translateY": 0,
