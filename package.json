@@ -12,6 +12,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "format": "prettier --write .",
+    "eas-build-pre-install": "node scripts/create-google-services.js",
     "storybook:generate": "sb-rn-get-stories",
     "storybook:start": "EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start",
     "export:embed:android": "EXPO_ROUTER_APP_ROOT=./src/app pnpm expo export:embed --eager --platform android --dev false"
