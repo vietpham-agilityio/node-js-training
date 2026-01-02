@@ -2,9 +2,9 @@ import { ConfigContext, ExpoConfig } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  owner: 'nhatduong-agilityio',
-  name: 'Movie Ticket Booking',
-  slug: 'movie-ticket-booking',
+  owner: 'vietphamagilityios-organization',
+  name: 'Movea',
+  slug: 'movea',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/movea-icon.png',
@@ -130,7 +130,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   primaryColor: '#0B0F2F',
   extra: {
     eas: {
-      projectId: 'd545b6f9-ee6c-4ddf-8944-718047e7983e',
+      projectId: '54dd09ea-1973-4085-9bec-cf848892de97',
     },
   },
 });
