@@ -14,18 +14,15 @@ import { FILTER_GENRE_TABS, ROUTES, TABS_FOOTER_HEIGHT } from '@/constants';
 import { SearchInput } from '@/components/SearchInput';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
-import { MovieBannerCarousel } from '@/features/booking/components/MovieBannerCarousel';
+import { ComingSoonSection } from '@/features/booking/components/ComingSoonSection';
+import { NowPlayingSection } from '@/features/booking/components/NowPlayingSection';
 import { PromotionCard } from '@/features/booking/components/PromotionCard';
-import { MovieBannerCarouselSkeleton } from '@/features/booking/components/Skeletons/MovieBannerCarouselSkeleton';
 
 // Hooks
-import {
-  useMoviesByGenreInfinite,
-  useMoviesInfinite,
-} from '@/features/booking/hooks/useMovies';
+import { useMovieData } from '@/features/booking/hooks/useMovieData';
 
 // Types
-import { GenreMovie, MovieStatus } from '@/features/booking/types/movie';
+import { MovieStatus } from '@/features/booking/types/movie';
 
 // Mock
 import { MOCK_PROMOTIONS } from '@/mocks';
@@ -38,229 +35,91 @@ const HomeScreen = () => {
   );
 
   const isAllCategory = activeGenre === FILTER_GENRE_TABS[0].id;
+  const currentGenre = isAllCategory ? undefined : activeGenre;
 
-  // Fetch all movies when "All" is selected
-  const {
-    data: allNowPlayingData,
-    isLoading: isLoadingAllNowPlaying,
-    isFetchingNextPage: isFetchingNextAllNowPlaying,
-    hasNextPage: hasNextAllNowPlaying,
-    fetchNextPage: fetchNextAllNowPlaying,
-    refetch: refetchAllNowPlaying,
-    isRefetching: isRefetchingAllNowPlaying,
-  } = useMoviesInfinite({
+  // Simplified data fetching with custom hook
+  const nowPlaying = useMovieData({
     status: MovieStatus.NOW_PLAYING,
-    enabled: isAllCategory,
+    genre: currentGenre,
   });
 
-  const {
-    data: allComingSoonData,
-    isLoading: isLoadingAllComingSoon,
-    isFetchingNextPage: isFetchingNextAllComingSoon,
-    hasNextPage: hasNextAllComingSoon,
-    fetchNextPage: fetchNextAllComingSoon,
-    refetch: refetchAllComingSoon,
-    isRefetching: isRefetchingAllComingSoon,
-  } = useMoviesInfinite({
+  const comingSoon = useMovieData({
     status: MovieStatus.COMING_SOON,
-    enabled: isAllCategory,
+    genre: currentGenre,
   });
 
-  // Fetch movies by genre when specific genre is selected
-  const {
-    data: genreNowPlayingData,
-    isLoading: isLoadingGenreNowPlaying,
-    isFetchingNextPage: isFetchingNextGenreNowPlaying,
-    hasNextPage: hasNextGenreNowPlaying,
-    fetchNextPage: fetchNextGenreNowPlaying,
-    refetch: refetchGenreNowPlaying,
-    isRefetching: isRefetchingGenreNowPlaying,
-  } = useMoviesByGenreInfinite({
-    genre: activeGenre as GenreMovie,
-    status: MovieStatus.NOW_PLAYING,
-    enabled: !isAllCategory,
-  });
-
-  const {
-    data: genreComingSoonData,
-    isLoading: isLoadingGenreComingSoon,
-    isFetchingNextPage: isFetchingNextGenreComingSoon,
-    hasNextPage: hasNextGenreComingSoon,
-    fetchNextPage: fetchNextGenreComingSoon,
-    refetch: refetchGenreComingSoon,
-    isRefetching: isRefetchingGenreComingSoon,
-  } = useMoviesByGenreInfinite({
-    genre: activeGenre as GenreMovie,
-    status: MovieStatus.COMING_SOON,
-    enabled: !isAllCategory,
-  });
-
-  // Select the appropriate data based on active category
-  const nowPlayingData = isAllCategory
-    ? allNowPlayingData
-    : genreNowPlayingData;
-  const comingSoonData = isAllCategory
-    ? allComingSoonData
-    : genreComingSoonData;
-
-  const isLoadingNowPlaying = isAllCategory
-    ? isLoadingAllNowPlaying
-    : isLoadingGenreNowPlaying;
-  const isLoadingComingSoon = isAllCategory
-    ? isLoadingAllComingSoon
-    : isLoadingGenreComingSoon;
-
-  const isFetchingNextNowPlaying = isAllCategory
-    ? isFetchingNextAllNowPlaying
-    : isFetchingNextGenreNowPlaying;
-  const isFetchingNextComingSoon = isAllCategory
-    ? isFetchingNextAllComingSoon
-    : isFetchingNextGenreComingSoon;
-
-  const hasNextNowPlaying = isAllCategory
-    ? hasNextAllNowPlaying
-    : hasNextGenreNowPlaying;
-  const hasNextComingSoon = isAllCategory
-    ? hasNextAllComingSoon
-    : hasNextGenreComingSoon;
-
-  const fetchNextNowPlaying = isAllCategory
-    ? fetchNextAllNowPlaying
-    : fetchNextGenreNowPlaying;
-  const fetchNextComingSoon = isAllCategory
-    ? fetchNextAllComingSoon
-    : fetchNextGenreComingSoon;
-
-  const refetchNowPlaying = isAllCategory
-    ? refetchAllNowPlaying
-    : refetchGenreNowPlaying;
-  const refetchComingSoon = isAllCategory
-    ? refetchAllComingSoon
-    : refetchGenreComingSoon;
-
-  const isRefetchingNowPlaying = isAllCategory
-    ? isRefetchingAllNowPlaying
-    : isRefetchingGenreNowPlaying;
-  const isRefetchingComingSoon = isAllCategory
-    ? isRefetchingAllComingSoon
-    : isRefetchingGenreComingSoon;
-
-  // Flatten paginated data and take top 10 sorted by rating
-  const nowPlayingMovies = useMemo(() => {
-    if (!nowPlayingData?.pages) return [];
-    return nowPlayingData.pages
-      .flat()
-      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-      .slice(0, 10);
-  }, [nowPlayingData]);
-
-  const comingSoonMovies = useMemo(() => {
-    if (!comingSoonData?.pages) return [];
-    return comingSoonData.pages.flat().slice(0, 10);
-  }, [comingSoonData]);
-
+  // Handlers
   const handleRefresh = useCallback(async () => {
-    await Promise.all([refetchNowPlaying(), refetchComingSoon()]);
-  }, [refetchNowPlaying, refetchComingSoon]);
+    await Promise.all([nowPlaying.refetch(), comingSoon.refetch()]);
+  }, [nowPlaying, comingSoon]);
 
   const handleSearchPress = useCallback(() => {
     router.push(ROUTES.SEARCH);
   }, []);
 
-  const renderNowPlaying = useCallback(
-    () => (
-      <View className="pt-3">
-        <View className="gap-2">
-          <View className="px-6 flex-row items-center justify-between">
-            <Typo size="xl" weight="semibold" accessibilityRole="header">
-              Now Playing
-            </Typo>
-          </View>
+  const handleFetchNextNowPlaying = useCallback(() => {
+    if (nowPlaying.hasNextPage && !nowPlaying.isFetchingNextPage) {
+      nowPlaying.fetchNextPage();
+    }
+  }, [nowPlaying]);
 
-          {isLoadingNowPlaying ||
-          isRefetchingNowPlaying ||
-          isFetchingNextNowPlaying ? (
-            <View className="my-4">
-              <MovieBannerCarouselSkeleton variant="horizontal" count={3} />
-            </View>
-          ) : nowPlayingMovies.length > 0 ? (
-            <MovieBannerCarousel
-              movies={nowPlayingMovies}
-              onReachEnd={fetchNextNowPlaying}
-              hasNextPage={hasNextNowPlaying}
-              isFetchingNextPage={isFetchingNextNowPlaying}
-            />
-          ) : (
-            <View className="px-6 py-8 gap-2">
-              <Typo className="text-text-secondary text-center">
-                No movies available in this category
-              </Typo>
-            </View>
-          )}
-        </View>
-      </View>
-    ),
+  const handleFetchNextComingSoon = useCallback(() => {
+    if (comingSoon.hasNextPage && !comingSoon.isFetchingNextPage) {
+      comingSoon.fetchNextPage();
+    }
+  }, [comingSoon]);
+
+  // Memoized section props
+  const nowPlayingProps = useMemo(
+    () => ({
+      movies: nowPlaying.movies,
+      isLoading: nowPlaying.isLoading,
+      isRefetching: nowPlaying.isRefetching,
+      isFetchingNext: nowPlaying.isFetchingNextPage,
+      onReachEnd: handleFetchNextNowPlaying,
+      hasNextPage: nowPlaying.hasNextPage,
+    }),
     [
-      fetchNextNowPlaying,
-      hasNextNowPlaying,
-      isFetchingNextNowPlaying,
-      isLoadingNowPlaying,
-      isRefetchingNowPlaying,
-      nowPlayingMovies,
+      nowPlaying.movies,
+      nowPlaying.isLoading,
+      nowPlaying.isRefetching,
+      nowPlaying.isFetchingNextPage,
+      nowPlaying.hasNextPage,
+      handleFetchNextNowPlaying,
     ],
   );
 
-  const renderComingSoon = useCallback(
-    () => (
-      <View className="gap-7">
-        <View className="px-6 flex-row items-center justify-between">
-          <Typo size="xl" weight="semibold" accessibilityRole="header">
-            Coming Soon
-          </Typo>
-        </View>
-
-        {isLoadingComingSoon ||
-        isRefetchingComingSoon ||
-        isFetchingNextComingSoon ? (
-          <MovieBannerCarouselSkeleton variant="vertical" count={4} />
-        ) : comingSoonMovies.length > 0 ? (
-          <MovieBannerCarousel
-            movies={comingSoonMovies}
-            variant="vertical"
-            onReachEnd={fetchNextComingSoon}
-            hasNextPage={hasNextComingSoon}
-            isFetchingNextPage={isFetchingNextComingSoon}
-          />
-        ) : (
-          <View className="px-6 h-[150px] justify-center">
-            <Typo className="text-text-secondary text-center">
-              No upcoming movies in this category
-            </Typo>
-          </View>
-        )}
-      </View>
-    ),
+  const comingSoonProps = useMemo(
+    () => ({
+      movies: comingSoon.movies,
+      isLoading: comingSoon.isLoading,
+      isRefetching: comingSoon.isRefetching,
+      isFetchingNext: comingSoon.isFetchingNextPage,
+      onReachEnd: handleFetchNextComingSoon,
+      hasNextPage: comingSoon.hasNextPage,
+    }),
     [
-      comingSoonMovies,
-      fetchNextComingSoon,
-      hasNextComingSoon,
-      isFetchingNextComingSoon,
-      isLoadingComingSoon,
-      isRefetchingComingSoon,
+      comingSoon.movies,
+      comingSoon.isLoading,
+      comingSoon.isRefetching,
+      comingSoon.isFetchingNextPage,
+      comingSoon.hasNextPage,
+      handleFetchNextComingSoon,
     ],
   );
 
-  const ListHeader = useCallback(
+  // Memoized list components
+  const ListHeader = useMemo(
     () => (
       <View className="pt-3">
-        {renderNowPlaying()}
-        {renderComingSoon()}
+        <NowPlayingSection {...nowPlayingProps} />
+        <ComingSoonSection {...comingSoonProps} />
       </View>
     ),
-    [renderNowPlaying, renderComingSoon],
+    [nowPlayingProps, comingSoonProps],
   );
 
-  const ListFooter = useCallback(
+  const ListFooter = useMemo(
     () => (
       <View className="px-6">
         <View className="gap-4 mt-7 mb-6">
@@ -329,7 +188,7 @@ const HomeScreen = () => {
         }}
         refreshControl={
           <RefreshControl
-            refreshing={isRefetchingNowPlaying || isRefetchingComingSoon}
+            refreshing={nowPlaying.isRefetching || comingSoon.isRefetching}
             onRefresh={handleRefresh}
             accessibilityLabel="Pull to refresh movies"
           />
