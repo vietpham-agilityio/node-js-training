@@ -79,6 +79,7 @@ movea-app/
 │
 ├── assets/                     # Images, fonts, static assets
 ├── .editorconfig               # Editor configuration
+├── .env.example                # Environment examples
 ├── .gitignore                  # Git ignore rules
 ├── .lintstagedrc.js            # Lint-staged configuration
 ├── .prettierrc                 # Prettier configuration
@@ -86,6 +87,7 @@ movea-app/
 ├── babel.config.js             # Babel configuration
 ├── eas.json                    # EAS build configuration
 ├── eslint.config.js            # ESLint configuration
+├── google-services.json        # Example for set up Google services for local development     
 ├── jest.config.js              # Jest configuration
 ├── jest.setup.ts               # Jest setup
 ├── metro.config.js             # Metro bundler configuration
@@ -133,6 +135,7 @@ pnpm install
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
+GOOGLE_SERVICES_JSON=
 ```
 
 - Option 2: Pull environment variables for your local development (need to Expo account)
@@ -150,18 +153,74 @@ The created .env.local file will look like this:
 
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
+# GOOGLE_SERVICES_JSON=***** (secret variables are not available for reading)
 ```
 
-4. Start the development server:
+4. Google Services Configuration
+
+The `google-services.json` file contains sensitive configuration details for Google services (e.g., Firebase). This file should **NOT** be committed directly to version control.
+
+A placeholder file, `google-services.json.example`, has been provided in the project root. To set up Google services for your local development:
+
+- Obtain your `google-services.json` file from your Firebase project settings.
+- Rename the downloaded file to `google-services.json` and place it in the root of this project.
+- **Ensure `google-services.json` is added to your `.gitignore` file** to prevent accidental commits.
+
+Example of `google-services.json.example`:
+```json
+{
+  "project_info": {
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "firebase_url": "https://YOUR_FIREBASE_PROJECT_ID.firebaseio.com",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_STORAGE_BUCKET"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "YOUR_MOBILE_SDK_APP_ID",
+        "android_client_info": {
+          "package_name": "YOUR_PACKAGE_NAME"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "YOUR_CLIENT_ID",
+          "client_type": 1
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "YOUR_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "YOUR_CLIENT_ID_2",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+```
+
+5. Start the development server:
 
 ```bash
 npx expo start
 ```
 
-5. Run on your preferred platform:
-   - Press `i` for iOS simulator
-   - Press `a` for Android emulator
-   - Scan QR code with Expo Go app on your physical device
+6. Run on your preferred platform:
+
+- Press `i` for iOS simulator
+- Press `a` for Android emulator
+- Scan QR code with Expo Go app on your physical device
 
 ## 🧪 Testing
 
@@ -226,7 +285,7 @@ yarn lint
 - ✅ Push Notifications
 - ✅ Social authentications (Facebook, Google)
 - ✅ Integrate Expo Application Services (EAS)
-- ✅ CI/CD
+- ✅ Set up Github Actions
 
 ## 📝 Design
 
