@@ -60,28 +60,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node
 
-      - name: Setup Expo CLI
-        run: pnpm add -g eas-cli
-
+      # Validate EAS config existence
       - name: Validate EAS configuration
         run: |
-          if [ -f "eas.json" ]; then
-            echo "EAS configuration found"
-            cat eas.json
-          else
-            echo "EAS configuration not found"
+          if [ ! -f "eas.json" ]; then
+            echo "eas.json not found"
             exit 1
           fi
+          echo "eas.json found"
 
-      - name: Check app.config.ts configuration
+      # Validate Expo config
+      - name: Validate Expo config
+        run: npx expo config --type public
+
+      - name: Print Expo app info
         run: |
-          if [ -f "app.config.ts" ]; then
-            echo "app.config.ts found"
-            node -e "const config = require('./app.config.ts'); console.log('App name:', config.expo.name); console.log('Version:', config.expo.version);"
-          else
-            echo "app.config.ts not found"
-            exit 1
-          fi
+          npx expo config --json | jq '.expo.name, .expo.version'
 
   ci-success:
     name: CI Success
