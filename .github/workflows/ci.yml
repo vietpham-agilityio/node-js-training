@@ -73,15 +73,8 @@ jobs:
             exit 1
           fi
 
-      - name: Check app.config.ts configuration
-        run: |
-          if [ -f "app.config.ts" ]; then
-            echo "app.config.ts found"
-            node -e "const config = require('./app.config.ts'); console.log('App name:', config.expo.name); console.log('Version:', config.expo.version);"
-          else
-            echo "app.config.ts not found"
-            exit 1
-          fi
+      - name: Validate Expo config
+        run: expo config --type public
 
   ci-success:
     name: CI Success
