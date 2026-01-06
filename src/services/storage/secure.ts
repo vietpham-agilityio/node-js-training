@@ -111,10 +111,6 @@ export class SecureStorageService {
     try {
       if (this.isSecureKey(key)) {
         if (!this.isWithinSecureStoreLimit(value)) {
-          console.warn(
-            `Value for key "${key}" exceeds SecureStore size limit (${SECURE_STORE_SIZE_LIMIT} bytes). ` +
-              `Falling back to AsyncStorage. Consider splitting the data.`,
-          );
           await AsyncStorage.setItem(key, value);
         } else {
           await SecureStore.setItemAsync(key, value);
@@ -123,7 +119,6 @@ export class SecureStorageService {
         await AsyncStorage.setItem(key, value);
       }
     } catch (error) {
-      console.error(`Error setting item "${key}":`, error);
       throw error;
     }
   }
@@ -138,7 +133,6 @@ export class SecureStorageService {
   async setSession(sessionData: any): Promise<void> {
     try {
       if (!sessionData) {
-        console.warn('Attempting to set null/undefined session');
         return;
       }
 
@@ -155,10 +149,6 @@ export class SecureStorageService {
             sensitiveJson,
           );
         } else {
-          console.warn(
-            `Sensitive session data too large (${sensitiveJson.length} bytes), ` +
-              `falling back to AsyncStorage`,
-          );
           await AsyncStorage.setItem(
             `${STORAGE_KEYS.USER_SESSION}_sensitive`,
             sensitiveJson,
@@ -174,7 +164,6 @@ export class SecureStorageService {
         );
       }
     } catch (error) {
-      console.error('Error storing session:', error);
       throw error;
     }
   }
@@ -192,8 +181,7 @@ export class SecureStorageService {
       } else {
         return await AsyncStorage.getItem(key);
       }
-    } catch (error) {
-      console.error(`Error getting item "${key}":`, error);
+    } catch {
       return null;
     }
   }
@@ -217,8 +205,8 @@ export class SecureStorageService {
       if (sensitiveJson) {
         try {
           sensitive = JSON.parse(sensitiveJson);
-        } catch (error) {
-          console.error('Error parsing sensitive session data:', error);
+        } catch {
+          return null;
         }
       }
 
@@ -226,8 +214,8 @@ export class SecureStorageService {
       if (nonSensitiveJson) {
         try {
           nonSensitive = JSON.parse(nonSensitiveJson);
-        } catch (error) {
-          console.error('Error parsing non-sensitive session data:', error);
+        } catch {
+          return null;
         }
       }
 
@@ -235,8 +223,7 @@ export class SecureStorageService {
       const session = this.mergeSessionData(sensitive, nonSensitive);
 
       return session;
-    } catch (error) {
-      console.error('Error retrieving session:', error);
+    } catch {
       return null;
     }
   }
@@ -260,8 +247,7 @@ export class SecureStorageService {
       return await AsyncStorage.getItem(
         `${STORAGE_KEYS.USER_SESSION}_sensitive`,
       );
-    } catch (error) {
-      console.error('Error getting sensitive session:', error);
+    } catch {
       return null;
     }
   }
@@ -280,7 +266,6 @@ export class SecureStorageService {
       this.getItem(key),
       new Promise<null>(resolve =>
         setTimeout(() => {
-          console.warn(`Timeout getting item "${key}" after ${timeout}ms`);
           resolve(null);
         }, timeout),
       ),
@@ -301,7 +286,6 @@ export class SecureStorageService {
         await AsyncStorage.removeItem(key);
       }
     } catch (error) {
-      console.error(`Error removing item "${key}":`, error);
       throw error;
     }
   }
@@ -314,18 +298,13 @@ export class SecureStorageService {
     try {
       await Promise.all([
         // Remove from SecureStore
-        SecureStore.deleteItemAsync(
-          `${STORAGE_KEYS.USER_SESSION}_sensitive`,
-        ).catch(err =>
-          console.warn('Note: No sensitive session in SecureStore', err),
-        ),
+        SecureStore.deleteItemAsync(`${STORAGE_KEYS.USER_SESSION}_sensitive`),
 
         // Remove from AsyncStorage (both regular and fallback)
         AsyncStorage.removeItem(STORAGE_KEYS.USER_SESSION),
         AsyncStorage.removeItem(`${STORAGE_KEYS.USER_SESSION}_sensitive`),
       ]);
     } catch (error) {
-      console.error('Error removing session:', error);
       throw error;
     }
   }
@@ -347,15 +326,8 @@ export class SecureStorageService {
         `${STORAGE_KEYS.USER_SESSION}_sensitive`,
       ];
 
-      await Promise.all(
-        sensitiveKeys.map(key =>
-          this.removeItem(key).catch(err =>
-            console.warn(`Note: "${key}" not found:`, err),
-          ),
-        ),
-      );
+      await Promise.all(sensitiveKeys.map(key => this.removeItem(key)));
     } catch (error) {
-      console.error('Error clearing sensitive data:', error);
       throw error;
     }
   }
@@ -378,15 +350,8 @@ export class SecureStorageService {
         STORAGE_KEYS.AUTH_REFRESH_TOKEN,
       ];
 
-      await Promise.all(
-        keys.map(key =>
-          this.removeItem(key).catch(err =>
-            console.warn(`Note: "${key}" not found:`, err),
-          ),
-        ),
-      );
+      await Promise.all(keys.map(key => this.removeItem(key)));
     } catch (error) {
-      console.error('Error clearing authentication data:', error);
       throw error;
     }
   }
@@ -450,8 +415,7 @@ export class SecureStorageService {
         hasSession: session !== null,
         sessionFields,
       };
-    } catch (error) {
-      console.error('Error getting storage info:', error);
+    } catch {
       return {
         secureStoreKeys: [],
         asyncStorageKeys: [],
@@ -488,8 +452,7 @@ export class SecureStorageService {
       await this.setSession(sessionData);
 
       return true;
-    } catch (error) {
-      console.error('Error during session migration:', error);
+    } catch {
       return false;
     }
   }

@@ -70,8 +70,8 @@ export const MovieTrailer = memo(
           }
 
           setThumbnail(thumbnail);
-        } catch (err) {
-          console.log('Thumbnail error:', err);
+        } catch {
+          setThumbnail(null);
         }
       };
       loadThumbnail();

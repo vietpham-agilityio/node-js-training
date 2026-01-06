@@ -54,7 +54,6 @@ export const Primary: Story = {
     title: 'Get Started',
     isPrimary: true,
     size: Size.MEDIUM,
-    onPress: () => console.log('Button pressed'),
   },
 };
 
@@ -63,7 +62,6 @@ export const Secondary: Story = {
     title: 'Login',
     isPrimary: false,
     size: Size.MEDIUM,
-    onPress: () => console.log('Login pressed'),
   },
 };
 
@@ -72,7 +70,6 @@ export const Small: Story = {
     title: 'Small Button',
     isPrimary: true,
     size: Size.SMALL,
-    onPress: () => console.log('Small button pressed'),
   },
 };
 
@@ -81,7 +78,6 @@ export const Medium: Story = {
     title: 'Medium Button',
     isPrimary: true,
     size: Size.MEDIUM,
-    onPress: () => console.log('Medium button pressed'),
   },
 };
 
@@ -90,7 +86,6 @@ export const Large: Story = {
     title: 'Large Button',
     isPrimary: true,
     size: Size.LARGE,
-    onPress: () => console.log('Large button pressed'),
   },
 };
 
@@ -102,7 +97,6 @@ export const Disabled: Story = {
         isPrimary={true}
         size={Size.MEDIUM}
         disabled={true}
-        onPress={() => console.log('Login pressed')}
       />
     </View>
   ),
@@ -113,7 +107,6 @@ export const LongText: Story = {
     title: 'Create New Account',
     isPrimary: true,
     size: Size.MEDIUM,
-    onPress: () => console.log('Button pressed'),
   },
 };
 
@@ -121,36 +114,16 @@ export const AllSizes: Story = {
   render: () => (
     <View className="h-full p-4 bg-dark-blue gap-4 items-center">
       <View className="w-28">
-        <Button
-          title="Action"
-          isPrimary={false}
-          size={Size.EXTRA_SMALL}
-          onPress={() => console.log('Extra Small pressed')}
-        />
+        <Button title="Action" isPrimary={false} size={Size.EXTRA_SMALL} />
       </View>
       <View className="w-30">
-        <Button
-          title="Book Ticket"
-          isPrimary
-          size={Size.SMALL}
-          onPress={() => console.log('Small pressed')}
-        />
+        <Button title="Book Ticket" isPrimary size={Size.SMALL} />
       </View>
       <View className="w-15">
-        <Button
-          title="Sun 22"
-          isPrimary
-          size={Size.MEDIUM}
-          onPress={() => console.log('Medium pressed')}
-        />
+        <Button title="Sun 22" isPrimary size={Size.MEDIUM} />
       </View>
       <View className="w-70">
-        <Button
-          title="Sign In"
-          disabled
-          size={Size.LARGE}
-          onPress={() => console.log('Large pressed')}
-        />
+        <Button title="Sign In" disabled size={Size.LARGE} />
       </View>
     </View>
   ),

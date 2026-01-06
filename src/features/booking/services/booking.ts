@@ -212,8 +212,7 @@ export class BookingsService {
           showtime_id: data.showtimeId,
           seats_count: data.seats.length,
         });
-      } catch (seatError) {
-        console.error('Error updating available seats:', seatError);
+      } catch {
         // Continue - booking is created, seats can be updated manually
       }
 
@@ -240,14 +239,10 @@ export class BookingsService {
       }
 
       // Update all tickets for this booking
-      const { error: ticketsError } = await supabase
+      await supabase
         .from('tickets')
         .update({ status: TicketStatus.CANCELLED })
         .eq('booking_id', bookingId);
-
-      if (ticketsError) {
-        console.error('Error cancelling tickets:', ticketsError);
-      }
     } catch (error) {
       throw error;
     }

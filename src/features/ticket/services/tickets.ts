@@ -379,9 +379,6 @@ export class TicketsService {
       }
 
       const count = data || 0;
-      if (count > 0) {
-        console.info(`Auto-expired ${count} tickets`);
-      }
 
       return count;
     } catch {

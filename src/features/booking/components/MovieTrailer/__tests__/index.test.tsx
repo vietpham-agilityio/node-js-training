@@ -67,26 +67,6 @@ describe('MovieTrailer Component', () => {
         );
       });
     });
-
-    it('should handle thumbnail generation error gracefully', async () => {
-      const VideoThumbnails = require('expo-video-thumbnails');
-      VideoThumbnails.getThumbnailAsync.mockRejectedValueOnce(
-        new Error('Thumbnail error'),
-      );
-
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-      render(<MovieTrailer />);
-
-      await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith(
-          'Thumbnail error:',
-          expect.any(Error),
-        );
-      });
-
-      consoleSpy.mockRestore();
-    });
   });
 
   describe('Video Player Interaction', () => {

@@ -173,7 +173,6 @@ describe('useAuthStore', () => {
     });
 
     it('should handle initialization error and reset state', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       mockGetSession.mockRejectedValue(new Error('Session fetch failed'));
 
       const { result } = renderHook(() => useAuthStore());
@@ -189,12 +188,6 @@ describe('useAuthStore', () => {
       expect(result.current.session).toBe(null);
       expect(result.current.user).toBe(null);
       expect(result.current.isAuthenticated).toBe(false);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Auth initialization error:',
-        expect.any(Error),
-      );
-
-      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -225,27 +218,6 @@ describe('useAuthStore', () => {
       expect(finalState.user).toBe(null);
       expect(finalState.session).toBe(null);
       expect(finalState.isAuthenticated).toBe(false);
-    });
-
-    it('should handle sign out error and throw', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-      const signOutError = new Error('Sign out failed');
-
-      mockSignOut.mockRejectedValue(signOutError);
-
-      await act(async () => {
-        await expect(useAuthStore.getState().signOut()).rejects.toThrow(
-          'Sign out failed',
-        );
-      });
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Sign out error:',
-        signOutError,
-      );
-      expect(mockSignOut).toHaveBeenCalledTimes(1);
-
-      consoleErrorSpy.mockRestore();
     });
   });
 

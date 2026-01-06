@@ -40,10 +40,8 @@ export const useDeepLinkHandler = () => {
           const accessToken = params.get('access_token');
           const refreshToken = params.get('refresh_token');
           const error = params.get('error');
-          const errorDescription = params.get('error_description');
 
           if (error) {
-            console.error('OAuth error:', errorDescription || error);
             // You might want to show an alert here
             return;
           }
@@ -55,7 +53,6 @@ export const useDeepLinkHandler = () => {
             });
 
             if (sessionError) {
-              console.error('Session error:', sessionError);
               return;
             }
 
@@ -77,10 +74,8 @@ export const useDeepLinkHandler = () => {
           const accessToken = params.get('access_token');
           const refreshToken = params.get('refresh_token');
           const error = params.get('error');
-          const errorDescription = params.get('error_description');
 
           if (error) {
-            console.error('Reset error:', errorDescription || error);
             return;
           }
 
@@ -95,8 +90,8 @@ export const useDeepLinkHandler = () => {
             });
           }
         }
-      } catch (error) {
-        console.error('Error handling deep link:', error);
+      } catch {
+        return;
       }
     };
 

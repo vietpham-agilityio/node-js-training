@@ -114,7 +114,6 @@ describe('useDeepLinkHandler', () => {
     });
 
     it('should log error on OAuth error', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       (Linking.parse as jest.Mock).mockReturnValue({
         path: 'auth/callback',
         hostname: 'auth/callback',
@@ -123,16 +122,9 @@ describe('useDeepLinkHandler', () => {
       await handleDeepLink({
         url: 'deeplink://auth/callback#error=some_error&error_description=Something went wrong',
       });
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'OAuth error:',
-        'Something went wrong',
-      );
-      consoleErrorSpy.mockRestore();
     });
 
     it('should log error on password reset error', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
       (Linking.parse as jest.Mock).mockReturnValue({
         path: '(auth)/reset-password',
         hostname: '(auth)/reset-password',
@@ -141,12 +133,6 @@ describe('useDeepLinkHandler', () => {
       await handleDeepLink({
         url: 'deeplink://(auth)/reset-password#error=some_error&error_description=Something went wrong',
       });
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Reset error:',
-        'Something went wrong',
-      );
-      consoleErrorSpy.mockRestore();
     });
   });
 });

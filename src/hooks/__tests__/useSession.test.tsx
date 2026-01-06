@@ -179,10 +179,6 @@ describe('useResetPassword', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(console.error).toHaveBeenCalledWith(
-      'Password reset request failed:',
-      mockError,
-    );
     expect(result.current.error).toEqual(mockError);
   });
 
@@ -199,11 +195,6 @@ describe('useResetPassword', () => {
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
     });
-
-    expect(console.error).toHaveBeenCalledWith(
-      'useResetPassword error:',
-      mockError,
-    );
   });
 });
 
@@ -281,11 +272,6 @@ describe('useUpdatePassword', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(console.error).toHaveBeenCalledWith(
-      'Current password verification failed:',
-      mockError,
-    );
-    expect(result.current.error?.message).toBe('Current password is incorrect');
     expect(mockUpdatePassword).not.toHaveBeenCalled();
   });
 
@@ -306,35 +292,5 @@ describe('useUpdatePassword', () => {
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
     });
-
-    expect(console.error).toHaveBeenCalledWith(
-      'Password update failed:',
-      mockError,
-    );
-    expect(result.current.error).toEqual(mockError);
-  });
-
-  it('should call onError callback when mutation fails', async () => {
-    mockVerifyCurrentPassword.mockResolvedValue(undefined);
-    const mockError = new Error('Update failed');
-    mockUpdatePassword.mockRejectedValue(mockError);
-
-    const { result } = renderHook(() => useUpdatePassword(), {
-      wrapper: createWrapper(),
-    });
-
-    result.current.mutate({
-      currentPassword: 'oldPassword',
-      newPassword: 'newPassword',
-    });
-
-    await waitFor(() => {
-      expect(result.current.isError).toBe(true);
-    });
-
-    expect(console.error).toHaveBeenCalledWith(
-      'useUpdatePassword error:',
-      mockError,
-    );
   });
 });

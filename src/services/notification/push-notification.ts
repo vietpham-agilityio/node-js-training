@@ -32,7 +32,6 @@ export class PushNotificationService {
     try {
       // Check if running on physical device
       if (!Device.isDevice) {
-        console.warn('Push notifications only work on physical devices');
         return null;
       }
 
@@ -49,7 +48,6 @@ export class PushNotificationService {
 
       // Check if permission granted
       if (finalStatus !== 'granted') {
-        console.warn('Push notification permission not granted');
         return null;
       }
 
@@ -57,7 +55,6 @@ export class PushNotificationService {
       const projectId = Constants.expoConfig?.extra?.eas?.projectId;
 
       if (!projectId) {
-        console.error('EAS Project ID not found');
         return null;
       }
 
@@ -209,7 +206,6 @@ export class PushNotificationService {
 
       // Don't schedule if already expired
       if (secondsUntilExpiration <= 0) {
-        console.warn('Ticket already expired, not scheduling notification');
         return '';
       }
 
@@ -268,7 +264,6 @@ export class PushNotificationService {
 
       // Don't schedule if show already started
       if (secondsUntilShow <= 0) {
-        console.warn('Show already started, not scheduling reminder');
         return '';
       }
 
