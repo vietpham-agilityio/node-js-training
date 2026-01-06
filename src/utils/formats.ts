@@ -46,7 +46,6 @@ export function formatIDR(
       : value;
 
   if (isNaN(amount)) {
-    console.warn('[formatIDR] Invalid amount:', value);
     return showCurrency ? 'IDR 0' : '0';
   }
 
@@ -95,7 +94,6 @@ export const formatTime = (
   const date = new Date(normalized);
 
   if (isNaN(date.getTime())) {
-    console.warn('[formatTime] Invalid date input:', value);
     return '--:--';
   }
 

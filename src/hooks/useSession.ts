@@ -38,12 +38,8 @@ export const useResetPassword = () => {
 
         return { success: true };
       } catch (error) {
-        console.error('Password reset request failed:', error);
         throw error;
       }
-    },
-    onError: error => {
-      console.error('useResetPassword error:', error);
     },
   });
 };
@@ -67,8 +63,7 @@ export const useUpdatePassword = () => {
           user.email,
           data.currentPassword,
         );
-      } catch (error) {
-        console.error('Current password verification failed:', error);
+      } catch {
         throw new Error('Current password is incorrect');
       }
 
@@ -77,12 +72,8 @@ export const useUpdatePassword = () => {
         await authService.updatePassword(data.newPassword);
         return { success: true };
       } catch (error) {
-        console.error('Password update failed:', error);
         throw error;
       }
-    },
-    onError: error => {
-      console.error('useUpdatePassword error:', error);
     },
   });
 };

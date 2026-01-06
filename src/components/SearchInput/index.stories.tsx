@@ -51,7 +51,6 @@ export const Default: Story = {
   args: {
     placeholder: 'Search movie',
     testID: 'search-input',
-    onChangeText: (text: string) => console.log('Search:', text),
   },
 };
 
@@ -61,7 +60,6 @@ export const WithValue: Story = {
     placeholder: 'Search movie',
     value: 'Inception',
     testID: 'search-input-value',
-    onChangeText: (text: string) => console.log('Search:', text),
   },
 };
 
@@ -70,7 +68,6 @@ export const CustomPlaceholder: Story = {
   args: {
     placeholder: 'Search for movies, actors, directors...',
     testID: 'search-input-custom',
-    onChangeText: (text: string) => console.log('Search:', text),
   },
 };
 
@@ -80,7 +77,6 @@ export const Empty: Story = {
     placeholder: 'Search movie',
     value: '',
     testID: 'search-input-empty',
-    onChangeText: (text: string) => console.log('Search:', text),
   },
 };
 
@@ -90,6 +86,5 @@ export const WithContainerClassName: Story = {
     placeholder: 'Search movie',
     containerClassName: 'bg-white p-2',
     testID: 'search-input-container',
-    onChangeText: (text: string) => console.log('Search:', text),
   },
 };

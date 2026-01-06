@@ -74,8 +74,7 @@ export function withCameraOption<P extends object>(
             format: SaveFormat.JPEG,
           });
           return result.uri;
-        } catch (error) {
-          console.error('Error compressing image:', error);
+        } catch {
           return uri;
         }
       },
@@ -158,8 +157,7 @@ export function withCameraOption<P extends object>(
           onImageSelected?.(compressedUri);
           setShowPreview(false);
           setPreviewUri(null);
-        } catch (error) {
-          console.error('Error confirming photo:', error);
+        } catch {
           Alert.alert('Error', 'Failed to save photo');
         } finally {
           setIsProcessing(false);

@@ -107,8 +107,7 @@ export class TicketExpirationService {
 
       if (error) throw error;
       return data || [];
-    } catch (error) {
-      console.error('Error fetching expired tickets:', error);
+    } catch {
       return [];
     }
   }

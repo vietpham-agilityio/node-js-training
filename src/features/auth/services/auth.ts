@@ -60,7 +60,6 @@ export class AuthService {
       // OAuth tokens are in the hash fragment (#), not query string
       const hashFragment = url.split('#')[1];
       if (!hashFragment) {
-        console.error('No hash fragment in callback URL');
         return null;
       }
 
@@ -69,7 +68,6 @@ export class AuthService {
       const refreshToken = params.get('refresh_token');
 
       if (!accessToken || !refreshToken) {
-        console.error('Missing tokens in callback URL');
         return null;
       }
 
@@ -77,8 +75,7 @@ export class AuthService {
         access_token: accessToken,
         refresh_token: refreshToken,
       };
-    } catch (error) {
-      console.error('Error parsing OAuth callback URL:', error);
+    } catch {
       return null;
     }
   }
@@ -304,7 +301,6 @@ export class AuthService {
 
       return true;
     } catch (error) {
-      console.error('❌ Password verification failed:', error);
       throw error;
     }
   }

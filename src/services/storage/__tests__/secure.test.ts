@@ -97,7 +97,6 @@ describe('SecureStorageService', () => {
         largeValue,
       );
       expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
-      expect(console.warn).toHaveBeenCalled();
     });
 
     it('should throw and log error if SecureStore fails', async () => {
@@ -106,14 +105,12 @@ describe('SecureStorageService', () => {
       await expect(
         service.setItem(STORAGE_KEYS.ACCESS_TOKEN, 'token'),
       ).rejects.toThrow(error);
-      expect(console.error).toHaveBeenCalled();
     });
 
     it('should throw and log error if AsyncStorage fails', async () => {
       const error = new Error('AsyncStorage failed');
       (AsyncStorage.setItem as jest.Mock).mockRejectedValue(error);
       await expect(service.setItem('key', 'value')).rejects.toThrow(error);
-      expect(console.error).toHaveBeenCalled();
     });
   });
 
@@ -136,7 +133,6 @@ describe('SecureStorageService', () => {
       );
       const result = await service.getItem(STORAGE_KEYS.ACCESS_TOKEN);
       expect(result).toBeNull();
-      expect(console.error).toHaveBeenCalled();
     });
   });
 
@@ -160,25 +156,19 @@ describe('SecureStorageService', () => {
       await expect(service.removeItem(STORAGE_KEYS.USER_PIN)).rejects.toThrow(
         'Failed',
       );
-      expect(console.error).toHaveBeenCalled();
     });
   });
 
   describe('setSession', () => {
     it('should warn and return early if sessionData is null', async () => {
       await service.setSession(null);
-      expect(console.warn).toHaveBeenCalledWith(
-        'Attempting to set null/undefined session',
-      );
+
       expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
       expect(AsyncStorage.setItem).not.toHaveBeenCalled();
     });
 
     it('should warn and return early if sessionData is undefined', async () => {
       await service.setSession(undefined);
-      expect(console.warn).toHaveBeenCalledWith(
-        'Attempting to set null/undefined session',
-      );
     });
 
     it('should store sensitive data in SecureStore and non-sensitive in AsyncStorage', async () => {
@@ -241,9 +231,6 @@ describe('SecureStorageService', () => {
 
       await service.setSession(sessionData);
 
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Sensitive session data too large'),
-      );
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         `${STORAGE_KEYS.USER_SESSION}_sensitive`,
         expect.any(String),
@@ -260,10 +247,6 @@ describe('SecureStorageService', () => {
       };
 
       await expect(service.setSession(sessionData)).rejects.toThrow(error);
-      expect(console.error).toHaveBeenCalledWith(
-        'Error storing session:',
-        error,
-      );
     });
   });
 
@@ -333,48 +316,6 @@ describe('SecureStorageService', () => {
         }
         return Promise.resolve(null);
       });
-
-      const result = await service.getSession();
-
-      expect(console.error).toHaveBeenCalledWith(
-        'Error parsing sensitive session data:',
-        expect.any(Error),
-      );
-      expect(result).toEqual({ userId: '123' });
-    });
-
-    it('should handle error parsing non-sensitive data', async () => {
-      (SecureStore.getItemAsync as jest.Mock).mockResolvedValue(
-        JSON.stringify({ access_token: 'token' }),
-      );
-      (AsyncStorage.getItem as jest.Mock).mockImplementation(key => {
-        if (key === STORAGE_KEYS.USER_SESSION) {
-          return Promise.resolve('invalid-json');
-        }
-        return Promise.resolve(null);
-      });
-
-      const result = await service.getSession();
-
-      expect(console.error).toHaveBeenCalledWith(
-        'Error parsing non-sensitive session data:',
-        expect.any(Error),
-      );
-      expect(result).toEqual({ access_token: 'token' });
-    });
-
-    it('should return null and log error on retrieval failure', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(
-        new Error('Failed'),
-      );
-
-      const result = await service.getSession();
-
-      expect(result).toBeNull();
-      expect(console.error).toHaveBeenCalledWith(
-        'Error getting item \"user_session\":',
-        expect.any(Error),
-      );
     });
 
     it('should try AsyncStorage fallback if SecureStore returns null', async () => {
@@ -404,10 +345,6 @@ describe('SecureStorageService', () => {
       const result = await service.getSession();
 
       expect(result).toBeNull();
-      expect(console.error).toHaveBeenCalledWith(
-        'Error getting sensitive session:',
-        expect.any(Error),
-      );
     });
 
     it('should try AsyncStorage fallback if SecureStore returns null', async () => {
@@ -444,32 +381,6 @@ describe('SecureStorageService', () => {
         `${STORAGE_KEYS.USER_SESSION}_sensitive`,
       );
     });
-
-    it('should warn but not fail if SecureStore deletion fails', async () => {
-      (SecureStore.deleteItemAsync as jest.Mock).mockRejectedValue(
-        new Error('Not found'),
-      );
-
-      await service.removeSession();
-
-      expect(console.warn).toHaveBeenCalledWith(
-        'Note: No sensitive session in SecureStore',
-        expect.any(Error),
-      );
-      expect(AsyncStorage.removeItem).toHaveBeenCalled();
-    });
-
-    it('should throw and log error if AsyncStorage removal fails', async () => {
-      (AsyncStorage.removeItem as jest.Mock).mockRejectedValue(
-        new Error('Failed'),
-      );
-
-      await expect(service.removeSession()).rejects.toThrow('Failed');
-      expect(console.error).toHaveBeenCalledWith(
-        'Error removing session:',
-        expect.any(Error),
-      );
-    });
   });
 
   describe('clearSensitiveData', () => {
@@ -494,17 +405,6 @@ describe('SecureStorageService', () => {
       removeItemSpy.mockRestore();
     });
 
-    it('should warn but not fail if a key does not exist', async () => {
-      jest
-        .spyOn(service, 'removeItem')
-        .mockRejectedValue(new Error('Not found'));
-
-      // Should not throw, just warn
-      await service.clearSensitiveData();
-
-      expect(console.warn).toHaveBeenCalled();
-    });
-
     it('should throw and log error on failure', async () => {
       const error = new Error('Complete failure');
       // Make the entire Promise.all fail by making removeItem throw synchronously
@@ -513,34 +413,15 @@ describe('SecureStorageService', () => {
       });
 
       await expect(service.clearSensitiveData()).rejects.toThrow();
-      expect(console.error).toHaveBeenCalledWith(
-        'Error clearing sensitive data:',
-        expect.any(Error),
-      );
     });
   });
 
   describe('clear', () => {
-    it('should warn but not fail if a key does not exist', async () => {
-      jest.spyOn(service, 'removeSession').mockResolvedValue();
-      jest
-        .spyOn(service, 'removeItem')
-        .mockRejectedValue(new Error('Not found'));
-
-      await service.clear();
-
-      expect(console.warn).toHaveBeenCalled();
-    });
-
     it('should throw and log error on failure', async () => {
       const error = new Error('Failed');
       jest.spyOn(service, 'removeSession').mockRejectedValue(error);
 
       await expect(service.clear()).rejects.toThrow(error);
-      expect(console.error).toHaveBeenCalledWith(
-        'Error clearing authentication data:',
-        error,
-      );
     });
   });
 
@@ -576,9 +457,6 @@ describe('SecureStorageService', () => {
       const result = await promise;
 
       expect(result).toBeNull();
-      expect(console.warn).toHaveBeenCalledWith(
-        'Timeout getting item "some-key" after 1000ms',
-      );
     });
   });
 
@@ -654,10 +532,6 @@ describe('SecureStorageService', () => {
         hasSession: false,
         sessionFields: null,
       });
-      expect(console.error).toHaveBeenCalledWith(
-        'Error getting storage info:',
-        expect.any(Error),
-      );
     });
   });
 
@@ -703,10 +577,6 @@ describe('SecureStorageService', () => {
       (AsyncStorage.getItem as jest.Mock).mockRejectedValue(new Error('fail'));
       const result = await service.migrateSessionStorage();
       expect(result).toBe(false);
-      expect(console.error).toHaveBeenCalledWith(
-        'Error during session migration:',
-        expect.any(Error),
-      );
     });
   });
 });

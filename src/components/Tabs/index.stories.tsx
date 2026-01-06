@@ -63,7 +63,6 @@ export const Primary: Story = {
     tabs: defaultTabs,
     activeTab: 'home',
     variant: 'primary',
-    onTabChange: (tabId: string) => console.log('Tab changed to:', tabId),
   },
 };
 
@@ -72,7 +71,6 @@ export const Secondary: Story = {
     tabs: defaultTabs,
     activeTab: 'explore',
     variant: 'secondary',
-    onTabChange: (tabId: string) => console.log('Tab changed to:', tabId),
   },
 };
 
@@ -84,7 +82,6 @@ export const TwoTabs: Story = {
     ],
     activeTab: 'login',
     variant: 'primary',
-    onTabChange: (tabId: string) => console.log('Tab changed to:', tabId),
   },
 };
 
@@ -93,7 +90,6 @@ export const ManyTabsScrollable: Story = {
     tabs: manyTabs,
     activeTab: 'all',
     variant: 'primary',
-    onTabChange: (tabId: string) => console.log('Tab changed to:', tabId),
   },
 };
 
@@ -102,6 +98,5 @@ export const SingleTab: Story = {
     tabs: [{ id: 'only', label: 'Dashboard' }],
     activeTab: 'only',
     variant: 'primary',
-    onTabChange: (tabId: string) => console.log('Tab changed to:', tabId),
   },
 };

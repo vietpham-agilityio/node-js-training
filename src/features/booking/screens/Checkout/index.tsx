@@ -8,11 +8,11 @@ import { useShallow } from 'zustand/react/shallow';
 import { withUniwind } from 'uniwind';
 
 // Components
-import { Typo } from '@/components/Typo';
 import { Button } from '@/components/Button';
+import { DetailRow } from '@/components/DetailRow';
 import { Divider } from '@/components/Divider';
 import { HorizontalCard } from '@/components/HorizontalCard';
-import { DetailRow } from '@/components/DetailRow';
+import { Typo } from '@/components/Typo';
 
 // Constants
 import { ERROR_MESSAGES, PARAMS, ROUTES, Size } from '@/constants';
@@ -139,7 +139,6 @@ const CheckoutScreen = () => {
     async (booking: Booking) => {
       try {
         if (!selectedShowtime || !selectedMovie) {
-          console.warn('Missing showtime or movie data for notifications');
           return;
         }
 
@@ -178,15 +177,14 @@ const CheckoutScreen = () => {
               showTime,
               showDateTime,
             );
-          } catch (error) {
-            console.error(
-              `Error scheduling notifications for ticket ${ticket.id}:`,
-              error,
-            );
+          } catch {
+            // Don't block checkout if notification scheduling fails
+            toast.error('Failed to schedule notifications.');
           }
         }
       } catch {
         // Don't block checkout if notification scheduling fails
+        toast.error('Failed to schedule notifications.');
       }
     },
     [
@@ -194,6 +192,7 @@ const CheckoutScreen = () => {
       selectedMovie,
       scheduleTicketExpiration,
       scheduleShowReminder,
+      toast,
     ],
   );
 

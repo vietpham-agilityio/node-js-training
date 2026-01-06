@@ -49,8 +49,7 @@ export const CameraModal = memo(
           if (photo?.uri) {
             onTakePicture(photo.uri);
           }
-        } catch (error) {
-          console.error('Error taking picture:', error);
+        } catch {
           Alert.alert('Error', ERROR_MESSAGES.TAKE_PICTURE_ERROR);
         }
       }

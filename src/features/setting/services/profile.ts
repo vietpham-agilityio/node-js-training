@@ -1,6 +1,6 @@
+import { supabase } from '@/services/supabase/client';
 import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system/legacy';
-import { supabase } from '@/services/supabase/client';
 
 // Types
 import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
@@ -119,7 +119,7 @@ export class ProfileService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Failed to delete old avatar:', error);
+      throw error;
     }
   }
 }

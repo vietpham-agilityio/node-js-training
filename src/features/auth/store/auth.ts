@@ -55,8 +55,7 @@ export const useAuthStore = create<AuthState>(set => ({
           isAuthenticated: true,
         });
       }
-    } catch (error) {
-      console.error('Auth initialization error:', error);
+    } catch {
       set({ user: null, session: null, isAuthenticated: false });
     } finally {
       set({ isLoading: false });
@@ -73,7 +72,6 @@ export const useAuthStore = create<AuthState>(set => ({
         isAuthenticated: false,
       });
     } catch (error) {
-      console.error('Sign out error:', error);
       throw error;
     }
   },

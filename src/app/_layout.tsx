@@ -68,7 +68,7 @@ const RootLayout = () => {
   const hasInitializedRef = useRef(false);
 
   // Initialize push notifications
-  const { expoPushToken } = usePushNotifications();
+  usePushNotifications();
 
   const [loaded, error] = useFonts({
     Montserrat_300Light,
@@ -87,12 +87,6 @@ const RootLayout = () => {
   useEffect(() => {
     Uniwind.setTheme('dark');
   }, []);
-
-  useEffect(() => {
-    if (expoPushToken) {
-      console.info('Push notifications ready!!');
-    }
-  }, [expoPushToken]);
 
   // Handle authentication routing
   useEffect(() => {

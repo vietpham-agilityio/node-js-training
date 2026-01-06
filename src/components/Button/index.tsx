@@ -18,7 +18,7 @@ export interface ButtonProps extends TouchableOpacityProps {
   size?: Size;
   disabled?: boolean;
   testID?: string;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
 const SIZE_CLASSES = {
