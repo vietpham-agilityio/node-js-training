@@ -253,9 +253,14 @@ const MyTicketScreen = () => {
     refetch,
   ]);
 
-  const ListHeader = useCallback(
-    () => (
-      <View className="gap-6 mb-6">
+  return (
+    <StyledSafeAreaView
+      edges={[]}
+      accessibilityLabel="My Ticket screen"
+      accessibilityHint="My Ticket screen"
+      className="flex-1 bg-bg-primary"
+    >
+      <View className="px-6 gap-6 mb-6">
         <Tabs
           variant="tertiary"
           tabs={TICKET_TABS}
@@ -264,18 +269,9 @@ const MyTicketScreen = () => {
         />
         <View className="border-b border-white/80" />
       </View>
-    ),
-    [activeTab],
-  );
 
-  return (
-    <StyledSafeAreaView
-      edges={[]}
-      accessibilityLabel="My Ticket screen"
-      accessibilityHint="My Ticket screen"
-      className="flex-1 bg-bg-primary"
-    >
       <FlashList
+        key={activeTab}
         data={filteredTickets}
         renderItem={renderTicket}
         keyExtractor={keyExtractor}
@@ -288,7 +284,6 @@ const MyTicketScreen = () => {
         showsVerticalScrollIndicator={false}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
-        ListHeaderComponent={ListHeader}
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
         refreshControl={

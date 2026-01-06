@@ -1,12 +1,6 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  Switch,
-  View,
-} from 'react-native';
+import { useMemo } from 'react';
+import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Unwind
@@ -19,7 +13,6 @@ import { ROUTES, SETTING_ITEMS } from '@/constants';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useProfile } from '@/features/setting/hooks/useProfile';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
-import { useToastAlert } from '@/hooks/useToast';
 
 // Components
 import { Avatar } from '@/components/Avatar';
@@ -28,9 +21,6 @@ import { SettingItem } from '@/features/setting/components/SettingItem';
 
 // Icons
 import { UserProfileIcon } from '@/icons/UserProfileIcon';
-
-// Services
-import { pushNotificationService } from '@/services/notification/push-notification';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 const StyledScrollView = withUniwind(ScrollView);
@@ -49,27 +39,8 @@ const MyProfileScreen = () => {
   const { data: profile, isLoading: isProfileLoading } = useProfile();
   const { signOut } = useAuth();
   const { user: userInfo } = useAuth();
-  const toast = useToastAlert();
 
   const { sendTestNotification } = usePushNotifications();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-  const toggleNotifications = async () => {
-    if (notificationsEnabled) {
-      // Disable: Cancel all scheduled notifications
-      await pushNotificationService.cancelAllScheduledNotifications();
-      setNotificationsEnabled(false);
-      toast.info('Notifications disabled');
-    } else {
-      // Enable: Request permission again
-      const token =
-        await pushNotificationService.registerForPushNotifications();
-      if (token) {
-        setNotificationsEnabled(true);
-        toast.success('Notifications enabled');
-      }
-    }
-  };
 
   const visibleSettings = useMemo(() => {
     const isOAuthUser = userInfo?.app_metadata.provider !== 'email';
@@ -145,17 +116,6 @@ const MyProfileScreen = () => {
               {profile?.email}
             </Typo>
           </View>
-        </View>
-
-        <View className="flex-row items-center justify-between mt-8">
-          <Typo size="base" weight="medium">
-            Notifications
-          </Typo>
-          <Switch
-            value={notificationsEnabled}
-            onValueChange={toggleNotifications}
-            accessibilityLabel="Toggle notifications"
-          />
         </View>
 
         <View className="mt-8 gap-5">

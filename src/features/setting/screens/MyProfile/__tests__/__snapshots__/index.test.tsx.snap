@@ -48,30 +48,6 @@ exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
         </View>
       </View>
       <View
-        className="flex-row items-center justify-between mt-8"
-      >
-        <Text
-          accessible={true}
-          className="text-white text-base font-montserrat-medium"
-          maxFontSizeMultiplier={1.2}
-        >
-          Notifications
-        </Text>
-        <RCTSwitch
-          accessibilityLabel="Toggle notifications"
-          accessibilityRole="switch"
-          onChange={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "alignSelf": "flex-start",
-            }
-          }
-          value={true}
-        />
-      </View>
-      <View
         className="mt-8 gap-5"
       >
         <View
