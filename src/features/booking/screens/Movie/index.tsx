@@ -243,13 +243,8 @@ const MovieScreen = () => {
     return [];
   }, [isMovieLoading, activeTab]);
 
-  return (
-    <StyledSafeAreaView
-      edges={['bottom']}
-      accessibilityLabel="Movie screen"
-      accessibilityHint="Movie screen"
-      className="h-full bg-dark-blue"
-    >
+  const ListHeaderComponent = useCallback(
+    () => (
       <>
         {/* Movie Banner */}
         <View
@@ -307,6 +302,27 @@ const MovieScreen = () => {
           />
         </View>
       </>
+    ),
+    [
+      handleGoBack,
+      title,
+      posterUrl,
+      isMovieLoading,
+      durationMinutes,
+      genre,
+      rating,
+      activeTab,
+      handleTabChange,
+    ],
+  );
+
+  return (
+    <StyledSafeAreaView
+      edges={['bottom']}
+      accessibilityLabel="Movie screen"
+      accessibilityHint="Movie screen"
+      className="h-full bg-dark-blue"
+    >
       <FlashList
         testID="vertical-flash-list"
         accessibilityLabel="Movie content list"
@@ -318,6 +334,7 @@ const MovieScreen = () => {
         contentContainerStyle={{
           paddingBottom: TABS_FOOTER_HEIGHT,
         }}
+        ListHeaderComponent={ListHeaderComponent}
         refreshControl={
           <RefreshControl
             testID="refresh-control"

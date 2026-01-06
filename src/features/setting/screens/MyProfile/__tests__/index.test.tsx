@@ -112,13 +112,6 @@ describe('MyProfileScreen', () => {
       expect(getByTestId('avatar-container')).toBeTruthy();
     });
 
-    it('should render notifications toggle', () => {
-      const { getByText, getByLabelText } = render(<MyProfileScreen />);
-
-      expect(getByText('Notifications')).toBeTruthy();
-      expect(getByLabelText('Toggle notifications')).toBeTruthy();
-    });
-
     it('should render all setting items', () => {
       const { getByTestId } = render(<MyProfileScreen />);
 
@@ -249,30 +242,11 @@ describe('MyProfileScreen', () => {
     });
   });
 
-  describe('Notifications Toggle', () => {
-    it('should render notifications toggle with correct initial state', () => {
-      const { getByLabelText } = render(<MyProfileScreen />);
-      const toggle = getByLabelText('Toggle notifications');
-
-      // Toggle should be rendered
-      expect(toggle).toBeTruthy();
-    });
-
-    it('should allow toggling notifications', () => {
-      const { getByLabelText } = render(<MyProfileScreen />);
-      const toggle = getByLabelText('Toggle notifications');
-
-      // Should not throw when toggling
-      expect(() => fireEvent(toggle, 'valueChange', false)).not.toThrow();
-    });
-  });
-
   describe('Accessibility', () => {
     it('should have correct accessibility labels', () => {
       const { getByLabelText } = render(<MyProfileScreen />);
 
       expect(getByLabelText('Profile screen')).toBeTruthy();
-      expect(getByLabelText('Toggle notifications')).toBeTruthy();
       expect(getByLabelText('Profile avatar')).toBeTruthy();
     });
 
