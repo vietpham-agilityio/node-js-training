@@ -18,10 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: 'com.anonymous.movieticketbooking',
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
-      NSCameraUsageDescription: 'This app needs access to your camera',
-      NSPhotoLibraryUsageDescription:
-        'This app needs access to your photo library',
-      NSFaceIDUsageDescription: 'This app needs access to your face ID',
+      UIBackgroundModes: ['remote-notification'],
       CFBundleURLTypes: [
         {
           CFBundleURLSchemes: ['movieticketbooking'],
@@ -41,10 +38,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     softwareKeyboardLayoutMode: 'pan',
     package: 'com.anonymous.movieticketbooking',
     predictiveBackGestureEnabled: false,
-    permissions: [
-      'android.permission.CAMERA',
-      'android.permission.RECORD_AUDIO',
-    ],
     intentFilters: [
       {
         action: 'VIEW',
@@ -127,8 +120,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         icon: './assets/images/movea-icon.png',
         color: '#0B0F2F',
-        defaultChannel: 'default',
-        enableBackgroundRemoteNotifications: false,
       },
     ],
   ],
@@ -136,12 +127,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
     reactCompiler: true,
   },
-  updates: {},
-  notification: {},
   primaryColor: '#0B0F2F',
-  locales: {},
   extra: {
-    router: {},
     eas: {
       projectId: 'd545b6f9-ee6c-4ddf-8944-718047e7983e',
     },

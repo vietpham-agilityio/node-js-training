@@ -16,6 +16,9 @@ export class PushTokenService {
 
   /**
    * Save push token to Supabase
+   *
+   * iOS Simulator: expoPushToken will be null
+   * This method will NOT save null tokens (skip save on simulator)
    */
   async savePushToken(
     userId: string,
@@ -23,6 +26,11 @@ export class PushTokenService {
     platform: 'ios' | 'android',
     deviceId?: string,
   ): Promise<void> {
+    // Skip saving null/empty tokens (iOS simulator case)
+    if (!expoPushToken || expoPushToken.trim() === '') {
+      return;
+    }
+
     try {
       // Check if token already exists
       const { data: existingToken } = await supabase
@@ -72,7 +80,10 @@ export class PushTokenService {
         .eq('is_active', true);
 
       if (error) throw error;
-      return keysToCamel(data || []) as PushToken[];
+
+      const tokens = keysToCamel(data || []) as PushToken[];
+
+      return tokens;
     } catch {
       return [];
     }

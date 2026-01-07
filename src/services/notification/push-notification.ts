@@ -27,13 +27,18 @@ export class PushNotificationService {
 
   /**
    * Register for push notifications and get Expo Push Token
+   *
+   * iOS Simulator Behavior:
+   * - Device.isDevice returns false on simulator
+   * - getExpoPushTokenAsync() will return null on iOS simulator
+   * - Local notifications still work perfectly on simulator
+   * - Only remote push notifications require physical device
    */
   async registerForPushNotifications(): Promise<string | null> {
     try {
-      // Check if running on physical device
-      if (!Device.isDevice) {
-        return null;
-      }
+      // iOS Simulator: Device.isDevice = false
+      // But we still want to request permissions for local notifications
+      const isPhysicalDevice = Device.isDevice;
 
       // Get current permission status
       const { status: existingStatus } =
@@ -51,7 +56,15 @@ export class PushNotificationService {
         return null;
       }
 
-      // Get Expo Push Token
+      // iOS Simulator: This will return null
+      // Only physical devices can get Expo Push Token
+      if (!isPhysicalDevice) {
+        // Return null for simulator - this is expected
+        // Your app should handle this case gracefully
+        return null;
+      }
+
+      // Get Expo Push Token (only works on physical device)
       const projectId = Constants.expoConfig?.extra?.eas?.projectId;
 
       if (!projectId) {
