@@ -1,13 +1,13 @@
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { TextInput, View } from 'react-native';
 
 // Components
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
 import { Typo } from '@/components/Typo';
+import { PasswordInput } from '@/components/PasswordInput';
 
 // Constants
 import {
@@ -125,58 +125,23 @@ export const ResetPasswordForm = () => {
 
         {/* New Password Input */}
         <View className={errors.newPassword ? 'mb-4' : 'mb-9'}>
-          <Controller
+          <PasswordInput
+            ref={newPasswordRef}
             control={control}
             name="newPassword"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <Input
-                ref={newPasswordRef}
-                accessibilityRole="text"
-                accessibilityLabel="New Password input field"
-                label="New Password"
-                value={value}
-                error={error?.message}
-                testID="new-password-input"
-                secureTextEntry
-                returnKeyType="next"
-                autoCapitalize="none"
-                autoCorrect={false}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                onSubmitEditing={handleNewPasswordSubmit}
-              />
-            )}
+            testID="new-password-input"
+            onSubmitEditing={handleNewPasswordSubmit}
           />
         </View>
 
         {/* Confirm Password Input */}
         <View className={errors.confirmPassword ? 'mb-6' : 'mb-5'}>
-          <Controller
+          <PasswordInput
+            ref={confirmPasswordRef}
             control={control}
             name="confirmPassword"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <Input
-                ref={confirmPasswordRef}
-                accessibilityRole="text"
-                accessibilityLabel="Confirm Password input field"
-                label="Confirm Password"
-                value={value}
-                error={error?.message}
-                testID="confirm-password-input"
-                secureTextEntry
-                returnKeyType="done"
-                autoCapitalize="none"
-                autoCorrect={false}
-                onChangeText={onChange}
-                onBlur={onBlur}
-              />
-            )}
+            testID="confirm-password-input"
+            returnKeyType="done"
           />
         </View>
       </View>

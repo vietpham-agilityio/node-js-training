@@ -1,12 +1,12 @@
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useRouter } from 'expo-router';
 import { memo, useCallback, useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { TextInput, View } from 'react-native';
 
 // Components
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
+import { PasswordInput } from '@/components/PasswordInput';
 
 // Hooks
 import { useUpdatePassword } from '@/hooks/useSession';
@@ -93,87 +93,35 @@ export const ChangePasswordForm = memo(() => {
       <View className="w-full">
         {/* Current Password Input */}
         <View className={errors.currentPassword ? 'mb-4' : 'mb-9'}>
-          <Controller
+          <PasswordInput
+            ref={currentPasswordRef}
             control={control}
             name="currentPassword"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <Input
-                ref={currentPasswordRef}
-                accessibilityRole="text"
-                accessibilityLabel="Current Password input field"
-                label="Current Password"
-                value={value}
-                error={error?.message}
-                testID="current-password-input"
-                secureTextEntry
-                returnKeyType="next"
-                autoCapitalize="none"
-                autoCorrect={false}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                onSubmitEditing={handleCurrentPasswordSubmit}
-              />
-            )}
+            testID="current-password-input"
+            onSubmitEditing={handleCurrentPasswordSubmit}
           />
         </View>
 
         {/* New Password Input */}
         <View className={errors.newPassword ? 'mb-4' : 'mb-9'}>
-          <Controller
+          <PasswordInput
+            ref={newPasswordRef}
             control={control}
             name="newPassword"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <Input
-                ref={newPasswordRef}
-                accessibilityRole="text"
-                accessibilityLabel="New Password input field"
-                label="Password"
-                value={value}
-                error={error?.message}
-                testID="new-password-input"
-                secureTextEntry
-                returnKeyType="next"
-                autoCapitalize="none"
-                autoCorrect={false}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                onSubmitEditing={handleNewPasswordSubmit}
-              />
-            )}
+            label="Password"
+            testID="new-password-input"
+            onSubmitEditing={handleNewPasswordSubmit}
           />
         </View>
 
         {/* Confirm Password Input */}
         <View className={errors.confirmPassword ? 'mb-6' : 'mb-5'}>
-          <Controller
+          <PasswordInput
+            ref={confirmPasswordRef}
             control={control}
             name="confirmPassword"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <Input
-                ref={confirmPasswordRef}
-                accessibilityRole="text"
-                accessibilityLabel="Confirm Password input field"
-                label="Confirm Password"
-                value={value}
-                error={error?.message}
-                testID="confirm-password-input"
-                secureTextEntry
-                returnKeyType="done"
-                autoCapitalize="none"
-                autoCorrect={false}
-                onChangeText={onChange}
-                onBlur={onBlur}
-              />
-            )}
+            testID="confirm-password-input"
+            returnKeyType="done"
           />
         </View>
       </View>

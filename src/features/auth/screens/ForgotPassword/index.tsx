@@ -1,7 +1,7 @@
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useRouter } from 'expo-router';
 import { useCallback } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 
 // Constants
@@ -17,7 +17,7 @@ import { useResetPassword } from '@/hooks/useSession';
 import { useToastAlert } from '@/hooks/useToast';
 
 // Components
-import { Input } from '@/components/Input';
+import { EmailInput } from '@/components/EmailInput';
 import { Typo } from '@/components/Typo';
 
 // Layout
@@ -84,29 +84,11 @@ const ForgotPasswordScreen = () => {
         </Typo>
 
         <View className={errors.email ? 'mb-0' : 'mb-5'}>
-          <Controller
+          <EmailInput
             control={control}
             name="email"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <Input
-                accessibilityRole="text"
-                accessibilityLabel="Email address input field"
-                accessibilityHint="Enter the email address associated with your account"
-                label="Email Address"
-                value={value}
-                error={error?.message}
-                testID="signup-email-input"
-                keyboardType="email-address"
-                returnKeyType="next"
-                autoCapitalize="none"
-                autoCorrect={false}
-                onChangeText={onChange}
-                onBlur={onBlur}
-              />
-            )}
+            testID="signup-email-input"
+            returnKeyType="next"
           />
         </View>
 

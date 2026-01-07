@@ -65,7 +65,7 @@ describe('ForgotPasswordScreen', () => {
 
     it('should render email input field', () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
-      expect(getByLabelText('Email address input field')).toBeTruthy();
+      expect(getByLabelText('Email Address input field')).toBeTruthy();
     });
 
     it('should render submit button', () => {
@@ -82,7 +82,7 @@ describe('ForgotPasswordScreen', () => {
   describe('Form Interaction', () => {
     it('should allow typing in email input', () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
-      const emailInput = getByLabelText('Email address input field');
+      const emailInput = getByLabelText('Email Address input field');
 
       fireEvent.changeText(emailInput, 'test@example.com');
       expect(emailInput.props.value).toBe('test@example.com');
@@ -98,7 +98,7 @@ describe('ForgotPasswordScreen', () => {
   describe('Form Validation', () => {
     it('should not show alert when email is provided', () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
-      const emailInput = getByLabelText('Email address input field');
+      const emailInput = getByLabelText('Email Address input field');
       const submitButton = getByLabelText('Send password reset link');
 
       fireEvent.changeText(emailInput, 'test@example.com');
@@ -111,7 +111,7 @@ describe('ForgotPasswordScreen', () => {
   describe('Form Submission', () => {
     it('should call resetPassword mutation with email when form is submitted', async () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
-      const emailInput = getByLabelText('Email address input field');
+      const emailInput = getByLabelText('Email Address input field');
       const submitButton = getByLabelText('Send password reset link');
 
       fireEvent.changeText(emailInput, 'test@example.com');
@@ -136,7 +136,7 @@ describe('ForgotPasswordScreen', () => {
 
     it('should show success toast and navigate to login on success', async () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
-      const emailInput = getByLabelText('Email address input field');
+      const emailInput = getByLabelText('Email Address input field');
       const submitButton = getByLabelText('Send password reset link');
 
       fireEvent.changeText(emailInput, 'test@example.com');
@@ -175,7 +175,7 @@ describe('ForgotPasswordScreen', () => {
 
     it('should show error toast on error', async () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
-      const emailInput = getByLabelText('Email address input field');
+      const emailInput = getByLabelText('Email Address input field');
       const submitButton = getByLabelText('Send password reset link');
 
       fireEvent.changeText(emailInput, 'test@example.com');
@@ -204,7 +204,7 @@ describe('ForgotPasswordScreen', () => {
     it('should have correct accessibility labels', () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
 
-      expect(getByLabelText('Email address input field')).toBeTruthy();
+      expect(getByLabelText('Email Address input field')).toBeTruthy();
       expect(getByLabelText('Send password reset link')).toBeTruthy();
       expect(getByLabelText('Back to login')).toBeTruthy();
     });
@@ -212,9 +212,9 @@ describe('ForgotPasswordScreen', () => {
     it('should have correct accessibility hints', () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);
 
-      const emailInput = getByLabelText('Email address input field');
+      const emailInput = getByLabelText('Email Address input field');
       expect(emailInput.props.accessibilityHint).toBe(
-        'Enter the email address associated with your account',
+        'Enter your email address',
       );
 
       const submitButton = getByLabelText('Send password reset link');

@@ -103,6 +103,7 @@ exports[`ChangePasswordScreen Snapshot should match snapshot 1`] = `
                     </Text>
                   </View>
                   <TextInput
+                    accessibilityHint="Type your current password"
                     accessibilityLabel="Current Password input field"
                     accessibilityRole="text"
                     accessible={true}
@@ -272,7 +273,8 @@ exports[`ChangePasswordScreen Snapshot should match snapshot 1`] = `
                     </Text>
                   </View>
                   <TextInput
-                    accessibilityLabel="New Password input field"
+                    accessibilityHint="Type your password"
+                    accessibilityLabel="Password input field"
                     accessibilityRole="text"
                     accessible={true}
                     allowFontScaling={false}
@@ -441,6 +443,7 @@ exports[`ChangePasswordScreen Snapshot should match snapshot 1`] = `
                     </Text>
                   </View>
                   <TextInput
+                    accessibilityHint="Type your confirm password"
                     accessibilityLabel="Confirm Password input field"
                     accessibilityRole="text"
                     accessible={true}
