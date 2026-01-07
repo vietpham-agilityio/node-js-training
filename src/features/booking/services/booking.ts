@@ -1,12 +1,7 @@
 import { supabase } from '@/services/supabase/client';
 
 // Types
-import {
-  Booking,
-  BookingStatus,
-  PaymentStatus,
-  TicketStatus,
-} from '@/features/booking/types/booking';
+import { Booking, BookingStatus } from '@/features/booking/types/booking';
 import {
   SeatReservation,
   SeatReservationStatus,
@@ -25,6 +20,15 @@ export interface CreateBookingData {
   totalAmount: number;
   promoCodeId?: string;
   discountAmount?: number;
+  walletId: string;
+}
+
+interface BookingTransactionResult {
+  bookingId: string;
+  bookingNumber: string;
+  ticketIds: string[];
+  walletTransactionId: string;
+  newWalletBalance: number;
 }
 
 export class BookingsService {
@@ -140,109 +144,70 @@ export class BookingsService {
 
   async createBooking(data: CreateBookingData): Promise<Booking> {
     try {
-      // Generate booking number
-      const { data: bookingNumber } = await supabase.rpc(
-        'generate_booking_number',
+      const subtotal = data.totalAmount + (data.discountAmount || 0);
+
+      const { data: result, error } = await supabase.rpc(
+        'create_booking_with_payment',
+        {
+          p_user_id: data.userId,
+          p_wallet_id: data.walletId,
+          p_showtime_id: data.showtimeId,
+          p_seat_numbers: data.seats,
+          p_subtotal: subtotal,
+          p_total_amount: data.totalAmount,
+          p_discount_amount: data.discountAmount || 0,
+          p_promo_code_id: data.promoCodeId,
+        },
       );
 
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 24);
-
-      // Create booking
-      const { data: booking, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: data.userId,
-          showtime_id: data.showtimeId,
-          booking_number: bookingNumber || `BK${Date.now()}`,
-          total_seats: data.seats.length,
-          seat_numbers: data.seats,
-          subtotal: data.totalAmount + (data.discountAmount || 0),
-          discount_amount: data.discountAmount || 0,
-          total_amount: data.totalAmount,
-          promo_code_id: data.promoCodeId,
-          payment_status: PaymentStatus.PAID,
-          booking_status: BookingStatus.ACTIVE,
-          expires_at: expiresAt.toISOString(),
-        })
-        .select()
-        .single();
-
-      if (bookingError) {
-        throw bookingError;
+      if (error) {
+        if (error.message.includes('Insufficient wallet balance')) {
+          throw new Error('Insufficient wallet balance');
+        } else if (error.message.includes('Wallet not found')) {
+          throw new Error('Wallet not found or inactive');
+        } else {
+          throw new Error(error.message || 'Booking creation failed');
+        }
       }
 
-      // Create tickets for each seat
-      const ticketPromises = data.seats.map(async seat => {
-        // Generate ticket number
-        const { data: ticketNumber } = await supabase.rpc(
-          'generate_ticket_number',
-        );
-
-        const fallbackTicketNumber = `TKT-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
-
-        // Generate QR code data
-        const { data: qrData } = await supabase.rpc('generate_qr_code_data', {
-          p_booking_id: booking.id,
-          p_seat_number: seat,
-          p_ticket_id: `temp-${Date.now()}`,
-        });
-
-        const fallbackQrData = JSON.stringify({
-          booking_id: booking.id,
-          seat,
-          timestamp: Date.now(),
-        });
-
-        return supabase.from('tickets').insert({
-          booking_id: booking.id,
-          seat_number: seat,
-          ticket_number: ticketNumber || fallbackTicketNumber,
-          qr_code_data: qrData || fallbackQrData,
-          price: data.totalAmount / data.seats.length,
-          status: TicketStatus.ACTIVE,
-        });
-      });
-
-      await Promise.all(ticketPromises);
-
-      // Update available seats using database function
-      try {
-        await supabase.rpc('decrement_available_seats', {
-          showtime_id: data.showtimeId,
-          seats_count: data.seats.length,
-        });
-      } catch {
-        // Continue - booking is created, seats can be updated manually
+      if (!result || result.length === 0) {
+        throw new Error('No result returned from booking transaction');
       }
+
+      const txResult = keysToCamel(result[0]) as BookingTransactionResult;
 
       // Fetch complete booking with all relations
-      return await this.getBookingById(booking.id);
+      return await this.getBookingById(txResult.bookingId);
     } catch (error) {
       throw error;
     }
   }
 
+  /**
+   * Cancel booking with refund using atomic transaction
+   */
   async cancelBooking(bookingId: string): Promise<void> {
     try {
-      // Update booking status
-      const { error: bookingError } = await supabase
-        .from('bookings')
-        .update({
-          booking_status: BookingStatus.CANCELLED,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', bookingId);
+      // Get booking to determine refund amount
+      const booking = await this.getBookingById(bookingId);
 
-      if (bookingError) {
-        throw bookingError;
+      if (!booking) {
+        throw new Error('Booking not found');
       }
 
-      // Update all tickets for this booking
-      await supabase
-        .from('tickets')
-        .update({ status: TicketStatus.CANCELLED })
-        .eq('booking_id', bookingId);
+      if (booking.bookingStatus === BookingStatus.CANCELLED) {
+        throw new Error('Booking already cancelled');
+      }
+
+      // Call stored procedure for atomic cancel + refund
+      const { error } = await supabase.rpc('cancel_booking_with_refund', {
+        p_booking_id: bookingId,
+        p_refund_amount: booking.totalAmount,
+      });
+
+      if (error) {
+        throw error;
+      }
     } catch (error) {
       throw error;
     }

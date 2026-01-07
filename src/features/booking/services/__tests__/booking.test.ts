@@ -1,9 +1,4 @@
-import {
-  Booking,
-  BookingStatus,
-  PaymentStatus,
-  TicketStatus,
-} from '@/features/booking/types/booking';
+import { Booking, BookingStatus } from '@/features/booking/types/booking';
 import { SeatReservationStatus } from '@/features/booking/types/cinema';
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
@@ -180,66 +175,51 @@ describe('BookingsService', () => {
       showtimeId: 'show1',
       seats: ['A1', 'A2'],
       totalAmount: 200,
+      walletId: 'wallet1',
     };
 
-    it('should create a booking with tickets successfully', async () => {
+    it('should create a booking with payment successfully', async () => {
+      const mockRpcResult = [
+        {
+          booking_id: 'booking1',
+          booking_number: 'BK123',
+          ticket_ids: ['ticket1', 'ticket2'],
+          wallet_transaction_id: 'tx1',
+          new_wallet_balance: 800,
+        },
+      ];
+
       const mockBooking = {
         id: 'booking1',
         booking_number: 'BK123',
         total_amount: 200,
-      };
+        showtime: {
+          id: 'show1',
+          movie: { title: 'Test Movie' },
+        },
+      } as unknown as Booking;
 
-      // Mock RPC calls
-      rpc
-        .mockResolvedValueOnce({ data: 'BK123', error: null }) // generate_booking_number
-        .mockResolvedValueOnce({ data: 'TKT001', error: null }) // generate_ticket_number (seat 1)
-        .mockResolvedValueOnce({ data: 'qr-data-1', error: null }) // generate_qr_code_data (seat 1)
-        .mockResolvedValueOnce({ data: 'TKT002', error: null }) // generate_ticket_number (seat 2)
-        .mockResolvedValueOnce({ data: 'qr-data-2', error: null }) // generate_qr_code_data (seat 2)
-        .mockResolvedValueOnce({ data: null, error: null }); // decrement_available_seats
-
-      // Mock booking insertion
-      (mockQueryBuilder.single as jest.Mock).mockResolvedValueOnce({
-        data: mockBooking,
-        error: null,
-      });
-
-      // Mock ticket insertions (returns promise-like objects)
-      (mockQueryBuilder.then as jest.Mock)
-        .mockImplementationOnce(resolve =>
-          resolve({ data: { id: 'ticket1' }, error: null }),
-        )
-        .mockImplementationOnce(resolve =>
-          resolve({ data: { id: 'ticket2' }, error: null }),
-        );
+      // Mock RPC call
+      rpc.mockResolvedValueOnce({ data: mockRpcResult, error: null });
 
       // Mock getBookingById
-      const getBookingByIdSpy = jest
-        .spyOn(service, 'getBookingById')
-        .mockResolvedValue(keysToCamel(mockBooking));
+      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
 
       const result = await service.createBooking(createData);
 
-      expect(rpc).toHaveBeenCalledWith('generate_booking_number');
-      expect(from).toHaveBeenCalledWith('bookings');
-      expect(mockQueryBuilder.insert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          user_id: createData.userId,
-          showtime_id: createData.showtimeId,
-          total_seats: createData.seats.length,
-          seat_numbers: createData.seats,
-          total_amount: createData.totalAmount,
-          payment_status: PaymentStatus.PAID,
-          booking_status: BookingStatus.ACTIVE,
-        }),
-      );
-      expect(from).toHaveBeenCalledWith('tickets');
-      expect(rpc).toHaveBeenCalledWith('decrement_available_seats', {
-        showtime_id: createData.showtimeId,
-        seats_count: createData.seats.length,
+      expect(rpc).toHaveBeenCalledWith('create_booking_with_payment', {
+        p_user_id: 'user1',
+        p_wallet_id: 'wallet1',
+        p_showtime_id: 'show1',
+        p_seat_numbers: ['A1', 'A2'],
+        p_subtotal: 200,
+        p_total_amount: 200,
+        p_discount_amount: 0,
+        p_promo_code_id: undefined,
       });
-      expect(getBookingByIdSpy).toHaveBeenCalledWith(mockBooking.id);
-      expect(result).toEqual(keysToCamel(mockBooking));
+
+      expect(service.getBookingById).toHaveBeenCalledWith('booking1');
+      expect(result).toEqual(mockBooking);
     });
 
     it('should apply discount when promo code is provided', async () => {
@@ -249,123 +229,142 @@ describe('BookingsService', () => {
         discountAmount: 20,
       };
 
+      const mockRpcResult = [
+        {
+          booking_id: 'booking1',
+          booking_number: 'BK123',
+          ticket_ids: ['ticket1'],
+          wallet_transaction_id: 'tx1',
+          new_wallet_balance: 800,
+        },
+      ];
+
       const mockBooking = {
         id: 'booking1',
         booking_number: 'BK123',
       } as unknown as Booking;
 
-      rpc.mockResolvedValue({ data: 'BK123', error: null });
-      (mockQueryBuilder.single as jest.Mock).mockResolvedValueOnce({
-        data: mockBooking,
-        error: null,
-      });
-      (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
-        resolve({ data: {}, error: null }),
-      );
+      rpc.mockResolvedValueOnce({ data: mockRpcResult, error: null });
       jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
 
       await service.createBooking(dataWithPromo);
 
-      expect(mockQueryBuilder.insert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          subtotal: 220, // totalAmount + discountAmount
-          discount_amount: 20,
-          total_amount: 200,
-          promo_code_id: 'promo123',
-        }),
+      expect(rpc).toHaveBeenCalledWith('create_booking_with_payment', {
+        p_user_id: 'user1',
+        p_wallet_id: 'wallet1',
+        p_showtime_id: 'show1',
+        p_seat_numbers: ['A1', 'A2'],
+        p_subtotal: 220, // totalAmount + discountAmount
+        p_total_amount: 200,
+        p_discount_amount: 20,
+        p_promo_code_id: 'promo123',
+      });
+    });
+
+    it('should throw an error with custom message for insufficient balance', async () => {
+      const error = { message: 'Insufficient wallet balance for booking' };
+
+      rpc.mockResolvedValueOnce({ data: null, error });
+
+      await expect(service.createBooking(createData)).rejects.toThrow(
+        'Insufficient wallet balance',
       );
     });
 
-    it('should throw an error if booking insertion fails', async () => {
-      const error = new Error('Insert failed');
+    it('should throw an error with custom message for wallet not found', async () => {
+      const error = { message: 'Wallet not found or inactive' };
 
-      rpc.mockResolvedValueOnce({ data: 'BK123', error: null });
-      (mockQueryBuilder.single as jest.Mock).mockResolvedValue({
-        data: null,
-        error,
-      });
+      rpc.mockResolvedValueOnce({ data: null, error });
 
-      await expect(service.createBooking(createData)).rejects.toThrow(error);
+      await expect(service.createBooking(createData)).rejects.toThrow(
+        'Wallet not found or inactive',
+      );
     });
 
-    it('should use fallback values when RPC calls fail', async () => {
-      const mockBooking = {
-        id: 'booking1',
-        booking_number: 'BK123',
-      } as unknown as Booking;
+    it('should throw generic error for other RPC failures', async () => {
+      const error = { message: 'Some database error' };
 
-      // Mock RPC failures
-      rpc
-        .mockResolvedValueOnce({ data: null, error: new Error('RPC failed') }) // generate_booking_number fails
-        .mockResolvedValue({ data: null, error: new Error('RPC failed') }); // All other RPCs fail
+      rpc.mockResolvedValueOnce({ data: null, error });
 
-      (mockQueryBuilder.single as jest.Mock).mockResolvedValueOnce({
-        data: mockBooking,
-        error: null,
-      });
-      (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
-        resolve({ data: {}, error: null }),
+      await expect(service.createBooking(createData)).rejects.toThrow(
+        'Some database error',
       );
-      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+    });
 
-      const result = await service.createBooking(createData);
+    it('should throw an error if no result returned', async () => {
+      rpc.mockResolvedValueOnce({ data: [], error: null });
 
-      // Should still succeed with fallback values
-      expect(result).toEqual(mockBooking);
-      expect(mockQueryBuilder.insert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          booking_number: expect.stringMatching(/^BK\d+$/),
-        }),
+      await expect(service.createBooking(createData)).rejects.toThrow(
+        'No result returned from booking transaction',
+      );
+    });
+
+    it('should throw an error if result is null', async () => {
+      rpc.mockResolvedValueOnce({ data: null, error: null });
+
+      await expect(service.createBooking(createData)).rejects.toThrow(
+        'No result returned from booking transaction',
       );
     });
   });
 
   describe('cancelBooking', () => {
-    it('should cancel a booking and its tickets', async () => {
-      (mockQueryBuilder.then as jest.Mock)
-        .mockImplementationOnce(resolve => resolve({ data: [], error: null })) // bookings update
-        .mockImplementationOnce(resolve => resolve({ data: [], error: null })); // tickets update
+    it('should cancel a booking with refund successfully', async () => {
+      const mockBooking = {
+        id: 'booking1',
+        bookingStatus: BookingStatus.ACTIVE,
+        totalAmount: 200,
+      } as Booking;
+
+      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+      rpc.mockResolvedValueOnce({ data: null, error: null });
 
       await service.cancelBooking('booking1');
 
-      expect(from).toHaveBeenCalledWith('bookings');
-      expect(mockQueryBuilder.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          booking_status: BookingStatus.CANCELLED,
-        }),
-      );
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith('id', 'booking1');
-
-      expect(from).toHaveBeenCalledWith('tickets');
-      expect(mockQueryBuilder.update).toHaveBeenCalledWith({
-        status: TicketStatus.CANCELLED,
+      expect(service.getBookingById).toHaveBeenCalledWith('booking1');
+      expect(rpc).toHaveBeenCalledWith('cancel_booking_with_refund', {
+        p_booking_id: 'booking1',
+        p_refund_amount: 200,
       });
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
-        'booking_id',
-        'booking1',
-      );
     });
 
-    it('should throw an error if booking cancellation fails', async () => {
-      const error = new Error('Cancel failed');
-
-      (mockQueryBuilder.then as jest.Mock).mockImplementationOnce(
-        (_resolve, reject) => reject(error),
-      );
-
-      await expect(service.cancelBooking('booking1')).rejects.toThrow(error);
-    });
-
-    it('should throw if ticket cancellation fails', async () => {
-      const ticketError = new Error('Ticket cancel failed');
-
-      (mockQueryBuilder.then as jest.Mock)
-        .mockImplementationOnce(resolve => resolve({ data: [], error: null })) // booking succeeds
-        .mockImplementationOnce((_resolve, reject) => reject(ticketError)); // tickets fails
+    it('should throw an error if booking not found', async () => {
+      jest
+        .spyOn(service, 'getBookingById')
+        .mockRejectedValue(new Error('Booking not found'));
 
       await expect(service.cancelBooking('booking1')).rejects.toThrow(
-        ticketError,
+        'Booking not found',
       );
+    });
+
+    it('should throw an error if booking already cancelled', async () => {
+      const mockBooking = {
+        id: 'booking1',
+        bookingStatus: BookingStatus.CANCELLED,
+        totalAmount: 200,
+      } as Booking;
+
+      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+
+      await expect(service.cancelBooking('booking1')).rejects.toThrow(
+        'Booking already cancelled',
+      );
+    });
+
+    it('should throw an error if RPC call fails', async () => {
+      const mockBooking = {
+        id: 'booking1',
+        bookingStatus: BookingStatus.ACTIVE,
+        totalAmount: 200,
+      } as Booking;
+
+      const error = new Error('Refund failed');
+
+      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+      rpc.mockResolvedValueOnce({ data: null, error });
+
+      await expect(service.cancelBooking('booking1')).rejects.toThrow(error);
     });
   });
 

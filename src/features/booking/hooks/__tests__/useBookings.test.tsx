@@ -411,6 +411,7 @@ describe('useCreateBooking', () => {
       showtimeId: 'showtime1',
       seats: ['A1', 'A2'],
       totalAmount: 50,
+      walletId: 'wallet1',
     };
 
     act(() => {
@@ -422,12 +423,6 @@ describe('useCreateBooking', () => {
     });
 
     expect(mockCreateBooking).toHaveBeenCalledWith(bookingData);
-    expect(mockProcessPurchase).toHaveBeenCalledWith(
-      'wallet1',
-      50,
-      'booking1',
-      'Ticket purchase - Booking #BK001',
-    );
     expect(mockResetBooking).toHaveBeenCalled();
   });
 
@@ -493,7 +488,7 @@ describe('useCreateBooking', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(result.current.error?.message).toBe('Insufficient wallet balance');
+    expect(result.current.error?.message).toBe('Wallet not found');
   });
 
   it('should handle bookings list being null in optimistic update', async () => {

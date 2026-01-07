@@ -99,22 +99,18 @@ export const useCreateBooking = () => {
   const resetBooking = useBookingStore(state => state.reset);
 
   return useMutation({
-    mutationFn: async (data: CreateBookingData) => {
+    mutationFn: async (data: Omit<CreateBookingData, 'walletId'>) => {
+      if (!wallet) throw new Error('Wallet not found');
       // Prevent booking if wallet balance is insufficient
-      if (!wallet || wallet.balance < data.totalAmount) {
+      if (wallet.balance < data.totalAmount) {
         throw new Error('Insufficient wallet balance');
       }
 
       // Create booking
-      const booking = await bookingsService.createBooking(data);
-
-      // Deduct wallet balance
-      await walletService.processPurchase(
-        wallet.id,
-        data.totalAmount,
-        booking.id,
-        `Ticket purchase - Booking #${booking.bookingNumber}`,
-      );
+      const booking = await bookingsService.createBooking({
+        ...data,
+        walletId: wallet.id,
+      });
 
       return booking;
     },
