@@ -49,15 +49,20 @@ export const usePushNotifications = () => {
         const token =
           await pushNotificationService.registerForPushNotifications();
 
+        // iOS Simulator: token will be null
+        // This is EXPECTED and OK!
         if (token) {
           setExpoPushToken(token);
 
-          // Save token to Supabase
+          // Save token to Supabase (only if we have a token)
           const platform = Platform.OS as 'ios' | 'android';
           await pushTokenService.savePushToken(user.id, token, platform);
+        } else {
+          // This is normal on iOS simulator
+          setExpoPushToken(null);
         }
-      } catch (error) {
-        throw error;
+      } catch {
+        // Don't throw - app should continue to work
       }
     };
 
