@@ -15,10 +15,12 @@ interface UseMoviesOptions {
   enabled?: boolean;
 }
 
-interface UseMoviesByGenreOptions {
+interface UseMoviesByGenreOptions extends UseMoviesOptions {
   genre: GenreMovie;
-  status?: MovieStatus;
-  enabled?: boolean;
+}
+
+interface UseSearchMoviesInfiniteOptions extends UseMoviesOptions {
+  searchQuery?: string;
 }
 
 export const useMovies = (options: UseMoviesOptions = {}) => {
@@ -63,13 +65,53 @@ export const useMovie = (id: string) => {
   });
 };
 
-export const useSearchMovies = (query: string) => {
-  return useQuery({
-    queryKey: queryKeys.movies.search(query),
-    queryFn: () => moviesService.searchMovies(query),
-    enabled: query.length > 0,
-    staleTime: API_CONFIG.MOVIE_STALE_TIME,
+export const useSearchMoviesInfinite = (
+  options: UseSearchMoviesInfiniteOptions = {},
+) => {
+  const { searchQuery, status, enabled = true } = options;
+
+  const isSearching = Boolean(searchQuery && searchQuery.trim().length > 0);
+
+  const infiniteQuery = useInfiniteQuery({
+    queryKey: isSearching
+      ? queryKeys.movies.searchInfinite(searchQuery!)
+      : queryKeys.movies.infinite({ status }),
+
+    queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) => {
+      if (isSearching) {
+        // Search with pagination
+        return moviesService.searchMoviesPaginated(
+          searchQuery!,
+          pageParam,
+          PAGINATION.PAGE_LIMIT,
+        );
+      }
+
+      // Regular browse with pagination
+      return moviesService.getMoviesPaginated(
+        status,
+        pageParam,
+        PAGINATION.PAGE_LIMIT,
+      );
+    },
+
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < PAGINATION.PAGE_LIMIT) return undefined;
+      return allPages.length;
+    },
+
+    initialPageParam: PAGINATION.PAGE_OFFSET,
+    enabled,
+    staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
+
+  // Transform the data to a flat array
+  const movies = infiniteQuery.data?.pages.flat() ?? [];
+
+  return {
+    ...infiniteQuery,
+    movies,
+  };
 };
 
 export const useMoviesByGenre = (genre: GenreMovie) => {

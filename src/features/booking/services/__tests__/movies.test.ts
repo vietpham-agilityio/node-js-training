@@ -86,18 +86,6 @@ describe('MoviesService', () => {
     });
   });
 
-  describe('searchMovies', () => {
-    it('should search for movies by title', async () => {
-      const mockData = [{ title: 'Search Result' }];
-      (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
-        resolve({ data: mockData, error: null }),
-      );
-      const movies = await service.searchMovies('Result');
-      expect(mockQueryBuilder.ilike).toHaveBeenCalledWith('title', '%Result%');
-      expect(movies).toEqual(keysToCamel(mockData));
-    });
-  });
-
   describe('getMoviesByGenre', () => {
     it('should fetch movies by genre', async () => {
       const mockData = [{ genre: ['Action'] }];

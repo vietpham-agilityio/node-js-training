@@ -50,12 +50,19 @@ export class MoviesService {
     return keysToCamel(data) as Movie;
   }
 
-  async searchMovies(query: string): Promise<Movie[]> {
+  async searchMoviesPaginated(
+    query: string,
+    page = PAGINATION.PAGE_OFFSET,
+    limit = PAGINATION.PAGE_LIMIT,
+  ): Promise<Movie[]> {
     const { data, error } = await supabase
       .from('movies')
       .select('*')
       .ilike('title', `%${query}%`)
-      .in('status', [MovieStatus.NOW_PLAYING, MovieStatus.COMING_SOON]);
+      .in('status', [MovieStatus.NOW_PLAYING, MovieStatus.COMING_SOON])
+      .order('release_date', { ascending: false })
+      .range(page * limit, (page + 1) * limit - 1);
+
     if (error) throw error;
     return keysToCamel(data) as Movie[];
   }

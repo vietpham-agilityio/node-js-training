@@ -6,40 +6,29 @@ import SearchScreen from '../index';
 
 // Mock dependencies
 const mockPush = jest.fn();
-const mockFetchNextAllMovies = jest.fn();
-const mockRefetchAllMovies = jest.fn();
-const mockRefetchSearch = jest.fn();
+const mockFetchNextPage = jest.fn();
+const mockRefetch = jest.fn();
 
-let mockAllMoviesData: any = {
-  pages: [
-    [
-      {
-        id: '1',
-        title: 'Movie 1',
-        rating: 4.5,
-        posterUrl: 'https://example.com/1.jpg',
-      },
-      {
-        id: '2',
-        title: 'Movie 2',
-        rating: 3.8,
-        posterUrl: 'https://example.com/2.jpg',
-      },
-    ],
-  ],
-};
-let mockSearchResults: any[] = [];
-let mockIsLoadingAllMovies = false;
-let mockIsFetchingNextAllMovies = false;
-let mockHasNextAllMovies = false;
-let mockIsRefetchingAllMovies = false;
-let mockIsAllMoviesError = false;
-let mockAllMoviesError: Error | null = null;
-
-let mockIsSearching = false;
-let mockIsSearchFetching = false;
-let mockIsSearchError = false;
-let mockSearchError: Error | null = null;
+let mockMovies: any[] = [
+  {
+    id: '1',
+    title: 'Movie 1',
+    rating: 4.5,
+    posterUrl: 'https://example.com/1.jpg',
+  },
+  {
+    id: '2',
+    title: 'Movie 2',
+    rating: 3.8,
+    posterUrl: 'https://example.com/2.jpg',
+  },
+];
+let mockIsLoading = false;
+let mockIsFetchingNextPage = false;
+let mockHasNextPage = false;
+let mockIsRefetching = false;
+let mockIsError = false;
+let mockError: Error | null = null;
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({
@@ -48,24 +37,16 @@ jest.mock('expo-router', () => ({
 }));
 
 jest.mock('@/features/booking/hooks/useMovies', () => ({
-  useMoviesInfinite: () => ({
-    data: mockAllMoviesData,
-    isLoading: mockIsLoadingAllMovies,
-    isFetchingNextPage: mockIsFetchingNextAllMovies,
-    hasNextPage: mockHasNextAllMovies,
-    fetchNextPage: mockFetchNextAllMovies,
-    refetch: mockRefetchAllMovies,
-    isRefetching: mockIsRefetchingAllMovies,
-    isError: mockIsAllMoviesError,
-    error: mockAllMoviesError,
-  }),
-  useSearchMovies: () => ({
-    data: mockSearchResults,
-    isLoading: mockIsSearching,
-    isFetching: mockIsSearchFetching,
-    isError: mockIsSearchError,
-    error: mockSearchError,
-    refetch: mockRefetchSearch,
+  useSearchMoviesInfinite: () => ({
+    movies: mockMovies,
+    isLoading: mockIsLoading,
+    isFetchingNextPage: mockIsFetchingNextPage,
+    hasNextPage: mockHasNextPage,
+    fetchNextPage: mockFetchNextPage,
+    refetch: mockRefetch,
+    isRefetching: mockIsRefetching,
+    isError: mockIsError,
+    error: mockError,
   }),
 }));
 
@@ -96,35 +77,26 @@ describe('SearchScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockDebouncedValue = '';
-    mockAllMoviesData = {
-      pages: [
-        [
-          {
-            id: '1',
-            title: 'Movie 1',
-            rating: 4.5,
-            posterUrl: 'https://example.com/1.jpg',
-          },
-          {
-            id: '2',
-            title: 'Movie 2',
-            rating: 3.8,
-            posterUrl: 'https://example.com/2.jpg',
-          },
-        ],
-      ],
-    };
-    mockSearchResults = [];
-    mockIsLoadingAllMovies = false;
-    mockIsFetchingNextAllMovies = false;
-    mockHasNextAllMovies = false;
-    mockIsRefetchingAllMovies = false;
-    mockIsAllMoviesError = false;
-    mockAllMoviesError = null;
-    mockIsSearching = false;
-    mockIsSearchFetching = false;
-    mockIsSearchError = false;
-    mockSearchError = null;
+    mockMovies = [
+      {
+        id: '1',
+        title: 'Movie 1',
+        rating: 4.5,
+        posterUrl: 'https://example.com/1.jpg',
+      },
+      {
+        id: '2',
+        title: 'Movie 2',
+        rating: 3.8,
+        posterUrl: 'https://example.com/2.jpg',
+      },
+    ];
+    mockIsLoading = false;
+    mockIsFetchingNextPage = false;
+    mockHasNextPage = false;
+    mockIsRefetching = false;
+    mockIsError = false;
+    mockError = null;
   });
 
   describe('Rendering', () => {
@@ -200,18 +172,9 @@ describe('SearchScreen', () => {
       // Search should be cleared
       expect(searchInput.props.value).toBe('');
     });
-  });
-
-  describe('Movie Display', () => {
-    it('should display all movies when no search query', () => {
-      const { getAllByTestId } = render(<SearchScreen />, {
-        wrapper: createWrapper(),
-      });
-      expect(getAllByTestId('horizontal-card').length).toBe(2);
-    });
 
     it('should display search results when search query is active', () => {
-      mockSearchResults = [
+      mockMovies = [
         {
           id: '3',
           title: 'Search Movie 1',
@@ -232,6 +195,15 @@ describe('SearchScreen', () => {
       });
 
       // Should show search results
+      expect(getAllByTestId('horizontal-card').length).toBe(2);
+    });
+  });
+
+  describe('Movie Display', () => {
+    it('should display all movies when no search query', () => {
+      const { getAllByTestId } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
       expect(getAllByTestId('horizontal-card').length).toBe(2);
     });
 
@@ -271,6 +243,35 @@ describe('SearchScreen', () => {
       // All movies should be shown
       expect(getAllByTestId('horizontal-card').length).toBe(2);
     });
+
+    it('should apply rating filter to search results', () => {
+      mockMovies = [
+        {
+          id: '3',
+          title: 'Search Movie 1',
+          rating: 4.5,
+          posterUrl: 'https://example.com/3.jpg',
+        },
+        {
+          id: '4',
+          title: 'Search Movie 2',
+          rating: 3.0,
+          posterUrl: 'https://example.com/4.jpg',
+        },
+      ];
+      mockDebouncedValue = 'test';
+
+      const { getByTestId, getAllByTestId } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      // Select 4+ rating filter
+      const highRatingTab = getByTestId('tab-4+');
+      fireEvent.press(highRatingTab);
+
+      // Only high-rated search result should show
+      expect(getAllByTestId('horizontal-card').length).toBe(1);
+    });
   });
 
   describe('Results Count', () => {
@@ -278,11 +279,11 @@ describe('SearchScreen', () => {
       const { getByText } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
-      expect(getByText(/Showing 2 movie/)).toBeTruthy();
+      expect(getByText(/Showing 2 movies/)).toBeTruthy();
     });
 
     it('should display search results count when searching', () => {
-      mockSearchResults = [
+      mockMovies = [
         {
           id: '3',
           title: 'Search Movie 1',
@@ -310,12 +311,28 @@ describe('SearchScreen', () => {
 
       expect(getByText(/with 4\+/)).toBeTruthy();
     });
+
+    it('should handle plural/singular in results count', () => {
+      mockMovies = [
+        {
+          id: '1',
+          title: 'Movie 1',
+          rating: 4.5,
+          posterUrl: 'https://example.com/1.jpg',
+        },
+      ];
+      const { getByText } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      expect(getByText(/Showing 1 movie$/)).toBeTruthy();
+    });
   });
 
   describe('Loading States', () => {
-    it('should show loading indicator when loading all movies', () => {
-      mockIsLoadingAllMovies = true;
-      mockAllMoviesData = { pages: [] };
+    it('should show loading indicator when loading movies', () => {
+      mockIsLoading = true;
+      mockMovies = [];
       const { getByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
@@ -324,84 +341,219 @@ describe('SearchScreen', () => {
     });
 
     it('should show loading indicator when searching', () => {
-      mockIsSearching = true;
+      mockIsLoading = true;
       mockDebouncedValue = 'test';
-      mockSearchResults = [];
-      const { getByTestId } = render(<SearchScreen />, {
+      mockMovies = [];
+      const { getByTestId, getByText } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
 
       expect(getByTestId('empty-loading')).toBeTruthy();
+      expect(getByText('Searching movies...')).toBeTruthy();
     });
 
     it('should show footer loading when fetching next page', () => {
-      mockIsFetchingNextAllMovies = true;
-      mockHasNextAllMovies = true;
-      mockDebouncedValue = '';
+      mockIsFetchingNextPage = true;
+      mockHasNextPage = true;
       const { getByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
 
       expect(getByTestId('footer-loading')).toBeTruthy();
     });
-  });
 
-  describe('Empty States', () => {
-    it('should show search placeholder when no search query', () => {
-      mockAllMoviesData = { pages: [] };
-      const { getByPlaceholderText } = render(<SearchScreen />, {
+    it('should not show footer loading when not fetching', () => {
+      mockIsFetchingNextPage = false;
+      const { queryByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
 
-      expect(getByPlaceholderText('Search movies...')).toBeTruthy();
+      expect(queryByTestId('footer-loading')).toBeNull();
     });
+  });
 
-    it('should show "No movies found" when search returns no results', () => {
-      mockSearchResults = [];
-      mockDebouncedValue = 'test';
+  describe('Infinite Scroll', () => {
+    it('should call fetchNextPage when scrolling to end with hasNextPage', () => {
+      mockHasNextPage = true;
+      mockIsFetchingNextPage = false;
+
       const { getByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
 
-      expect(getByTestId('empty-no-results')).toBeTruthy();
+      const flashList = getByTestId('search-input').parent?.parent;
+
+      // Simulate end reached
+      fireEvent(flashList!, 'onEndReached');
+
+      expect(mockFetchNextPage).toHaveBeenCalled();
+    });
+
+    it('should not call fetchNextPage when already fetching', () => {
+      mockHasNextPage = true;
+      mockIsFetchingNextPage = true;
+
+      const { getByTestId } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      const flashList = getByTestId('search-input').parent?.parent;
+
+      // Simulate end reached
+      fireEvent(flashList!, 'onEndReached');
+
+      expect(mockFetchNextPage).not.toHaveBeenCalled();
+    });
+
+    it('should support infinite scroll for search results', () => {
+      mockMovies = [
+        {
+          id: '1',
+          title: 'Search Movie 1',
+          rating: 4.0,
+          posterUrl: 'https://example.com/1.jpg',
+        },
+      ];
+      mockDebouncedValue = 'test';
+      mockHasNextPage = true;
+      mockIsFetchingNextPage = false;
+
+      const { getByTestId } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      const flashList = getByTestId('search-input').parent?.parent;
+      fireEvent(flashList!, 'onEndReached');
+
+      expect(mockFetchNextPage).toHaveBeenCalled();
+    });
+  });
+
+  describe('Pull to Refresh', () => {
+    it('should support pull to refresh for browse mode', () => {
+      const { UNSAFE_getByType } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      // Find RefreshControl and trigger refresh
+      const refreshControl = UNSAFE_getByType(
+        require('react-native').RefreshControl,
+      );
+      refreshControl.props.onRefresh();
+
+      expect(mockRefetch).toHaveBeenCalled();
+    });
+
+    it('should support pull to refresh for search mode', () => {
+      mockDebouncedValue = 'test';
+      const { UNSAFE_getByType } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      const refreshControl = UNSAFE_getByType(
+        require('react-native').RefreshControl,
+      );
+      refreshControl.props.onRefresh();
+
+      expect(mockRefetch).toHaveBeenCalled();
+    });
+
+    it('should show refreshing state', () => {
+      mockIsRefetching = true;
+      const { UNSAFE_getByType } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      const refreshControl = UNSAFE_getByType(
+        require('react-native').RefreshControl,
+      );
+      expect(refreshControl.props.refreshing).toBe(true);
+    });
+  });
+
+  describe('Error States', () => {
+    it('should show error when loading fails', () => {
+      mockIsError = true;
+      mockError = new Error('Network error');
+      mockMovies = [];
+      const { getByTestId } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      expect(getByTestId('empty-error')).toBeTruthy();
+    });
+
+    it('should show retry button on error', () => {
+      mockIsError = true;
+      mockError = new Error('Network error');
+      mockMovies = [];
+      const { getByText } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      const retryButton = getByText('Retry');
+      expect(retryButton).toBeTruthy();
+
+      fireEvent.press(retryButton);
+      expect(mockRefetch).toHaveBeenCalled();
+    });
+
+    it('should show different error message for search', () => {
+      mockIsError = true;
+      mockDebouncedValue = 'test';
+      mockMovies = [];
+      const { getByText } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      expect(
+        getByText('No results found. Please try a different search.'),
+      ).toBeTruthy();
+    });
+  });
+
+  describe('Empty States', () => {
+    it('should show "No movies found" when no results', () => {
+      mockMovies = [];
+      const { getByText } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      expect(getByText(/No movies found/)).toBeTruthy();
+    });
+
+    it('should show search-specific empty message', () => {
+      mockMovies = [];
+      mockDebouncedValue = 'test query';
+      const { getByText } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      expect(
+        getByText(/Try searching with different keywords for "test query"/),
+      ).toBeTruthy();
     });
 
     it('should not show empty states when there are movies', () => {
-      mockAllMoviesData = {
-        pages: [
-          [
-            {
-              id: '1',
-              title: 'Movie 1',
-              rating: 4.5,
-              posterUrl: 'https://example.com/1.jpg',
-            },
-          ],
-        ],
-      };
-      mockDebouncedValue = '';
       const { queryByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
 
       expect(queryByTestId('empty-loading')).toBeNull();
       expect(queryByTestId('empty-no-results')).toBeNull();
+      expect(queryByTestId('empty-error')).toBeNull();
     });
   });
 
   describe('Edge Cases', () => {
     it('should handle movies without rating', () => {
-      mockAllMoviesData = {
-        pages: [
-          [
-            {
-              id: '1',
-              title: 'Movie 1',
-              posterUrl: 'https://example.com/1.jpg',
-            },
-          ],
-        ],
-      };
+      mockMovies = [
+        {
+          id: '1',
+          title: 'Movie 1',
+          posterUrl: 'https://example.com/1.jpg',
+        },
+      ];
       const { getAllByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
@@ -410,7 +562,7 @@ describe('SearchScreen', () => {
     });
 
     it('should handle empty pages array', () => {
-      mockAllMoviesData = { pages: [] };
+      mockMovies = [];
       const { getByPlaceholderText } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
@@ -418,24 +570,40 @@ describe('SearchScreen', () => {
       expect(getByPlaceholderText('Search movies...')).toBeTruthy();
     });
 
-    it('should handle plural/singular in results count', () => {
-      mockAllMoviesData = {
-        pages: [
-          [
-            {
-              id: '1',
-              title: 'Movie 1',
-              rating: 4.5,
-              posterUrl: 'https://example.com/1.jpg',
-            },
-          ],
-        ],
-      };
-      const { getByText } = render(<SearchScreen />, {
+    it('should handle multiple movies', () => {
+      mockMovies = [
+        {
+          id: '1',
+          title: 'Movie 1',
+          rating: 4.5,
+          posterUrl: 'https://example.com/1.jpg',
+        },
+        {
+          id: '2',
+          title: 'Movie 2',
+          rating: 3.8,
+          posterUrl: 'https://example.com/2.jpg',
+        },
+        {
+          id: '3',
+          title: 'Movie 3',
+          rating: 4.2,
+          posterUrl: 'https://example.com/3.jpg',
+        },
+        {
+          id: '4',
+          title: 'Movie 4',
+          rating: 3.5,
+          posterUrl: 'https://example.com/4.jpg',
+        },
+      ];
+
+      const { getAllByTestId } = render(<SearchScreen />, {
         wrapper: createWrapper(),
       });
 
-      expect(getByText(/Showing 1 movie$/)).toBeTruthy();
+      // Should display all movies (hook now handles flattening internally)
+      expect(getAllByTestId('horizontal-card').length).toBe(4);
     });
   });
 
@@ -446,6 +614,17 @@ describe('SearchScreen', () => {
       });
 
       expect(getByLabelText('Search movies input')).toBeTruthy();
+    });
+
+    it('should have correct accessibility label on clear button', () => {
+      const { getByTestId, getByLabelText } = render(<SearchScreen />, {
+        wrapper: createWrapper(),
+      });
+
+      const searchInput = getByTestId('search-input-input');
+      fireEvent.changeText(searchInput, 'test');
+
+      expect(getByLabelText('Clear search')).toBeTruthy();
     });
   });
 });
