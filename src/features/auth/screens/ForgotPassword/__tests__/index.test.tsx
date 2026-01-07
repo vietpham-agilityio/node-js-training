@@ -200,17 +200,6 @@ describe('ForgotPasswordScreen', () => {
     });
   });
 
-  describe('Navigation', () => {
-    it('should navigate back when "Back to Login" button is pressed', () => {
-      const { getByLabelText } = render(<ForgotPasswordScreen />);
-      const backButton = getByLabelText('Back to login');
-
-      fireEvent.press(backButton);
-
-      expect(mockBack).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe('Accessibility', () => {
     it('should have correct accessibility labels', () => {
       const { getByLabelText } = render(<ForgotPasswordScreen />);

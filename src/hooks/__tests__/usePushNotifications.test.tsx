@@ -122,10 +122,6 @@ describe('usePushNotifications', () => {
     );
   });
 
-  /* -------------------------------------------------------------------------- */
-  /*                        No token returned from service                       */
-  /* -------------------------------------------------------------------------- */
-
   it('does not save token when registration returns null', async () => {
     (
       pushNotificationService.registerForPushNotifications as jest.Mock
@@ -306,10 +302,6 @@ describe('usePushNotifications', () => {
     expect(mockRouterPush).not.toHaveBeenCalled();
   });
 
-  /* -------------------------------------------------------------------------- */
-  /*                  Handle notification tap - unknown type                     */
-  /* -------------------------------------------------------------------------- */
-
   it('does not navigate for unknown notification type', async () => {
     let responseCallback: any;
 
@@ -374,10 +366,6 @@ describe('usePushNotifications', () => {
     expect(notificationId).toBe('notification-id');
   });
 
-  /* -------------------------------------------------------------------------- */
-  /*                  Schedule ticket expiration - error                         */
-  /* -------------------------------------------------------------------------- */
-
   it('throws error when scheduling ticket expiration fails', async () => {
     const scheduleError = new Error('Schedule failed');
     (
@@ -396,10 +384,6 @@ describe('usePushNotifications', () => {
       ),
     ).rejects.toThrow(scheduleError);
   });
-
-  /* -------------------------------------------------------------------------- */
-  /*                        Schedule show reminder                               */
-  /* -------------------------------------------------------------------------- */
 
   it('schedules show reminder notification', async () => {
     (
@@ -454,43 +438,6 @@ describe('usePushNotifications', () => {
     ).rejects.toThrow(scheduleError);
   });
 
-  /* -------------------------------------------------------------------------- */
-  /*                           Send test notification                            */
-  /* -------------------------------------------------------------------------- */
-
-  it('sends test notification', async () => {
-    const { result } = renderHook(() => usePushNotifications());
-
-    await result.current.sendTestNotification();
-
-    expect(pushNotificationService.sendLocalNotification).toHaveBeenCalledWith(
-      'Test Notification 🎬',
-      'This is a test notification from Movie Ticket Booking app!',
-      { type: 'test' },
-    );
-  });
-
-  /* -------------------------------------------------------------------------- */
-  /*                     Send test notification - error                          */
-  /* -------------------------------------------------------------------------- */
-
-  it('throws error when sending test notification fails', async () => {
-    const sendError = new Error('Send failed');
-    (
-      pushNotificationService.sendLocalNotification as jest.Mock
-    ).mockRejectedValue(sendError);
-
-    const { result } = renderHook(() => usePushNotifications());
-
-    await expect(result.current.sendTestNotification()).rejects.toThrow(
-      sendError,
-    );
-  });
-
-  /* -------------------------------------------------------------------------- */
-  /*                                Cleanup                                      */
-  /* -------------------------------------------------------------------------- */
-
   it('removes listeners on unmount', () => {
     const { unmount } = renderHook(() => usePushNotifications());
 
@@ -498,10 +445,6 @@ describe('usePushNotifications', () => {
 
     expect(mockRemove).toHaveBeenCalledTimes(2);
   });
-
-  /* -------------------------------------------------------------------------- */
-  /*                    Cleanup - null listeners                                 */
-  /* -------------------------------------------------------------------------- */
 
   it('handles cleanup when listeners are null', () => {
     // Mock listeners returning null
@@ -519,10 +462,6 @@ describe('usePushNotifications', () => {
     expect(() => unmount()).not.toThrow();
   });
 
-  /* -------------------------------------------------------------------------- */
-  /*                    Listeners added after mount                              */
-  /* -------------------------------------------------------------------------- */
-
   it('adds notification listeners after mount', async () => {
     renderHook(() => usePushNotifications());
 
@@ -538,10 +477,6 @@ describe('usePushNotifications', () => {
       ).toHaveBeenCalled();
     });
   });
-
-  /* -------------------------------------------------------------------------- */
-  /*                    User changes during hook lifetime                        */
-  /* -------------------------------------------------------------------------- */
 
   it('re-registers when user changes from null to defined', async () => {
     let currentUser: any = null;

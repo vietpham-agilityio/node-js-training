@@ -1,15 +1,13 @@
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useLocalSearchParams } from 'expo-router';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Text, TextInput, View } from 'react-native';
-
-// Uniwind
-import { withUniwind } from 'uniwind';
+import { TextInput, View } from 'react-native';
 
 // Components
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { Typo } from '@/components/Typo';
 
 // Constants
 import {
@@ -28,9 +26,6 @@ import { useToastAlert } from '@/hooks/useToast';
 import { authService } from '@/features/auth/services/auth';
 import { supabase } from '@/services/supabase/client';
 
-const StyledView = withUniwind(View);
-const StyledText = withUniwind(Text);
-
 export const ResetPasswordForm = () => {
   const params = useLocalSearchParams<{
     access_token: string;
@@ -42,10 +37,12 @@ export const ResetPasswordForm = () => {
   const newPasswordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<ResetPasswordFormData>({
     resolver: valibotResolver(resetPasswordSchema),
     mode: 'onBlur',
@@ -55,6 +52,8 @@ export const ResetPasswordForm = () => {
       confirmPassword: '',
     },
   });
+
+  const isDisabled = isSubmitting || isLoading || !isDirty;
 
   const handleNewPasswordSubmit = useCallback(() => {
     confirmPasswordRef.current?.focus();
@@ -95,7 +94,7 @@ export const ResetPasswordForm = () => {
               },
             },
           ],
-          { type: ToastType.SUCCESS },
+          { type: ToastType.SUCCESS, mode: 'auto' },
         );
       } catch (error) {
         toast.alert(
@@ -106,23 +105,26 @@ export const ResetPasswordForm = () => {
           [],
           { type: ToastType.ERROR },
         );
+      } finally {
+        setIsLoading(false);
+        await signOut();
       }
     },
     [params.access_token, params.refresh_token, signOut, toast],
   );
 
   return (
-    <StyledView className="flex-1 justify-between" testID="reset-password-form">
-      <StyledView className="w-full">
-        <StyledText className="text-text-primary text-2xl font-bold mb-2">
+    <View className="flex-1 justify-between" testID="reset-password-form">
+      <View className="w-full">
+        <Typo size="2xl" weight="semibold" className="mb-2">
           Reset Password
-        </StyledText>
-        <StyledText className="text-text-secondary text-base mb-8">
+        </Typo>
+        <Typo size="base" className="text-text-secondary mb-8">
           Enter your new password below
-        </StyledText>
+        </Typo>
 
         {/* New Password Input */}
-        <StyledView className={errors.newPassword ? 'mb-4' : 'mb-9'}>
+        <View className={errors.newPassword ? 'mb-4' : 'mb-9'}>
           <Controller
             control={control}
             name="newPassword"
@@ -148,10 +150,10 @@ export const ResetPasswordForm = () => {
               />
             )}
           />
-        </StyledView>
+        </View>
 
         {/* Confirm Password Input */}
-        <StyledView className={errors.confirmPassword ? 'mb-6' : 'mb-5'}>
+        <View className={errors.confirmPassword ? 'mb-6' : 'mb-5'}>
           <Controller
             control={control}
             name="confirmPassword"
@@ -176,18 +178,18 @@ export const ResetPasswordForm = () => {
               />
             )}
           />
-        </StyledView>
-      </StyledView>
+        </View>
+      </View>
 
       {/* Submit Button */}
       <Button
         accessible
-        disabled={isSubmitting}
+        disabled={isDisabled}
         testID="reset-password-submit-button"
         title="Reset Password"
         accessibilityLabel="Reset Password"
         onPress={handleSubmit(handleSubmitForm)}
       />
-    </StyledView>
+    </View>
   );
 };

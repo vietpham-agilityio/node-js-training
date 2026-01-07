@@ -28,12 +28,16 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
           className="w-full"
         >
           <Text
-            className="text-text-primary text-2xl font-bold mb-2"
+            accessible={true}
+            className="text-white text-2xl font-montserrat-semibold mb-2"
+            maxFontSizeMultiplier={1.2}
           >
             Reset Password
           </Text>
           <Text
-            className="text-text-secondary text-base mb-8"
+            accessible={true}
+            className="text-base font-montserrat-regular text-text-secondary mb-8"
+            maxFontSizeMultiplier={1.2}
           >
             Enter your new password below
           </Text>
@@ -382,7 +386,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
             {
               "busy": undefined,
               "checked": undefined,
-              "disabled": false,
+              "disabled": true,
               "expanded": undefined,
               "selected": undefined,
             }
@@ -397,7 +401,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
           }
           accessible={true}
           collapsable={false}
-          focusable={true}
+          focusable={false}
           onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
@@ -413,7 +417,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
           testID="reset-password-submit-button"
         >
           <View
-            className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-primary"
+            className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
           >
             <Text
               accessible={false}

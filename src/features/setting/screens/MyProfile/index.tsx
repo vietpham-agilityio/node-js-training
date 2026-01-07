@@ -12,7 +12,6 @@ import { ROUTES, SETTING_ITEMS } from '@/constants';
 // Hooks
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useProfile } from '@/features/setting/hooks/useProfile';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 // Components
 import { Avatar } from '@/components/Avatar';
@@ -40,8 +39,6 @@ const MyProfileScreen = () => {
   const { signOut } = useAuth();
   const { user: userInfo } = useAuth();
 
-  const { sendTestNotification } = usePushNotifications();
-
   const visibleSettings = useMemo(() => {
     const isOAuthUser = userInfo?.app_metadata.provider !== 'email';
 
@@ -59,7 +56,7 @@ const MyProfileScreen = () => {
       [SettingKey.Edit]: () => router.push(ROUTES.PROFILE_EDIT),
       [SettingKey.MyWallet]: () => null,
       [SettingKey.ChangeLanguage]: () => null,
-      [SettingKey.HelpCenter]: () => sendTestNotification(),
+      [SettingKey.HelpCenter]: () => () => null,
       [SettingKey.RateApp]: () => {
         Alert.alert('Enjoying Movea?', 'Please take a moment to rate us ⭐', [
           { text: 'Later', style: 'cancel' },
@@ -73,7 +70,7 @@ const MyProfileScreen = () => {
         router.push(ROUTES.PROFILE_CHANGE_PASSWORD),
       [SettingKey.Logout]: () => signOut(),
     }),
-    [sendTestNotification, signOut],
+    [signOut],
   );
 
   if (isProfileLoading) {

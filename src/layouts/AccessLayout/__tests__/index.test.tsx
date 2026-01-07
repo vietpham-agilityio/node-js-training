@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react-native';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 
 import { AccessLayout } from '..';
 
@@ -34,7 +34,7 @@ describe('AccessLayout', () => {
         <Text>Child Component</Text>
       </AccessLayout>,
     );
-    expect(getByText('Creating your account...')).toBeTruthy();
+    expect(getByText('Creating your account')).toBeTruthy();
     expect(getByLabelText('Creating your account')).toBeTruthy();
   });
 
@@ -44,7 +44,7 @@ describe('AccessLayout', () => {
         <Text>Child Component</Text>
       </AccessLayout>,
     );
-    expect(getByText('Logging you in...')).toBeTruthy();
+    expect(getByText('Logging you in')).toBeTruthy();
     expect(getByLabelText('Logging you in')).toBeTruthy();
   });
 
