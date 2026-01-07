@@ -84,6 +84,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   </Text>
                 </View>
                 <TextInput
+                  accessibilityHint="Type your new password"
                   accessibilityLabel="New Password input field"
                   accessibilityRole="text"
                   accessible={true}
@@ -253,6 +254,7 @@ exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot
                   </Text>
                 </View>
                 <TextInput
+                  accessibilityHint="Type your confirm password"
                   accessibilityLabel="Confirm Password input field"
                   accessibilityRole="text"
                   accessible={true}

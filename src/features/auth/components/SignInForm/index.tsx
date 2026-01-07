@@ -1,11 +1,12 @@
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { memo, useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { TextInput, TouchableOpacity, View } from 'react-native';
 
 // Components
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
+import { EmailInput } from '@/components/EmailInput';
+import { PasswordInput } from '@/components/PasswordInput';
 import { Typo } from '@/components/Typo';
 
 // Constants
@@ -50,61 +51,25 @@ export const SignInForm = memo(
       <View className="w-full" testID="signin-form">
         {/* Email Address Input */}
         <View className={errors.email ? 'gap-4' : 'gap-9'}>
-          <Controller
+          <EmailInput
+            ref={emailRef}
             control={control}
             name="email"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <Input
-                ref={emailRef}
-                accessibilityRole="text"
-                accessibilityLabel="Email Address input field"
-                accessibilityHint="Type your email address"
-                label="Email Address"
-                value={value}
-                error={error?.message}
-                testID="signin-email-input"
-                keyboardType="email-address"
-                returnKeyType="next"
-                autoCapitalize="none"
-                onChangeText={onChange}
-                onBlur={onBlur}
-                autoCorrect={false}
-                onSubmitEditing={handleEmailSubmit}
-              />
-            )}
+            testID="signin-email-input"
+            onSubmitEditing={handleEmailSubmit}
           />
 
           {/* Password Input */}
-          <Controller
+          <PasswordInput
+            ref={passwordRef}
             control={control}
             name="password"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <Input
-                ref={passwordRef}
-                accessibilityRole="text"
-                accessibilityLabel="Password input field"
-                accessibilityHint="type your password"
-                secureTextEntry
-                label="Password"
-                value={value}
-                error={error?.message}
-                testID="signin-password-input"
-                containerClassName={`${errors.password ? 'mb-1' : 'mb-3'}`}
-                autoCapitalize="none"
-                returnKeyType="done"
-                autoCorrect={false}
-                onChangeText={onChange}
-                onBlur={onBlur}
-              />
-            )}
+            testID="signin-password-input"
+            returnKeyType="done"
+            containerClassName={errors.password ? 'mb-1' : 'mb-3'}
           />
         </View>
+
         <View className="w-full items-end">
           <TouchableOpacity
             activeOpacity={0.8}

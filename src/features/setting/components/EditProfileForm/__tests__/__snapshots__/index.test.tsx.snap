@@ -219,6 +219,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot 1`] = `
             </Text>
           </View>
           <TextInput
+            accessibilityHint="Enter your email address"
             accessibilityLabel="Email Address input field"
             accessibilityRole="text"
             accessible={true}
@@ -814,6 +815,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             </Text>
           </View>
           <TextInput
+            accessibilityHint="Enter your email address"
             accessibilityLabel="Email Address input field"
             accessibilityRole="text"
             accessible={true}

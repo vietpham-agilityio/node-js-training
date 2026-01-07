@@ -6,6 +6,8 @@ import { TextInput, View } from 'react-native';
 // Components
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
+import { EmailInput } from '@/components/EmailInput';
+import { PasswordInput } from '@/components/PasswordInput';
 import { EditableAvatar } from '@/features/camera/components/EditableAvatar';
 
 // Types
@@ -113,91 +115,38 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
           )}
         />
       </View>
+
+      {/* Email Address Input */}
       <View className={errors.email ? 'mb-4' : 'mb-9'}>
-        {/* Email Address Input */}
-        <Controller
+        <EmailInput
+          ref={emailRef}
           control={control}
           name="email"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <Input
-              ref={emailRef}
-              accessibilityRole="text"
-              accessibilityLabel="Email Address input field"
-              accessibilityHint="Type your email address"
-              label="Email Address"
-              value={value}
-              error={error?.message}
-              testID="signup-email-input"
-              keyboardType="email-address"
-              returnKeyType="next"
-              autoCapitalize="none"
-              autoCorrect={false}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              onSubmitEditing={handleEmailSubmit}
-            />
-          )}
+          testID="signup-email-input"
+          onSubmitEditing={handleEmailSubmit}
         />
       </View>
+
+      {/* Password Input */}
       <View className={errors.password ? 'mb-4' : 'mb-9'}>
-        {/* Password Input */}
-        <Controller
+        <PasswordInput
+          ref={passwordRef}
           control={control}
           name="password"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <Input
-              ref={passwordRef}
-              accessibilityRole="text"
-              accessibilityLabel="Password input field"
-              accessibilityHint="Type your password"
-              secureTextEntry
-              label="Password"
-              value={value}
-              error={error?.message}
-              testID="signup-password-input"
-              autoCapitalize="none"
-              returnKeyType="next"
-              autoCorrect={false}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              onSubmitEditing={handlePasswordSubmit}
-            />
-          )}
+          testID="signup-password-input"
+          onSubmitEditing={handlePasswordSubmit}
         />
       </View>
+
+      {/* Confirm Password Input */}
       <View className={errors.confirmPassword ? 'mb-6' : 'mb-5'}>
-        {/* Confirm Password Input */}
-        <Controller
+        <PasswordInput
+          ref={confirmPasswordRef}
           control={control}
           name="confirmPassword"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <Input
-              ref={confirmPasswordRef}
-              accessibilityRole="text"
-              accessibilityLabel="Confirm Password input field"
-              accessibilityHint="Type your confirm password"
-              secureTextEntry
-              label="Confirm Password"
-              value={value}
-              error={error?.message}
-              testID="signup-confirmpassword-input"
-              containerClassName={`${errors.confirmPassword ? 'mb-1' : 'mb-7'}`}
-              autoCapitalize="none"
-              returnKeyType="done"
-              autoCorrect={false}
-              onChangeText={onChange}
-              onBlur={onBlur}
-            />
-          )}
+          testID="signup-confirmpassword-input"
+          returnKeyType="done"
+          containerClassName={errors.confirmPassword ? 'mb-1' : 'mb-7'}
         />
       </View>
 

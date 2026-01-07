@@ -436,7 +436,7 @@ describe('ChangePasswordForm Component', () => {
       );
 
       expect(getByLabelText('Current Password input field')).toBeTruthy();
-      expect(getByLabelText('New Password input field')).toBeTruthy();
+      expect(getByLabelText('Password input field')).toBeTruthy();
       expect(getByLabelText('Confirm Password input field')).toBeTruthy();
       expect(getAllByLabelText('Change Password')).toBeTruthy();
     });

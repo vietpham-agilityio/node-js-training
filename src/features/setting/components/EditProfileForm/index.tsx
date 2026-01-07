@@ -7,6 +7,7 @@ import { TextInput, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { EditableAvatar } from '@/features/camera/components/EditableAvatar';
+import { EmailInput } from '@/components/EmailInput';
 
 // Types
 import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
@@ -122,30 +123,12 @@ export const EditProfileForm = memo(
           </View>
           <View className={errors.email ? 'mb-4' : 'mb-9'}>
             {/* Email Address Input */}
-            <Controller
+            <EmailInput
+              ref={emailRef}
               control={control}
               name="email"
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => (
-                <Input
-                  ref={emailRef}
-                  accessibilityRole="text"
-                  accessibilityLabel="Email Address input field"
-                  label="Email Address"
-                  value={value}
-                  error={error?.message}
-                  testID="signup-email-input"
-                  keyboardType="email-address"
-                  returnKeyType="next"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  onSubmitEditing={handleEmailSubmit}
-                />
-              )}
+              testID="signup-email-input"
+              onSubmitEditing={handleEmailSubmit}
             />
           </View>
           <View className={errors.address ? 'mb-4' : 'mb-9'}>

@@ -272,6 +272,7 @@ exports[`EditProfileScreen Snapshot should match snapshot 1`] = `
                     </Text>
                   </View>
                   <TextInput
+                    accessibilityHint="Enter your email address"
                     accessibilityLabel="Email Address input field"
                     accessibilityRole="text"
                     accessible={true}
