@@ -150,26 +150,10 @@ export const usePushNotifications = () => {
     [],
   );
 
-  /**
-   * Send test notification
-   */
-  const sendTestNotification = useCallback(async () => {
-    try {
-      await pushNotificationService.sendLocalNotification(
-        'Test Notification 🎬',
-        'This is a test notification from Movie Ticket Booking app!',
-        { type: 'test' },
-      );
-    } catch (error) {
-      throw error;
-    }
-  }, []);
-
   return {
     expoPushToken,
     notification,
     scheduleTicketExpiration,
     scheduleShowReminder,
-    sendTestNotification,
   };
 };

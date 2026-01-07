@@ -21,14 +21,7 @@ import { cn } from '@/utils/cn';
 type AccessLayoutProps = {
   loading?: boolean;
   children?: ReactNode;
-  mode: 'onboarding' | 'signin' | 'signup' | 'confirmation';
-};
-
-const ACCESSIBILITY_LABEL = {
-  signin: 'Sign in screen',
-  signup: 'Sign up screen',
-  onboarding: 'Onboarding screen',
-  confirmation: 'Confirmation screen',
+  mode: 'onboarding' | 'signin' | 'signup' | 'forgot-password';
 };
 
 const StyledScrollView = withUniwind(ScrollView);
@@ -38,6 +31,7 @@ export const AccessLayout = memo(
   ({ loading = false, mode = 'signin', children }: AccessLayoutProps) => {
     const isSignin = mode === 'signin';
     const isSignup = mode === 'signup';
+    const isForgotPassword = mode === 'forgot-password';
 
     // Both signin and signup need keyboard-friendly behavior
     const needsKeyboardHandling = isSignin || isSignup;
@@ -49,6 +43,12 @@ export const AccessLayout = memo(
       : 'flex-1';
 
     const containerStyles = useResolveClassNames('flex-1 bg-bg-primary');
+    const loadingMessage =
+      isSignin && !isForgotPassword
+        ? 'Logging you in'
+        : isForgotPassword
+          ? 'Sending'
+          : 'Creating your account';
 
     const handleKeyboardDismiss = () => {
       Keyboard.dismiss();
@@ -88,17 +88,13 @@ export const AccessLayout = memo(
         {loading && (
           <View
             className="absolute top-0 left-0 right-0 bottom-0 items-center justify-center bg-bg-dark/50"
-            accessibilityLabel={
-              isSignin ? 'Logging you in' : 'Creating your account'
-            }
-            accessibilityHint={
-              isSignin ? 'Logging you in' : 'Creating your account'
-            }
+            accessibilityLabel={loadingMessage}
+            accessibilityHint={loadingMessage}
           >
             <View className="bg-bg-primary rounded-lg gap-6 items-center p-8">
               <ActivityIndicator size="large" className="text-primary" />
               <Typo weight="medium" size="xs" className="text-primary">
-                {isSignin ? 'Logging you in...' : 'Creating your account...'}
+                {loadingMessage}
               </Typo>
             </View>
           </View>

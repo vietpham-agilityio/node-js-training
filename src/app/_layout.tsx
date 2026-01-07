@@ -28,7 +28,6 @@ import { ROUTES, SCREEN_COLOR_PRIMARY, SCREENS } from '@/constants';
 
 // Hooks
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useDeepLinkHandler } from '@/hooks/useDeepLinkHandler';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 // Components
@@ -76,9 +75,6 @@ const RootLayout = () => {
     Montserrat_500Medium,
     Montserrat_600SemiBold,
   });
-
-  //  Deep link handler for OAuth callbacks and password reset
-  useDeepLinkHandler();
 
   useEffect(() => {
     if (error) throw error;

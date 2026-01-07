@@ -65,6 +65,10 @@ const ForgotPasswordScreen = () => {
     [resetPassword, router, toast],
   );
 
+  const handleBackToLogin = useCallback(() => {
+    router.replace(ROUTES.LOGIN);
+  }, [router]);
+
   return (
     <AccessLayout mode="signup" loading={isPending}>
       <View className="gap-1 mt-8 mb-[30]">
@@ -123,7 +127,7 @@ const ForgotPasswordScreen = () => {
           accessibilityHint="Navigate back to the Login screen"
           title="Back to Login"
           isPrimary={false}
-          onPress={() => router.back()}
+          onPress={handleBackToLogin}
         />
       </View>
     </AccessLayout>

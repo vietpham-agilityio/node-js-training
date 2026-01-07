@@ -185,15 +185,6 @@ describe('MyProfileScreen', () => {
       expect(mockSignOut).toHaveBeenCalledTimes(1);
     });
 
-    it('should send test notification when Help Center is pressed', () => {
-      const { getByTestId } = render(<MyProfileScreen />);
-      const helpCenterItem = getByTestId('help_center');
-
-      fireEvent.press(helpCenterItem);
-
-      expect(mockSendTestNotification).toHaveBeenCalledTimes(1);
-    });
-
     it('should handle My Wallet press', () => {
       const { getByTestId } = render(<MyProfileScreen />);
       const myWalletItem = getByTestId('my_wallet');
