@@ -20,10 +20,7 @@ import {
 } from '@/constants';
 
 // Hooks
-import {
-  useMoviesInfinite,
-  useSearchMovies,
-} from '@/features/booking/hooks/useMovies';
+import { useSearchMoviesInfinite } from '@/features/booking/hooks/useMovies';
 import { useDebounce } from '@/hooks/useDebounce';
 
 // Types
@@ -47,59 +44,32 @@ const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRating, setSelectedRating] = useState('all');
   const debouncedQuery = useDebounce(searchQuery, 500);
-
-  // Fetch movies with infinite scroll
   const {
-    data: allMoviesData,
-    isLoading: isLoadingAllMovies,
-    isFetchingNextPage: isFetchingNextAllMovies,
-    hasNextPage: hasNextAllMovies,
-    fetchNextPage: fetchNextAllMovies,
-    refetch: refetchAllMovies,
-    isRefetching: isRefetchingAllMovies,
-    isError: isAllMoviesError,
-    error: allMoviesError,
-  } = useMoviesInfinite({
-    enabled: !debouncedQuery, // Only fetch when not searching
+    movies,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+    isRefetching,
+    isError,
+    error,
+  } = useSearchMoviesInfinite({
+    searchQuery: debouncedQuery,
   });
 
-  // Search movies when query is provided
-  const {
-    data: searchResults,
-    isLoading: isSearching,
-    isFetching: isSearchFetching,
-    isError: isSearchError,
-    error: searchError,
-    refetch: refetchSearch,
-  } = useSearchMovies(debouncedQuery);
+  const isSearchActive = Boolean(
+    debouncedQuery && debouncedQuery.trim().length > 0,
+  );
 
-  // Determine which data to use
-  const isSearchActive = debouncedQuery;
-
-  // Flatten paginated data for all movies
-  const allMovies = useMemo(() => {
-    if (!allMoviesData?.pages) return [];
-    return allMoviesData.pages.flat();
-  }, [allMoviesData]);
-
-  // IMPROVEMENT: Apply rating filter to both search results and all movies
+  // Apply rating filter
   const displayedMovies = useMemo(() => {
-    const movies = isSearchActive ? searchResults || [] : allMovies;
+    if (selectedRating === 'all') return movies;
+
     const minRating =
       RATING_FILTERS.find(f => f.id === selectedRating)?.minRating || 0;
-
-    if (minRating === 0) return movies;
-
     return movies.filter((movie: Movie) => (movie.rating || 0) >= minRating);
-  }, [isSearchActive, searchResults, allMovies, selectedRating]);
-
-  const isLoading = isSearchActive ? isSearching : isLoadingAllMovies;
-  const isFetching = isSearchActive
-    ? isSearchFetching
-    : isFetchingNextAllMovies;
-  const isError = isSearchActive ? isSearchError : isAllMoviesError;
-  const error = isSearchActive ? searchError : allMoviesError;
-  const hasNextPage = !isSearchActive && hasNextAllMovies;
+  }, [movies, selectedRating]);
 
   const handleMoviePress = useCallback(
     (movieId: string) => {
@@ -113,23 +83,10 @@ const SearchScreen = () => {
   }, []);
 
   const handleLoadMore = useCallback(() => {
-    if (!isSearchActive && hasNextPage && !isFetchingNextAllMovies) {
-      fetchNextAllMovies();
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  }, [
-    isSearchActive,
-    hasNextPage,
-    isFetchingNextAllMovies,
-    fetchNextAllMovies,
-  ]);
-
-  const handleRetry = useCallback(() => {
-    if (isSearchActive) {
-      refetchSearch();
-    } else {
-      refetchAllMovies();
-    }
-  }, [isSearchActive, refetchSearch, refetchAllMovies]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const renderMovie = useCallback(
     ({ item }: { item: Movie }) => (
@@ -156,6 +113,7 @@ const SearchScreen = () => {
 
     [debouncedQuery, displayedMovies.length, isSearchActive],
   );
+
   const ratingFilterContent = useMemo(
     () =>
       selectedRating !== 'all'
@@ -165,7 +123,7 @@ const SearchScreen = () => {
   );
 
   const Footer = useCallback(() => {
-    if (!isFetching || isSearchActive) return null;
+    if (!isFetchingNextPage) return null;
 
     return (
       <View
@@ -180,7 +138,7 @@ const SearchScreen = () => {
         </Typo>
       </View>
     );
-  }, [isFetching, isSearchActive]);
+  }, [isFetchingNextPage]);
 
   const Empty = useCallback(() => {
     if (isLoading) {
@@ -220,7 +178,7 @@ const SearchScreen = () => {
           <Button
             size={Size.EXTRA_SMALL}
             title="Retry"
-            onPress={handleRetry}
+            onPress={refetch}
             accessibilityRole="button"
             accessibilityLabel={
               isSearchActive ? 'Retry search' : 'Retry loading'
@@ -230,7 +188,7 @@ const SearchScreen = () => {
       );
     }
 
-    if (isSearchActive && displayedMovies.length === 0) {
+    if (displayedMovies.length === 0) {
       return (
         <View
           testID="empty-no-results"
@@ -245,8 +203,9 @@ const SearchScreen = () => {
             No movies found
           </Typo>
           <Typo size="sm" className="text-center mt-2">
-            Try searching with different keywords for &quot;{debouncedQuery}
-            &quot;
+            {isSearchActive
+              ? `Try searching with different keywords for "${debouncedQuery}"`
+              : 'No movies available'}
           </Typo>
         </View>
       );
@@ -260,7 +219,7 @@ const SearchScreen = () => {
     isSearchActive,
     debouncedQuery,
     displayedMovies.length,
-    handleRetry,
+    refetch,
   ]);
 
   return (
@@ -338,13 +297,11 @@ const SearchScreen = () => {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         refreshControl={
-          !isSearchActive ? (
-            <RefreshControl
-              refreshing={isRefetchingAllMovies}
-              onRefresh={refetchAllMovies}
-              accessibilityLabel="Pull to refresh movies"
-            />
-          ) : undefined
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            accessibilityLabel="Pull to refresh movies"
+          />
         }
         accessibilityLabel={`${isSearchActive ? 'Search results' : 'All movies'} showing ${displayedMovies.length} movies`}
       />

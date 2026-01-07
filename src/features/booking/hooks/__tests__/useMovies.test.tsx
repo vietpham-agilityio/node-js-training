@@ -8,7 +8,6 @@ import {
   useMovies,
   useMoviesByGenre,
   useMoviesInfinite,
-  useSearchMovies,
 } from '../useMovies';
 
 // Types
@@ -313,92 +312,6 @@ describe('useMovie', () => {
     mockGetMovieById.mockRejectedValue(mockError);
 
     const { result } = renderHook(() => useMovie('1'), {
-      wrapper: createWrapper(),
-    });
-
-    await waitFor(() => {
-      expect(result.current.isError).toBe(true);
-    });
-
-    expect(result.current.error).toEqual(mockError);
-  });
-});
-
-describe('useSearchMovies', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('should fetch movies when query length is greater than 2', async () => {
-    const mockMovies = [
-      { id: '1', title: 'Movie 1' },
-      { id: '2', title: 'Movie 2' },
-    ];
-    mockSearchMovies.mockResolvedValue(mockMovies);
-
-    const { result } = renderHook(() => useSearchMovies('test'), {
-      wrapper: createWrapper(),
-    });
-
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
-
-    expect(mockSearchMovies).toHaveBeenCalledWith('test');
-    expect(result.current.data).toEqual(mockMovies);
-  });
-
-  it('should not fetch when query length is 2 or less', () => {
-    renderHook(() => useSearchMovies(''), {
-      wrapper: createWrapper(),
-    });
-
-    expect(mockSearchMovies).not.toHaveBeenCalled();
-  });
-
-  it('should not fetch when query is empty', () => {
-    renderHook(() => useSearchMovies(''), {
-      wrapper: createWrapper(),
-    });
-
-    expect(mockSearchMovies).not.toHaveBeenCalled();
-  });
-
-  it('should refetch when query changes', async () => {
-    const mockMovies1 = [{ id: '1', title: 'Movie 1' }];
-    const mockMovies2 = [{ id: '2', title: 'Movie 2' }];
-    mockSearchMovies
-      .mockResolvedValueOnce(mockMovies1)
-      .mockResolvedValueOnce(mockMovies2);
-
-    const { result, rerender } = renderHook(
-      ({ query }: { query: string }) => useSearchMovies(query),
-      {
-        wrapper: createWrapper(),
-        initialProps: { query: 'test1' },
-      },
-    );
-
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-    });
-
-    expect(result.current.data).toEqual(mockMovies1);
-
-    rerender({ query: 'test2' });
-
-    await waitFor(() => {
-      expect(result.current.data).toEqual(mockMovies2);
-    });
-
-    expect(mockSearchMovies).toHaveBeenCalledTimes(2);
-  });
-
-  it('should handle error when search fails', async () => {
-    const mockError = new Error('Failed to search movies');
-    mockSearchMovies.mockRejectedValue(mockError);
-
-    const { result } = renderHook(() => useSearchMovies('test'), {
       wrapper: createWrapper(),
     });
 

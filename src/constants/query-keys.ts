@@ -16,8 +16,8 @@ export const queryKeys = {
       [...queryKeys.movies.lists(), 'infinite', filters] as const,
     details: () => [...queryKeys.movies.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.movies.details(), id] as const,
-    search: (query: string) =>
-      [...queryKeys.movies.all, 'search', query] as const,
+    searchInfinite: (query: string) =>
+      [...queryKeys.movies.all, 'search', 'infinite', query] as const,
   },
 
   // Showtimes
