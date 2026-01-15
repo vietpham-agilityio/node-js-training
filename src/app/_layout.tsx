@@ -65,11 +65,19 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  const main: Effect.Effect<void> = Console.log('Hello Effect');
+  type PrintType = Effect.Effect<void>;
 
-  Effect.runSync(main);
+  const print: PrintType = Console.log('Hello Effect');
 
-  const log: void = console.log('log executed');
+  const printArray = [print, print, print];
+
+  Effect.runSync(Effect.all(printArray)); // Execute array of effects
+
+  const printIfTrue = (check: boolean, toPrint: PrintType) => {
+    check && Effect.runSync(toPrint);
+  };
+
+  printIfTrue(true, print);
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
