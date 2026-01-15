@@ -65,9 +65,11 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  const main = Console.log('Hello Effect');
+  const main: Effect.Effect<void> = Console.log('Hello Effect');
 
   Effect.runSync(main);
+
+  const log: void = console.log('log executed');
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
