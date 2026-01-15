@@ -72,9 +72,17 @@ const RootLayout = () => {
   const extractResponse = (res: Response) =>
     Effect.tryPromise(() => res.json());
 
-  const printPokemon = Effect.flatMap(fetchPokemon, extractResponse);
+  const savePokemon = (pokemon: unknown) =>
+    Effect.tryPromise(() =>
+      fetch('/api/pokemon', { body: JSON.stringify(pokemon) }),
+    );
 
-  Effect.runPromise(printPokemon).then(console.log); // log response from Effect promise
+  const printPokemon = fetchPokemon.pipe(
+    Effect.flatMap(extractResponse),
+    Effect.flatMap(savePokemon),
+  );
+
+  Effect.runPromise(printPokemon).then(console.log);
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
