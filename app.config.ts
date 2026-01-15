@@ -2,7 +2,7 @@ import { ConfigContext, ExpoConfig } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  owner: 'vietphamagilityios-organization',
+  owner: 'px_viet',
   name: 'Movea',
   slug: 'movea',
   version: '1.0.0',
@@ -130,7 +130,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   primaryColor: '#0B0F2F',
   extra: {
     eas: {
-      projectId: '54dd09ea-1973-4085-9bec-cf848892de97',
+      projectId: '55913f90-5eeb-4669-a915-82809054f674',
     },
+  },
+  updates: {
+    url: 'https://u.expo.dev/55913f90-5eeb-4669-a915-82809054f674',
+  },
+  runtimeVersion: {
+    policy: 'appVersion',
   },
 });

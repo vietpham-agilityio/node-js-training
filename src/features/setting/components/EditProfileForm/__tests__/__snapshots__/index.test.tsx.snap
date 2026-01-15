@@ -664,7 +664,7 @@ exports[`EditProfileForm Component Snapshot should match snapshot with empty use
             height={24}
             meetOrSlice={0}
             minX={0}
-            minY={0}
+            minY={1}
             style={
               [
                 {

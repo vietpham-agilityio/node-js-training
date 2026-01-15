@@ -14,7 +14,7 @@ export const AddIcon = ({
       width={width}
       height={height}
       fill="none"
-      viewBox="0 0 24 24"
+      viewBox="0 1 24 24"
       {...props}
     >
       <Path
