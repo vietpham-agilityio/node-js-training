@@ -65,19 +65,11 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  type PrintType = Effect.Effect<void>;
+  const fetchPokemon: Effect.Effect<Response> = Effect.promise(() =>
+    fetch('https://pokeapi.co/api/v2/pokemon/ditto'),
+  );
 
-  const print: PrintType = Console.log('Hello Effect');
-
-  const printArray = [print, print, print];
-
-  Effect.runSync(Effect.all(printArray)); // Execute array of effects
-
-  const printIfTrue = (check: boolean, toPrint: PrintType) => {
-    check && Effect.runSync(toPrint);
-  };
-
-  printIfTrue(true, print);
+  const extractResponse = (res: Response) => Effect.promise(() => res.json());
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
