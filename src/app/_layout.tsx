@@ -2,6 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
+// Effect
+import { Console, Effect } from 'effect';
+
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
 
@@ -61,6 +64,10 @@ const RootLayout = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+
+  const main = Console.log('Hello Effect');
+
+  Effect.runSync(main);
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);

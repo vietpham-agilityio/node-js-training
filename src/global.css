@@ -219,7 +219,7 @@
     --color-gradient-dark: var(--white-alpha-90); /* #ffffffe6 */
 
     /* ---- Semantic Background Colors ---- */
-    --color-bg-primary: var(--error-900); /* #0b0f2f */
+    --color-bg-primary: var(--blue-900); /* #0b0f2f */
     --color-bg-secondary: var(--grey-100); /* #dbdbdb */
     --color-bg-tertiary: var(--blue-900); /* #0b0f2f */
     --color-bg-quaternary: var(--blue-800); /* #151d3b */
