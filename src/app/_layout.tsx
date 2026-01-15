@@ -3,7 +3,8 @@ import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
 // Effect
-import { Console, Effect } from 'effect';
+import { Effect } from 'effect';
+import { UnknownException } from 'effect/Cause';
 
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
@@ -65,11 +66,11 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  const fetchPokemon: Effect.Effect<Response> = Effect.promise(() =>
-    fetch('https://pokeapi.co/api/v2/pokemon/ditto'),
-  );
+  const fetchPokemon: Effect.Effect<Response, UnknownException> =
+    Effect.tryPromise(() => fetch('https://pokeapi.co/api/v2/pokemon/ditto'));
 
-  const extractResponse = (res: Response) => Effect.promise(() => res.json());
+  const extractResponse = (res: Response) =>
+    Effect.tryPromise(() => res.json());
 
   const printPokemon = Effect.flatMap(fetchPokemon, extractResponse);
 
