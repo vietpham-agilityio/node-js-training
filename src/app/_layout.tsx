@@ -3,7 +3,7 @@ import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
 // Effect
-import { Data, Effect, Schema } from 'effect';
+import { Config, Data, Effect, Schema } from 'effect';
 
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
@@ -83,15 +83,17 @@ class FetchPokemonErr extends Data.TaggedError('FetchPokemonErr')<{
 
 class ExtractResponseErr extends Data.TaggedError('ExtractResponseErr') {}
 
+const DITTO_ENDPOINT = Config.string('EXPO_PUBLIC_POKEMON_DITTO');
+
 const RootLayout = () => {
   const { theme } = useUniwind();
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
-  const fetchPokemon: Effect.Effect<Response, FetchPokemonErr> =
+  const fetchPokemon = (baseUrl: string) =>
     Effect.tryPromise({
-      try: () => fetch('https://pokeapi.co/api/v2/pokemon/ditto'),
+      try: () => fetch(baseUrl),
       catch: () =>
         new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
     });
@@ -124,7 +126,8 @@ const RootLayout = () => {
   // );
 
   const printPokemon = Effect.gen(function* () {
-    const res = yield* fetchPokemon;
+    const baseUrl = yield* DITTO_ENDPOINT;
+    const res = yield* fetchPokemon(baseUrl);
 
     if (!res.ok)
       yield* new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' });
@@ -138,6 +141,7 @@ const RootLayout = () => {
       FetchPokemonErr: err => Effect.succeed(err.customMessage),
       ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
       ParseError: () => Effect.succeed('Parse Pokemon Error'),
+      ConfigError: () => Effect.succeed('Config Error'),
     }),
   );
 
