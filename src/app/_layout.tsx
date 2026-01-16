@@ -4,7 +4,6 @@ import { Fragment, useEffect, useRef } from 'react';
 
 // Effect
 import { Effect } from 'effect';
-import { UnknownException } from 'effect/Cause';
 
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
@@ -84,9 +83,19 @@ const RootLayout = () => {
       fetch('/api/pokemon', { body: JSON.stringify(pokemon) }),
     );
 
+  // Effect pipeline: fetch -> validate -> extract JSON -> save
+  // Each step transforms the value or can fail with a typed error
   const printPokemon = fetchPokemon.pipe(
+    // Validate response - if res.ok is false, fail with FetchPokemonErr
+    // filterOrFail acts as a guard: passes value through if predicate is true,
+    // otherwise fails with the provided error
+    Effect.filterOrFail(
+      res => res.ok, // just have res when status is 200
+      (): FetchPokemonErr => ({ _tag: 'FetchPokemonErr' }),
+    ),
     Effect.flatMap(extractResponse),
     Effect.flatMap(savePokemon),
+    // catch all errors
     Effect.catchTags({
       FetchPokemonErr: () => Effect.succeed('Fetch Pokemon went wrong'),
       UnknownException: () => Effect.succeed('Something went wrong'),
