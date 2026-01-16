@@ -60,14 +60,21 @@ export const unstable_settings = {
   initialRouteName: StorybookEnabled ? SCREENS.STORYBOOK : SCREENS.AUTH.LAYOUT,
 };
 
+interface FetchPokemonErr {
+  readonly _tag: 'FetchPokemonErr';
+}
+
 const RootLayout = () => {
   const { theme } = useUniwind();
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
-  const fetchPokemon: Effect.Effect<Response, UnknownException> =
-    Effect.tryPromise(() => fetch('https://pokeapi.co/api/v2/pokemon/ditto'));
+  const fetchPokemon: Effect.Effect<Response, FetchPokemonErr> =
+    Effect.tryPromise({
+      try: () => fetch('https://pokeapi.co/api/v2/pokemon/ditto'),
+      catch: (): FetchPokemonErr => ({ _tag: 'FetchPokemonErr' }),
+    });
 
   const extractResponse = (res: Response) =>
     Effect.tryPromise(() => res.json());
@@ -77,9 +84,15 @@ const RootLayout = () => {
       fetch('/api/pokemon', { body: JSON.stringify(pokemon) }),
     );
 
-  const printPokemon = fetchPokemon.pipe(
+  const printPokemon: Effect.Effect<
+    unknown,
+    UnknownException | FetchPokemonErr
+  > = fetchPokemon.pipe(
     Effect.flatMap(extractResponse),
     Effect.flatMap(savePokemon),
+    Effect.catchTag('FetchPokemonErr', () =>
+      Effect.succeed('Fetch Pokemon went wrong'),
+    ),
     Effect.catchTag('UnknownException', () =>
       Effect.succeed('Something went wrong'),
     ),
