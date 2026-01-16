@@ -92,26 +92,37 @@ const RootLayout = () => {
       catch: () => new SaveResponseErr(),
     });
 
-  // Effect pipeline: fetch -> validate -> extract JSON -> save
-  // Each step transforms the value or can fail with a typed error
-  const printPokemon = fetchPokemon.pipe(
-    // Validate response - if res.ok is false, fail with FetchPokemonErr
-    // filterOrFail acts as a guard: passes value through if predicate is true,
-    // otherwise fails with the provided error
-    Effect.filterOrFail(
-      res => res.ok, // just have res when status is 200
-      () => new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
-    ),
-    Effect.flatMap(extractResponse),
-    Effect.flatMap(savePokemon),
+  // // Effect pipeline: fetch -> validate -> extract JSON -> save
+  // // Each step transforms the value or can fail with a typed error
+  // const printPokemon = fetchPokemon.pipe(
+  //   // Validate response - if res.ok is false, fail with FetchPokemonErr
+  //   // filterOrFail acts as a guard: passes value through if predicate is true,
+  //   // otherwise fails with the provided error
+  //   Effect.filterOrFail(
+  //     res => res.ok, // just have res when status is 200
+  //     () => new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
+  //   ),
+  //   Effect.flatMap(extractResponse),
+  //   Effect.flatMap(savePokemon),
 
-    // catch all errors
-    Effect.catchTags({
-      FetchPokemonErr: err => Effect.succeed(err.customMessage),
-      ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
-      SaveResponseErr: () => Effect.succeed('Save Response went wrong'),
-    }),
-  );
+  //   // catch all errors
+  //   Effect.catchTags({
+  //     FetchPokemonErr: err => Effect.succeed(err.customMessage),
+  //     ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
+  //     SaveResponseErr: () => Effect.succeed('Save Response went wrong'),
+  //   }),
+  // );
+
+  const printPokemon = Effect.gen(function* () {
+    const res = yield* fetchPokemon;
+
+    if (!res.ok)
+      yield* new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' });
+
+    const jsonRes = yield* extractResponse(res);
+
+    return yield* savePokemon(jsonRes);
+  });
 
   Effect.runPromise(printPokemon).then(console.log);
 
