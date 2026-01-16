@@ -80,6 +80,9 @@ const RootLayout = () => {
   const printPokemon = fetchPokemon.pipe(
     Effect.flatMap(extractResponse),
     Effect.flatMap(savePokemon),
+    Effect.catchTag('UnknownException', () =>
+      Effect.succeed('Something went wrong'),
+    ),
   );
 
   Effect.runPromise(printPokemon).then(console.log);
