@@ -3,7 +3,7 @@ import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
 // Effect
-import { Data, Effect } from 'effect';
+import { Data, Effect, Schema } from 'effect';
 
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
@@ -58,6 +58,14 @@ const StorybookEnabled = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';
 export const unstable_settings = {
   initialRouteName: StorybookEnabled ? SCREENS.STORYBOOK : SCREENS.AUTH.LAYOUT,
 };
+
+const Pokemon = Schema.Struct({
+  id: Schema.Number,
+  order: Schema.Number,
+  name: Schema.String,
+  height: Schema.Number,
+  weight: Schema.Number,
+});
 
 class FetchPokemonErr extends Data.TaggedError('FetchPokemonErr')<{
   customMessage: string;
