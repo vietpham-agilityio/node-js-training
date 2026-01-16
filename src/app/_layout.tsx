@@ -67,6 +67,8 @@ const Pokemon = Schema.Struct({
   weight: Schema.Number,
 });
 
+const decodePokemon = Schema.decodeUnknown(Pokemon);
+
 class FetchPokemonErr extends Data.TaggedError('FetchPokemonErr')<{
   customMessage: string;
 }> {}
@@ -128,8 +130,11 @@ const RootLayout = () => {
       yield* new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' });
 
     const jsonRes = yield* extractResponse(res);
+    const decodedPokemon = yield* decodePokemon(jsonRes);
 
-    yield* savePokemon(jsonRes);
+    yield* savePokemon(decodedPokemon);
+
+    return decodedPokemon;
   });
 
   const handlePrintPokemon = printPokemon.pipe(
@@ -137,6 +142,7 @@ const RootLayout = () => {
       FetchPokemonErr: err => Effect.succeed(err.customMessage),
       ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
       SaveResponseErr: () => Effect.succeed('Save Response went wrong'),
+      ParseError: () => Effect.succeed('Parse Pokemon Error'),
     }),
   );
 
