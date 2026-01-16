@@ -121,10 +121,18 @@ const RootLayout = () => {
 
     const jsonRes = yield* extractResponse(res);
 
-    return yield* savePokemon(jsonRes);
+    yield* savePokemon(jsonRes);
   });
 
-  Effect.runPromise(printPokemon).then(console.log);
+  const handlePrintPokemon = printPokemon.pipe(
+    Effect.catchTags({
+      FetchPokemonErr: err => Effect.succeed(err.customMessage),
+      ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
+      SaveResponseErr: () => Effect.succeed('Save Response went wrong'),
+    }),
+  );
+
+  Effect.runPromise(handlePrintPokemon).then(console.log);
 
   const doubleNum = (num: number) => Effect.succeed(num * 2);
 
