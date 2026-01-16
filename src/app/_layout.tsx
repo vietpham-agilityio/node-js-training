@@ -84,6 +84,16 @@ const RootLayout = () => {
 
   Effect.runPromise(printPokemon).then(console.log);
 
+  const doubleNum = (num: number) => Effect.succeed(num * 2);
+
+  const numEffect = Effect.succeed(10);
+
+  const doubleNumEffect = numEffect.pipe(Effect.flatMap(doubleNum));
+
+  const result = Effect.runSync(doubleNumEffect);
+
+  console.log(result);
+
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
   const hasInitializedRef = useRef(false);
