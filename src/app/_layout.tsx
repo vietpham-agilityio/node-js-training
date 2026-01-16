@@ -84,18 +84,13 @@ const RootLayout = () => {
       fetch('/api/pokemon', { body: JSON.stringify(pokemon) }),
     );
 
-  const printPokemon: Effect.Effect<
-    unknown,
-    UnknownException | FetchPokemonErr
-  > = fetchPokemon.pipe(
+  const printPokemon = fetchPokemon.pipe(
     Effect.flatMap(extractResponse),
     Effect.flatMap(savePokemon),
-    Effect.catchTag('FetchPokemonErr', () =>
-      Effect.succeed('Fetch Pokemon went wrong'),
-    ),
-    Effect.catchTag('UnknownException', () =>
-      Effect.succeed('Something went wrong'),
-    ),
+    Effect.catchTags({
+      FetchPokemonErr: () => Effect.succeed('Fetch Pokemon went wrong'),
+      UnknownException: () => Effect.succeed('Something went wrong'),
+    }),
   );
 
   Effect.runPromise(printPokemon).then(console.log);
