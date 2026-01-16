@@ -3,7 +3,7 @@ import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
 // Effect
-import { Effect } from 'effect';
+import { Data, Effect } from 'effect';
 
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
@@ -59,9 +59,13 @@ export const unstable_settings = {
   initialRouteName: StorybookEnabled ? SCREENS.STORYBOOK : SCREENS.AUTH.LAYOUT,
 };
 
-interface FetchPokemonErr {
-  readonly _tag: 'FetchPokemonErr';
-}
+class FetchPokemonErr extends Data.TaggedError('FetchPokemonErr')<{
+  customMessage: string;
+}> {}
+
+class ExtractResponseErr extends Data.TaggedError('ExtractResponseErr') {}
+
+class SaveResponseErr extends Data.TaggedError('SaveResponseErr') {}
 
 const RootLayout = () => {
   const { theme } = useUniwind();
@@ -72,16 +76,21 @@ const RootLayout = () => {
   const fetchPokemon: Effect.Effect<Response, FetchPokemonErr> =
     Effect.tryPromise({
       try: () => fetch('https://pokeapi.co/api/v2/pokemon/ditto'),
-      catch: (): FetchPokemonErr => ({ _tag: 'FetchPokemonErr' }),
+      catch: () =>
+        new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
     });
 
   const extractResponse = (res: Response) =>
-    Effect.tryPromise(() => res.json());
+    Effect.tryPromise({
+      try: () => res.json(),
+      catch: () => new ExtractResponseErr(),
+    });
 
   const savePokemon = (pokemon: unknown) =>
-    Effect.tryPromise(() =>
-      fetch('/api/pokemon', { body: JSON.stringify(pokemon) }),
-    );
+    Effect.tryPromise({
+      try: () => fetch('/api/pokemon', { body: JSON.stringify(pokemon) }),
+      catch: () => new SaveResponseErr(),
+    });
 
   // Effect pipeline: fetch -> validate -> extract JSON -> save
   // Each step transforms the value or can fail with a typed error
@@ -91,14 +100,16 @@ const RootLayout = () => {
     // otherwise fails with the provided error
     Effect.filterOrFail(
       res => res.ok, // just have res when status is 200
-      (): FetchPokemonErr => ({ _tag: 'FetchPokemonErr' }),
+      () => new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
     ),
     Effect.flatMap(extractResponse),
     Effect.flatMap(savePokemon),
+
     // catch all errors
     Effect.catchTags({
-      FetchPokemonErr: () => Effect.succeed('Fetch Pokemon went wrong'),
-      UnknownException: () => Effect.succeed('Something went wrong'),
+      FetchPokemonErr: err => Effect.succeed(err.customMessage),
+      ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
+      SaveResponseErr: () => Effect.succeed('Save Response went wrong'),
     }),
   );
 
