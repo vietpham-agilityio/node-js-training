@@ -59,13 +59,21 @@ export const unstable_settings = {
   initialRouteName: StorybookEnabled ? SCREENS.STORYBOOK : SCREENS.AUTH.LAYOUT,
 };
 
-const Pokemon = Schema.Struct({
+// const Pokemon = Schema.Struct({
+//   id: Schema.Number,
+//   order: Schema.Number,
+//   name: Schema.String,
+//   height: Schema.Number,
+//   weight: Schema.Number,
+// });
+
+class Pokemon extends Schema.Class<Pokemon>('Pokemon')({
   id: Schema.Number,
   order: Schema.Number,
   name: Schema.String,
   height: Schema.Number,
   weight: Schema.Number,
-});
+}) {}
 
 const decodePokemon = Schema.decodeUnknown(Pokemon);
 
@@ -74,8 +82,6 @@ class FetchPokemonErr extends Data.TaggedError('FetchPokemonErr')<{
 }> {}
 
 class ExtractResponseErr extends Data.TaggedError('ExtractResponseErr') {}
-
-class SaveResponseErr extends Data.TaggedError('SaveResponseErr') {}
 
 const RootLayout = () => {
   const { theme } = useUniwind();
@@ -94,12 +100,6 @@ const RootLayout = () => {
     Effect.tryPromise({
       try: () => res.json(),
       catch: () => new ExtractResponseErr(),
-    });
-
-  const savePokemon = (pokemon: unknown) =>
-    Effect.tryPromise({
-      try: () => fetch('/api/pokemon', { body: JSON.stringify(pokemon) }),
-      catch: () => new SaveResponseErr(),
     });
 
   // // Effect pipeline: fetch -> validate -> extract JSON -> save
@@ -130,33 +130,28 @@ const RootLayout = () => {
       yield* new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' });
 
     const jsonRes = yield* extractResponse(res);
-    const decodedPokemon = yield* decodePokemon(jsonRes);
-
-    yield* savePokemon(decodedPokemon);
-
-    return decodedPokemon;
+    return yield* decodePokemon(jsonRes);
   });
 
   const handlePrintPokemon = printPokemon.pipe(
     Effect.catchTags({
       FetchPokemonErr: err => Effect.succeed(err.customMessage),
       ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
-      SaveResponseErr: () => Effect.succeed('Save Response went wrong'),
       ParseError: () => Effect.succeed('Parse Pokemon Error'),
     }),
   );
 
   Effect.runPromise(handlePrintPokemon).then(console.log);
 
-  const doubleNum = (num: number) => Effect.succeed(num * 2);
+  // const doubleNum = (num: number) => Effect.succeed(num * 2);
 
-  const numEffect = Effect.succeed(10);
+  // const numEffect = Effect.succeed(10);
 
-  const doubleNumEffect = numEffect.pipe(Effect.flatMap(doubleNum));
+  // const doubleNumEffect = numEffect.pipe(Effect.flatMap(doubleNum));
 
-  const result = Effect.runSync(doubleNumEffect);
+  // const result = Effect.runSync(doubleNumEffect);
 
-  console.log(result);
+  // console.log(result);
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
