@@ -37,8 +37,11 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { Loading } from '@/components/Loading';
 import { Toast } from '@/components/Toast';
 
-// Servies
-import { getPokemnon } from '@/services/effect/pokemon';
+// Context
+import { PokeApi } from '@/context/pokemon';
+
+// Services
+import { PokemonAPILive } from '@/services/effect/pokemon';
 
 // Error Boundary
 export { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -68,7 +71,17 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  const handlePrintPokemon = getPokemnon.pipe(
+  const printPokemon = Effect.gen(function* () {
+    const pokemonApi = yield* PokeApi;
+
+    return yield* pokemonApi.getPokemon;
+  });
+
+  const handlePrintPokemon = printPokemon.pipe(
+    Effect.provideService(PokeApi, PokemonAPILive),
+  );
+
+  const runHandlePrintPokemon = handlePrintPokemon.pipe(
     Effect.catchTags({
       FetchPokemonErr: err => Effect.succeed(err.customMessage),
       ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
@@ -77,7 +90,7 @@ const RootLayout = () => {
     }),
   );
 
-  Effect.runPromise(handlePrintPokemon).then(console.log);
+  Effect.runPromise(runHandlePrintPokemon).then(console.log);
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
