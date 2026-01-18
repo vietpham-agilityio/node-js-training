@@ -1,4 +1,5 @@
 import * as v from 'valibot';
+import { Schema } from 'effect';
 
 // Constans
 import { ERROR_MESSAGES } from './messages';
@@ -170,6 +171,14 @@ export const forgotPasswordSchema = v.pipe(
     ),
   }),
 );
+
+export class Pokemon extends Schema.Class<Pokemon>('Pokemon')({
+  id: Schema.Number,
+  order: Schema.Number,
+  name: Schema.String,
+  height: Schema.Number,
+  weight: Schema.Number,
+}) {}
 
 export type ResetPasswordFormData = v.InferOutput<typeof resetPasswordSchema>;
 

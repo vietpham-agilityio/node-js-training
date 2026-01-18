@@ -1,6 +1,8 @@
+import { Pokemon } from '@/constants/schema';
 import { Seat } from '@/features/booking/types/cinema';
 
 import { PromoCodeStatus } from '@/features/booking/types/movie';
+import { Schema } from 'effect';
 
 export const formatCardNumber = (number?: string) => {
   if (!number) return '•••• •••• •••• ••••';
@@ -224,3 +226,5 @@ export const groupSeatsByRow = (seats: Seat[]): Record<string, Seat[]> => {
   });
   return grouped;
 };
+
+export const decodePokemon = Schema.decodeUnknown(Pokemon);

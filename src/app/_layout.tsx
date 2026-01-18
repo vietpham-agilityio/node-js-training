@@ -3,7 +3,7 @@ import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
 // Effect
-import { Config, Data, Effect, Schema } from 'effect';
+import { Effect } from 'effect';
 
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
@@ -37,6 +37,9 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { Loading } from '@/components/Loading';
 import { Toast } from '@/components/Toast';
 
+// Servies
+import { getPokemnon } from '@/services/effect/pokemon';
+
 // Error Boundary
 export { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -59,84 +62,13 @@ export const unstable_settings = {
   initialRouteName: StorybookEnabled ? SCREENS.STORYBOOK : SCREENS.AUTH.LAYOUT,
 };
 
-// const Pokemon = Schema.Struct({
-//   id: Schema.Number,
-//   order: Schema.Number,
-//   name: Schema.String,
-//   height: Schema.Number,
-//   weight: Schema.Number,
-// });
-
-class Pokemon extends Schema.Class<Pokemon>('Pokemon')({
-  id: Schema.Number,
-  order: Schema.Number,
-  name: Schema.String,
-  height: Schema.Number,
-  weight: Schema.Number,
-}) {}
-
-const decodePokemon = Schema.decodeUnknown(Pokemon);
-
-class FetchPokemonErr extends Data.TaggedError('FetchPokemonErr')<{
-  customMessage: string;
-}> {}
-
-class ExtractResponseErr extends Data.TaggedError('ExtractResponseErr') {}
-
-const DITTO_ENDPOINT = Config.string('EXPO_PUBLIC_POKEMON_DITTO');
-
 const RootLayout = () => {
   const { theme } = useUniwind();
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
-  const fetchPokemon = (baseUrl: string) =>
-    Effect.tryPromise({
-      try: () => fetch(baseUrl),
-      catch: () =>
-        new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
-    });
-
-  const extractResponse = (res: Response) =>
-    Effect.tryPromise({
-      try: () => res.json(),
-      catch: () => new ExtractResponseErr(),
-    });
-
-  // // Effect pipeline: fetch -> validate -> extract JSON -> save
-  // // Each step transforms the value or can fail with a typed error
-  // const printPokemon = fetchPokemon.pipe(
-  //   // Validate response - if res.ok is false, fail with FetchPokemonErr
-  //   // filterOrFail acts as a guard: passes value through if predicate is true,
-  //   // otherwise fails with the provided error
-  //   Effect.filterOrFail(
-  //     res => res.ok, // just have res when status is 200
-  //     () => new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
-  //   ),
-  //   Effect.flatMap(extractResponse),
-  //   Effect.flatMap(savePokemon),
-
-  //   // catch all errors
-  //   Effect.catchTags({
-  //     FetchPokemonErr: err => Effect.succeed(err.customMessage),
-  //     ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
-  //     SaveResponseErr: () => Effect.succeed('Save Response went wrong'),
-  //   }),
-  // );
-
-  const printPokemon = Effect.gen(function* () {
-    const baseUrl = yield* DITTO_ENDPOINT;
-    const res = yield* fetchPokemon(baseUrl);
-
-    if (!res.ok)
-      yield* new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' });
-
-    const jsonRes = yield* extractResponse(res);
-    return yield* decodePokemon(jsonRes);
-  });
-
-  const handlePrintPokemon = printPokemon.pipe(
+  const handlePrintPokemon = getPokemnon.pipe(
     Effect.catchTags({
       FetchPokemonErr: err => Effect.succeed(err.customMessage),
       ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
@@ -146,16 +78,6 @@ const RootLayout = () => {
   );
 
   Effect.runPromise(handlePrintPokemon).then(console.log);
-
-  // const doubleNum = (num: number) => Effect.succeed(num * 2);
-
-  // const numEffect = Effect.succeed(10);
-
-  // const doubleNumEffect = numEffect.pipe(Effect.flatMap(doubleNum));
-
-  // const result = Effect.runSync(doubleNumEffect);
-
-  // console.log(result);
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
