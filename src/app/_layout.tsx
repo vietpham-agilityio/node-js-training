@@ -71,12 +71,7 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  const mainLayer = Layer.mergeAll(
-    PokeApi.Live,
-    PokemonCollection.Live,
-    BuildPokemonUrl.Live.pipe(Layer.provide(PokemonUrl.Live)), // Provide the dependency of BuildPokemonUrl to PokemonUrl
-    PokemonUrl.Live,
-  );
+  const mainLayer = Layer.mergeAll(PokeApi.Live);
 
   const printPokemon = Effect.gen(function* () {
     const pokemonApi = yield* PokeApi; // yield* to get the service from the context

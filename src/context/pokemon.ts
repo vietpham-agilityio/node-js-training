@@ -27,36 +27,42 @@ interface IPokeApi {
 // PokeApi at first is type of IPokeApi class
 // IPokeApi is a interface for the PokeApi context
 
-const pokemonImplement = {
-  getPokemon: Effect.gen(function* () {
-    const pokemonCollection = yield* PokemonCollection;
-    const buildPokemonUrl = yield* BuildPokemonUrl;
+const pokemonImplement = Effect.gen(function* () {
+  const pokemonCollection = yield* PokemonCollection;
+  const buildPokemonUrl = yield* BuildPokemonUrl;
 
-    const combinedPokemonUrl = buildPokemonUrl({ name: pokemonCollection[2]! });
-
-    const response = yield* Effect.tryPromise({
-      try: () => fetch(combinedPokemonUrl),
-      catch: () =>
-        new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
-    });
-
-    if (!response.ok)
-      yield* new FetchPokemonErr({
-        customMessage: 'Fetch Pokemon with response not ok',
+  return {
+    getPokemon: Effect.gen(function* () {
+      const combinedPokemonUrl = buildPokemonUrl({
+        name: pokemonCollection[2]!,
       });
 
-    const jsonResponse = yield* Effect.tryPromise({
-      try: () => response.json(),
-      catch: () => new ExtractResponseErr(),
-    });
+      const response = yield* Effect.tryPromise({
+        try: () => fetch(combinedPokemonUrl),
+        catch: () =>
+          new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
+      });
 
-    return yield* decodePokemon(jsonResponse);
-  }),
-};
+      if (!response.ok)
+        yield* new FetchPokemonErr({
+          customMessage: 'Fetch Pokemon with response not ok',
+        });
+
+      const jsonResponse = yield* Effect.tryPromise({
+        try: () => response.json(),
+        catch: () => new ExtractResponseErr(),
+      });
+
+      return yield* decodePokemon(jsonResponse);
+    }),
+  };
+});
 
 export class PokeApi extends Context.Tag('PokeApiTag')<
   PokeApi,
-  typeof pokemonImplement
+  Effect.Effect.Success<typeof pokemonImplement>
 >() {
-  static readonly Live = Layer.succeed(this, pokemonImplement);
+  static readonly Live = Layer.effect(this, pokemonImplement).pipe(
+    Layer.provide(Layer.mergeAll(PokemonCollection.Live, BuildPokemonUrl.Live)),
+  );
 }

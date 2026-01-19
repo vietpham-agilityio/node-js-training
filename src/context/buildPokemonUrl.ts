@@ -14,5 +14,5 @@ export class BuildPokemonUrl extends Context.Tag('BuildPokemonUrlTag')<
 
       return ({ name }) => `${pokeBaseUrl}/${name}`;
     }),
-  );
+  ).pipe(Layer.provide(PokemonUrl.Live));
 }
