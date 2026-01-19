@@ -1,10 +1,7 @@
-import { ConfigError, Context, Effect, ParseResult, Layer } from 'effect';
+import { Effect } from 'effect';
 
 // Types
 import { ExtractResponseErr, FetchPokemonErr } from '@/types/error';
-
-// Constants
-import { Pokemon } from '@/constants/schema';
 
 // Utils
 import { decodePokemon } from '@/utils/formats';
@@ -13,66 +10,34 @@ import { decodePokemon } from '@/utils/formats';
 import { PokemonCollection } from './pokemonCollection';
 import { BuildPokemonUrl } from './buildPokemonUrl';
 
-interface IPokeApi {
-  readonly getPokemon: Effect.Effect<
-    typeof Pokemon.Type,
-    | ParseResult.ParseError
-    | ConfigError.ConfigError
-    | FetchPokemonErr
-    | ExtractResponseErr
-  >;
-}
+export class PokeApi extends Effect.Service<PokeApi>()('PokeApiTag', {
+  effect: Effect.gen(function* () {
+    const pokemonCollection = yield* PokemonCollection;
+    const buildPokemonUrl = yield* BuildPokemonUrl;
 
-// PokeApiTag is a tag for the PokeApi context
-// PokeApi at first is type of IPokeApi class
-// IPokeApi is a interface for the PokeApi context
+    return {
+      getPokemon: Effect.gen(function* () {
+        const requestUrl = buildPokemonUrl({ name: pokemonCollection[2]! });
 
-const pokemonImplement = Effect.gen(function* () {
-  const pokemonCollection = yield* PokemonCollection;
-  const buildPokemonUrl = yield* BuildPokemonUrl;
-
-  return {
-    getPokemon: Effect.gen(function* () {
-      const combinedPokemonUrl = buildPokemonUrl({
-        name: pokemonCollection[2]!,
-      });
-
-      const response = yield* Effect.tryPromise({
-        try: () => fetch(combinedPokemonUrl),
-        catch: () =>
-          new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
-      });
-
-      if (!response.ok)
-        yield* new FetchPokemonErr({
-          customMessage: 'Fetch Pokemon with response not ok',
+        const response = yield* Effect.tryPromise({
+          try: () => fetch(requestUrl),
+          catch: () =>
+            new FetchPokemonErr({ customMessage: 'Fetch Pokemon went wrong' }),
         });
 
-      const jsonResponse = yield* Effect.tryPromise({
-        try: () => response.json(),
-        catch: () => new ExtractResponseErr(),
-      });
+        if (!response.ok)
+          yield* new FetchPokemonErr({
+            customMessage: 'Fetch Pokemon with response not ok',
+          });
 
-      return yield* decodePokemon(jsonResponse);
-    }),
-  };
-});
+        const jsonResponse = yield* Effect.tryPromise({
+          try: () => response.json(),
+          catch: () => new ExtractResponseErr(),
+        });
 
-export class PokeApi extends Context.Tag('PokeApiTag')<
-  PokeApi,
-  Effect.Effect.Success<typeof pokemonImplement>
->() {
-  static readonly Live = Layer.effect(this, pokemonImplement).pipe(
-    Layer.provide(Layer.mergeAll(PokemonCollection.Live, BuildPokemonUrl.Live)),
-  );
-
-  static readonly Test = Layer.succeed(this, {
-    getPokemon: Effect.succeed({
-      id: 1,
-      order: 1,
-      name: 'ditto',
-      height: 14,
-      weight: 3,
-    }),
-  });
-}
+        return yield* decodePokemon(jsonResponse);
+      }),
+    };
+  }),
+  dependencies: [PokemonCollection.Default, BuildPokemonUrl.Default],
+}) {}

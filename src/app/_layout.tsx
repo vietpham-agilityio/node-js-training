@@ -71,7 +71,7 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  const mainLayer = Layer.mergeAll(PokeApi.Test);
+  const mainLayer = Layer.mergeAll(PokeApi.Default);
 
   const printPokemon = Effect.gen(function* () {
     const pokemonApi = yield* PokeApi; // yield* to get the service from the context
