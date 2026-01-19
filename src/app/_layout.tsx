@@ -40,9 +40,6 @@ import { Toast } from '@/components/Toast';
 // Context
 import { PokeApi } from '@/context/pokemon';
 
-// Services
-import { PokemonAPILive } from '@/services/effect/pokemon';
-
 // Error Boundary
 export { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -72,13 +69,13 @@ const RootLayout = () => {
   const router = useRouter();
 
   const printPokemon = Effect.gen(function* () {
-    const pokemonApi = yield* PokeApi;
+    const pokemonApi = yield* PokeApi; // yield* to get the service from the context
 
-    return yield* pokemonApi.getPokemon;
+    return yield* pokemonApi.getPokemon; // yield* to run the effect
   });
 
   const handlePrintPokemon = printPokemon.pipe(
-    Effect.provideService(PokeApi, PokemonAPILive),
+    Effect.provideService(PokeApi, PokeApi.Live), // provide the service to the effect
   );
 
   const runHandlePrintPokemon = handlePrintPokemon.pipe(
