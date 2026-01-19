@@ -3,7 +3,7 @@ import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
 // Effect
-import { Effect } from 'effect';
+import { Effect, Layer } from 'effect';
 
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
@@ -71,18 +71,20 @@ const RootLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
+  const mainLayer = Layer.mergeAll(
+    PokeApi.Live,
+    PokemonCollection.Live,
+    BuildPokemonUrl.Live.pipe(Layer.provide(PokemonUrl.Live)), // Provide the dependency of BuildPokemonUrl to PokemonUrl
+    PokemonUrl.Live,
+  );
+
   const printPokemon = Effect.gen(function* () {
     const pokemonApi = yield* PokeApi; // yield* to get the service from the context
 
     return yield* pokemonApi.getPokemon; // yield* to run the effect
   });
 
-  const handlePrintPokemon = printPokemon.pipe(
-    Effect.provideService(PokeApi, PokeApi.Live),
-    Effect.provideService(PokemonCollection, PokemonCollection.Live),
-    Effect.provideServiceEffect(BuildPokemonUrl, BuildPokemonUrl.Live),
-    Effect.provideServiceEffect(PokemonUrl, PokemonUrl.Live),
-  );
+  const handlePrintPokemon = printPokemon.pipe(Effect.provide(mainLayer));
 
   const runHandlePrintPokemon = handlePrintPokemon.pipe(
     Effect.catchTags({

@@ -1,4 +1,4 @@
-import { ConfigError, Context, Effect, ParseResult } from 'effect';
+import { ConfigError, Context, Effect, ParseResult, Layer } from 'effect';
 
 // Types
 import { ExtractResponseErr, FetchPokemonErr } from '@/types/error';
@@ -58,5 +58,5 @@ export class PokeApi extends Context.Tag('PokeApiTag')<
   PokeApi,
   typeof pokemonImplement
 >() {
-  static readonly Live = PokeApi.of(pokemonImplement);
+  static readonly Live = Layer.succeed(this, pokemonImplement);
 }
