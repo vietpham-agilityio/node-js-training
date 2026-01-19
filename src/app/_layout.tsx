@@ -38,7 +38,10 @@ import { Loading } from '@/components/Loading';
 import { Toast } from '@/components/Toast';
 
 // Context
+import { BuildPokemonUrl } from '@/context/buildPokemonUrl';
 import { PokeApi } from '@/context/pokemon';
+import { PokemonCollection } from '@/context/pokemonCollection';
+import { PokemonUrl } from '@/context/pokemonUrl';
 
 // Error Boundary
 export { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -75,7 +78,10 @@ const RootLayout = () => {
   });
 
   const handlePrintPokemon = printPokemon.pipe(
-    Effect.provideService(PokeApi, PokeApi.Live), // provide the service to the effect
+    Effect.provideService(PokeApi, PokeApi.Live),
+    Effect.provideService(PokemonCollection, PokemonCollection.Live),
+    Effect.provideServiceEffect(BuildPokemonUrl, BuildPokemonUrl.Live),
+    Effect.provideServiceEffect(PokemonUrl, PokemonUrl.Live),
   );
 
   const runHandlePrintPokemon = handlePrintPokemon.pipe(
@@ -83,7 +89,6 @@ const RootLayout = () => {
       FetchPokemonErr: err => Effect.succeed(err.customMessage),
       ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
       ParseError: () => Effect.succeed('Parse Pokemon Error'),
-      ConfigError: () => Effect.succeed('Config Error'),
     }),
   );
 
