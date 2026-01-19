@@ -65,4 +65,14 @@ export class PokeApi extends Context.Tag('PokeApiTag')<
   static readonly Live = Layer.effect(this, pokemonImplement).pipe(
     Layer.provide(Layer.mergeAll(PokemonCollection.Live, BuildPokemonUrl.Live)),
   );
+
+  static readonly Test = Layer.succeed(this, {
+    getPokemon: Effect.succeed({
+      id: 1,
+      order: 1,
+      name: 'ditto',
+      height: 14,
+      weight: 3,
+    }),
+  });
 }
