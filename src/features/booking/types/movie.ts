@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+import { Schema } from 'effect';
+
 export enum MovieStatus {
   NOW_PLAYING = 'now_playing',
   COMING_SOON = 'coming_soon',
@@ -32,53 +35,63 @@ export enum GenreMovie {
   WESTERN = 'western',
 }
 
-export interface CastMember {
-  character?: string;
-  name: string;
-  imageUrl: string | null;
-}
+export const CastMemberSchema = Schema.Struct({
+  character: Schema.optional(Schema.String),
+  name: Schema.String,
+  imageUrl: Schema.optional(Schema.String),
+});
 
-export interface CrewMember {
-  name: string;
-}
+export const CrewMemberSchema = Schema.Struct({
+  name: Schema.String,
+});
 
-export interface CastCrew {
-  actors: CastMember[];
-  directors: CrewMember[];
-  producers: CrewMember[];
-  writers: CrewMember[];
-}
+export const CastCrewSchema = Schema.Struct({
+  actors: Schema.Array(CastMemberSchema),
+  directors: Schema.Array(CrewMemberSchema),
+  producers: Schema.Array(CrewMemberSchema),
+  writers: Schema.Array(CrewMemberSchema),
+});
 
-export interface Movie {
-  id: string;
-  title: string;
-  synopsis: string;
-  posterUrl: string;
-  trailerUrl: string[];
-  durationMinutes: number;
-  releaseDate: string;
-  rating: number;
-  genre: GenreMovie[];
-  castCrew: CastCrew;
-  language?: string;
-  status: MovieStatus;
-  createdAt: string;
-  updatedAt: string;
-}
+export const MovieSchema = Schema.Struct({
+  id: Schema.String,
+  title: Schema.String,
+  synopsis: Schema.String,
+  posterUrl: Schema.String,
+  trailerUrl: Schema.Array(Schema.String),
+  durationMinutes: Schema.Number,
+  releaseDate: Schema.String,
+  rating: Schema.Number,
+  genre: Schema.Array(Schema.Enums(GenreMovie)),
+  castCrew: CastCrewSchema,
+  language: Schema.optional(Schema.String),
+  status: Schema.Enums(MovieStatus),
+  createdAt: Schema.String,
+  updatedAt: Schema.String,
+});
 
-export interface PromoCode {
-  id: string;
-  code: string;
-  description?: string;
-  discountType: PromoCodeStatus;
-  discountValue: number;
-  minPurchaseAmount?: number;
-  maxDiscountAmount?: number;
-  usageLimit?: number;
-  usageCount?: number;
-  validFrom?: string;
-  validUntil?: string;
-  isActive?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export const PromoCodeSchema = Schema.Struct({
+  id: Schema.String,
+  code: Schema.String,
+  description: Schema.optional(Schema.String),
+  discountType: Schema.Enums(PromoCodeStatus),
+  discountValue: Schema.Number,
+  minPurchaseAmount: Schema.optional(Schema.Number),
+  maxDiscountAmount: Schema.optional(Schema.Number),
+  usageLimit: Schema.optional(Schema.Number),
+  usageCount: Schema.optional(Schema.Number),
+  validFrom: Schema.optional(Schema.String),
+  validUntil: Schema.optional(Schema.String),
+  isActive: Schema.optional(Schema.Boolean),
+  createdAt: Schema.optional(Schema.String),
+  updatedAt: Schema.optional(Schema.String),
+});
+
+export interface Movie extends Schema.Schema.Type<typeof MovieSchema> {}
+export interface PromoCode extends Schema.Schema.Type<typeof PromoCodeSchema> {}
+export interface CastMember extends Schema.Schema.Type<
+  typeof CastMemberSchema
+> {}
+export interface CrewMember extends Schema.Schema.Type<
+  typeof CrewMemberSchema
+> {}
+export interface CastCrew extends Schema.Schema.Type<typeof CastCrewSchema> {}

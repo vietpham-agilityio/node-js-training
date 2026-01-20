@@ -11,6 +11,8 @@ import { useProfile, useUpdateProfile, useUploadAvatar } from '../useProfile';
 // Types
 import { UserProfile } from '@/features/auth/types/auth';
 
+import { Option } from 'effect';
+
 // Mock dependencies
 const mockGetProfile = jest.fn();
 const mockUpdateProfile = jest.fn();
@@ -180,8 +182,7 @@ describe('useUpdateProfile', () => {
     const optimisticData = queryClient.getQueryData<UserProfile>(
       queryKeys.profile.detail('user-123'),
     );
-    expect(optimisticData?.fullName).toBe('John Doe');
-
+    expect(optimisticData?.fullName).toStrictEqual('John Doe');
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });

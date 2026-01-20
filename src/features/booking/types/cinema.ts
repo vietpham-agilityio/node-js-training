@@ -1,3 +1,7 @@
+// Effect
+import { Schema } from 'effect';
+
+// Type
 import { Movie } from './movie';
 
 export enum ShowtimeStatus {
@@ -18,63 +22,85 @@ export enum SeatStatus {
   SELECTED = 'selected',
 }
 
-export interface Cinema {
-  id: string;
-  name: string;
-  location: string;
-  address: string;
-  city: string;
-  phoneNumber?: string;
-  facilities?: string[];
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+// Core schema for Cinema
+export const CinemaSchema = Schema.Struct({
+  id: Schema.String,
+  name: Schema.String,
+  location: Schema.String,
+  address: Schema.String,
+  city: Schema.String,
+  phoneNumber: Schema.optional(Schema.String),
+  facilities: Schema.optional(Schema.Array(Schema.String)),
+  isActive: Schema.Boolean,
+  createdAt: Schema.String,
+  updatedAt: Schema.String,
+});
 
-export interface CinemaHall {
-  id: string;
-  cinemaId: string;
-  name: string;
-  hallType: string;
-  totalSeats: number;
-  seatLayout: any;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+// Core schema for CinemaHall
+export const CinemaHallSchema = Schema.Struct({
+  id: Schema.String,
+  cinemaId: Schema.String,
+  name: Schema.String,
+  hallType: Schema.String,
+  totalSeats: Schema.Number,
+  seatLayout: Schema.Any,
+  isActive: Schema.Boolean,
+  createdAt: Schema.String,
+  updatedAt: Schema.String,
+  cinema: Schema.optional(CinemaSchema),
+});
+
+// Core schema for Showtime (without external type references)
+export const ShowtimeSchema = Schema.Struct({
+  id: Schema.String,
+  movieId: Schema.String,
+  cinemaHallId: Schema.String,
+  showDate: Schema.String,
+  showTime: Schema.String,
+  endTime: Schema.String,
+  price: Schema.Number,
+  availableSeats: Schema.Number,
+  status: Schema.Enums(ShowtimeStatus),
+  createdAt: Schema.String,
+  updatedAt: Schema.String,
+  cinemaHall: Schema.optional(CinemaHallSchema),
+});
+
+// Core schema for SeatReservation
+export const SeatReservationSchema = Schema.Struct({
+  id: Schema.String,
+  showtimeId: Schema.String,
+  userId: Schema.String,
+  seatNumbers: Schema.Array(Schema.String),
+  reservedUntil: Schema.String,
+  status: Schema.Enums(SeatReservationStatus),
+  createdAt: Schema.String,
+});
+
+// Core schema for Seat
+export const SeatSchema = Schema.Struct({
+  id: Schema.String,
+  row: Schema.String,
+  number: Schema.Number,
+  status: Schema.Enums(SeatStatus),
+});
+
+// Derive base types from schemas
+export type Cinema = Schema.Schema.Type<typeof CinemaSchema>;
+export type CinemaHallBase = Schema.Schema.Type<typeof CinemaHallSchema>;
+export type ShowtimeBase = Schema.Schema.Type<typeof ShowtimeSchema>;
+export type SeatReservationBase = Schema.Schema.Type<
+  typeof SeatReservationSchema
+>;
+export type SeatBase = Schema.Schema.Type<typeof SeatSchema>;
+
+export interface CinemaHall extends CinemaHallBase {
   cinema?: Cinema;
 }
 
-export interface Showtime {
-  id: string;
-  movieId: string;
-  cinemaHallId: string;
-  showDate: string;
-  showTime: string;
-  endTime: string;
-  price: number;
-  availableSeats: number;
-  status: ShowtimeStatus;
-  createdAt: string;
-  updatedAt: string;
+export interface Showtime extends ShowtimeBase {
   cinemaHall?: CinemaHall;
   movie?: Movie;
-}
-
-export interface SeatReservation {
-  id: string;
-  showtimeId: string;
-  userId: string;
-  seatNumbers: string[];
-  reservedUntil: string;
-  status: SeatReservationStatus;
-  createdAt: string;
-}
-
-export interface Seat {
-  id: string;
-  row: string;
-  number: number;
-  status: SeatStatus;
 }
 
 export interface CinemaWithShowtimes {

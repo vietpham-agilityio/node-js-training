@@ -1,35 +1,54 @@
-export interface SignUpData {
-  email: string;
-  password: string;
-  fullName?: string;
-  avatarUrl?: string;
-}
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+import { Schema } from 'effect';
 
-export interface SignInData {
-  email: string;
-  password: string;
-}
+export const SignUpDataSchema = Schema.Struct({
+  email: Schema.String,
+  password: Schema.String,
+  fullName: Schema.optional(Schema.String),
+  avatarUrl: Schema.optional(Schema.String),
+});
 
-export interface UserProfile {
-  id: string;
-  fullName?: string;
-  email?: string;
-  phoneNumber?: string;
-  address?: string;
-  avatarUrl?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export const SignInDataSchema = Schema.Struct({
+  email: Schema.String,
+  password: Schema.String,
+});
 
-export interface UpdateProfileData {
-  fullName?: string;
-  phoneNumber?: string;
-  address?: string;
-  email?: string;
-  avatarUrl?: string;
-}
+export const UserProfileSchema = Schema.Struct({
+  id: Schema.String,
+  fullName: Schema.optional(Schema.String),
+  email: Schema.String,
+  phoneNumber: Schema.optional(Schema.String),
+  address: Schema.optional(Schema.String),
+  avatarUrl: Schema.optional(Schema.String),
+  createdAt: Schema.optional(Schema.String),
+  updatedAt: Schema.optional(Schema.String),
+});
 
-export interface ChangePasswordData {
-  currentPassword: string;
-  newPassword: string;
-}
+export const UpdateProfileDataSchema = Schema.Struct({
+  fullName: Schema.optional(Schema.String),
+  phoneNumber: Schema.optional(Schema.String),
+  address: Schema.optional(Schema.String),
+  email: Schema.optional(Schema.String),
+  avatarUrl: Schema.optional(Schema.String),
+});
+
+export const ChangePasswordDataSchema = Schema.Struct({
+  currentPassword: Schema.String,
+  newPassword: Schema.String,
+});
+
+export interface SignUpData extends Schema.Schema.Type<
+  typeof SignUpDataSchema
+> {}
+export interface SignInData extends Schema.Schema.Type<
+  typeof SignInDataSchema
+> {}
+export interface UserProfile extends Schema.Schema.Type<
+  typeof UserProfileSchema
+> {}
+export interface UpdateProfileData extends Schema.Schema.Type<
+  typeof UpdateProfileDataSchema
+> {}
+export interface ChangePasswordData extends Schema.Schema.Type<
+  typeof ChangePasswordDataSchema
+> {}
