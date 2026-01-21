@@ -4,8 +4,11 @@ import { View } from 'react-native';
 // Components
 import { SelectBox } from '@/features/booking/components/SelectBox';
 
+// Constants
+import { SEAT_STATUS } from '@/constants/status';
+
 // Types
-import { Seat, SeatStatus } from '@/features/booking/types/cinema';
+import { Seat } from '@/features/booking/schemas/cinema';
 
 interface SeatItemProps {
   seat: Seat;
@@ -17,8 +20,8 @@ export const SeatItem = memo(({ seat, onSeatPress }: SeatItemProps) => {
     onSeatPress(seat);
   }, [seat, onSeatPress]);
 
-  const isBooked = seat.status === SeatStatus.BOOKED;
-  const isSelected = seat.status === SeatStatus.SELECTED;
+  const isBooked = seat.status === SEAT_STATUS.BOOKED;
+  const isSelected = seat.status === SEAT_STATUS.SELECTED;
   const hasAisleSpacing = seat.number === 5;
 
   const seatLabel = `Seat ${seat.id}`;

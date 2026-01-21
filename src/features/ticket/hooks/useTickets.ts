@@ -7,7 +7,8 @@ import { ticketsService } from '@/features/ticket/services/tickets';
 import { useAuthStore } from '@/features/auth/store/auth';
 
 // Types
-import { Ticket, TicketStatus } from '@/features/booking/types/booking';
+import { Ticket } from '@/features/booking/schemas/booking';
+import { BOOKING_STATUS } from '@/constants/status';
 
 import {
   useInfiniteQuery,
@@ -69,7 +70,7 @@ export const useValidateTicket = () => {
           queryKeys.tickets.detail(result.ticket.id),
           (old: Ticket) => ({
             ...old,
-            status: TicketStatus.USED,
+            status: BOOKING_STATUS.USED,
             scannedAt: new Date().toISOString(),
           }),
         );

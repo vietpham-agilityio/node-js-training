@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react-native';
-import { MovieStatus } from '../../types/movie';
 import { useMovieData } from '../useMovieData';
 import * as useMoviesModule from '../useMovies';
+import { MOVIE_STATUS } from '@/constants/status';
+import { MovieStatus } from '../../schemas/movie';
 
 // Mock the hooks
 jest.mock('../useMovies');
@@ -65,20 +66,20 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
       );
 
       expect(mockUseMoviesInfinite).toHaveBeenCalledWith({
-        status: MovieStatus.NOW_PLAYING,
+        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
         enabled: true,
       });
 
       expect(mockUseMoviesByGenreInfinite).toHaveBeenCalledWith({
         genre: undefined,
-        status: MovieStatus.NOW_PLAYING,
+        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
         enabled: false,
       });
 
@@ -95,15 +96,15 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
       );
 
-      expect(result.current.movies[0].rating).toBe(9.1);
-      expect(result.current.movies[1].rating).toBe(8.5);
-      expect(result.current.movies[2].rating).toBe(7.2);
+      expect(result.current?.movies[0]?.rating).toBe(9.1);
+      expect(result.current?.movies[1]?.rating).toBe(8.5);
+      expect(result.current?.movies[2]?.rating).toBe(7.2);
     });
 
     it('should limit to 10 movies', () => {
@@ -125,7 +126,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -146,20 +147,20 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: 'action',
           }),
         { wrapper: createWrapper() },
       );
 
       expect(mockUseMoviesInfinite).toHaveBeenCalledWith({
-        status: MovieStatus.NOW_PLAYING,
+        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
         enabled: false,
       });
 
       expect(mockUseMoviesByGenreInfinite).toHaveBeenCalledWith({
         genre: 'action',
-        status: MovieStatus.NOW_PLAYING,
+        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
         enabled: true,
       });
 
@@ -178,16 +179,16 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.COMING_SOON,
+            status: MOVIE_STATUS.COMING_SOON as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
       );
 
       // Should maintain original order
-      expect(result.current.movies[0].id).toBe('1');
-      expect(result.current.movies[1].id).toBe('2');
-      expect(result.current.movies[2].id).toBe('3');
+      expect(result.current.movies[0]?.id).toBe('1');
+      expect(result.current.movies[1]?.id).toBe('2');
+      expect(result.current.movies[2]?.id).toBe('3');
     });
   });
 
@@ -205,7 +206,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -227,7 +228,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -249,7 +250,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -273,7 +274,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -295,7 +296,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -319,7 +320,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -343,7 +344,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -369,7 +370,7 @@ describe('useMovieData', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
           }),
         { wrapper: createWrapper() },
@@ -392,7 +393,7 @@ describe('useMovieData', () => {
       renderHook(
         () =>
           useMovieData({
-            status: MovieStatus.NOW_PLAYING,
+            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
             genre: undefined,
             enabled: false,
           }),
@@ -400,7 +401,7 @@ describe('useMovieData', () => {
       );
 
       expect(mockUseMoviesInfinite).toHaveBeenCalledWith({
-        status: MovieStatus.NOW_PLAYING,
+        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
         enabled: false,
       });
     });

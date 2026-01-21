@@ -5,11 +5,15 @@ import MyWalletScreen from '../index';
 
 // Constants
 import { ROUTES } from '@/constants';
+import { GENRE_MOVIE } from '@/constants/movie';
+import {
+  MOVIE_STATUS,
+  BOOKING_STATUS,
+  PAYMENT_STATUS,
+  SHOWTIME_STATUS,
+} from '@/constants/status';
 
 // Types
-import { BookingStatus, PaymentStatus } from '@/features/booking/types/booking';
-import { ShowtimeStatus } from '@/features/booking/types/cinema';
-import { GenreMovie, MovieStatus } from '@/features/booking/types/movie';
 import {
   Wallet,
   WalletTransaction,
@@ -99,8 +103,8 @@ const mockTransactions: WalletTransaction[] = [
       subtotal: 50000,
       discountAmount: 0,
       paymentMethod: 'credit_card',
-      paymentStatus: PaymentStatus.PAID,
-      bookingStatus: BookingStatus.ACTIVE,
+      paymentStatus: PAYMENT_STATUS.PAID,
+      bookingStatus: BOOKING_STATUS.ACTIVE,
       expiresAt: '2024-01-02T12:00:00Z',
       createdAt: '2024-01-02T00:00:00Z',
       updatedAt: '2024-01-02T00:00:00Z',
@@ -113,7 +117,7 @@ const mockTransactions: WalletTransaction[] = [
         endTime: '16:00',
         price: 50000,
         availableSeats: 100,
-        status: ShowtimeStatus.ACTIVE,
+        status: SHOWTIME_STATUS.ACTIVE,
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
         movie: {
@@ -124,9 +128,9 @@ const mockTransactions: WalletTransaction[] = [
           trailerUrl: ['https://example.com/trailer.mp4'],
           durationMinutes: 120,
           releaseDate: '2024-01-01',
-          status: MovieStatus.NOW_PLAYING,
+          status: MOVIE_STATUS.NOW_PLAYING,
           rating: 4.5,
-          genre: [GenreMovie.ACTION, GenreMovie.DRAMA],
+          genre: [GENRE_MOVIE.ACTION, GENRE_MOVIE.DRAMA],
           castCrew: {
             actors: [],
             directors: [],
@@ -497,8 +501,8 @@ describe('MyWalletScreen', () => {
                 bookingNumber: '1234567890',
                 discountAmount: 0,
                 paymentMethod: 'credit_card',
-                paymentStatus: PaymentStatus.PAID,
-                bookingStatus: BookingStatus.ACTIVE,
+                paymentStatus: PAYMENT_STATUS.PAID,
+                bookingStatus: BOOKING_STATUS.ACTIVE,
                 totalAmount: 50000,
                 expiresAt: '2024-01-02T12:00:00Z',
                 createdAt: '2024-01-01T00:00:00Z',
@@ -512,7 +516,7 @@ describe('MyWalletScreen', () => {
                   endTime: '16:00',
                   price: 50000,
                   availableSeats: 100,
-                  status: ShowtimeStatus.ACTIVE,
+                  status: SHOWTIME_STATUS.ACTIVE,
                   createdAt: '2024-01-01T00:00:00Z',
                   updatedAt: '2024-01-01T00:00:00Z',
                 },

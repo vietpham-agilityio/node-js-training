@@ -1,7 +1,7 @@
 import { supabase } from '@/services/supabase/client';
 
 // Types
-import { Cinema } from '@/features/booking/types/cinema';
+import { Cinema } from '@/features/booking/schemas/cinema';
 
 // Utils
 import { keysToCamel } from '@/utils/convert';

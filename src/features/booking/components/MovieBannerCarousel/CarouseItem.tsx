@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 
 // Types
-import { Movie } from '@/features/booking/types/movie';
+import { Movie } from '@/features/booking/schemas/movie';
 
 // Components
 import { MovieBanner } from '../MovieBanner';

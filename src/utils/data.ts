@@ -1,4 +1,5 @@
-import { Seat, SeatStatus } from '@/features/booking/types/cinema';
+import { SEAT_STATUS } from '@/constants/status';
+import { Seat, SeatStatus } from '@/features/booking/schemas/cinema';
 
 // Generate seat layout: Rows A-J, Columns 1-10
 export const generateSeats = (): Seat[] => {
@@ -14,7 +15,9 @@ export const generateSeats = (): Seat[] => {
         id: seatId,
         row,
         number: num,
-        status: isBooked ? SeatStatus.BOOKED : SeatStatus.AVAILABLE,
+        status: isBooked
+          ? (SEAT_STATUS.BOOKED as SeatStatus)
+          : (SEAT_STATUS.AVAILABLE as SeatStatus),
       });
     }
   });

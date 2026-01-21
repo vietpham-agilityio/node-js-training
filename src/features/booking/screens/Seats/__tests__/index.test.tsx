@@ -47,17 +47,15 @@ jest.mock('@/features/booking/store/booking', () => ({
 }));
 
 jest.mock('@/utils/data', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { SeatStatus } = require('@/features/booking/types/cinema');
   return {
     generateSeats: () => [
-      { id: 'A1', row: 'A', number: 1, status: SeatStatus.AVAILABLE },
-      { id: 'A2', row: 'A', number: 2, status: SeatStatus.AVAILABLE },
-      { id: 'A3', row: 'A', number: 3, status: SeatStatus.AVAILABLE },
-      { id: 'A4', row: 'A', number: 4, status: SeatStatus.AVAILABLE },
-      { id: 'A5', row: 'A', number: 5, status: SeatStatus.AVAILABLE },
-      { id: 'B1', row: 'B', number: 1, status: SeatStatus.BOOKED },
-      { id: 'B2', row: 'B', number: 2, status: SeatStatus.AVAILABLE },
+      { id: 'A1', row: 'A', number: 1, status: 'available' },
+      { id: 'A2', row: 'A', number: 2, status: 'available' },
+      { id: 'A3', row: 'A', number: 3, status: 'available' },
+      { id: 'A4', row: 'A', number: 4, status: 'available' },
+      { id: 'A5', row: 'A', number: 5, status: 'available' },
+      { id: 'B1', row: 'B', number: 1, status: 'booked' },
+      { id: 'B2', row: 'B', number: 2, status: 'available' },
     ],
   };
 });
@@ -69,7 +67,7 @@ jest.mock('@/utils/formats', () => ({
       if (!grouped[seat.row]) {
         grouped[seat.row] = [];
       }
-      grouped[seat.row].push(seat);
+      grouped[seat?.row || '']?.push(seat);
     });
     return grouped;
   },

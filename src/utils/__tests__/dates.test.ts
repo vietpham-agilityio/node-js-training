@@ -1,4 +1,4 @@
-import { Showtime } from '@/features/booking/types/cinema';
+import { Showtime } from '@/features/booking/schemas/cinema';
 import {
   filterShowtimesByTime,
   formatShowtimes,
@@ -53,19 +53,19 @@ describe('getDayOfWeekLabels', () => {
   it('should include day name and number', () => {
     jest.setSystemTime(new Date('2024-01-15')); // Monday
     const labels = getDayOfWeekLabels();
-    expect(labels[0].label).toMatch('MON');
+    expect(labels[0]?.label).toMatch('MON');
   });
 
   it('should include date string in YYYY-MM-DD format', () => {
     jest.setSystemTime(new Date('2024-01-15'));
     const labels = getDayOfWeekLabels();
-    expect(labels[0].dayNumber).toMatch(/^\d+$/);
+    expect(labels[0]?.dayNumber).toMatch(/^\d+$/);
   });
 
   it('should start from today', () => {
     jest.setSystemTime(new Date('2024-01-15'));
     const labels = getDayOfWeekLabels();
-    expect(labels[0].label).toBe('MON');
+    expect(labels[0]?.label).toBe('MON');
   });
 
   it('should have unique IDs', () => {
@@ -145,9 +145,9 @@ describe('filterShowtimesByTime', () => {
       createMockShowtime('10:00', 'cinema-1', 'hall-1'),
       createMockShowtime('11:00', 'cinema-1', 'hall-1'),
     ];
-    showtimes[0].showDate = '2024-01-16';
-    showtimes[1].showDate = '2024-01-16';
-    showtimes[2].showDate = '2024-01-16';
+    showtimes[0]!.showDate = '2024-01-16';
+    showtimes[1]!.showDate = '2024-01-16';
+    showtimes[2]!.showDate = '2024-01-16';
 
     const result = filterShowtimesByTime(showtimes as Showtime[], '2024-01-16');
     expect(result).toHaveLength(3);
@@ -165,7 +165,7 @@ describe('filterShowtimesByTime', () => {
 
     const result = filterShowtimesByTime(showtimes as Showtime[], today);
     expect(result).toHaveLength(2); // 10:30 and 11:00
-    expect(result[0].showTime).toBe('10:30');
+    expect(result[0]?.showTime).toBe('10:30');
   });
 
   it('should return empty array if past 23:00', () => {
@@ -226,10 +226,10 @@ describe('formatShowtimes', () => {
 
     const result = formatShowtimes(showtimes as Showtime[], '2024-01-16');
     expect(result).toHaveLength(2);
-    expect(result[0].cinema.id).toBe('cinema-1');
-    expect(result[0].showtimes).toHaveLength(2);
-    expect(result[1].cinema.id).toBe('cinema-2');
-    expect(result[1].showtimes).toHaveLength(1);
+    expect(result[0]!.cinema.id).toBe('cinema-1');
+    expect(result[0]!.showtimes).toHaveLength(2);
+    expect(result[1]!.cinema.id).toBe('cinema-2');
+    expect(result[1]!.showtimes).toHaveLength(1);
   });
 
   it('should sort showtimes by time within each cinema', () => {
@@ -241,9 +241,9 @@ describe('formatShowtimes', () => {
     showtimes.forEach(s => (s.showDate = '2024-01-16'));
 
     const result = formatShowtimes(showtimes as Showtime[], '2024-01-16');
-    expect(result[0].showtimes[0].showTime).toBe('11:00');
-    expect(result[0].showtimes[1].showTime).toBe('12:00');
-    expect(result[0].showtimes[2].showTime).toBe('13:00');
+    expect(result[0]?.showtimes[0]?.showTime).toBe('11:00');
+    expect(result[0]?.showtimes[1]?.showTime).toBe('12:00');
+    expect(result[0]?.showtimes[2]?.showTime).toBe('13:00');
   });
 
   it('should sort cinemas alphabetically by name', () => {
@@ -255,9 +255,9 @@ describe('formatShowtimes', () => {
     showtimes.forEach(s => (s.showDate = '2024-01-16'));
 
     const result = formatShowtimes(showtimes as Showtime[], '2024-01-16');
-    expect(result[0].cinema.name).toBe('Cinema cinema-a');
-    expect(result[1].cinema.name).toBe('Cinema cinema-m');
-    expect(result[2].cinema.name).toBe('Cinema cinema-z');
+    expect(result[0]?.cinema.name).toBe('Cinema cinema-a');
+    expect(result[1]?.cinema.name).toBe('Cinema cinema-m');
+    expect(result[2]?.cinema.name).toBe('Cinema cinema-z');
   });
 
   it('should filter showtimes by time for today', () => {
@@ -271,7 +271,7 @@ describe('formatShowtimes', () => {
     showtimes.forEach(s => (s.showDate = today));
 
     const result = formatShowtimes(showtimes as Showtime[], today);
-    expect(result[0].showtimes).toHaveLength(2); // Only 10:30 and 11:00
+    expect(result[0]?.showtimes).toHaveLength(2); // Only 10:30 and 11:00
   });
 
   it('should skip showtimes without cinemaHall', () => {
@@ -286,7 +286,7 @@ describe('formatShowtimes', () => {
 
     const result = formatShowtimes(showtimes as Showtime[], '2024-01-16');
     expect(result).toHaveLength(1);
-    expect(result[0].cinema.id).toBe('cinema-1');
+    expect(result[0]?.cinema.id).toBe('cinema-1');
   });
 
   it('should skip showtimes without cinema', () => {

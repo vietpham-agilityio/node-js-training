@@ -4,23 +4,22 @@ import { Schema } from 'effect';
 // Type
 import { Movie } from './movie';
 
-export enum ShowtimeStatus {
-  ACTIVE = 'active',
-  CANCELLED = 'cancelled',
-  COMPLETED = 'completed',
-}
-
-export enum SeatReservationStatus {
-  RESERVED = 'reserved',
-  CONFIRMED = 'confirmed',
-  RELEASED = 'released',
-}
-
-export enum SeatStatus {
-  AVAILABLE = 'available',
-  BOOKED = 'booked',
-  SELECTED = 'selected',
-}
+// Status schemas using Schema.Literal
+export const ShowtimeStatusSchema = Schema.Literal(
+  'active',
+  'cancelled',
+  'completed',
+);
+export const SeatReservationStatusSchema = Schema.Literal(
+  'reserved',
+  'confirmed',
+  'released',
+);
+export const SeatStatusSchema = Schema.Literal(
+  'available',
+  'booked',
+  'selected',
+);
 
 // Core schema for Cinema
 export const CinemaSchema = Schema.Struct({
@@ -60,7 +59,7 @@ export const ShowtimeSchema = Schema.Struct({
   endTime: Schema.String,
   price: Schema.Number,
   availableSeats: Schema.Number,
-  status: Schema.Enums(ShowtimeStatus),
+  status: ShowtimeStatusSchema,
   createdAt: Schema.String,
   updatedAt: Schema.String,
   cinemaHall: Schema.optional(CinemaHallSchema),
@@ -73,7 +72,7 @@ export const SeatReservationSchema = Schema.Struct({
   userId: Schema.String,
   seatNumbers: Schema.Array(Schema.String),
   reservedUntil: Schema.String,
-  status: Schema.Enums(SeatReservationStatus),
+  status: SeatReservationStatusSchema,
   createdAt: Schema.String,
 });
 
@@ -82,10 +81,17 @@ export const SeatSchema = Schema.Struct({
   id: Schema.String,
   row: Schema.String,
   number: Schema.Number,
-  status: Schema.Enums(SeatStatus),
+  status: SeatStatusSchema,
 });
 
-// Derive base types from schemas
+// Status types derived from schemas
+export type ShowtimeStatus = Schema.Schema.Type<typeof ShowtimeStatusSchema>;
+export type SeatReservationStatus = Schema.Schema.Type<
+  typeof SeatReservationStatusSchema
+>;
+export type SeatStatus = Schema.Schema.Type<typeof SeatStatusSchema>;
+
+// Base types derived from schemas
 export type Cinema = Schema.Schema.Type<typeof CinemaSchema>;
 export type CinemaHallBase = Schema.Schema.Type<typeof CinemaHallSchema>;
 export type ShowtimeBase = Schema.Schema.Type<typeof ShowtimeSchema>;
@@ -94,6 +100,7 @@ export type SeatReservationBase = Schema.Schema.Type<
 >;
 export type SeatBase = Schema.Schema.Type<typeof SeatSchema>;
 
+// Extended interfaces/types with optional nested relationships
 export interface CinemaHall extends CinemaHallBase {
   cinema?: Cinema;
 }
@@ -102,6 +109,9 @@ export interface Showtime extends ShowtimeBase {
   cinemaHall?: CinemaHall;
   movie?: Movie;
 }
+
+export type SeatReservation = SeatReservationBase;
+export type Seat = SeatBase;
 
 export interface CinemaWithShowtimes {
   cinema: Cinema;

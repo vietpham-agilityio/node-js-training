@@ -29,7 +29,7 @@ interface HorizontalCardProps extends Omit<TouchableOpacityProps, 'children'> {
   title: string;
   posterUrl: string;
   durationMinutes?: number;
-  genre?: string[];
+  genre?: readonly string[];
   rating?: number;
   cinemaLocation?: string;
   cinemaName?: string;

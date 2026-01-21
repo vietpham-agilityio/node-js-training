@@ -1,4 +1,5 @@
-import { TicketStatus } from '@/features/booking/types/booking';
+import { BOOKING_STATUS } from '@/constants/status';
+import { BookingStatus } from '@/features/booking/schemas/booking';
 import { supabase } from '@/services/supabase/client';
 
 export class TicketExpirationService {
@@ -41,7 +42,7 @@ export class TicketExpirationService {
    * Check if a specific ticket has expired
    * Returns the computed status
    */
-  async checkTicketStatus(ticketId: string): Promise<TicketStatus> {
+  async checkTicketStatus(ticketId: string): Promise<BookingStatus> {
     try {
       // First, trigger expiration check
       await this.checkAndExpireTickets();
@@ -67,13 +68,13 @@ export class TicketExpirationService {
         .single();
 
       if (error || !ticket) {
-        return TicketStatus.EXPIRED;
+        return BOOKING_STATUS.EXPIRED as BookingStatus;
       }
 
       // Return current status from database
-      return ticket.status as TicketStatus;
+      return ticket.status as BookingStatus;
     } catch {
-      return TicketStatus.EXPIRED;
+      return BOOKING_STATUS.EXPIRED as BookingStatus;
     }
   }
 

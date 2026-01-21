@@ -10,8 +10,11 @@ import {
 } from '../useTickets';
 
 // Types
-import { Ticket, TicketStatus } from '@/features/booking/types/booking';
-import { GenreMovie } from '@/features/booking/types/movie';
+import { Ticket } from '@/features/booking/schemas/booking';
+
+// Constants
+import { BOOKING_STATUS, PAYMENT_STATUS } from '@/constants/status';
+import { GENRE_MOVIE } from '@/constants/movie';
 
 // Mock services
 const mockGetTickets = jest.fn();
@@ -89,7 +92,7 @@ const mockTicket: Ticket = {
   ticketNumber: 'TKT-001',
   qrCodeData: '{"booking_id":"booking-1","seat":"A1"}',
   price: 50000,
-  status: TicketStatus.ACTIVE,
+  status: BOOKING_STATUS.ACTIVE,
   scannedAt: undefined,
   createdAt: '2025-01-01T00:00:00Z',
   booking: {
@@ -97,14 +100,14 @@ const mockTicket: Ticket = {
     userId: 'user-123',
     showtimeId: 'showtime-1',
     bookingNumber: 'BKG-001',
-    bookingStatus: 'confirmed' as any,
+    bookingStatus: BOOKING_STATUS.CONFIRMED,
     totalSeats: 1,
     seatNumbers: ['A1'],
     subtotal: 50000,
     discountAmount: 0,
     totalAmount: 50000,
     paymentMethod: 'wallet',
-    paymentStatus: 'paid' as any,
+    paymentStatus: PAYMENT_STATUS.PAID,
     expiresAt: '2025-01-15T16:00:00Z',
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',
@@ -118,7 +121,7 @@ const mockTicket: Ticket = {
         id: 'movie-1',
         title: 'Test Movie',
         posterUrl: 'https://example.com/poster.jpg',
-        genre: [GenreMovie.ACTION],
+        genre: [GENRE_MOVIE.ACTION],
         durationMinutes: 120,
         rating: 8.5,
       },
@@ -135,7 +138,7 @@ const mockTicket: Ticket = {
       },
     },
   },
-} as Ticket;
+} as unknown as Ticket;
 
 describe('useTickets', () => {
   beforeEach(() => {

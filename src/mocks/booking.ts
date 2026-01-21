@@ -1,25 +1,26 @@
-import { PromoCode, PromoCodeStatus } from '@/features/booking/types/movie';
+import { PROMO_CODE_STATUS } from '@/constants/status';
+import { PromoCode, PromoCodeStatus } from '@/features/booking/schemas/movie';
 
 export const MOCK_PROMOTIONS: PromoCode[] = [
   {
     id: '1',
     code: 'Student Holiday',
     description: 'Maximal only for two people',
-    discountType: PromoCodeStatus.PERCENTAGE,
+    discountType: PROMO_CODE_STATUS.PERCENTAGE as PromoCodeStatus,
     discountValue: 50,
   },
   {
     id: '2',
     code: 'Student Holiday',
     description: 'Maximal only for two people',
-    discountType: PromoCodeStatus.PERCENTAGE,
+    discountType: PROMO_CODE_STATUS.PERCENTAGE as PromoCodeStatus,
     discountValue: 50,
   },
   {
     id: '3',
     code: 'Student Holiday',
     description: 'Maximal only for two people',
-    discountType: PromoCodeStatus.PERCENTAGE,
+    discountType: PROMO_CODE_STATUS.PERCENTAGE as PromoCodeStatus,
     discountValue: 50,
   },
 ];

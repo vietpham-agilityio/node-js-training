@@ -1,17 +1,15 @@
 import { supabase } from '@/services/supabase/client';
 
 // Types
-import { Booking, BookingStatus } from '@/features/booking/types/booking';
-import {
-  SeatReservation,
-  SeatReservationStatus,
-} from '@/features/booking/types/cinema';
+import { Booking } from '@/features/booking/schemas/booking';
+import { SeatReservation } from '@/features/booking/schemas/cinema';
 
 // Utils
 import { keysToCamel } from '@/utils/convert';
 
 // Constants
 import { PAGINATION } from '@/constants';
+import { BOOKING_STATUS, SEAT_RESERVATION_STATUS } from '@/constants/status';
 
 export interface CreateBookingData {
   userId: string;
@@ -195,7 +193,7 @@ export class BookingsService {
         throw new Error('Booking not found');
       }
 
-      if (booking.bookingStatus === BookingStatus.CANCELLED) {
+      if (booking.bookingStatus === BOOKING_STATUS.CANCELLED) {
         throw new Error('Booking already cancelled');
       }
 
@@ -229,7 +227,7 @@ export class BookingsService {
           user_id: userId,
           seat_numbers: seats,
           reserved_until: reservedUntil.toISOString(),
-          status: SeatReservationStatus.RESERVED,
+          status: SEAT_RESERVATION_STATUS.RESERVED,
         })
         .select()
         .single();
@@ -248,7 +246,7 @@ export class BookingsService {
     try {
       const { error } = await supabase
         .from('seat_reservations')
-        .update({ status: SeatReservationStatus.RELEASED })
+        .update({ status: SEAT_RESERVATION_STATUS.RELEASED })
         .eq('id', reservationId);
 
       if (error) {

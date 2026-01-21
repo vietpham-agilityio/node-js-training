@@ -1,5 +1,5 @@
 import { ERROR_MESSAGES, MESSAGES } from '@/constants';
-import { TicketStatus } from '@/features/booking/types/booking';
+import { BOOKING_STATUS } from '@/constants/status';
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
 import { TicketsService, ticketsService } from '../tickets';
@@ -151,7 +151,7 @@ describe('TicketsService', () => {
         booking_id: 'booking1',
         seat_number: 'A1',
         ticket_number: 'TKT001',
-        status: TicketStatus.ACTIVE,
+        status: BOOKING_STATUS.ACTIVE,
       };
 
       rpc.mockResolvedValueOnce({ data: 0, error: null });
@@ -195,7 +195,7 @@ describe('TicketsService', () => {
         id: 'ticket1',
         booking_id: 'booking1',
         seat_number: 'A1',
-        status: TicketStatus.ACTIVE,
+        status: BOOKING_STATUS.ACTIVE,
         scanned_at: null,
         booking: {
           booking_status: 'active',
@@ -218,7 +218,7 @@ describe('TicketsService', () => {
       expect(result.message).toBe(MESSAGES.TICKET_VALIDATED_SUCCESS);
       expect(mockQueryBuilder.update).toHaveBeenCalledWith({
         scanned_at: expect.any(String),
-        status: TicketStatus.USED,
+        status: BOOKING_STATUS.USED,
       });
     });
 
@@ -254,7 +254,7 @@ describe('TicketsService', () => {
       const mockTicket = {
         id: 'ticket1',
         scanned_at: '2024-01-01T10:00:00Z',
-        status: TicketStatus.USED,
+        status: BOOKING_STATUS.USED,
       };
 
       rpc.mockResolvedValueOnce({ data: 0, error: null });
@@ -279,7 +279,7 @@ describe('TicketsService', () => {
 
       const mockTicket = {
         id: 'ticket1',
-        status: TicketStatus.EXPIRED,
+        status: BOOKING_STATUS.EXPIRED,
         scanned_at: null,
       };
 
@@ -304,7 +304,7 @@ describe('TicketsService', () => {
 
       const mockTicket = {
         id: 'ticket1',
-        status: TicketStatus.ACTIVE,
+        status: BOOKING_STATUS.ACTIVE,
         scanned_at: null,
         booking: {
           booking_status: 'cancelled',

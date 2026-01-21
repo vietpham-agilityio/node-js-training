@@ -7,9 +7,9 @@ import {
   BookingStatus,
   PaymentStatus,
   Ticket,
-  TicketStatus,
-} from '@/features/booking/types/booking';
-import { GenreMovie } from '@/features/booking/types/movie';
+} from '@/features/booking/schemas/booking';
+import { BOOKING_STATUS, PAYMENT_STATUS } from '@/constants/status';
+import { GENRE_MOVIE } from '@/constants/movie';
 
 // Mock expo-router
 let mockTicketId = 'ticket-123';
@@ -123,7 +123,9 @@ jest.mock('@/constants', () => ({
 }));
 
 // Mock ticket data
-const createMockTicket = (status: TicketStatus = TicketStatus.ACTIVE): Ticket =>
+const createMockTicket = (
+  status: BookingStatus = BOOKING_STATUS.ACTIVE as BookingStatus,
+): Ticket =>
   ({
     id: 'ticket-123',
     bookingId: 'booking-123',
@@ -137,7 +139,7 @@ const createMockTicket = (status: TicketStatus = TicketStatus.ACTIVE): Ticket =>
     booking: {
       id: 'booking-123',
       bookingNumber: 'BKG-001',
-      bookingStatus: BookingStatus.USED,
+      bookingStatus: BOOKING_STATUS.USED as BookingStatus,
       userId: 'user-1',
       showtimeId: 'showtime-1',
       totalSeats: 2,
@@ -146,7 +148,7 @@ const createMockTicket = (status: TicketStatus = TicketStatus.ACTIVE): Ticket =>
       discountAmount: 0,
       totalAmount: 100000,
       paymentMethod: 'wallet',
-      paymentStatus: PaymentStatus.PAID,
+      paymentStatus: PAYMENT_STATUS.PAID as PaymentStatus,
       expiresAt: '2025-01-15T16:00:00Z',
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
@@ -160,7 +162,7 @@ const createMockTicket = (status: TicketStatus = TicketStatus.ACTIVE): Ticket =>
           id: 'movie-1',
           title: 'Test Movie',
           posterUrl: 'https://example.com/poster.jpg',
-          genre: [GenreMovie.ACTION, GenreMovie.ADVENTURE],
+          genre: [GENRE_MOVIE.ACTION, GENRE_MOVIE.ADVENTURE],
           durationMinutes: 120,
           rating: 8.5,
         },
@@ -177,7 +179,7 @@ const createMockTicket = (status: TicketStatus = TicketStatus.ACTIVE): Ticket =>
         },
       },
     },
-  }) as Ticket;
+  }) as unknown as Ticket;
 
 describe('TicketDetailScreen', () => {
   beforeEach(() => {
@@ -254,7 +256,7 @@ describe('TicketDetailScreen', () => {
 
   describe('Ticket Display - Active Ticket', () => {
     beforeEach(() => {
-      mockTicketData = createMockTicket(TicketStatus.ACTIVE);
+      mockTicketData = createMockTicket(BOOKING_STATUS.ACTIVE);
     });
 
     it('should display movie title', () => {
@@ -327,7 +329,7 @@ describe('TicketDetailScreen', () => {
 
   describe('Ticket Display - Expired Ticket', () => {
     beforeEach(() => {
-      mockTicketData = createMockTicket(TicketStatus.EXPIRED);
+      mockTicketData = createMockTicket(BOOKING_STATUS.EXPIRED);
     });
 
     it('should not display QR code for expired ticket', () => {
@@ -353,7 +355,7 @@ describe('TicketDetailScreen', () => {
 
   describe('Ticket Display - Used Ticket', () => {
     beforeEach(() => {
-      mockTicketData = createMockTicket(TicketStatus.USED);
+      mockTicketData = createMockTicket(BOOKING_STATUS.USED);
     });
 
     it('should not display QR code for used ticket', () => {
@@ -373,7 +375,7 @@ describe('TicketDetailScreen', () => {
 
   describe('Ticket Display - Cancelled Ticket', () => {
     beforeEach(() => {
-      mockTicketData = createMockTicket(TicketStatus.CANCELLED);
+      mockTicketData = createMockTicket(BOOKING_STATUS.CANCELLED);
     });
 
     it('should not display QR code for cancelled ticket', () => {
@@ -435,7 +437,7 @@ describe('TicketDetailScreen', () => {
 
   describe('Order Details', () => {
     beforeEach(() => {
-      mockTicketData = createMockTicket(TicketStatus.ACTIVE);
+      mockTicketData = createMockTicket(BOOKING_STATUS.ACTIVE);
     });
 
     it('should display all order detail rows', () => {
@@ -463,7 +465,7 @@ describe('TicketDetailScreen', () => {
 
   describe('Status Styling', () => {
     it('should apply success color for active status', () => {
-      mockTicketData = createMockTicket(TicketStatus.ACTIVE);
+      mockTicketData = createMockTicket(BOOKING_STATUS.ACTIVE);
 
       const { getByTestId } = render(<TicketDetailScreen />);
 
@@ -474,7 +476,7 @@ describe('TicketDetailScreen', () => {
     });
 
     it('should apply error color for expired status', () => {
-      mockTicketData = createMockTicket(TicketStatus.EXPIRED);
+      mockTicketData = createMockTicket(BOOKING_STATUS.EXPIRED);
 
       const { getByTestId } = render(<TicketDetailScreen />);
 

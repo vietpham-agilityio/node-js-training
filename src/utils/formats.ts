@@ -1,7 +1,8 @@
 import { Pokemon } from '@/constants/schema';
-import { Seat } from '@/features/booking/types/cinema';
+import { PROMO_CODE_STATUS } from '@/constants/status';
+import { Seat } from '@/features/booking/schemas/cinema';
 
-import { PromoCodeStatus } from '@/features/booking/types/movie';
+import { PromoCodeStatus } from '@/features/booking/schemas/movie';
 import { Schema } from 'effect';
 
 export const formatCardNumber = (number?: string) => {
@@ -117,7 +118,7 @@ export const generateBookingNumber = (): string => {
 };
 
 export const generateTicketNumber = (): string => {
-  const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+  const date = new Date().toISOString().split('T')[0]?.replace(/-/g, '') || '';
   const random = Math.floor(Math.random() * 1000000)
     .toString()
     .padStart(6, '0');
@@ -152,7 +153,7 @@ export const calculateDiscount = (
 ): number => {
   let discount = 0;
 
-  if (discountType === PromoCodeStatus.PERCENTAGE) {
+  if (discountType === PROMO_CODE_STATUS.PERCENTAGE) {
     discount = (amount * discountValue) / 100;
     if (maxDiscount && discount > maxDiscount) {
       discount = maxDiscount;
@@ -222,7 +223,7 @@ export const groupSeatsByRow = (seats: Seat[]): Record<string, Seat[]> => {
     if (!grouped[seat.row]) {
       grouped[seat.row] = [];
     }
-    grouped[seat.row].push(seat);
+    grouped[seat.row]?.push(seat);
   });
   return grouped;
 };

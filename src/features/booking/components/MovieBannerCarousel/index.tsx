@@ -10,7 +10,7 @@ import { useRouter } from 'expo-router';
 import { ROUTES } from '@/constants';
 
 // Types
-import { Movie } from '@/features/booking/types/movie';
+import { Movie } from '@/features/booking/schemas/movie';
 
 // Components
 import { CarouselItem, Variant } from './CarouseItem';

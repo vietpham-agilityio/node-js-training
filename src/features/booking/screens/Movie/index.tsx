@@ -44,7 +44,7 @@ import { useMovieStore } from '@/stores/movie';
 
 // Types
 
-import { CastMember } from '@/features/booking/types/movie';
+import { CastMember } from '@/features/booking/schemas/movie';
 
 // Icons
 import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
@@ -80,7 +80,9 @@ const MovieScreen = () => {
 
   const setMovie = useBookingStore(state => state.setMovie);
 
-  const [activeTab, setActiveTab] = useState<string>(DETAIL_MOVIE_TABS[0].id);
+  const [activeTab, setActiveTab] = useState<string>(
+    DETAIL_MOVIE_TABS[0]?.id || '',
+  );
 
   const {
     data: movie,
@@ -106,13 +108,13 @@ const MovieScreen = () => {
       castCrew?.actors.map(({ name, imageUrl }: CastMember) => ({
         id: name,
         name: name,
-        imageUrl: imageUrl,
+        imageUrl: imageUrl || '',
       })) ?? [],
     [castCrew],
   );
 
   const contentItems = useMemo<ContentItem[]>(() => {
-    if (activeTab === DETAIL_MOVIE_TABS[0].id) {
+    if (activeTab === DETAIL_MOVIE_TABS[0]?.id) {
       const items: ContentItem[] = [
         { type: ContentType.SYNOPSIS, data: synopsis },
       ];
@@ -122,7 +124,7 @@ const MovieScreen = () => {
       }
 
       if (trailerUrl?.length > 0) {
-        items.push({ type: ContentType.TRAILER, data: trailerUrl });
+        items.push({ type: ContentType.TRAILER, data: trailerUrl as string[] });
       }
 
       return items;
@@ -233,7 +235,7 @@ const MovieScreen = () => {
 
   // Create skeleton content items for loading state
   const skeletonContentItems = useMemo<ContentItem[]>(() => {
-    if (isMovieLoading && activeTab === DETAIL_MOVIE_TABS[0].id) {
+    if (isMovieLoading && activeTab === DETAIL_MOVIE_TABS[0]?.id) {
       return [
         { type: ContentType.SYNOPSIS, data: '' },
         { type: ContentType.CAST_CREW, data: [] },

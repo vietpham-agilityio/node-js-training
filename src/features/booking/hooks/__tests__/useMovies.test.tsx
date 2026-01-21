@@ -11,7 +11,9 @@ import {
 } from '../useMovies';
 
 // Types
-import { GenreMovie, MovieStatus } from '@/features/booking/types/movie';
+import { GenreMovie, MovieStatus } from '@/features/booking/schemas/movie';
+import { MOVIE_STATUS } from '@/constants/status';
+import { GENRE_MOVIE } from '@/constants/movie';
 
 // Mock dependencies
 const mockGetMovies = jest.fn();
@@ -60,8 +62,8 @@ describe('useMovies', () => {
 
   it('should fetch movies with default options', async () => {
     const mockMovies = [
-      { id: '1', title: 'Movie 1', status: MovieStatus.NOW_PLAYING },
-      { id: '2', title: 'Movie 2', status: MovieStatus.NOW_PLAYING },
+      { id: '1', title: 'Movie 1', status: MOVIE_STATUS.NOW_PLAYING },
+      { id: '2', title: 'Movie 2', status: MOVIE_STATUS.NOW_PLAYING },
     ];
     mockGetMovies.mockResolvedValue(mockMovies);
 
@@ -79,12 +81,12 @@ describe('useMovies', () => {
 
   it('should fetch movies with status filter', async () => {
     const mockMovies = [
-      { id: '1', title: 'Movie 1', status: MovieStatus.COMING_SOON },
+      { id: '1', title: 'Movie 1', status: MOVIE_STATUS.COMING_SOON },
     ];
     mockGetMovies.mockResolvedValue(mockMovies);
 
     const { result } = renderHook(
-      () => useMovies({ status: MovieStatus.COMING_SOON }),
+      () => useMovies({ status: MOVIE_STATUS.COMING_SOON }),
       {
         wrapper: createWrapper(),
       },
@@ -94,7 +96,7 @@ describe('useMovies', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMovies).toHaveBeenCalledWith(MovieStatus.COMING_SOON);
+    expect(mockGetMovies).toHaveBeenCalledWith(MOVIE_STATUS.COMING_SOON);
     expect(result.current.data).toEqual(mockMovies);
   });
 
@@ -195,7 +197,7 @@ describe('useMoviesInfinite', () => {
     // When page has exactly PAGE_LIMIT items, hasNextPage should be true
     // This means getNextPageParam returned allPages.length (line 43)
     expect(result.current.hasNextPage).toBe(true);
-    expect(result.current.data?.pages[0].length).toBe(10);
+    expect(result?.current?.data?.pages[0]?.length || 0).toBe(10);
   });
 
   it('should return allPages.length for subsequent pages when they have PAGE_LIMIT items', async () => {
@@ -283,7 +285,7 @@ describe('useMovie', () => {
     const mockMovie = {
       id: '1',
       title: 'Movie 1',
-      status: MovieStatus.NOW_PLAYING,
+      status: MOVIE_STATUS.NOW_PLAYING,
     };
     mockGetMovieById.mockResolvedValue(mockMovie);
 
@@ -335,20 +337,23 @@ describe('useMoviesByGenre', () => {
     ];
     mockGetMoviesByGenre.mockResolvedValue(mockMovies);
 
-    const { result } = renderHook(() => useMoviesByGenre(GenreMovie.ACTION), {
-      wrapper: createWrapper(),
-    });
+    const { result } = renderHook(
+      () => useMoviesByGenre(GENRE_MOVIE.ACTION as GenreMovie),
+      {
+        wrapper: createWrapper(),
+      },
+    );
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMoviesByGenre).toHaveBeenCalledWith(GenreMovie.ACTION);
+    expect(mockGetMoviesByGenre).toHaveBeenCalledWith(GENRE_MOVIE.ACTION);
     expect(result.current.data).toEqual(mockMovies);
   });
 
   it('should not fetch when genre is "All"', () => {
-    renderHook(() => useMoviesByGenre(GenreMovie.ALL), {
+    renderHook(() => useMoviesByGenre(GENRE_MOVIE.ALL as GenreMovie), {
       wrapper: createWrapper(),
     });
 
@@ -359,9 +364,12 @@ describe('useMoviesByGenre', () => {
     const mockError = new Error('Failed to fetch movies by genre');
     mockGetMoviesByGenre.mockRejectedValue(mockError);
 
-    const { result } = renderHook(() => useMoviesByGenre(GenreMovie.ACTION), {
-      wrapper: createWrapper(),
-    });
+    const { result } = renderHook(
+      () => useMoviesByGenre(GENRE_MOVIE.ACTION as GenreMovie),
+      {
+        wrapper: createWrapper(),
+      },
+    );
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);

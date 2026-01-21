@@ -3,13 +3,11 @@ import { fireEvent, render } from '@testing-library/react-native';
 import MyTicketScreen from '../index';
 
 // Types
-import {
-  BookingStatus,
-  PaymentStatus,
-  Ticket,
-  TicketStatus,
-} from '@/features/booking/types/booking';
-import { GenreMovie } from '@/features/booking/types/movie';
+import { BookingStatus, Ticket } from '@/features/booking/schemas/booking';
+
+// Constants
+import { BOOKING_STATUS, PAYMENT_STATUS } from '@/constants/status';
+import { GENRE_MOVIE } from '@/constants/movie';
 
 // Mock expo-router
 const mockPush = jest.fn();
@@ -129,7 +127,7 @@ jest.mock('@/constants', () => ({
 // Mock ticket data
 const createMockTicket = (
   id: string,
-  status: TicketStatus = TicketStatus.ACTIVE,
+  status: BookingStatus = BOOKING_STATUS.ACTIVE as BookingStatus,
 ): Ticket =>
   ({
     id,
@@ -144,7 +142,7 @@ const createMockTicket = (
     booking: {
       id: `booking-${id}`,
       bookingNumber: `BKG-${id}`,
-      bookingStatus: BookingStatus.USED,
+      bookingStatus: BOOKING_STATUS.USED,
       userId: 'user-1',
       showtimeId: 'showtime-1',
       totalSeats: 1,
@@ -153,7 +151,7 @@ const createMockTicket = (
       discountAmount: 0,
       totalAmount: 50000,
       paymentMethod: 'wallet',
-      paymentStatus: PaymentStatus.PAID,
+      paymentStatus: PAYMENT_STATUS.PAID,
       expiresAt: '2025-01-01T00:00:00Z',
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
@@ -167,7 +165,7 @@ const createMockTicket = (
           id: 'movie-1',
           title: `Test Movie ${id}`,
           posterUrl: 'https://example.com/poster.jpg',
-          genre: [GenreMovie.ACTION],
+          genre: [GENRE_MOVIE.ACTION],
           durationMinutes: 120,
           rating: 8.5,
         },
@@ -184,7 +182,7 @@ const createMockTicket = (
         },
       },
     },
-  }) as Ticket;
+  }) as unknown as Ticket;
 
 describe('MyTicketScreen', () => {
   beforeEach(() => {
@@ -368,9 +366,9 @@ describe('MyTicketScreen', () => {
   describe('Tab Filtering', () => {
     it('should show all tickets by default', () => {
       const tickets = [
-        createMockTicket('1', TicketStatus.ACTIVE),
-        createMockTicket('2', TicketStatus.EXPIRED),
-        createMockTicket('3', TicketStatus.USED),
+        createMockTicket('1', BOOKING_STATUS.ACTIVE),
+        createMockTicket('2', BOOKING_STATUS.EXPIRED),
+        createMockTicket('3', BOOKING_STATUS.USED),
       ];
       mockTicketsData = { pages: [tickets] };
 
@@ -383,8 +381,8 @@ describe('MyTicketScreen', () => {
 
     it('should filter active tickets when Active tab is selected', () => {
       const tickets = [
-        createMockTicket('1', TicketStatus.ACTIVE),
-        createMockTicket('2', TicketStatus.EXPIRED),
+        createMockTicket('1', BOOKING_STATUS.ACTIVE),
+        createMockTicket('2', BOOKING_STATUS.EXPIRED),
       ];
       mockTicketsData = { pages: [tickets] };
 
@@ -399,10 +397,10 @@ describe('MyTicketScreen', () => {
 
     it('should filter expired tickets when Expired tab is selected', () => {
       const tickets = [
-        createMockTicket('1', TicketStatus.ACTIVE),
-        createMockTicket('2', TicketStatus.EXPIRED),
-        createMockTicket('3', TicketStatus.USED),
-        createMockTicket('4', TicketStatus.CANCELLED),
+        createMockTicket('1', BOOKING_STATUS.ACTIVE),
+        createMockTicket('2', BOOKING_STATUS.EXPIRED),
+        createMockTicket('3', BOOKING_STATUS.USED),
+        createMockTicket('4', BOOKING_STATUS.CANCELLED),
       ];
       mockTicketsData = { pages: [tickets] };
 
@@ -419,8 +417,8 @@ describe('MyTicketScreen', () => {
 
     it('should switch back to All tab', () => {
       const tickets = [
-        createMockTicket('1', TicketStatus.ACTIVE),
-        createMockTicket('2', TicketStatus.EXPIRED),
+        createMockTicket('1', BOOKING_STATUS.ACTIVE),
+        createMockTicket('2', BOOKING_STATUS.EXPIRED),
       ];
       mockTicketsData = { pages: [tickets] };
 
@@ -535,8 +533,8 @@ describe('MyTicketScreen', () => {
 
     it('should update accessibility label based on filter', () => {
       const tickets = [
-        createMockTicket('1', TicketStatus.ACTIVE),
-        createMockTicket('2', TicketStatus.ACTIVE),
+        createMockTicket('1', BOOKING_STATUS.ACTIVE),
+        createMockTicket('2', BOOKING_STATUS.ACTIVE),
       ];
       mockTicketsData = { pages: [tickets] };
 

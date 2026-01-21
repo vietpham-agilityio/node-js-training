@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { GenreMovie, MovieStatus } from '../types/movie';
+import { GenreMovie, MovieStatus } from '../schemas/movie';
 import { useMoviesByGenreInfinite, useMoviesInfinite } from './useMovies';
+import { MOVIE_STATUS } from '@/constants/status';
 
 interface UseMovieDataParams {
   status: MovieStatus;
@@ -38,7 +39,7 @@ export const useMovieData = ({
     const flatMovies = activeQuery.data.pages.flat();
 
     // Sort by rating for NOW_PLAYING, keep order for COMING_SOON
-    if (status === MovieStatus.NOW_PLAYING) {
+    if (status === MOVIE_STATUS.NOW_PLAYING) {
       return flatMovies
         .sort((a, b) => (b.rating || 0) - (a.rating || 0))
         .slice(0, 10);

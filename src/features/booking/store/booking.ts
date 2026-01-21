@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 
 // Types
-import { Showtime } from '@/features/booking/types/cinema';
-import { Movie } from '../types/movie';
+import { Showtime } from '@/features/booking/schemas/cinema';
+import { Movie } from '../schemas/movie';
 
 interface BookingState {
   selectedMovie: Movie | null;

@@ -1,4 +1,7 @@
-import { TicketStatus } from '@/features/booking/types/booking';
+import { BookingStatus } from '@/features/booking/schemas/booking';
+
+// Constants
+import { BOOKING_STATUS } from './status';
 
 export const ERROR_MESSAGES = {
   INVALID_TICKET: 'Invalid ticket',
@@ -77,9 +80,12 @@ export const MESSAGES = {
   PASSWORD_UPDATE_SUCCESS: 'Your password has been changed successfully',
 };
 
-export const UNACTIVE_MESSAGE: Record<TicketStatus, string> = {
-  [TicketStatus.ACTIVE]: '',
-  [TicketStatus.EXPIRED]: 'This ticket has expired and can no longer be used.',
-  [TicketStatus.USED]: 'This ticket has already been scanned and used.',
-  [TicketStatus.CANCELLED]: 'This booking has been cancelled.',
+export const UNACTIVE_MESSAGE: Record<string, string> = {
+  [BOOKING_STATUS.ACTIVE as BookingStatus]: '',
+  [BOOKING_STATUS.EXPIRED as BookingStatus]:
+    'This ticket has expired and can no longer be used.',
+  [BOOKING_STATUS.USED as BookingStatus]:
+    'This ticket has already been scanned and used.',
+  [BOOKING_STATUS.CANCELLED as BookingStatus]:
+    'This booking has been cancelled.',
 };

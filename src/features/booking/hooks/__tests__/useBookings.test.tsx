@@ -19,7 +19,10 @@ import {
   Booking,
   BookingStatus,
   InfiniteBookingsData,
-} from '@/features/booking/types/booking';
+} from '@/features/booking/schemas/booking';
+
+// Constants
+import { BOOKING_STATUS } from '@/constants/status';
 
 // Mock dependencies
 const mockGetBookings = jest.fn();
@@ -156,7 +159,7 @@ describe('useBookings', () => {
         totalAmount: 100,
         paymentMethod: 'wallet',
         paymentStatus: 'paid' as any,
-        bookingStatus: BookingStatus.ACTIVE,
+        bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
         expiresAt: '2024-01-02',
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
@@ -256,7 +259,7 @@ describe('useBookingsInfinite', () => {
       totalAmount: 50,
       paymentMethod: 'wallet',
       paymentStatus: 'paid' as any,
-      bookingStatus: BookingStatus.ACTIVE,
+      bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
       expiresAt: '2024-01-02',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
@@ -273,7 +276,7 @@ describe('useBookingsInfinite', () => {
     });
 
     expect(result.current.hasNextPage).toBe(true);
-    expect(result.current.data?.pages[0].length).toBe(20);
+    expect(result.current.data?.pages[0]?.length).toBe(20);
   });
 
   it('should return undefined for nextPageParam when last page has fewer items', async () => {
@@ -337,7 +340,7 @@ describe('useBooking', () => {
       totalAmount: 100,
       paymentMethod: 'wallet',
       paymentStatus: 'paid' as any,
-      bookingStatus: BookingStatus.ACTIVE,
+      bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
       expiresAt: '2024-01-02',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
@@ -392,7 +395,7 @@ describe('useCreateBooking', () => {
       totalAmount: 50,
       paymentMethod: 'wallet',
       paymentStatus: 'paid' as any,
-      bookingStatus: BookingStatus.ACTIVE,
+      bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
       expiresAt: '2024-01-02',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
@@ -504,7 +507,7 @@ describe('useCreateBooking', () => {
       totalAmount: 100,
       paymentMethod: 'wallet',
       paymentStatus: 'paid' as any,
-      bookingStatus: BookingStatus.ACTIVE,
+      bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
       expiresAt: '2024-01-02',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
@@ -565,7 +568,7 @@ describe('useCreateBooking', () => {
         totalAmount: 50,
         paymentMethod: 'wallet',
         paymentStatus: 'paid' as any,
-        bookingStatus: BookingStatus.ACTIVE,
+        bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
         expiresAt: '2024-01-02',
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
@@ -584,7 +587,7 @@ describe('useCreateBooking', () => {
       totalAmount: 100,
       paymentMethod: 'wallet',
       paymentStatus: 'paid' as any,
-      bookingStatus: BookingStatus.ACTIVE,
+      bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
       expiresAt: '2024-01-02',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
@@ -652,7 +655,7 @@ describe('useCreateBooking', () => {
       totalAmount: 100,
       paymentMethod: 'wallet',
       paymentStatus: 'paid' as any,
-      bookingStatus: BookingStatus.ACTIVE,
+      bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
       expiresAt: '2024-01-02',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
@@ -712,7 +715,7 @@ describe('useCreateBooking', () => {
         totalAmount: 50,
         paymentMethod: 'wallet',
         paymentStatus: 'paid' as any,
-        bookingStatus: BookingStatus.ACTIVE,
+        bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
         expiresAt: '2024-01-02',
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
@@ -931,7 +934,7 @@ describe('useCancelBooking', () => {
         totalAmount: 50,
         paymentMethod: 'wallet',
         paymentStatus: 'paid' as any,
-        bookingStatus: BookingStatus.ACTIVE,
+        bookingStatus: BOOKING_STATUS.ACTIVE as BookingStatus,
         expiresAt: '2024-01-02',
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',

@@ -16,6 +16,7 @@ import { SeatItem } from './SeatItem';
 
 // Constants
 import { ROUTES, Size } from '@/constants';
+import { SEAT_STATUS } from '@/constants/status';
 
 // Icons
 import { ScreenIcon } from '@/icons/ScreenIcon';
@@ -32,7 +33,7 @@ import {
 } from '@/utils/formats';
 
 // Types
-import { Seat, SeatStatus } from '@/features/booking/types/cinema';
+import { Seat } from '@/features/booking/schemas/cinema';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
@@ -67,20 +68,20 @@ const SeatsScreen = () => {
   // Update seat status based on selected seats
   const seatsWithStatus = useMemo(() => {
     return seats.map(seat => {
-      if (seat.status === SeatStatus.BOOKED) {
+      if (seat.status === SEAT_STATUS.BOOKED) {
         return seat;
       }
       const isSelected = selectedSeats.includes(seat.id);
       return {
         ...seat,
-        status: isSelected ? SeatStatus.SELECTED : SeatStatus.AVAILABLE,
+        status: isSelected ? SEAT_STATUS.SELECTED : SEAT_STATUS.AVAILABLE,
       };
     });
   }, [seats, selectedSeats]);
 
   // Group seats by row
   const seatsByRow = useMemo(
-    () => groupSeatsByRow(seatsWithStatus),
+    () => groupSeatsByRow(seatsWithStatus as Seat[]),
     [seatsWithStatus],
   );
 
@@ -91,11 +92,11 @@ const SeatsScreen = () => {
 
   const handleSeatPress = useCallback(
     (seat: Seat) => {
-      if (seat.status === SeatStatus.BOOKED) {
+      if (seat.status === SEAT_STATUS.BOOKED) {
         return;
       }
 
-      if (seat.status === SeatStatus.SELECTED) {
+      if (seat.status === SEAT_STATUS.SELECTED) {
         removeSeat(seat.id);
       } else {
         addSeat(seat.id);

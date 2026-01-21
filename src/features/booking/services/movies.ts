@@ -1,8 +1,9 @@
 import { PAGINATION } from '@/constants';
+import { SHOWTIME_STATUS, MOVIE_STATUS } from '@/constants/status';
 
 // Types
-import { Showtime, ShowtimeStatus } from '@/features/booking/types/cinema';
-import { GenreMovie, Movie, MovieStatus } from '../types/movie';
+import { Showtime, ShowtimeStatus } from '@/features/booking/schemas/cinema';
+import { GenreMovie, Movie, MovieStatus } from '../schemas/movie';
 
 // Utils
 import { supabase } from '@/services/supabase/client';
@@ -30,8 +31,8 @@ export class MoviesService {
       query = query.eq('status', status);
     } else {
       query = query.in('status', [
-        MovieStatus.NOW_PLAYING,
-        MovieStatus.COMING_SOON,
+        MOVIE_STATUS.NOW_PLAYING as MovieStatus,
+        MOVIE_STATUS.COMING_SOON as MovieStatus,
       ]);
     }
 
@@ -59,7 +60,10 @@ export class MoviesService {
       .from('movies')
       .select('*')
       .ilike('title', `%${query}%`)
-      .in('status', [MovieStatus.NOW_PLAYING, MovieStatus.COMING_SOON])
+      .in('status', [
+        MOVIE_STATUS.NOW_PLAYING as MovieStatus,
+        MOVIE_STATUS.COMING_SOON as MovieStatus,
+      ])
       .order('release_date', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);
 
@@ -72,7 +76,10 @@ export class MoviesService {
       .from('movies')
       .select('*')
       .contains('genre', [genre])
-      .in('status', [MovieStatus.NOW_PLAYING, MovieStatus.COMING_SOON]);
+      .in('status', [
+        MOVIE_STATUS.NOW_PLAYING as MovieStatus,
+        MOVIE_STATUS.COMING_SOON as MovieStatus,
+      ]);
     if (error) throw error;
     return keysToCamel(data) as Movie[];
   }
@@ -94,8 +101,8 @@ export class MoviesService {
       query = query.eq('status', status);
     } else {
       query = query.in('status', [
-        MovieStatus.NOW_PLAYING,
-        MovieStatus.COMING_SOON,
+        MOVIE_STATUS.NOW_PLAYING as MovieStatus,
+        MOVIE_STATUS.COMING_SOON as MovieStatus,
       ]);
     }
 
@@ -110,7 +117,7 @@ export class MoviesService {
       .select('*, cinema_hall:cinema_halls(*, cinema:cinemas(*))')
       .eq('movie_id', movieId)
       .eq('show_date', date)
-      .eq('status', ShowtimeStatus.ACTIVE)
+      .eq('status', SHOWTIME_STATUS.ACTIVE as ShowtimeStatus)
       .order('show_time', { ascending: true });
     if (error) throw error;
     return keysToCamel(data) as Showtime[];
@@ -143,8 +150,8 @@ export class MoviesService {
       query = query.eq('status', status);
     } else {
       query = query.in('status', [
-        MovieStatus.NOW_PLAYING,
-        MovieStatus.COMING_SOON,
+        MOVIE_STATUS.NOW_PLAYING as MovieStatus,
+        MOVIE_STATUS.COMING_SOON as MovieStatus,
       ]);
     }
 

@@ -1,5 +1,6 @@
-import { SeatStatus } from '@/features/booking/types/cinema';
+import { SeatStatus } from '@/features/booking/schemas/cinema';
 import { generateSeats } from '../data';
+import { SEAT_STATUS } from '@/constants/status';
 
 // Mock Math.random to make tests deterministic
 const mockMathRandom = jest.spyOn(Math, 'random');
@@ -19,7 +20,7 @@ describe('generateSeats', () => {
 
     const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
     rows.forEach(row => {
-      const rowSeats = seats.filter(seat => seat.row === row);
+      const rowSeats = seats.filter(seat => seat?.row === row);
       expect(rowSeats).toHaveLength(10);
     });
   });
@@ -31,7 +32,7 @@ describe('generateSeats', () => {
     const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
     rows.forEach(row => {
       for (let num = 1; num <= 10; num++) {
-        const seat = seats.find(s => s.row === row && s.number === num);
+        const seat = seats.find(s => s?.row === row && s?.number === num);
         expect(seat).toBeDefined();
         expect(seat?.id).toBe(`${row}${num}`);
       }
@@ -49,9 +50,11 @@ describe('generateSeats', () => {
     mockMathRandom.mockReturnValue(0.1); // All seats booked
     const seats = generateSeats();
 
-    const bookedSeats = seats.filter(seat => seat.status === SeatStatus.BOOKED);
+    const bookedSeats = seats.filter(
+      seat => seat?.status === SEAT_STATUS.BOOKED,
+    );
     expect(bookedSeats.length).toBeGreaterThan(0);
-    expect(bookedSeats.every(seat => seat.status === SeatStatus.BOOKED)).toBe(
+    expect(bookedSeats.every(seat => seat?.status === SEAT_STATUS.BOOKED)).toBe(
       true,
     );
   });
@@ -61,11 +64,11 @@ describe('generateSeats', () => {
     const seats = generateSeats();
 
     const availableSeats = seats.filter(
-      seat => seat.status === SeatStatus.AVAILABLE,
+      seat => seat?.status === SEAT_STATUS.AVAILABLE,
     );
     expect(availableSeats.length).toBeGreaterThan(0);
     expect(
-      availableSeats.every(seat => seat.status === SeatStatus.AVAILABLE),
+      availableSeats.every(seat => seat?.status === SEAT_STATUS.AVAILABLE),
     ).toBe(true);
   });
 
@@ -73,7 +76,7 @@ describe('generateSeats', () => {
     mockMathRandom.mockReturnValue(0);
     const seats = generateSeats();
 
-    const seatIds = seats.map(seat => seat.id);
+    const seatIds = seats.map(seat => seat?.id);
     const uniqueIds = new Set(seatIds);
 
     expect(uniqueIds.size).toBe(seatIds.length);
@@ -91,7 +94,9 @@ describe('generateSeats', () => {
       expect(typeof seat.id).toBe('string');
       expect(typeof seat.row).toBe('string');
       expect(typeof seat.number).toBe('number');
-      expect([SeatStatus.AVAILABLE, SeatStatus.BOOKED]).toContain(seat.status);
+      expect([SEAT_STATUS.AVAILABLE, SEAT_STATUS.BOOKED]).toContain(
+        seat.status,
+      );
     });
   });
 
@@ -100,11 +105,11 @@ describe('generateSeats', () => {
     const seats = generateSeats();
 
     // Check first seat
-    expect(seats[0].row).toBe('A');
-    expect(seats[0].number).toBe(1);
+    expect(seats[0]?.row).toBe('A');
+    expect(seats[0]?.number).toBe(1);
 
     // Check last seat
-    expect(seats[99].row).toBe('J');
-    expect(seats[99].number).toBe(10);
+    expect(seats[99]?.row).toBe('J');
+    expect(seats[99]?.number).toBe(10);
   });
 });

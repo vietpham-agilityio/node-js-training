@@ -5,26 +5,18 @@ import { Schema } from 'effect';
 // Type
 import { Showtime } from './cinema';
 
-export enum TicketStatus {
-  ACTIVE = 'active',
-  USED = 'used',
-  EXPIRED = 'expired',
-  CANCELLED = 'cancelled',
-}
-
-export enum BookingStatus {
-  ACTIVE = 'active',
-  CANCELLED = 'cancelled',
-  EXPIRED = 'expired',
-  USED = 'used',
-}
-
-export enum PaymentStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  FAILED = 'failed',
-  REFUNDED = 'refunded',
-}
+export const BookingStatusSchema = Schema.Literal(
+  'active',
+  'cancelled',
+  'expired',
+  'used',
+);
+export const PaymentStatusSchema = Schema.Literal(
+  'pending',
+  'paid',
+  'failed',
+  'refunded',
+);
 
 export const BookingSchema = Schema.Struct({
   id: Schema.String,
@@ -38,8 +30,8 @@ export const BookingSchema = Schema.Struct({
   totalAmount: Schema.Number,
   promoCodeId: Schema.optional(Schema.String),
   paymentMethod: Schema.String,
-  paymentStatus: Schema.Enums(PaymentStatus),
-  bookingStatus: Schema.Enums(BookingStatus),
+  paymentStatus: PaymentStatusSchema,
+  bookingStatus: BookingStatusSchema,
   expiresAt: Schema.String,
   qrCodeData: Schema.optional(Schema.String),
   createdAt: Schema.String,
@@ -53,18 +45,26 @@ export const TicketSchema = Schema.Struct({
   ticketNumber: Schema.String,
   qrCodeData: Schema.String,
   price: Schema.Number,
-  status: Schema.optional(Schema.Enums(TicketStatus)),
+  status: Schema.optional(BookingStatusSchema),
   scannedAt: Schema.optional(Schema.String),
   createdAt: Schema.String,
-  booking: Schema.optional(BookingSchema),
 });
 
-export interface Ticket extends Schema.Schema.Type<typeof TicketSchema> {}
+// Types
+export type BookingStatus = Schema.Schema.Type<typeof BookingStatusSchema>;
+export type PaymentStatus = Schema.Schema.Type<typeof PaymentStatusSchema>;
+
+// Interface
+export interface TicketBase extends Schema.Schema.Type<typeof TicketSchema> {}
 export interface BookingBase extends Schema.Schema.Type<typeof BookingSchema> {}
 
 export interface Booking extends BookingBase {
   showtime?: Showtime;
-  tickets?: Ticket[];
+  tickets?: TicketBase[];
+}
+
+export interface Ticket extends TicketBase {
+  booking?: Booking;
 }
 
 export interface InfiniteBookingsData {

@@ -1,11 +1,12 @@
-// Types
-import { Ticket, TicketStatus } from '@/features/booking/types/booking';
+// Schema
+import { Ticket } from '@/features/booking/schemas/booking';
 
 // Utils
 import { keysToCamel } from '@/utils/convert';
 
 // Constants
 import { ERROR_MESSAGES, MESSAGES, PAGINATION } from '@/constants';
+import { BOOKING_STATUS } from '@/constants/status';
 
 // Supabase
 import { supabase } from '@/services/supabase/client';
@@ -245,12 +246,12 @@ export class TicketsService {
       }
 
       // Check if expired
-      if (ticket.status === TicketStatus.EXPIRED) {
+      if (ticket.status === BOOKING_STATUS.EXPIRED) {
         return { valid: false, message: ERROR_MESSAGES.TICKET_EXPIRED };
       }
 
       // Check booking status
-      if (ticket.booking.booking_status === 'cancelled') {
+      if (ticket.booking.booking_status === BOOKING_STATUS.CANCELLED) {
         return { valid: false, message: 'Booking has been cancelled' };
       }
 
@@ -259,7 +260,7 @@ export class TicketsService {
         .from('tickets')
         .update({
           scanned_at: new Date().toISOString(),
-          status: TicketStatus.USED,
+          status: BOOKING_STATUS.USED,
         })
         .eq('id', ticket.id);
 

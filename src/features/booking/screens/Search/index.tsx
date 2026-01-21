@@ -24,7 +24,7 @@ import { useSearchMoviesInfinite } from '@/features/booking/hooks/useMovies';
 import { useDebounce } from '@/hooks/useDebounce';
 
 // Types
-import { Movie } from '@/features/booking/types/movie';
+import { Movie } from '@/features/booking/schemas/movie';
 
 // Components
 import { Button } from '@/components/Button';

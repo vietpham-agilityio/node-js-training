@@ -3,13 +3,15 @@ import React from 'react';
 
 // Types
 import {
-  GenreMovie,
-  MovieStatus,
   type Movie,
-} from '@/features/booking/types/movie';
+  MovieStatus,
+  GenreMovie,
+} from '@/features/booking/schemas/movie';
 
 // Components
 import { MovieBanner } from '..';
+import { GENRE_MOVIE } from '@/constants/movie';
+import { MOVIE_STATUS } from '@/constants/status';
 
 // Mock expo-image
 jest.mock('expo-image', () => ({
@@ -45,12 +47,16 @@ describe('MovieBanner Component', () => {
     },
     trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
     durationMinutes: 112,
-    genre: [GenreMovie.ACTION, GenreMovie.COMEDY, GenreMovie.ADVENTURE],
+    genre: [
+      GENRE_MOVIE.ACTION as GenreMovie,
+      GENRE_MOVIE.COMEDY as GenreMovie,
+      GENRE_MOVIE.ADVENTURE as GenreMovie,
+    ],
     language: 'EN',
     releaseDate: '2023-06-15',
     createdAt: '2023-06-15T12:34:56Z',
     updatedAt: '2023-06-15T12:34:56Z',
-    status: MovieStatus.NOW_PLAYING,
+    status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
   };
 
   const mockOnPress = jest.fn();

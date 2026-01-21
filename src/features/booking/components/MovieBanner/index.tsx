@@ -11,7 +11,7 @@ import { withUniwind } from 'uniwind';
 import { BLUR_HASH } from '@/constants';
 
 // Types
-import { Movie } from '@/features/booking/types/movie';
+import { Movie } from '@/features/booking/schemas/movie';
 
 // Utils
 import { cn } from '@/utils/cn';

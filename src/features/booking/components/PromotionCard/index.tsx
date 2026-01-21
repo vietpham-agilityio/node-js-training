@@ -13,8 +13,9 @@ import { useResolveClassNames } from 'uniwind';
 // Components
 import { Typo } from '@/components/Typo';
 
-// Types
-import { PromoCodeStatus } from '@/features/booking/types/movie';
+// Constants
+import { PromoCodeStatus } from '@/features/booking/schemas/movie';
+import { PROMO_CODE_STATUS } from '@/constants/status';
 
 interface PromotionCardProps {
   description?: string;
@@ -28,7 +29,7 @@ export const PromotionCard = memo(
     code,
     description,
     discountValue,
-    discountType = PromoCodeStatus.PERCENTAGE,
+    discountType = PROMO_CODE_STATUS.PERCENTAGE,
   }: PromotionCardProps) => {
     const imageBackgroundStyles = useResolveClassNames(
       'rounded-xl overflow-hidden',
@@ -67,7 +68,7 @@ export const PromotionCard = memo(
               </Typo>
               <Typo size="base" weight="semibold">
                 {discountValue}
-                {discountType === PromoCodeStatus.PERCENTAGE && '%'}
+                {discountType === PROMO_CODE_STATUS.PERCENTAGE && '%'}
               </Typo>
             </View>
           </View>

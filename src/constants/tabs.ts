@@ -2,7 +2,7 @@
  * Tab constants for movie filtering and detail views
  */
 
-import { TicketStatus } from '@/features/booking/types/booking';
+import { BOOKING_STATUS } from '@/constants/status';
 
 export const GENRE_TABS = {
   ALL: { ID: 'all', LABEL: 'All' },
@@ -87,8 +87,8 @@ export const DETAIL_MOVIE_TABS = [
  */
 export const TICKET_TABS = [
   { id: 'all', label: 'All' },
-  { id: TicketStatus.ACTIVE, label: 'Active' },
-  { id: TicketStatus.EXPIRED, label: 'Expired' },
+  { id: BOOKING_STATUS.ACTIVE, label: 'Active' },
+  { id: BOOKING_STATUS.EXPIRED, label: 'Expired' },
 ];
 
 // NEW: Rating filter options

@@ -3,7 +3,7 @@ import {
   CinemaHall,
   CinemaWithShowtimes,
   Showtime,
-} from '@/features/booking/types/cinema';
+} from '@/features/booking/schemas/cinema';
 
 /**
  * Get the labels for the next 7 days of the week
@@ -95,7 +95,7 @@ export const filterShowtimesByTime = (
 
     // Convert to minutes for comparison
     const timeInMinutes = timeHours * 60 + timeMinutes;
-    const minInMinutes = minHours * 60 + minMinutes;
+    const minInMinutes = (minHours || 0) * 60 + (minMinutes || 0);
     const maxInMinutes = 23 * 60; // 23:00
 
     // Showtime must be >= minimum time and <= 23:00

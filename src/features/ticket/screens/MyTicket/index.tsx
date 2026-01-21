@@ -16,25 +16,26 @@ import {
   TABS_FOOTER_HEIGHT,
   TICKET_TABS,
 } from '@/constants';
+import { BOOKING_STATUS } from '@/constants/status';
 
 // Hooks
 import { useTicketExpiration } from '@/features/ticket/hooks/useTicketExpiration';
 import { useTicketsInfinite } from '@/features/ticket/hooks/useTickets';
 
 // Types
-import { Ticket, TicketStatus } from '@/features/booking/types/booking';
-
+import { Ticket } from '@/features/booking/schemas/booking';
 // Components
 import { Button } from '@/components/Button';
 import { HorizontalCard } from '@/components/HorizontalCard';
 import { HorizontalCardSkeleton } from '@/components/Skeletons/HorizontalCardSkeleton';
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
+import { Tab } from '@/components/Tabs/TabItem';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
 const MyTicketScreen = () => {
-  const [activeTab, setActiveTab] = useState(TICKET_TABS[0].id);
+  const [activeTab, setActiveTab] = useState(TICKET_TABS[0]?.id || '');
 
   // Hooks for ticket expiration
   const { checkExpiredTickets } = useTicketExpiration();
@@ -65,15 +66,15 @@ const MyTicketScreen = () => {
   }, [data]);
 
   const isAllTickets = useMemo(
-    () => activeTab === TICKET_TABS[0].id,
+    () => activeTab === TICKET_TABS[0]?.id,
     [activeTab],
   );
   const isExpiredTickets = useMemo(
-    () => activeTab === TicketStatus.EXPIRED,
+    () => activeTab === BOOKING_STATUS.EXPIRED,
     [activeTab],
   );
   const isActiveTickets = useMemo(
-    () => activeTab === TicketStatus.ACTIVE,
+    () => activeTab === BOOKING_STATUS.ACTIVE,
     [activeTab],
   );
 
@@ -82,15 +83,17 @@ const MyTicketScreen = () => {
     if (isAllTickets) return allTickets;
 
     if (isActiveTickets) {
-      return allTickets.filter(ticket => ticket.status === TicketStatus.ACTIVE);
+      return allTickets.filter(
+        ticket => ticket.status === BOOKING_STATUS.ACTIVE,
+      );
     }
 
     if (isExpiredTickets) {
       return allTickets.filter(
         ticket =>
-          ticket.status === TicketStatus.EXPIRED ||
-          ticket.status === TicketStatus.CANCELLED ||
-          ticket.status === TicketStatus.USED,
+          ticket.status === BOOKING_STATUS.EXPIRED ||
+          ticket.status === BOOKING_STATUS.CANCELLED ||
+          ticket.status === BOOKING_STATUS.USED,
       );
     }
 
@@ -263,7 +266,7 @@ const MyTicketScreen = () => {
       <View className="px-6 gap-6 mb-6">
         <Tabs
           variant="tertiary"
-          tabs={TICKET_TABS}
+          tabs={TICKET_TABS as Tab[]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // Types
-import { Movie } from '@/features/booking/types/movie';
+import { Movie } from '@/features/booking/schemas/movie';
 
 interface MovieState {
   selectedMovie: Movie | null;

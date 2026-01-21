@@ -1,7 +1,9 @@
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
-import { GenreMovie, MovieStatus } from '../../types/movie';
 import { MoviesService, moviesService } from '../movies';
+import { MOVIE_STATUS } from '@/constants/status';
+import { GENRE_MOVIE } from '@/constants/movie';
+import { GenreMovie } from '../../schemas/movie';
 
 const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
@@ -53,12 +55,12 @@ describe('MoviesService', () => {
         resolve({ data: mockData, error: null }),
       );
 
-      const movies = await service.getMovies(MovieStatus.NOW_PLAYING);
+      const movies = await service.getMovies(MOVIE_STATUS.NOW_PLAYING);
 
       expect(from).toHaveBeenCalledWith('movies');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
         'status',
-        MovieStatus.NOW_PLAYING,
+        MOVIE_STATUS.NOW_PLAYING,
       );
       expect(movies).toEqual(keysToCamel(mockData));
     });
@@ -66,8 +68,8 @@ describe('MoviesService', () => {
     it('should fetch now playing and coming soon if no status', async () => {
       await service.getMovies();
       expect(mockQueryBuilder.in).toHaveBeenCalledWith('status', [
-        MovieStatus.NOW_PLAYING,
-        MovieStatus.COMING_SOON,
+        MOVIE_STATUS.NOW_PLAYING,
+        MOVIE_STATUS.COMING_SOON,
       ]);
     });
   });
@@ -92,7 +94,9 @@ describe('MoviesService', () => {
       (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
         resolve({ data: mockData, error: null }),
       );
-      const movies = await service.getMoviesByGenre(GenreMovie.ACTION);
+      const movies = await service.getMoviesByGenre(
+        GENRE_MOVIE.ACTION as GenreMovie,
+      );
       expect(mockQueryBuilder.contains).toHaveBeenCalledWith('genre', [
         'action',
       ]);
@@ -139,7 +143,7 @@ describe('MoviesService', () => {
       );
 
       const movies = await service.getMoviesPaginated(
-        MovieStatus.NOW_PLAYING,
+        MOVIE_STATUS.NOW_PLAYING,
         0,
         10,
       );

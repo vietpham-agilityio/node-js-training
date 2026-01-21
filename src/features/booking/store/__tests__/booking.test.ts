@@ -1,17 +1,23 @@
-import { Showtime, ShowtimeStatus } from '@/features/booking/types/cinema';
-import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
+import { Showtime, ShowtimeStatus } from '@/features/booking/schemas/cinema';
+import {
+  GenreMovie,
+  Movie,
+  MovieStatus,
+} from '@/features/booking/schemas/movie';
 import { act } from '@testing-library/react-native';
 import { useBookingStore } from '../booking';
+import { GENRE_MOVIE } from '@/constants/movie';
+import { MOVIE_STATUS, SHOWTIME_STATUS } from '@/constants/status';
 
 describe('useBookingStore', () => {
   const mockMovie: Movie = {
     id: 'movie1',
     title: 'Test Movie',
     posterUrl: 'https://example.com/poster.jpg',
-    genre: [GenreMovie.ACTION, GenreMovie.DRAMA],
+    genre: [GENRE_MOVIE.ACTION as GenreMovie, GENRE_MOVIE.DRAMA as GenreMovie],
     durationMinutes: 120,
     rating: 8.5,
-    status: MovieStatus.NOW_PLAYING,
+    status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
     releaseDate: '2024-01-01',
     synopsis: 'Test synopsis',
     trailerUrl: ['https://example.com/trailer.mp4'],
@@ -34,7 +40,7 @@ describe('useBookingStore', () => {
     endTime: '16:00',
     price: 50000,
     availableSeats: 50,
-    status: ShowtimeStatus.ACTIVE,
+    status: SHOWTIME_STATUS.ACTIVE as ShowtimeStatus,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
   };

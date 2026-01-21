@@ -22,7 +22,8 @@ import { PromotionCard } from '@/features/booking/components/PromotionCard';
 import { useMovieData } from '@/features/booking/hooks/useMovieData';
 
 // Types
-import { MovieStatus } from '@/features/booking/types/movie';
+import { MovieStatus } from '@/features/booking/schemas/movie';
+import { MOVIE_STATUS } from '@/constants/status';
 
 // Mock
 import { MOCK_PROMOTIONS } from '@/mocks';
@@ -31,20 +32,20 @@ const StyledSafeAreaView = withUniwind(SafeAreaView);
 
 const HomeScreen = () => {
   const [activeGenre, setActiveGenre] = useState<string>(
-    FILTER_GENRE_TABS[0].id,
+    FILTER_GENRE_TABS[0]?.id || '',
   );
 
-  const isAllCategory = activeGenre === FILTER_GENRE_TABS[0].id;
+  const isAllCategory = activeGenre === FILTER_GENRE_TABS[0]?.id;
   const currentGenre = isAllCategory ? undefined : activeGenre;
 
   // Simplified data fetching with custom hook
   const nowPlaying = useMovieData({
-    status: MovieStatus.NOW_PLAYING,
+    status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
     genre: currentGenre,
   });
 
   const comingSoon = useMovieData({
-    status: MovieStatus.COMING_SOON,
+    status: MOVIE_STATUS.COMING_SOON as MovieStatus,
     genre: currentGenre,
   });
 

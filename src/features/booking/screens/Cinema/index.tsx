@@ -37,7 +37,10 @@ import { useBookingStore } from '@/features/booking/store/booking';
 import { useToastStore } from '@/stores/toast';
 
 // Types
-import { CinemaWithShowtimes, Showtime } from '@/features/booking/types/cinema';
+import {
+  CinemaWithShowtimes,
+  Showtime,
+} from '@/features/booking/schemas/cinema';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
@@ -158,12 +161,12 @@ const CinemaScreen = () => {
           >
             {DATE_LABELS.map(({ id, label, dayNumber }) => {
               const isSelected = selectedDate === id;
-              const handleSelectDate = () => handleDateSelect(id);
+              const handleSelectDate = () => handleDateSelect(id || '');
 
               return (
                 <View key={id}>
                   <SelectBox
-                    value={label}
+                    value={label || ''}
                     date={dayNumber}
                     isPrimary={isSelected}
                     onPress={handleSelectDate}

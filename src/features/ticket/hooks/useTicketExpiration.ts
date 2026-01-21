@@ -9,9 +9,7 @@ import { useAuthStore } from '@/features/auth/store/auth';
 
 // Constants
 import { queryKeys } from '@/constants';
-
-// Types
-import { TicketStatus } from '@/features/booking/types/booking';
+import { BOOKING_STATUS } from '@/constants/status';
 
 export const useTicketExpiration = () => {
   const queryClient = useQueryClient();
@@ -53,7 +51,7 @@ export const useTicketExpiration = () => {
           await ticketExpirationService.checkTicketStatus(ticketId);
 
         // Invalidate queries if status changed
-        if (status === TicketStatus.EXPIRED) {
+        if (status === BOOKING_STATUS.EXPIRED) {
           queryClient.invalidateQueries({
             queryKey: queryKeys.tickets.detail(ticketId),
           });
@@ -64,7 +62,7 @@ export const useTicketExpiration = () => {
 
         return status;
       } catch {
-        return TicketStatus.EXPIRED;
+        return BOOKING_STATUS.EXPIRED;
       }
     },
     [queryClient],

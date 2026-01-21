@@ -7,7 +7,15 @@ import { ScreenHeader } from '..';
 // Type
 import { ParamListBase } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
+import {
+  GenreMovie,
+  Movie,
+  MovieStatus,
+} from '@/features/booking/schemas/movie';
+
+// Constant
+import { GENRE_MOVIE } from '@/constants/movie';
+import { MOVIE_STATUS } from '@/constants/status';
 
 // Mock expo-router
 const mockBack = jest.fn();
@@ -166,7 +174,7 @@ describe('ScreenHeader', () => {
       id: '1',
       title: 'Store Title',
       posterUrl: 'https://example.com/poster.jpg',
-      genre: [GenreMovie.ACTION],
+      genre: [GENRE_MOVIE.ACTION as GenreMovie],
       durationMinutes: 120,
       rating: 8.5,
       synopsis: 'Test synopsis',
@@ -180,7 +188,7 @@ describe('ScreenHeader', () => {
       },
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
-      status: MovieStatus.NOW_PLAYING,
+      status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
     };
   });
 
@@ -227,7 +235,7 @@ describe('ScreenHeader', () => {
       id: '1',
       title: 'Store Title',
       posterUrl: 'https://example.com/poster.jpg',
-      genre: [GenreMovie.ACTION],
+      genre: [GENRE_MOVIE.ACTION as GenreMovie],
       durationMinutes: 120,
       rating: 8.5,
       synopsis: 'Test synopsis',
@@ -241,7 +249,7 @@ describe('ScreenHeader', () => {
       },
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
-      status: MovieStatus.NOW_PLAYING,
+      status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
     };
     // Simulate being on Cinema screen (second call to isScreenPathname returns true for CINEMA)
     mockIsScreenPathname.mockImplementation(
@@ -263,7 +271,7 @@ describe('ScreenHeader', () => {
       id: '1',
       title: 'Store Title',
       posterUrl: 'https://example.com/poster.jpg',
-      genre: [GenreMovie.ACTION],
+      genre: [GENRE_MOVIE.ACTION as GenreMovie],
       durationMinutes: 120,
       rating: 8.5,
       synopsis: 'Test synopsis',
@@ -277,7 +285,7 @@ describe('ScreenHeader', () => {
       },
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
-      status: MovieStatus.NOW_PLAYING,
+      status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
     };
     // Simulate being on Seats screen
     mockIsScreenPathname.mockImplementation(
@@ -299,7 +307,7 @@ describe('ScreenHeader', () => {
       id: '1',
       title: 'Store Title',
       posterUrl: 'https://example.com/poster.jpg',
-      genre: [GenreMovie.ACTION],
+      genre: [GENRE_MOVIE.ACTION as GenreMovie],
       durationMinutes: 120,
       rating: 8.5,
       synopsis: 'Test synopsis',
@@ -313,7 +321,7 @@ describe('ScreenHeader', () => {
       },
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
-      status: MovieStatus.NOW_PLAYING,
+      status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
     };
 
     // Simulate being on Seats screen

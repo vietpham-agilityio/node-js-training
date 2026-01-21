@@ -5,7 +5,7 @@ import { API_CONFIG, PAGINATION, queryKeys } from '@/constants';
 import { moviesService } from '@/features/booking/services/movies';
 
 // Types
-import { GenreMovie, MovieStatus } from '../types/movie';
+import { GenreMovie, MovieStatus } from '../schemas/movie';
 
 // React Query
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';

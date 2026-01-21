@@ -4,16 +4,24 @@ import { act } from '@testing-library/react-native';
 import { useMovieStore } from '../movie';
 
 // Types
-import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
+import {
+  GenreMovie,
+  Movie,
+  MovieStatus,
+} from '@/features/booking/schemas/movie';
+
+// Constant
+import { GENRE_MOVIE } from '@/constants/movie';
+import { MOVIE_STATUS } from '@/constants/status';
 
 const MOCK_MOVIE: Movie = {
   id: '1',
   title: 'Test Title',
   posterUrl: 'https://example.com/poster.jpg',
-  genre: [GenreMovie.ACTION],
+  genre: [GENRE_MOVIE.ACTION as GenreMovie],
   durationMinutes: 120,
   rating: 8.5,
-  status: MovieStatus.NOW_PLAYING,
+  status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
   releaseDate: '2024-01-01',
   synopsis: 'Test synopsis',
   trailerUrl: ['https://example.com/trailer.mp4'],

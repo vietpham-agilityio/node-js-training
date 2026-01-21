@@ -9,6 +9,7 @@ import { withUniwind } from 'uniwind';
 
 // Constants
 import { Size, UNACTIVE_MESSAGE } from '@/constants';
+import { BOOKING_STATUS } from '@/constants/status';
 
 // Utils
 import { capitalize } from '@/utils/convert';
@@ -18,7 +19,7 @@ import { formatDate, formatIDR, formatTime } from '@/utils/formats';
 import { useTicket } from '@/features/ticket/hooks/useTickets';
 
 // Types
-import { TicketStatus } from '@/features/booking/types/booking';
+import { BookingStatus } from '@/features/booking/schemas/booking';
 
 // Components
 import { Button } from '@/components/Button';
@@ -68,7 +69,7 @@ const TicketDetailScreen = () => {
   }, [ticket]);
 
   // Determine if QR should be shown
-  const isActive = ticketDetail?.status === TicketStatus.ACTIVE;
+  const isActive = ticketDetail?.status === BOOKING_STATUS.ACTIVE;
 
   const orderRows = useMemo(
     () => [
@@ -109,7 +110,7 @@ const TicketDetailScreen = () => {
   );
 
   const unActiveMessage =
-    UNACTIVE_MESSAGE[ticketDetail?.status as TicketStatus] || '';
+    UNACTIVE_MESSAGE[ticketDetail?.status as BookingStatus] || '';
 
   return (
     <StyledSafeAreaView
@@ -135,7 +136,7 @@ const TicketDetailScreen = () => {
         ) : (
           <View className="bg-deep-blue px-4 py-6 rounded-xl gap-3.5">
             {/* Movie Details Section */}
-            <HorizontalCard justifyContent="center" {...ticketDetail?.movie!} />
+            <HorizontalCard justifyContent="center" {...ticketDetail?.movie} />
 
             {/* Order Details Section */}
             <View className="gap-4 pt-6.5">

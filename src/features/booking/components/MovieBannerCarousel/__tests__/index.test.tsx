@@ -1,10 +1,18 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 // Types
-import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
+import {
+  GenreMovie,
+  Movie,
+  MovieStatus,
+} from '@/features/booking/schemas/movie';
+
+// Constants
+import { GENRE_MOVIE } from '@/constants/movie';
 
 // Components
 import { MovieBannerCarousel } from '..';
+import { MOVIE_STATUS } from '@/constants/status';
 
 const MOVIES_MOCK: Movie[] = [
   {
@@ -23,12 +31,16 @@ const MOVIES_MOCK: Movie[] = [
     },
     trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
     durationMinutes: 112,
-    genre: [GenreMovie.ACTION, GenreMovie.COMEDY, GenreMovie.ADVENTURE],
+    genre: [
+      GENRE_MOVIE.ACTION as GenreMovie,
+      GENRE_MOVIE.COMEDY as GenreMovie,
+      GENRE_MOVIE.ADVENTURE as GenreMovie,
+    ],
     language: 'EN',
     releaseDate: '2023-06-15',
     createdAt: '2023-06-15T12:34:56Z',
     updatedAt: '2023-06-15T12:34:56Z',
-    status: MovieStatus.NOW_PLAYING,
+    status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
   },
 ];
 
@@ -190,7 +202,7 @@ describe('MovieBannerCarousel Component', () => {
           releaseDate: '',
           createdAt: '',
           updatedAt: '',
-          status: MovieStatus.NOW_PLAYING,
+          status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
         },
       ];
 
@@ -207,7 +219,7 @@ describe('MovieBannerCarousel Component', () => {
           title:
             'This Is A Very Long Movie Title That Should Still Render Correctly In The Carousel Component Without Breaking The Layout',
         },
-      ];
+      ] as Movie[];
 
       render(<MovieBannerCarousel movies={longTitleMovie} />);
 
@@ -223,7 +235,7 @@ describe('MovieBannerCarousel Component', () => {
 
       render(<MovieBannerCarousel movies={duplicateMovies} />);
 
-      expect(screen.getAllByText(MOVIES_MOCK[0].title).length).toBe(2);
+      expect(screen.getAllByText(MOVIES_MOCK[0]?.title || '').length).toBe(2);
     });
 
     it('should handle movies with special characters in title', () => {
@@ -233,7 +245,7 @@ describe('MovieBannerCarousel Component', () => {
           id: '101',
           title: 'Movie & Title: Part 2 - "The Sequel"',
         },
-      ];
+      ] as Movie[];
 
       render(<MovieBannerCarousel movies={specialCharMovie} />);
 
@@ -260,7 +272,7 @@ describe('MovieBannerCarousel Component', () => {
     it('should update when movies change', () => {
       const { rerender } = render(<MovieBannerCarousel movies={MOVIES_MOCK} />);
 
-      expect(screen.getByText(MOVIES_MOCK[0].title)).toBeTruthy();
+      expect(screen.getByText(MOVIES_MOCK[0]?.title || '')).toBeTruthy();
 
       const newMovies: Movie[] = [
         {
@@ -268,7 +280,7 @@ describe('MovieBannerCarousel Component', () => {
           id: '200',
           title: 'New Movie Title',
         },
-      ];
+      ] as Movie[];
 
       rerender(<MovieBannerCarousel movies={newMovies} />);
 
@@ -387,7 +399,7 @@ describe('MovieBannerCarousel Component', () => {
 
     it('should navigate with correct movie ID for each movie', () => {
       const multipleMovies: Movie[] = [
-        ...MOVIES_MOCK,
+        ...(MOVIES_MOCK as Movie[]),
         {
           ...MOVIES_MOCK[0],
           id: '2',
@@ -398,7 +410,7 @@ describe('MovieBannerCarousel Component', () => {
           id: '3',
           title: 'Third Movie',
         },
-      ];
+      ] as Movie[];
 
       render(<MovieBannerCarousel movies={multipleMovies} />);
 

@@ -10,6 +10,7 @@ import { generateUUIDSync } from '@/utils/uuid';
 
 // Constant
 import { API_CONFIG, PAGINATION, queryKeys } from '@/constants';
+import { BOOKING_STATUS } from '@/constants/status';
 
 // Services
 import {
@@ -26,10 +27,9 @@ import { useWalletStore } from '@/features/wallet/store/wallet';
 // Types
 import {
   Booking,
-  BookingStatus,
   InfiniteBookingsData,
-} from '@/features/booking/types/booking';
-import { Showtime } from '@/features/booking/types/cinema';
+} from '@/features/booking/schemas/booking';
+import { Showtime } from '@/features/booking/schemas/cinema';
 import { Wallet } from '@/features/wallet/types/wallet';
 
 export const useBookings = (status?: string) => {
@@ -147,7 +147,7 @@ export const useCreateBooking = () => {
             id: generateUUIDSync(), // temporary ID
             ...newBooking,
             bookingNumber: generateUUIDSync(),
-            bookingStatus: BookingStatus.ACTIVE,
+            bookingStatus: BOOKING_STATUS.ACTIVE,
             createdAt: new Date().toISOString(),
           };
 
@@ -177,14 +177,14 @@ export const useCreateBooking = () => {
             id: generateUUIDSync(),
             ...newBooking,
             bookingNumber: generateUUIDSync(),
-            bookingStatus: BookingStatus.ACTIVE,
+            bookingStatus: BOOKING_STATUS.ACTIVE,
             createdAt: new Date().toISOString(),
           };
 
           return {
             ...old,
             pages: [
-              [optimisticBooking, ...old.pages[0]],
+              [optimisticBooking, ...(old.pages[0] || [])],
               ...old.pages.slice(1),
             ],
           };
@@ -303,7 +303,7 @@ export const useCancelBooking = () => {
           if (!old) return old;
           return old.map(booking =>
             booking.id === bookingId
-              ? { ...booking, bookingStatus: BookingStatus.CANCELLED }
+              ? { ...booking, bookingStatus: BOOKING_STATUS.CANCELLED }
               : booking,
           );
         },
@@ -319,7 +319,7 @@ export const useCancelBooking = () => {
             pages: old.pages.map(page =>
               page.map(booking =>
                 booking.id === bookingId
-                  ? { ...booking, bookingStatus: BookingStatus.CANCELLED }
+                  ? { ...booking, bookingStatus: BOOKING_STATUS.CANCELLED }
                   : booking,
               ),
             ),

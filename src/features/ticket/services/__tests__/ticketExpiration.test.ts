@@ -1,10 +1,9 @@
-
 import {
   TicketExpirationService,
   ticketExpirationService,
 } from '../ticketExpiration';
 import { supabase } from '@/services/supabase/client';
-import { TicketStatus } from '@/features/booking/types/booking';
+import { BOOKING_STATUS } from '@/constants/status';
 
 jest.mock('@/services/supabase/client', () => ({
   supabase: {
@@ -61,7 +60,7 @@ describe('TicketExpirationService', () => {
 
   describe('checkTicketStatus', () => {
     it('should return the current status of a ticket', async () => {
-      const mockTicket = { id: 'ticket1', status: TicketStatus.ACTIVE };
+      const mockTicket = { id: 'ticket1', status: BOOKING_STATUS.ACTIVE };
       (mockQueryBuilder.single as jest.Mock).mockResolvedValue({
         data: mockTicket,
         error: null,
@@ -72,7 +71,7 @@ describe('TicketExpirationService', () => {
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets'); // check first
       expect(from).toHaveBeenCalledWith('tickets');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('id', 'ticket1');
-      expect(status).toBe(TicketStatus.ACTIVE);
+      expect(status).toBe(BOOKING_STATUS.ACTIVE);
     });
 
     it('should return EXPIRED if fetching fails', async () => {
@@ -81,13 +80,13 @@ describe('TicketExpirationService', () => {
         error: new Error('Fetch failed'),
       });
       const status = await service.checkTicketStatus('ticket1');
-      expect(status).toBe(TicketStatus.EXPIRED);
+      expect(status).toBe(BOOKING_STATUS.EXPIRED);
     });
   });
 
   describe('getExpiredTickets', () => {
     it('should fetch expired tickets for a user', async () => {
-      const mockExpired = [{ id: 'ticket1', status: 'expired' }];
+      const mockExpired = [{ id: 'ticket1', status: BOOKING_STATUS.EXPIRED }];
       (mockQueryBuilder.order as jest.Mock).mockResolvedValue({
         data: mockExpired,
         error: null,
@@ -97,8 +96,14 @@ describe('TicketExpirationService', () => {
 
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets');
       expect(from).toHaveBeenCalledWith('tickets');
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith('booking.user_id', 'user1');
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith('status', 'expired');
+      expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
+        'booking.user_id',
+        'user1',
+      );
+      expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
+        'status',
+        BOOKING_STATUS.EXPIRED,
+      );
       expect(tickets).toEqual(mockExpired);
     });
   });

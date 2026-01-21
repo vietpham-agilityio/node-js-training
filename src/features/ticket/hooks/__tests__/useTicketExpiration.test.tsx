@@ -4,8 +4,11 @@ import { ReactNode } from 'react';
 
 import { useTicketExpiration } from '../useTicketExpiration';
 
-// Types
-import { TicketStatus } from '@/features/booking/types/booking';
+// Constants
+import { BOOKING_STATUS } from '@/constants/status';
+
+// Type
+import { BookingStatus } from '@/features/booking/schemas/booking';
 
 // Mock services
 const mockCheckAndExpireTickets = jest.fn();
@@ -84,7 +87,7 @@ describe('useTicketExpiration', () => {
     jest.useFakeTimers();
     mockUserState = mockUser;
     mockCheckAndExpireTickets.mockResolvedValue(0);
-    mockCheckTicketStatus.mockResolvedValue(TicketStatus.ACTIVE);
+    mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.ACTIVE);
     mockStartPeriodicCheck.mockReturnValue(123);
   });
 
@@ -211,23 +214,25 @@ describe('useTicketExpiration', () => {
 
   describe('checkTicketStatus', () => {
     it('should return ticket status', async () => {
-      mockCheckTicketStatus.mockResolvedValue(TicketStatus.ACTIVE);
+      mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.ACTIVE);
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
       });
 
-      let status: TicketStatus;
+      let status: BookingStatus;
       await act(async () => {
-        status = await result.current.checkTicketStatus('ticket-123');
+        status = (await result.current.checkTicketStatus(
+          'ticket-123',
+        )) as BookingStatus;
       });
 
-      expect(status!).toBe(TicketStatus.ACTIVE);
+      expect(status!).toBe(BOOKING_STATUS.ACTIVE);
       expect(mockCheckTicketStatus).toHaveBeenCalledWith('ticket-123');
     });
 
     it('should invalidate queries when ticket is expired', async () => {
-      mockCheckTicketStatus.mockResolvedValue(TicketStatus.EXPIRED);
+      mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.EXPIRED);
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
@@ -246,7 +251,7 @@ describe('useTicketExpiration', () => {
     });
 
     it('should not invalidate queries when ticket is active', async () => {
-      mockCheckTicketStatus.mockResolvedValue(TicketStatus.ACTIVE);
+      mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.ACTIVE);
       mockInvalidateQueries.mockClear();
 
       const { result } = renderHook(() => useTicketExpiration(), {
@@ -261,7 +266,7 @@ describe('useTicketExpiration', () => {
       mockInvalidateQueries.mockClear();
 
       await act(async () => {
-        await result.current.checkTicketStatus('ticket-123');
+        (await result.current.checkTicketStatus('ticket-123')) as BookingStatus;
       });
 
       // Should not invalidate for active ticket
@@ -271,18 +276,20 @@ describe('useTicketExpiration', () => {
     });
 
     it('should return EXPIRED status when ticket is used', async () => {
-      mockCheckTicketStatus.mockResolvedValue(TicketStatus.USED);
+      mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.USED);
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
       });
 
-      let status: TicketStatus;
+      let status: BookingStatus;
       await act(async () => {
-        status = await result.current.checkTicketStatus('ticket-123');
+        status = (await result.current.checkTicketStatus(
+          'ticket-123',
+        )) as BookingStatus;
       });
 
-      expect(status!).toBe(TicketStatus.USED);
+      expect(status!).toBe(BOOKING_STATUS.USED);
     });
 
     it('should return EXPIRED on service error', async () => {
@@ -292,12 +299,14 @@ describe('useTicketExpiration', () => {
         wrapper: createWrapper(),
       });
 
-      let status: TicketStatus;
+      let status: BookingStatus;
       await act(async () => {
-        status = await result.current.checkTicketStatus('ticket-123');
+        status = (await result.current.checkTicketStatus(
+          'ticket-123',
+        )) as BookingStatus;
       });
 
-      expect(status!).toBe(TicketStatus.EXPIRED);
+      expect(status!).toBe(BOOKING_STATUS.EXPIRED);
     });
   });
 

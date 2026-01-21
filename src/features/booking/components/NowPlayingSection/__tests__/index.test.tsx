@@ -1,4 +1,4 @@
-import { Movie } from '@/features/booking/types/movie';
+import { Movie } from '@/features/booking/schemas/movie';
 import { render, screen } from '@testing-library/react-native';
 import { NowPlayingSection } from '../index';
 

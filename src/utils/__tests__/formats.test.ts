@@ -1,5 +1,6 @@
-import { Seat, SeatStatus } from '@/features/booking/types/cinema';
-import { PromoCodeStatus } from '@/features/booking/types/movie';
+import { Seat, SeatStatus } from '@/features/booking/schemas/cinema';
+import { PromoCodeStatus } from '@/features/booking/schemas/movie';
+import { PROMO_CODE_STATUS, SEAT_STATUS } from '@/constants/status';
 import {
   calculateDiscount,
   calculateTotalPrice,
@@ -268,27 +269,50 @@ describe('getTimeRemaining', () => {
 
 describe('calculateDiscount', () => {
   it('should calculate percentage discount', () => {
-    expect(calculateDiscount(1000, PromoCodeStatus.PERCENTAGE, 10)).toBe(100);
+    expect(
+      calculateDiscount(
+        1000,
+        PROMO_CODE_STATUS.PERCENTAGE as PromoCodeStatus,
+        10,
+      ),
+    ).toBe(100);
   });
 
   it('should apply max discount for percentage', () => {
-    expect(calculateDiscount(1000, PromoCodeStatus.PERCENTAGE, 10, 50)).toBe(
-      50,
-    );
+    expect(
+      calculateDiscount(
+        1000,
+        PROMO_CODE_STATUS.PERCENTAGE as PromoCodeStatus,
+        10,
+        50,
+      ),
+    ).toBe(50);
   });
 
   it('should calculate fixed discount', () => {
-    expect(calculateDiscount(1000, PromoCodeStatus.FIXED_AMOUNT, 100)).toBe(
-      100,
-    );
+    expect(
+      calculateDiscount(
+        1000,
+        PROMO_CODE_STATUS.FIXED_AMOUNT as PromoCodeStatus,
+        100,
+      ),
+    ).toBe(100);
   });
 
   it('should not exceed amount', () => {
-    expect(calculateDiscount(100, PromoCodeStatus.FIXED_AMOUNT, 200)).toBe(100);
+    expect(
+      calculateDiscount(
+        100,
+        PROMO_CODE_STATUS.FIXED_AMOUNT as PromoCodeStatus,
+        200,
+      ),
+    ).toBe(100);
   });
 
   it('should handle zero amount', () => {
-    expect(calculateDiscount(0, PromoCodeStatus.PERCENTAGE, 10)).toBe(0);
+    expect(
+      calculateDiscount(0, PROMO_CODE_STATUS.PERCENTAGE as PromoCodeStatus, 10),
+    ).toBe(0);
   });
 });
 
@@ -397,25 +421,25 @@ describe('groupSeatsByRow', () => {
         id: 'A1',
         row: 'A',
         number: 1,
-        status: SeatStatus.AVAILABLE,
+        status: SEAT_STATUS.AVAILABLE as SeatStatus,
       }),
       createMockSeat({
         id: 'A2',
         row: 'A',
         number: 2,
-        status: SeatStatus.AVAILABLE,
+        status: SEAT_STATUS.AVAILABLE as SeatStatus,
       }),
       createMockSeat({
         id: 'B1',
         row: 'B',
         number: 1,
-        status: SeatStatus.AVAILABLE,
+        status: SEAT_STATUS.AVAILABLE as SeatStatus,
       }),
       createMockSeat({
         id: 'B2',
         row: 'B',
         number: 2,
-        status: SeatStatus.AVAILABLE,
+        status: SEAT_STATUS.AVAILABLE as SeatStatus,
       }),
     ];
 
@@ -436,25 +460,25 @@ describe('groupSeatsByRow', () => {
         id: 'A1',
         row: 'A',
         number: 1,
-        status: SeatStatus.AVAILABLE,
+        status: SEAT_STATUS.AVAILABLE as SeatStatus,
       }),
       createMockSeat({
         id: 'A2',
         row: 'A',
         number: 2,
-        status: SeatStatus.AVAILABLE,
+        status: SEAT_STATUS.AVAILABLE as SeatStatus,
       }),
       createMockSeat({
         id: 'A3',
         row: 'A',
         number: 3,
-        status: SeatStatus.AVAILABLE,
+        status: SEAT_STATUS.AVAILABLE as SeatStatus,
       }),
     ];
 
     const result = groupSeatsByRow(seats);
-    expect(result.A[0].number).toBe(1);
-    expect(result.A[1].number).toBe(2);
-    expect(result.A[2].number).toBe(3);
+    expect(result.A?.[0]?.number).toBe(1);
+    expect(result.A?.[1]?.number).toBe(2);
+    expect(result.A?.[2]?.number).toBe(3);
   });
 });

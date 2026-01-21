@@ -1,8 +1,14 @@
-import { GenreMovie, Movie, MovieStatus } from '@/features/booking/types/movie';
+import {
+  GenreMovie,
+  Movie,
+  MovieStatus,
+} from '@/features/booking/schemas/movie';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react-native';
 import { LinkProps } from 'expo-router';
 import HomeScreen from '../index';
+import { MOVIE_STATUS } from '@/constants/status';
+import { GENRE_MOVIE } from '@/constants/movie';
 
 // Mock dependencies
 const mockPush = jest.fn();
@@ -10,7 +16,7 @@ const mockRefetchNowPlaying = jest.fn();
 const mockRefetchComingSoon = jest.fn();
 const mockFetchNextNowPlaying = jest.fn();
 const mockFetchNextComingSoon = jest.fn();
-const mockMovieStatus = MovieStatus;
+const mockMovieStatus = MOVIE_STATUS;
 
 let mockNowPlayingData: {
   pages: Movie[][];
@@ -186,12 +192,16 @@ describe('HomeScreen', () => {
     },
     trailerUrl: ['https://youtube.com/watch?v=6hB3S9bIaco'],
     durationMinutes: 112,
-    genre: [GenreMovie.ACTION, GenreMovie.COMEDY, GenreMovie.ADVENTURE],
+    genre: [
+      GENRE_MOVIE.ACTION as GenreMovie,
+      GENRE_MOVIE.COMEDY as GenreMovie,
+      GENRE_MOVIE.ADVENTURE as GenreMovie,
+    ],
     language: 'EN',
     releaseDate: '2023-06-15',
     createdAt: '2023-06-15T12:34:56Z',
     updatedAt: '2023-06-15T12:34:56Z',
-    status: MovieStatus.NOW_PLAYING,
+    status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
   };
 
   const mockMovies = [
@@ -369,7 +379,7 @@ describe('HomeScreen', () => {
           id: '2',
           title: 'Movie 2',
           rating: 4.0,
-          genre: [GenreMovie.ACTION],
+          genre: [GENRE_MOVIE.ACTION as GenreMovie],
         },
       ];
 
@@ -385,13 +395,18 @@ describe('HomeScreen', () => {
 
     it('should handle movies without rating', () => {
       const moviesWithoutRating = [
-        { ...mockMovie, id: '1', title: 'Movie 1', genre: [GenreMovie.ACTION] },
+        {
+          ...mockMovie,
+          id: '1',
+          title: 'Movie 1',
+          genre: [GENRE_MOVIE.ACTION as GenreMovie],
+        },
         {
           ...mockMovie,
           id: '2',
           title: 'Movie 2',
           rating: 4.0,
-          genre: [GenreMovie.ACTION],
+          genre: [GENRE_MOVIE.ACTION as GenreMovie],
         },
       ];
 

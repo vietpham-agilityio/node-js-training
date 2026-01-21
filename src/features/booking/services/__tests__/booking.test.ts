@@ -1,5 +1,4 @@
-import { Booking, BookingStatus } from '@/features/booking/types/booking';
-import { SeatReservationStatus } from '@/features/booking/types/cinema';
+import { Booking } from '@/features/booking/schemas/booking';
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
 import {
@@ -7,6 +6,7 @@ import {
   bookingsService,
   CreateBookingData,
 } from '../booking';
+import { BOOKING_STATUS, SEAT_RESERVATION_STATUS } from '@/constants/status';
 
 const createMockQueryBuilder = () => ({
   select: jest.fn().mockReturnThis(),
@@ -312,7 +312,7 @@ describe('BookingsService', () => {
     it('should cancel a booking with refund successfully', async () => {
       const mockBooking = {
         id: 'booking1',
-        bookingStatus: BookingStatus.ACTIVE,
+        bookingStatus: BOOKING_STATUS.ACTIVE,
         totalAmount: 200,
       } as Booking;
 
@@ -341,7 +341,7 @@ describe('BookingsService', () => {
     it('should throw an error if booking already cancelled', async () => {
       const mockBooking = {
         id: 'booking1',
-        bookingStatus: BookingStatus.CANCELLED,
+        bookingStatus: BOOKING_STATUS.CANCELLED,
         totalAmount: 200,
       } as Booking;
 
@@ -355,7 +355,7 @@ describe('BookingsService', () => {
     it('should throw an error if RPC call fails', async () => {
       const mockBooking = {
         id: 'booking1',
-        bookingStatus: BookingStatus.ACTIVE,
+        bookingStatus: BOOKING_STATUS.ACTIVE,
         totalAmount: 200,
       } as Booking;
 
@@ -375,7 +375,7 @@ describe('BookingsService', () => {
         showtime_id: 'show1',
         user_id: 'user1',
         seat_numbers: ['A1', 'A2'],
-        status: SeatReservationStatus.RESERVED,
+        status: SEAT_RESERVATION_STATUS.RESERVED,
       };
 
       (mockQueryBuilder.single as jest.Mock).mockResolvedValue({
@@ -391,7 +391,7 @@ describe('BookingsService', () => {
           showtime_id: 'show1',
           user_id: 'user1',
           seat_numbers: ['A1', 'A2'],
-          status: SeatReservationStatus.RESERVED,
+          status: SEAT_RESERVATION_STATUS.RESERVED,
         }),
       );
       expect(mockQueryBuilder.select).toHaveBeenCalled();
@@ -446,7 +446,7 @@ describe('BookingsService', () => {
 
       expect(from).toHaveBeenCalledWith('seat_reservations');
       expect(mockQueryBuilder.update).toHaveBeenCalledWith({
-        status: SeatReservationStatus.RELEASED,
+        status: SEAT_RESERVATION_STATUS.RELEASED,
       });
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('id', 'reservation1');
     });

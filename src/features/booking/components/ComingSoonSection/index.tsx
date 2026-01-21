@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { View } from 'react-native';
 
 // Types
-import { Movie } from '@/features/booking/types/movie';
+import { Movie } from '@/features/booking/schemas/movie';
 
 // Components
 import { Typo } from '@/components/Typo';
