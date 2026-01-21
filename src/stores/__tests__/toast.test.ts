@@ -72,9 +72,9 @@ describe('useToastStore', () => {
     });
     const { toasts } = useToastStore.getState();
     expect(toasts.length).toBe(1);
-    expect(toasts[0].message).toBe(message);
-    expect(toasts[0].type).toBe(ToastType.SUCCESS);
-    expect(toasts[0].duration).toBe(3000); // Default duration for success
+    expect(toasts[0]?.message).toBe(message);
+    expect(toasts[0]?.type).toBe(ToastType.SUCCESS);
+    expect(toasts[0]?.duration).toBe(3000); // Default duration for success
   });
 
   it('should show an error toast', () => {
@@ -84,9 +84,9 @@ describe('useToastStore', () => {
     });
     const { toasts } = useToastStore.getState();
     expect(toasts.length).toBe(1);
-    expect(toasts[0].message).toBe(message);
-    expect(toasts[0].type).toBe(ToastType.ERROR);
-    expect(toasts[0].duration).toBe(4000); // Default duration for error
+    expect(toasts[0]?.message).toBe(message);
+    expect(toasts[0]?.type).toBe(ToastType.ERROR);
+    expect(toasts[0]?.duration).toBe(4000); // Default duration for error
   });
 
   it('should show a warning toast', () => {
@@ -96,9 +96,9 @@ describe('useToastStore', () => {
     });
     const { toasts } = useToastStore.getState();
     expect(toasts.length).toBe(1);
-    expect(toasts[0].message).toBe(message);
-    expect(toasts[0].type).toBe(ToastType.WARNING);
-    expect(toasts[0].duration).toBe(3500); // Default duration for warning
+    expect(toasts[0]?.message).toBe(message);
+    expect(toasts[0]?.type).toBe(ToastType.WARNING);
+    expect(toasts[0]?.duration).toBe(3500); // Default duration for warning
   });
 
   it('should show an info toast', () => {
@@ -108,9 +108,9 @@ describe('useToastStore', () => {
     });
     const { toasts } = useToastStore.getState();
     expect(toasts.length).toBe(1);
-    expect(toasts[0].message).toBe(message);
-    expect(toasts[0].type).toBe(ToastType.INFO);
-    expect(toasts[0].duration).toBe(3000); // Default duration for info
+    expect(toasts[0]?.message).toBe(message);
+    expect(toasts[0]?.type).toBe(ToastType.INFO);
+    expect(toasts[0]?.duration).toBe(3000); // Default duration for info
   });
 
   it('should show a toast with an action', () => {
@@ -121,10 +121,10 @@ describe('useToastStore', () => {
     });
     const { toasts } = useToastStore.getState();
     expect(toasts.length).toBe(1);
-    expect(toasts[0].message).toBe(message);
-    expect(toasts[0].action?.label).toBe('Undo');
-    expect(toasts[0].action?.onPress).toBe(action.onPress);
-    expect(toasts[0].duration).toBe(5000); // Default duration for action toast
+    expect(toasts[0]?.message).toBe(message);
+    expect(toasts[0]?.action?.label).toBe('Undo');
+    expect(toasts[0]?.action?.onPress).toBe(action.onPress);
+    expect(toasts[0]?.duration).toBe(5000); // Default duration for action toast
   });
 
   it('should hide a specific toast', () => {
@@ -134,7 +134,7 @@ describe('useToastStore', () => {
 
     act(() => {
       useToastStore.getState().show(message1);
-      id1 = useToastStore.getState().toasts[0].id;
+      id1 = useToastStore.getState().toasts[0]?.id || '';
     });
 
     // Ensure Math.random returns a different value for the second toast
@@ -151,7 +151,7 @@ describe('useToastStore', () => {
 
     const { toasts } = useToastStore.getState();
     expect(toasts.length).toBe(1);
-    expect(toasts[0].message).toBe(message2);
+    expect(toasts[0]?.message).toBe(message2);
   });
 
   it('should hide all toasts', () => {

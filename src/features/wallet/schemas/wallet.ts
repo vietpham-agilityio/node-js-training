@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import { BookingSchema } from '@/features/booking/schemas/booking';
+import { Booking } from '@/features/booking/schemas/booking';
 import { Schema } from 'effect';
 
 export const WalletTransactionTypeSchema = Schema.Literal(
@@ -36,7 +36,6 @@ export const WalletTransactionSchema = Schema.Struct({
   referenceId: Schema.optional(Schema.String),
   status: WalletTransactionStatusSchema,
   createdAt: Schema.String,
-  booking: Schema.optional(BookingSchema),
 });
 
 export type WalletTransactionType = Schema.Schema.Type<
@@ -47,6 +46,10 @@ export type WalletTransactionStatus = Schema.Schema.Type<
 >;
 
 export interface Wallet extends Schema.Schema.Type<typeof WalletSchema> {}
-export interface WalletTransaction extends Schema.Schema.Type<
+export interface WalletTransactionBase extends Schema.Schema.Type<
   typeof WalletTransactionSchema
 > {}
+
+export interface WalletTransaction extends WalletTransactionBase {
+  booking?: Booking;
+}

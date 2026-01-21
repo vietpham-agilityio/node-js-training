@@ -334,7 +334,7 @@ describe('EditProfileScreen', () => {
       // Verify showLoading is called before hideLoading
       const showLoadingCallOrder = mockShowLoading.mock.invocationCallOrder[0];
       const hideLoadingCallOrder = mockHideLoading.mock.invocationCallOrder[0];
-      expect(showLoadingCallOrder).toBeLessThan(hideLoadingCallOrder);
+      expect(showLoadingCallOrder).toBeLessThan(hideLoadingCallOrder || 0);
     });
   });
 

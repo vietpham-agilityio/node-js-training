@@ -16,7 +16,7 @@ export const SignInDataSchema = Schema.Struct({
 export const UserProfileSchema = Schema.Struct({
   id: Schema.String,
   fullName: Schema.optional(Schema.String),
-  email: Schema.String,
+  email: Schema.optional(Schema.String),
   phoneNumber: Schema.optional(Schema.String),
   address: Schema.optional(Schema.String),
   avatarUrl: Schema.optional(Schema.String),

@@ -225,7 +225,10 @@ describe('MyProfileScreen', () => {
 
       // Get the Rate now button callback and call it
       const alertCall = mockAlert.mock.calls[0];
-      const buttons = alertCall[2] as { text?: string; onPress?: () => void }[];
+      const buttons = alertCall?.[2] as {
+        text?: string;
+        onPress?: () => void;
+      }[];
       const rateNowButton = buttons?.find(btn => btn.text === 'Rate now');
 
       // Should not throw when onPress is called (returns null)

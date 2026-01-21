@@ -63,7 +63,7 @@ export const EditProfileForm = memo(
 
           // Include the field if it's dirty
           if (dirtyFields[fieldKey]) {
-            acc[fieldKey] = value || '';
+            (acc as any)[fieldKey] = value || '';
           }
 
           return acc;

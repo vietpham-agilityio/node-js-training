@@ -14,8 +14,8 @@ export const generateUUID = async (): Promise<string> => {
   const randomBytes = await Crypto.getRandomBytesAsync(16);
 
   // Set version (4) and variant bits according to UUID v4 spec
-  randomBytes[6] = (randomBytes[6] & 0x0f) | 0x40; // Version 4
-  randomBytes[8] = (randomBytes[8] & 0x3f) | 0x80; // Variant 10
+  randomBytes[6] = (randomBytes[6] ?? 0 & 0x0f) | 0x40; // Version 4
+  randomBytes[8] = (randomBytes[8] ?? 0 & 0x3f) | 0x80; // Variant 10
 
   // Convert to hex string and format as UUID
   const hex = Array.from(randomBytes)

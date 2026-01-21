@@ -231,7 +231,7 @@ describe('MovieBannerCarousel Component', () => {
     });
 
     it('should handle duplicate movie IDs', () => {
-      const duplicateMovies = [MOVIES_MOCK[0], MOVIES_MOCK[0]];
+      const duplicateMovies = [MOVIES_MOCK[0], MOVIES_MOCK[0]] as Movie[];
 
       render(<MovieBannerCarousel movies={duplicateMovies} />);
 
@@ -311,7 +311,7 @@ describe('MovieBannerCarousel Component', () => {
       }));
 
       const Carousel = require('react-native-reanimated-carousel');
-      render(<MovieBannerCarousel movies={manyMovies} />);
+      render(<MovieBannerCarousel movies={manyMovies as Movie[]} />);
 
       const carouselCall = Carousel.mock.calls[0][0];
       expect(carouselCall.loop).toBe(true);
@@ -325,7 +325,7 @@ describe('MovieBannerCarousel Component', () => {
       }));
 
       const Carousel = require('react-native-reanimated-carousel');
-      render(<MovieBannerCarousel movies={fewMovies} />);
+      render(<MovieBannerCarousel movies={fewMovies as Movie[]} />);
 
       const carouselCall = Carousel.mock.calls[0][0];
       expect(carouselCall.loop).toBe(false);
@@ -340,7 +340,7 @@ describe('MovieBannerCarousel Component', () => {
         title: `Movie ${index + 1}`,
       }));
 
-      render(<MovieBannerCarousel movies={manyMovies} />);
+      render(<MovieBannerCarousel movies={manyMovies as Movie[]} />);
 
       expect(screen.getByTestId('movie-banner-carousel')).toBeTruthy();
     });

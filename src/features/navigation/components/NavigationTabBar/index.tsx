@@ -36,7 +36,7 @@ export const NavigationTabBar = memo(
         }}
       >
         {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
+          const { options } = descriptors[route.key] || {};
           const isFocused = state.index === index;
           const isDisabled = disabledRoutes?.includes(route.name);
 
@@ -44,7 +44,7 @@ export const NavigationTabBar = memo(
             <TabBarItem
               key={route.key}
               route={route}
-              options={options}
+              options={options || {}}
               isFocused={isFocused}
               isDisabled={isDisabled}
               navigation={navigation}

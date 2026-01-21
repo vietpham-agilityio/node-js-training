@@ -1,6 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { memo, useCallback, useMemo, useState } from 'react';
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, TouchableOpacity, View } from 'react-native';
 
 // SDKs
 import {
@@ -87,7 +87,7 @@ export const LocationDropdown = memo(
         longitude: currentLocation.coords.longitude,
       });
 
-      setLocation(address[0]);
+      setLocation(address[0] || null);
       setHasRequestedPermission(true);
 
       if (address[0]?.city || address[0]?.region) {

@@ -80,7 +80,7 @@ describe('MovieTrailerCarousel Component', () => {
 
   describe('Trailer Data', () => {
     it('should handle single trailer', () => {
-      const singleTrailer = [mockTrailers[0]];
+      const singleTrailer = [mockTrailers[0] || ''];
       render(<MovieTrailerCarousel trailers={singleTrailer} />);
 
       expect(screen.getByTestId('movie-trailer-slide-item-0')).toBeTruthy();
@@ -393,7 +393,7 @@ describe('MovieTrailerCarousel Component', () => {
 
       expect(screen.getAllByTestId('movie-trailer').length).toBe(3);
 
-      const newTrailers = [mockTrailers[0], mockTrailers[1]];
+      const newTrailers = [mockTrailers[0] || '', mockTrailers[1] || ''];
       rerender(<MovieTrailerCarousel trailers={newTrailers} />);
 
       expect(screen.getAllByTestId('movie-trailer').length).toBe(2);
@@ -408,7 +408,7 @@ describe('MovieTrailerCarousel Component', () => {
         getByTestId('movie-trailer-carousel').props.accessibilityLabel,
       ).toBe('Movie carousel with 3 movies');
 
-      const newTrailers = [mockTrailers[0]];
+      const newTrailers = [mockTrailers[0] || ''];
       rerender(<MovieTrailerCarousel trailers={newTrailers} />);
 
       expect(
@@ -532,7 +532,7 @@ describe('MovieTrailerCarousel Component', () => {
     });
 
     it('should render with minimum one trailer', () => {
-      render(<MovieTrailerCarousel trailers={[mockTrailers[0]]} />);
+      render(<MovieTrailerCarousel trailers={[mockTrailers[0] || '']} />);
 
       expect(screen.getByTestId('movie-trailer-carousel')).toBeTruthy();
       expect(screen.getAllByTestId('movie-trailer').length).toBe(1);

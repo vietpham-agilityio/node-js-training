@@ -35,7 +35,7 @@ import { useLoadingStore } from '@/stores/loading';
 import { useMovieStore } from '@/stores/movie';
 
 // Utils
-import { Booking } from '@/features/booking/types/booking';
+import { Booking } from '@/features/booking/schemas/booking';
 import { cn } from '@/utils/cn';
 
 // Icons

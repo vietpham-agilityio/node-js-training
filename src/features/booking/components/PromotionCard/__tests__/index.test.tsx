@@ -5,6 +5,7 @@ import { MOCK_PROMOTIONS } from '@/mocks';
 
 // Component
 import { PromotionCard } from '..';
+import { PromoCode } from '@/features/booking/schemas/movie';
 
 jest.mock('uniwind', () => {
   return {
@@ -32,7 +33,7 @@ jest.mock('uniwind', () => ({
 }));
 
 describe('PromotionCard Component', () => {
-  const defaultProps = MOCK_PROMOTIONS[0];
+  const defaultProps = MOCK_PROMOTIONS[0] as PromoCode;
 
   describe('Rendering', () => {
     it('should render without crashing', () => {

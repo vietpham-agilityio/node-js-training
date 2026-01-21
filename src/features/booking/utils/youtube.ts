@@ -3,7 +3,7 @@ export const isYouTubeUrl = (url?: string) =>
 
 export const getYouTubeId = (url: string) => {
   if (url.includes('youtu.be/')) {
-    return url.split('youtu.be/')[1].split('?')[0];
+    return url.split('youtu.be/')[1]?.split('?')[0];
   }
   return url.split('v=')[1]?.split('&')[0];
 };

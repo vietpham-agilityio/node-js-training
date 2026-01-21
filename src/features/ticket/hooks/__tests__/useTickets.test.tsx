@@ -100,7 +100,7 @@ const mockTicket: Ticket = {
     userId: 'user-123',
     showtimeId: 'showtime-1',
     bookingNumber: 'BKG-001',
-    bookingStatus: BOOKING_STATUS.CONFIRMED,
+    bookingStatus: BOOKING_STATUS.USED,
     totalSeats: 1,
     seatNumbers: ['A1'],
     subtotal: 50000,
