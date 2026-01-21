@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 // Types
-import { Wallet } from '@/features/wallet/types/wallet';
+import { Wallet } from '@/features/wallet/schemas/wallet';
 
 interface WalletState {
   wallet: Wallet | null;

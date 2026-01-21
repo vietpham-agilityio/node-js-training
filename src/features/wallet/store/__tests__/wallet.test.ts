@@ -3,7 +3,7 @@ import { act } from '@testing-library/react-native';
 import { useWalletStore } from '../wallet';
 
 // Types
-import { Wallet } from '@/features/wallet/types/wallet';
+import { Wallet } from '@/features/wallet/schemas/wallet';
 
 const mockWallet: Wallet = {
   id: 'wallet-123',

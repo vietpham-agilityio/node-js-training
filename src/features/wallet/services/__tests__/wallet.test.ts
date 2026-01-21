@@ -1,11 +1,11 @@
-import {
-  Wallet,
-  WalletTransactionStatus,
-  WalletTransactionType,
-} from '@/features/wallet/types/wallet';
+import { Wallet } from '@/features/wallet/schemas/wallet';
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
 import { WalletService, walletService } from '../wallet';
+import {
+  WALLET_TRANSACTION_STATUS,
+  WALLET_TRANSACTION_TYPE,
+} from '@/constants/status';
 
 // --- Mock Query Builder Factory ---
 const createMockQueryBuilder = () => ({
@@ -178,14 +178,14 @@ describe('WalletService', () => {
         {
           id: 'tx1',
           wallet_id: 'wallet1',
-          transaction_type: WalletTransactionType.TOP_UP,
+          transaction_type: WALLET_TRANSACTION_TYPE.TOP_UP,
           amount: 50000,
           reference_id: null,
         },
         {
           id: 'tx2',
           wallet_id: 'wallet1',
-          transaction_type: WalletTransactionType.PAYMENT,
+          transaction_type: WALLET_TRANSACTION_TYPE.PAYMENT,
           amount: -20000,
           reference_id: 'booking1',
         },
@@ -280,7 +280,7 @@ describe('WalletService', () => {
       const mockTransaction = {
         id: 'tx1',
         wallet_id: 'wallet1',
-        transaction_type: WalletTransactionType.TOP_UP,
+        transaction_type: WALLET_TRANSACTION_TYPE.TOP_UP,
         amount: 50000,
         balance_before: 10000,
         balance_after: 60000,
@@ -301,11 +301,11 @@ describe('WalletService', () => {
       expect(mockQueryBuilder.insert).toHaveBeenCalledWith(
         expect.objectContaining({
           wallet_id: 'wallet1',
-          transaction_type: WalletTransactionType.TOP_UP,
+          transaction_type: WALLET_TRANSACTION_TYPE.TOP_UP,
           amount: 50000,
           balance_before: 10000,
           balance_after: 60000,
-          status: WalletTransactionStatus.COMPLETED,
+          status: WALLET_TRANSACTION_STATUS.COMPLETED,
         }),
       );
       expect(mockQueryBuilder.update).toHaveBeenCalledWith(
@@ -361,7 +361,7 @@ describe('WalletService', () => {
       const mockTransaction = {
         id: 'tx1',
         wallet_id: 'wallet1',
-        transaction_type: WalletTransactionType.PAYMENT,
+        transaction_type: WALLET_TRANSACTION_TYPE.PAYMENT,
         amount: -20000,
         balance_before: 50000,
         balance_after: 30000,
@@ -385,13 +385,13 @@ describe('WalletService', () => {
       expect(mockQueryBuilder.insert).toHaveBeenCalledWith(
         expect.objectContaining({
           wallet_id: 'wallet1',
-          transaction_type: WalletTransactionType.PAYMENT,
+          transaction_type: WALLET_TRANSACTION_TYPE.PAYMENT,
           amount: -20000,
           balance_before: 50000,
           balance_after: 30000,
           description: 'Movie ticket purchase',
           reference_id: 'booking1',
-          status: WalletTransactionStatus.COMPLETED,
+          status: WALLET_TRANSACTION_STATUS.COMPLETED,
         }),
       );
       expect(mockQueryBuilder.update).toHaveBeenCalledWith(
@@ -443,7 +443,7 @@ describe('WalletService', () => {
       const mockTransaction = {
         id: 'tx1',
         wallet_id: 'wallet1',
-        transaction_type: WalletTransactionType.REFUND,
+        transaction_type: WALLET_TRANSACTION_TYPE.REFUND,
         amount: 20000,
         balance_before: 30000,
         balance_after: 50000,
@@ -462,13 +462,13 @@ describe('WalletService', () => {
       expect(mockQueryBuilder.insert).toHaveBeenCalledWith(
         expect.objectContaining({
           wallet_id: 'wallet1',
-          transaction_type: WalletTransactionType.REFUND,
+          transaction_type: WALLET_TRANSACTION_TYPE.REFUND,
           amount: 20000,
           balance_before: 30000,
           balance_after: 50000,
           description: 'Booking refund',
           reference_id: 'booking1',
-          status: WalletTransactionStatus.COMPLETED,
+          status: WALLET_TRANSACTION_STATUS.COMPLETED,
         }),
       );
       expect(mockQueryBuilder.update).toHaveBeenCalledWith(
@@ -558,7 +558,7 @@ describe('WalletService', () => {
       );
 
       expect(transactions[0]).toHaveProperty('booking');
-      expect(transactions[0].booking).toBeTruthy();
+      expect(transactions[0]?.booking).toBeTruthy();
     });
   });
 });

@@ -23,7 +23,7 @@ import {
 } from '@/features/wallet/hooks/useWallet';
 
 // Types
-import { WalletTransaction } from '@/features/wallet/types/wallet';
+import { WalletTransaction } from '@/features/wallet/schemas/wallet';
 
 // Components
 import { Button } from '@/components/Button';

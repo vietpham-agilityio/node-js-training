@@ -8,11 +8,14 @@ import { Typo } from '@/components/Typo';
 import { MovieTopUpIcon } from '@/icons/MovieTopUpIcon';
 
 // Types
-import { WalletTransactionType } from '@/features/wallet/types/wallet';
+import { WalletTransactionType } from '@/features/wallet/schemas/wallet';
 
 // Utils
 import { cn } from '@/utils/cn';
 import { formatIDR, formatShowtimeDate } from '@/utils/formats';
+
+// Constant
+import { WALLET_TRANSACTION_TYPE } from '@/constants/status';
 
 interface TransactionProps extends Omit<TouchableOpacityProps, 'children'> {
   className?: string;
@@ -22,10 +25,10 @@ interface TransactionProps extends Omit<TouchableOpacityProps, 'children'> {
   transactionType: WalletTransactionType;
 }
 
-const WalletTransactionColor: Record<WalletTransactionType, string> = {
-  [WalletTransactionType.TOP_UP]: 'text-text-success',
-  [WalletTransactionType.PAYMENT]: 'text-text-error',
-  [WalletTransactionType.REFUND]: 'text-text-primary',
+const WalletTransactionColor: Record<string, string> = {
+  [WALLET_TRANSACTION_TYPE.TOP_UP]: 'text-text-success',
+  [WALLET_TRANSACTION_TYPE.PAYMENT]: 'text-text-error',
+  [WALLET_TRANSACTION_TYPE.REFUND]: 'text-text-primary',
 };
 
 export const Transaction = memo(

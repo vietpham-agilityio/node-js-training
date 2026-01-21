@@ -5,15 +5,14 @@ import { supabase } from '@/services/supabase/client';
 import { PAGINATION } from '@/constants';
 
 // Types
-import {
-  Wallet,
-  WalletTransaction,
-  WalletTransactionStatus,
-  WalletTransactionType,
-} from '@/features/wallet/types/wallet';
+import { Wallet, WalletTransaction } from '@/features/wallet/schemas/wallet';
 
 // Utils
 import { keysToCamel } from '@/utils/convert';
+import {
+  WALLET_TRANSACTION_STATUS,
+  WALLET_TRANSACTION_TYPE,
+} from '@/constants/status';
 
 export class WalletService {
   private static instance: WalletService;
@@ -195,12 +194,12 @@ export class WalletService {
         .from('wallet_transactions')
         .insert({
           wallet_id: walletId,
-          transaction_type: WalletTransactionType.TOP_UP,
+          transaction_type: WALLET_TRANSACTION_TYPE.TOP_UP,
           amount,
           balance_before: balanceBefore,
           balance_after: balanceAfter,
           description: 'Wallet top-up',
-          status: WalletTransactionStatus.COMPLETED,
+          status: WALLET_TRANSACTION_STATUS.COMPLETED,
         })
         .select()
         .single();
@@ -260,13 +259,13 @@ export class WalletService {
         .from('wallet_transactions')
         .insert({
           wallet_id: walletId,
-          transaction_type: WalletTransactionType.PAYMENT,
+          transaction_type: WALLET_TRANSACTION_TYPE.PAYMENT,
           amount: -amount, // Negative for deduction
           balance_before: balanceBefore,
           balance_after: balanceAfter,
           description,
           reference_id: bookingId,
-          status: WalletTransactionStatus.COMPLETED,
+          status: WALLET_TRANSACTION_STATUS.COMPLETED,
         })
         .select()
         .single();
@@ -319,13 +318,13 @@ export class WalletService {
         .from('wallet_transactions')
         .insert({
           wallet_id: walletId,
-          transaction_type: WalletTransactionType.REFUND,
+          transaction_type: WALLET_TRANSACTION_TYPE.REFUND,
           amount,
           balance_before: balanceBefore,
           balance_after: balanceAfter,
           description: 'Booking refund',
           reference_id: bookingId,
-          status: WalletTransactionStatus.COMPLETED,
+          status: WALLET_TRANSACTION_STATUS.COMPLETED,
         })
         .select()
         .single();

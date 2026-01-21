@@ -4,6 +4,10 @@ import React from 'react';
 
 // Constants
 import { queryKeys } from '@/constants';
+import {
+  WALLET_TRANSACTION_STATUS,
+  WALLET_TRANSACTION_TYPE,
+} from '@/constants/status';
 
 // Hooks
 import {
@@ -14,12 +18,7 @@ import {
 } from '../useWallet';
 
 // Types
-import {
-  Wallet,
-  WalletTransaction,
-  WalletTransactionStatus,
-  WalletTransactionType,
-} from '@/features/wallet/types/wallet';
+import { Wallet, WalletTransaction } from '@/features/wallet/schemas/wallet';
 
 // Mock dependencies
 const mockGetWallet = jest.fn();
@@ -203,12 +202,12 @@ describe('useTransactions', () => {
       {
         id: 'tx1',
         walletId: 'wallet1',
-        transactionType: WalletTransactionType.PAYMENT,
+        transactionType: WALLET_TRANSACTION_TYPE.PAYMENT,
         amount: 50000,
         balanceBefore: 100000,
         balanceAfter: 50000,
         description: 'Movie ticket purchase',
-        status: WalletTransactionStatus.COMPLETED,
+        status: WALLET_TRANSACTION_STATUS.COMPLETED,
         createdAt: '2024-01-01T00:00:00Z',
       },
     ];
@@ -411,7 +410,7 @@ describe('useTransactionsInfinite', () => {
     });
 
     expect(result.current.hasNextPage).toBe(true);
-    expect(result.current.data?.pages[0].length).toBe(20);
+    expect(result.current.data?.pages[0]?.length).toBe(20);
   });
 
   it('should be disabled when user does not exist', () => {

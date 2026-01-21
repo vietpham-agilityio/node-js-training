@@ -30,7 +30,7 @@ import {
   InfiniteBookingsData,
 } from '@/features/booking/schemas/booking';
 import { Showtime } from '@/features/booking/schemas/cinema';
-import { Wallet } from '@/features/wallet/types/wallet';
+import { Wallet } from '@/features/wallet/schemas/wallet';
 
 export const useBookings = (status?: string) => {
   const user = useAuthStore(state => state.user);

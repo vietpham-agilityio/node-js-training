@@ -7,19 +7,17 @@ import MyWalletScreen from '../index';
 import { ROUTES } from '@/constants';
 import { GENRE_MOVIE } from '@/constants/movie';
 import {
-  MOVIE_STATUS,
   BOOKING_STATUS,
+  MOVIE_STATUS,
   PAYMENT_STATUS,
   SHOWTIME_STATUS,
+  WALLET_TRANSACTION_STATUS,
+  WALLET_TRANSACTION_TYPE,
 } from '@/constants/status';
 
 // Types
-import {
-  Wallet,
-  WalletTransaction,
-  WalletTransactionStatus,
-  WalletTransactionType,
-} from '@/features/wallet/types/wallet';
+import { Wallet, WalletTransaction } from '@/features/wallet/schemas/wallet';
+import { Booking } from '@/features/booking/schemas/booking';
 
 // Mock expo-image with ImageBackground
 jest.mock('expo-image', () => {
@@ -74,23 +72,23 @@ const mockTransactions: WalletTransaction[] = [
   {
     id: 'tx1',
     walletId: 'wallet1',
-    transactionType: WalletTransactionType.PAYMENT,
+    transactionType: WALLET_TRANSACTION_TYPE.PAYMENT,
     amount: 100000,
     balanceBefore: 400000,
     balanceAfter: 500000,
     description: 'Top up wallet',
-    status: WalletTransactionStatus.COMPLETED,
+    status: WALLET_TRANSACTION_STATUS.COMPLETED,
     createdAt: '2024-01-01T00:00:00Z',
   },
   {
     id: 'tx2',
     walletId: 'wallet1',
-    transactionType: WalletTransactionType.PAYMENT,
+    transactionType: WALLET_TRANSACTION_TYPE.PAYMENT,
     amount: 50000,
     balanceBefore: 500000,
     balanceAfter: 450000,
     description: 'Movie ticket purchase',
-    status: WalletTransactionStatus.COMPLETED,
+    status: WALLET_TRANSACTION_STATUS.COMPLETED,
     createdAt: '2024-01-02T00:00:00Z',
     booking: {
       id: 'booking1',
@@ -162,7 +160,7 @@ const mockTransactions: WalletTransaction[] = [
           updatedAt: '2024-01-01T00:00:00Z',
         },
       },
-    },
+    } as unknown as Booking,
   },
 ];
 
@@ -484,12 +482,12 @@ describe('MyWalletScreen', () => {
             {
               id: 'tx1',
               walletId: 'wallet1',
-              transactionType: WalletTransactionType.PAYMENT,
+              transactionType: WALLET_TRANSACTION_TYPE.PAYMENT,
               amount: 50000,
               balanceBefore: 100000,
               balanceAfter: 50000,
               description: 'Payment',
-              status: WalletTransactionStatus.COMPLETED,
+              status: WALLET_TRANSACTION_STATUS.COMPLETED,
               createdAt: '2024-01-01T00:00:00Z',
               booking: {
                 id: 'booking1',
@@ -520,7 +518,7 @@ describe('MyWalletScreen', () => {
                   createdAt: '2024-01-01T00:00:00Z',
                   updatedAt: '2024-01-01T00:00:00Z',
                 },
-              },
+              } as unknown as Booking,
             },
           ],
         ],

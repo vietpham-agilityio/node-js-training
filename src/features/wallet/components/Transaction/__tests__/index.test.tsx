@@ -1,6 +1,6 @@
-import { WalletTransactionType } from '@/features/wallet/types/wallet';
 import { fireEvent, render } from '@testing-library/react-native';
 import { Transaction } from '../index';
+import { WALLET_TRANSACTION_TYPE } from '@/constants/status';
 
 const mockFormatIDR = jest.fn(
   (amount: number) => `IDR ${amount.toLocaleString('id-ID')}`,
@@ -21,7 +21,7 @@ describe('Transaction Component', () => {
     description: 'Movie Ticket Purchase',
     createdAt: '2024-01-15T14:00:00Z',
     amount: 50000,
-    transactionType: WalletTransactionType.PAYMENT,
+    transactionType: WALLET_TRANSACTION_TYPE.PAYMENT,
   };
 
   beforeEach(() => {
@@ -60,7 +60,7 @@ describe('Transaction Component', () => {
       const { getByTestId } = render(
         <Transaction
           {...defaultProps}
-          transactionType={WalletTransactionType.TOP_UP}
+          transactionType={WALLET_TRANSACTION_TYPE.TOP_UP}
         />,
       );
 
@@ -72,7 +72,7 @@ describe('Transaction Component', () => {
       const { getByTestId } = render(
         <Transaction
           {...defaultProps}
-          transactionType={WalletTransactionType.PAYMENT}
+          transactionType={WALLET_TRANSACTION_TYPE.PAYMENT}
         />,
       );
 
@@ -84,7 +84,7 @@ describe('Transaction Component', () => {
       const { getByTestId } = render(
         <Transaction
           {...defaultProps}
-          transactionType={WalletTransactionType.REFUND}
+          transactionType={WALLET_TRANSACTION_TYPE.REFUND}
         />,
       );
 

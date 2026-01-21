@@ -9,13 +9,14 @@ import { withUniwind } from 'uniwind';
 
 // Constants
 import { BLUR_HASH, IMAGE_SIZE_MAP, Size } from '@/constants';
+import { WALLET_TRANSACTION_TYPE } from '@/constants/status';
+
+// Types
+import { WalletTransactionType } from '@/features/wallet/schemas/wallet';
 
 // Components
 import { Rating } from '../Rating';
 import { Typo } from '../Typo';
-
-// Types
-import { WalletTransactionType } from '@/features/wallet/types/wallet';
 
 // Utils
 import { cn } from '@/utils/cn';
@@ -44,10 +45,10 @@ interface HorizontalCardProps extends Omit<TouchableOpacityProps, 'children'> {
 
 const StyledImage = withUniwind(Image);
 
-const WalletTransactionColor: Record<WalletTransactionType, string> = {
-  [WalletTransactionType.TOP_UP]: 'text-text-success',
-  [WalletTransactionType.PAYMENT]: 'text-text-error',
-  [WalletTransactionType.REFUND]: 'text-text-primary',
+const WalletTransactionColor: Record<string, string> = {
+  [WALLET_TRANSACTION_TYPE.TOP_UP]: 'text-text-success',
+  [WALLET_TRANSACTION_TYPE.PAYMENT]: 'text-text-error',
+  [WALLET_TRANSACTION_TYPE.REFUND]: 'text-text-primary',
 };
 
 export const HorizontalCard = memo(
