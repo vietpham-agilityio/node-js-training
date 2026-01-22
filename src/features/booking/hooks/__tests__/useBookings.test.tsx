@@ -24,46 +24,28 @@ import {
 // Constants
 import { BOOKING_STATUS } from '@/constants/status';
 
-// Mock dependencies
-const mockGetBookings = jest.fn();
-const mockGetBookingsPaginated = jest.fn();
-const mockGetBookingById = jest.fn();
-const mockCreateBooking = jest.fn();
-const mockCancelBooking = jest.fn();
-const mockReserveSeats = jest.fn();
-const mockReleaseSeats = jest.fn();
-const mockProcessPurchase = jest.fn();
-const mockRefund = jest.fn();
+// Services
+import { BookingError } from '@/features/booking/error/booking';
+import { bookingsServiceEffect } from '@/features/booking/services/booking';
+import { walletService } from '@/features/wallet/services/wallet';
+import { Effect } from 'effect';
 
 jest.mock('@/features/booking/services/booking', () => ({
-  bookingsService: {
-    getBookings: (userId: string, status?: string) =>
-      mockGetBookings(userId, status),
-    getBookingsPaginated: (
-      userId: string,
-      status?: string,
-      page?: number,
-      limit?: number,
-    ) => mockGetBookingsPaginated(userId, status, page, limit),
-    getBookingById: (id: string) => mockGetBookingById(id),
-    createBooking: (data: any) => mockCreateBooking(data),
-    cancelBooking: (id: string) => mockCancelBooking(id),
-    reserveSeats: (showtimeId: string, userId: string, seats: string[]) =>
-      mockReserveSeats(showtimeId, userId, seats),
-    releaseSeats: (reservationId: string) => mockReleaseSeats(reservationId),
+  bookingsServiceEffect: {
+    getBookings: jest.fn(),
+    getBookingsPaginated: jest.fn(),
+    getBookingById: jest.fn(),
+    createBooking: jest.fn(),
+    cancelBooking: jest.fn(),
+    reserveSeats: jest.fn(),
+    releaseSeats: jest.fn(),
   },
 }));
 
 jest.mock('@/features/wallet/services/wallet', () => ({
   walletService: {
-    processPurchase: (
-      walletId: string,
-      amount: number,
-      bookingId: string,
-      description: string,
-    ) => mockProcessPurchase(walletId, amount, bookingId, description),
-    refund: (walletId: string, amount: number, bookingId: string) =>
-      mockRefund(walletId, amount, bookingId),
+    processPurchase: jest.fn(),
+    refund: jest.fn(),
   },
 }));
 
@@ -165,7 +147,9 @@ describe('useBookings', () => {
         updatedAt: '2024-01-01',
       },
     ];
-    mockGetBookings.mockResolvedValue(mockBookings);
+    (bookingsServiceEffect.getBookings as jest.Mock).mockReturnValue(
+      Effect.succeed(mockBookings),
+    );
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useBookings(), {
@@ -176,13 +160,18 @@ describe('useBookings', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetBookings).toHaveBeenCalledWith('user1', undefined);
+    expect(bookingsServiceEffect.getBookings).toHaveBeenCalledWith(
+      'user1',
+      undefined,
+    );
     expect(result.current.data).toEqual(mockBookings);
   });
 
   it('should fetch bookings with status filter', async () => {
     const mockBookings: Booking[] = [];
-    mockGetBookings.mockResolvedValue(mockBookings);
+    (bookingsServiceEffect.getBookings as jest.Mock).mockReturnValue(
+      Effect.succeed(mockBookings),
+    );
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useBookings('active'), {
@@ -193,7 +182,10 @@ describe('useBookings', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetBookings).toHaveBeenCalledWith('user1', 'active');
+    expect(bookingsServiceEffect.getBookings).toHaveBeenCalledWith(
+      'user1',
+      'active',
+    );
   });
 
   it('should not fetch when user is not available', () => {
@@ -209,17 +201,17 @@ describe('useBookings', () => {
       wrapper: Wrapper,
     });
 
-    expect(mockGetBookings).not.toHaveBeenCalled();
+    expect(bookingsServiceEffect.getBookings).not.toHaveBeenCalled();
   });
 
   it('should handle retry with exponential backoff', async () => {
     let callCount = 0;
-    mockGetBookings.mockImplementation(() => {
+    (bookingsServiceEffect.getBookings as jest.Mock).mockImplementation(() => {
       callCount++;
       if (callCount < 2) {
-        return Promise.reject(new Error('Network error'));
+        return Effect.fail(BookingError.ticketNetworkError('Network error'));
       }
-      return Promise.resolve([]);
+      return Effect.succeed([]);
     });
 
     const { Wrapper } = createWrapper();
@@ -236,7 +228,7 @@ describe('useBookings', () => {
     );
 
     // Should have been called twice (initial + 1 retry)
-    expect(mockGetBookings).toHaveBeenCalledTimes(2);
+    expect(bookingsServiceEffect.getBookings).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -264,7 +256,9 @@ describe('useBookingsInfinite', () => {
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
     }));
-    mockGetBookingsPaginated.mockResolvedValue(fullPage);
+    (bookingsServiceEffect.getBookingsPaginated as jest.Mock).mockReturnValue(
+      Effect.succeed(fullPage),
+    );
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useBookingsInfinite(), {
@@ -281,7 +275,9 @@ describe('useBookingsInfinite', () => {
 
   it('should return undefined for nextPageParam when last page has fewer items', async () => {
     const mockBookings: Booking[] = [{ id: '1' } as Booking];
-    mockGetBookingsPaginated.mockResolvedValue(mockBookings);
+    (bookingsServiceEffect.getBookingsPaginated as jest.Mock).mockReturnValue(
+      Effect.succeed(mockBookings),
+    );
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useBookingsInfinite(), {
@@ -297,12 +293,14 @@ describe('useBookingsInfinite', () => {
 
   it('should handle retry with exponential backoff', async () => {
     let callCount = 0;
-    mockGetBookingsPaginated.mockImplementation(() => {
+    (
+      bookingsServiceEffect.getBookingsPaginated as jest.Mock
+    ).mockImplementation(() => {
       callCount++;
       if (callCount < 2) {
-        return Promise.reject(new Error('Network error'));
+        return Effect.fail(BookingError.ticketNetworkError('Network error'));
       }
-      return Promise.resolve([]);
+      return Effect.succeed([]);
     });
 
     const { Wrapper } = createWrapper();
@@ -317,7 +315,7 @@ describe('useBookingsInfinite', () => {
       { timeout: 5000 },
     );
 
-    expect(mockGetBookingsPaginated).toHaveBeenCalledTimes(2);
+    expect(bookingsServiceEffect.getBookingsPaginated).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -345,7 +343,9 @@ describe('useBooking', () => {
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
     };
-    mockGetBookingById.mockResolvedValue(mockBooking);
+    (bookingsServiceEffect.getBookingById as jest.Mock).mockReturnValue(
+      Effect.succeed(mockBooking),
+    );
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useBooking('1'), {
@@ -356,7 +356,7 @@ describe('useBooking', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetBookingById).toHaveBeenCalledWith('1');
+    expect(bookingsServiceEffect.getBookingById).toHaveBeenCalledWith('1');
     expect(result.current.data).toEqual(mockBooking);
   });
 
@@ -366,7 +366,7 @@ describe('useBooking', () => {
       wrapper: Wrapper,
     });
 
-    expect(mockGetBookingById).not.toHaveBeenCalled();
+    expect(bookingsServiceEffect.getBookingById).not.toHaveBeenCalled();
   });
 });
 
@@ -401,8 +401,10 @@ describe('useCreateBooking', () => {
       updatedAt: '2024-01-01',
     };
 
-    mockCreateBooking.mockResolvedValue(mockBooking);
-    mockProcessPurchase.mockResolvedValue(undefined);
+    (bookingsServiceEffect.createBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(mockBooking),
+    );
+    (walletService.processPurchase as jest.Mock).mockResolvedValue(undefined);
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useCreateBooking(), {
@@ -425,7 +427,9 @@ describe('useCreateBooking', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockCreateBooking).toHaveBeenCalledWith(bookingData);
+    expect(bookingsServiceEffect.createBooking).toHaveBeenCalledWith(
+      bookingData,
+    );
     expect(mockResetBooking).toHaveBeenCalled();
   });
 
@@ -460,7 +464,7 @@ describe('useCreateBooking', () => {
     });
 
     expect(result.current.error?.message).toBe('Insufficient wallet balance');
-    expect(mockCreateBooking).not.toHaveBeenCalled();
+    expect(bookingsServiceEffect.createBooking).not.toHaveBeenCalled();
   });
 
   it('should throw error when wallet is not available', async () => {
@@ -513,8 +517,10 @@ describe('useCreateBooking', () => {
       updatedAt: '2024-01-01',
     };
 
-    mockCreateBooking.mockResolvedValue(mockBooking);
-    mockProcessPurchase.mockResolvedValue(undefined);
+    (bookingsServiceEffect.createBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(mockBooking),
+    );
+    (walletService.processPurchase as jest.Mock).mockResolvedValue(undefined);
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -593,8 +599,10 @@ describe('useCreateBooking', () => {
       updatedAt: '2024-01-01',
     };
 
-    mockCreateBooking.mockResolvedValue(mockBooking);
-    mockProcessPurchase.mockResolvedValue(undefined);
+    (bookingsServiceEffect.createBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(mockBooking),
+    );
+    (walletService.processPurchase as jest.Mock).mockResolvedValue(undefined);
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -661,8 +669,10 @@ describe('useCreateBooking', () => {
       updatedAt: '2024-01-01',
     };
 
-    mockCreateBooking.mockResolvedValue(mockBooking);
-    mockProcessPurchase.mockResolvedValue(undefined);
+    (bookingsServiceEffect.createBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(mockBooking),
+    );
+    (walletService.processPurchase as jest.Mock).mockResolvedValue(undefined);
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -722,7 +732,9 @@ describe('useCreateBooking', () => {
       },
     ];
 
-    mockCreateBooking.mockRejectedValue(new Error('Booking failed'));
+    (bookingsServiceEffect.createBooking as jest.Mock).mockReturnValue(
+      Effect.fail(BookingError.checkoutFailed('Booking failed')),
+    );
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -774,8 +786,10 @@ describe('useCancelBooking', () => {
   });
 
   it('should cancel booking and refund wallet', async () => {
-    mockCancelBooking.mockResolvedValue(undefined);
-    mockRefund.mockResolvedValue(undefined);
+    (bookingsServiceEffect.cancelBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(undefined),
+    );
+    (walletService.refund as jest.Mock).mockResolvedValue(undefined);
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useCancelBooking(), {
@@ -790,8 +804,14 @@ describe('useCancelBooking', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockCancelBooking).toHaveBeenCalledWith('booking1');
-    expect(mockRefund).toHaveBeenCalledWith('wallet1', 100, 'booking1');
+    expect(bookingsServiceEffect.cancelBooking).toHaveBeenCalledWith(
+      'booking1',
+    );
+    expect(walletService.refund).toHaveBeenCalledWith(
+      'wallet1',
+      100,
+      'booking1',
+    );
   });
 
   it('should not refund when wallet is not available', async () => {
@@ -802,7 +822,9 @@ describe('useCancelBooking', () => {
       return { wallet: null };
     });
 
-    mockCancelBooking.mockResolvedValue(undefined);
+    (bookingsServiceEffect.cancelBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(undefined),
+    );
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useCancelBooking(), {
@@ -817,13 +839,17 @@ describe('useCancelBooking', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockCancelBooking).toHaveBeenCalledWith('booking1');
-    expect(mockRefund).not.toHaveBeenCalled();
+    expect(bookingsServiceEffect.cancelBooking).toHaveBeenCalledWith(
+      'booking1',
+    );
+    expect(walletService.refund).not.toHaveBeenCalled();
   });
 
   it('should handle list being null in optimistic update', async () => {
-    mockCancelBooking.mockResolvedValue(undefined);
-    mockRefund.mockResolvedValue(undefined);
+    (bookingsServiceEffect.cancelBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(undefined),
+    );
+    (walletService.refund as jest.Mock).mockResolvedValue(undefined);
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -855,8 +881,10 @@ describe('useCancelBooking', () => {
   });
 
   it('should handle infinite query being null/without pages in optimistic update', async () => {
-    mockCancelBooking.mockResolvedValue(undefined);
-    mockRefund.mockResolvedValue(undefined);
+    (bookingsServiceEffect.cancelBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(undefined),
+    );
+    (walletService.refund as jest.Mock).mockResolvedValue(undefined);
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -888,8 +916,10 @@ describe('useCancelBooking', () => {
   });
 
   it('should handle wallet being null in optimistic update', async () => {
-    mockCancelBooking.mockResolvedValue(undefined);
-    mockRefund.mockResolvedValue(undefined);
+    (bookingsServiceEffect.cancelBooking as jest.Mock).mockReturnValue(
+      Effect.succeed(undefined),
+    );
+    (walletService.refund as jest.Mock).mockResolvedValue(undefined);
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -946,7 +976,9 @@ describe('useCancelBooking', () => {
       pageParams: [0],
     };
 
-    mockCancelBooking.mockRejectedValue(new Error('Cancel failed'));
+    (bookingsServiceEffect.cancelBooking as jest.Mock).mockReturnValue(
+      Effect.fail(BookingError.checkoutFailed('Cancel failed')),
+    );
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -995,7 +1027,9 @@ describe('useReleaseSeats', () => {
   });
 
   it('should release seats and clear reservation', async () => {
-    mockReleaseSeats.mockResolvedValue(undefined);
+    (bookingsServiceEffect.releaseSeats as jest.Mock).mockReturnValue(
+      Effect.succeed(undefined),
+    );
 
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useReleaseSeats(), {
@@ -1010,7 +1044,9 @@ describe('useReleaseSeats', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockReleaseSeats).toHaveBeenCalledWith('reservation1');
+    expect(bookingsServiceEffect.releaseSeats).toHaveBeenCalledWith(
+      'reservation1',
+    );
     expect(mockSetReservationId).toHaveBeenCalledWith(null);
   });
 });

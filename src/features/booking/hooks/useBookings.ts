@@ -7,6 +7,7 @@ import {
 
 // Utils
 import { generateUUIDSync } from '@/utils/uuid';
+import { runEffectForQuery } from '@/utils/effect';
 
 // Constant
 import { API_CONFIG, PAGINATION, queryKeys } from '@/constants';
@@ -14,7 +15,7 @@ import { BOOKING_STATUS } from '@/constants/status';
 
 // Services
 import {
-  bookingsService,
+  bookingsServiceEffect,
   CreateBookingData,
 } from '@/features/booking/services/booking';
 import { walletService } from '@/features/wallet/services/wallet';
@@ -37,7 +38,8 @@ export const useBookings = (status?: string) => {
 
   return useQuery({
     queryKey: queryKeys.bookings.list(user?.id, status),
-    queryFn: () => bookingsService.getBookings(user!.id, status),
+    queryFn: () =>
+      runEffectForQuery(bookingsServiceEffect.getBookings(user!.id, status)),
     enabled: !!user,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
     gcTime: API_CONFIG.QUERY_STALE_TIME,
@@ -55,11 +57,13 @@ export const useBookingsInfinite = (status?: string) => {
     // Cache key scoped by user + status
     queryKey: queryKeys.bookings.infinite(user?.id, status),
     queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) =>
-      bookingsService.getBookingsPaginated(
-        user!.id,
-        status,
-        pageParam,
-        PAGINATION.PAGE_LIMIT,
+      runEffectForQuery(
+        bookingsServiceEffect.getBookingsPaginated(
+          user!.id,
+          status,
+          pageParam,
+          PAGINATION.PAGE_LIMIT,
+        ),
       ),
     getNextPageParam: (lastPage, allPages) => {
       // If last page has fewer items than page size, we've reached the end
@@ -84,7 +88,8 @@ export const useBookingsInfinite = (status?: string) => {
 export const useBooking = (bookingId: string) => {
   return useQuery({
     queryKey: queryKeys.bookings.detail(bookingId),
-    queryFn: () => bookingsService.getBookingById(bookingId),
+    queryFn: () =>
+      runEffectForQuery(bookingsServiceEffect.getBookingById(bookingId)),
     enabled: !!bookingId,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
     gcTime: API_CONFIG.QUERY_STALE_TIME,
@@ -107,10 +112,12 @@ export const useCreateBooking = () => {
       }
 
       // Create booking
-      const booking = await bookingsService.createBooking({
-        ...data,
-        walletId: wallet.id,
-      });
+      const booking = await runEffectForQuery(
+        bookingsServiceEffect.createBooking({
+          ...data,
+          walletId: wallet.id,
+        }),
+      );
 
       return booking;
     },
@@ -270,7 +277,7 @@ export const useCancelBooking = () => {
       bookingId: string;
       amount: number;
     }) => {
-      await bookingsService.cancelBooking(bookingId);
+      await runEffectForQuery(bookingsServiceEffect.cancelBooking(bookingId));
 
       if (wallet) {
         await walletService.refund(wallet.id, amount, bookingId);
@@ -384,7 +391,10 @@ export const useReserveSeats = () => {
     }: {
       showtimeId: string;
       seats: string[];
-    }) => bookingsService.reserveSeats(showtimeId, user!.id, seats),
+    }) =>
+      runEffectForQuery(
+        bookingsServiceEffect.reserveSeats(showtimeId, user!.id, seats),
+      ),
 
     onSuccess: data => {
       // Store reservation ID
@@ -413,7 +423,7 @@ export const useReleaseSeats = () => {
 
   return useMutation({
     mutationFn: (reservationId: string) =>
-      bookingsService.releaseSeats(reservationId),
+      runEffectForQuery(bookingsServiceEffect.releaseSeats(reservationId)),
 
     onSuccess: () => {
       setReservationId(null);

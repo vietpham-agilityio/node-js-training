@@ -1,11 +1,12 @@
-import { ERROR_MESSAGES } from '@/constants/messages';
 import { Data } from 'effect';
+
+// Constants
+import { ERROR_MESSAGES } from '@/constants/messages';
 
 export class AuthenticationError extends Data.TaggedError(
   'AuthenticationError',
 )<{
   message: string;
-  cause?: unknown;
 }> {
   /**
    * Get the underlying cause of the error

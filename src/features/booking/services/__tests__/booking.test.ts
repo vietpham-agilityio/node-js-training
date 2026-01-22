@@ -1,12 +1,15 @@
+import { BOOKING_STATUS, SEAT_RESERVATION_STATUS } from '@/constants/status';
 import { Booking } from '@/features/booking/schemas/booking';
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
+import { runEffectForQuery } from '@/utils/effect';
+import { Effect } from 'effect';
+import { BookingError } from '../../error/booking';
 import {
-  BookingsService,
-  bookingsService,
+  BookingsServiceEffect,
+  bookingsServiceEffect,
   CreateBookingData,
 } from '../booking';
-import { BOOKING_STATUS, SEAT_RESERVATION_STATUS } from '@/constants/status';
 
 const createMockQueryBuilder = () => ({
   select: jest.fn().mockReturnThis(),
@@ -34,13 +37,13 @@ jest.mock('@/services/supabase/client', () => ({
 jest.unmock('@/utils/convert');
 
 describe('BookingsService', () => {
-  let service: BookingsService;
+  let service: BookingsServiceEffect;
   const from = supabase.from as jest.Mock;
   const rpc = supabase.rpc as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = BookingsService.getInstance();
+    service = BookingsServiceEffect.getInstance();
 
     // Reset mockQueryBuilder methods
     Object.values(mockQueryBuilder).forEach(mockFn => {
@@ -69,10 +72,10 @@ describe('BookingsService', () => {
   });
 
   it('should be a singleton', () => {
-    const instance1 = BookingsService.getInstance();
-    const instance2 = BookingsService.getInstance();
+    const instance1 = BookingsServiceEffect.getInstance();
+    const instance2 = BookingsServiceEffect.getInstance();
     expect(instance1).toBe(instance2);
-    expect(instance1).toBe(bookingsService);
+    expect(instance1).toBe(bookingsServiceEffect);
   });
 
   describe('getBookings', () => {
@@ -91,7 +94,9 @@ describe('BookingsService', () => {
         resolve({ data: mockData, error: null }),
       );
 
-      const bookings = await service.getBookings('user1');
+      const bookings = await runEffectForQuery(
+        bookingsServiceEffect.getBookings('user1'),
+      );
 
       expect(from).toHaveBeenCalledWith('bookings');
       expect(mockQueryBuilder.select).toHaveBeenCalled();
@@ -109,7 +114,9 @@ describe('BookingsService', () => {
         resolve({ data: mockData, error: null }),
       );
 
-      await service.getBookings('user1', 'active');
+      await runEffectForQuery(
+        bookingsServiceEffect.getBookings('user1', 'active'),
+      );
 
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('user_id', 'user1');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
@@ -125,7 +132,9 @@ describe('BookingsService', () => {
         (_resolve, reject) => reject(error),
       );
 
-      await expect(service.getBookings('user1')).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.getBookings('user1')),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -146,7 +155,9 @@ describe('BookingsService', () => {
         error: null,
       });
 
-      const booking = await service.getBookingById('booking1');
+      const booking = await runEffectForQuery(
+        bookingsServiceEffect.getBookingById('booking1'),
+      );
 
       expect(from).toHaveBeenCalledWith('bookings');
       expect(mockQueryBuilder.select).toHaveBeenCalled();
@@ -163,9 +174,9 @@ describe('BookingsService', () => {
         error,
       });
 
-      await expect(service.getBookingById('nonexistent')).rejects.toThrow(
-        error,
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.getBookingById('nonexistent')),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -203,9 +214,13 @@ describe('BookingsService', () => {
       rpc.mockResolvedValueOnce({ data: mockRpcResult, error: null });
 
       // Mock getBookingById
-      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+      jest
+        .spyOn(bookingsServiceEffect, 'getBookingById')
+        .mockImplementationOnce(() => Effect.succeed(mockBooking));
 
-      const result = await service.createBooking(createData);
+      const result = await runEffectForQuery(
+        bookingsServiceEffect.createBooking(createData),
+      );
 
       expect(rpc).toHaveBeenCalledWith('create_booking_with_payment', {
         p_user_id: 'user1',
@@ -245,9 +260,13 @@ describe('BookingsService', () => {
       } as unknown as Booking;
 
       rpc.mockResolvedValueOnce({ data: mockRpcResult, error: null });
-      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+      jest
+        .spyOn(bookingsServiceEffect, 'getBookingById')
+        .mockImplementationOnce(() => Effect.succeed(mockBooking));
 
-      await service.createBooking(dataWithPromo);
+      await runEffectForQuery(
+        bookingsServiceEffect.createBooking(dataWithPromo),
+      );
 
       expect(rpc).toHaveBeenCalledWith('create_booking_with_payment', {
         p_user_id: 'user1',
@@ -266,9 +285,9 @@ describe('BookingsService', () => {
 
       rpc.mockResolvedValueOnce({ data: null, error });
 
-      await expect(service.createBooking(createData)).rejects.toThrow(
-        'Insufficient wallet balance',
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
+      ).rejects.toThrow('Insufficient wallet balance');
     });
 
     it('should throw an error with custom message for wallet not found', async () => {
@@ -276,9 +295,9 @@ describe('BookingsService', () => {
 
       rpc.mockResolvedValueOnce({ data: null, error });
 
-      await expect(service.createBooking(createData)).rejects.toThrow(
-        'Wallet not found or inactive',
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
+      ).rejects.toThrow('Wallet not found or inactive');
     });
 
     it('should throw generic error for other RPC failures', async () => {
@@ -286,25 +305,25 @@ describe('BookingsService', () => {
 
       rpc.mockResolvedValueOnce({ data: null, error });
 
-      await expect(service.createBooking(createData)).rejects.toThrow(
-        'Some database error',
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
+      ).rejects.toThrow('Some database error');
     });
 
     it('should throw an error if no result returned', async () => {
       rpc.mockResolvedValueOnce({ data: [], error: null });
 
-      await expect(service.createBooking(createData)).rejects.toThrow(
-        'No result returned from booking transaction',
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
+      ).rejects.toThrow('No result returned from booking transaction');
     });
 
     it('should throw an error if result is null', async () => {
       rpc.mockResolvedValueOnce({ data: null, error: null });
 
-      await expect(service.createBooking(createData)).rejects.toThrow(
-        'No result returned from booking transaction',
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
+      ).rejects.toThrow('No result returned from booking transaction');
     });
   });
 
@@ -316,12 +335,16 @@ describe('BookingsService', () => {
         totalAmount: 200,
       } as Booking;
 
-      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+      jest
+        .spyOn(bookingsServiceEffect, 'getBookingById')
+        .mockImplementationOnce(() => Effect.succeed(mockBooking));
       rpc.mockResolvedValueOnce({ data: null, error: null });
 
-      await service.cancelBooking('booking1');
+      await runEffectForQuery(bookingsServiceEffect.cancelBooking('booking1'));
 
-      expect(service.getBookingById).toHaveBeenCalledWith('booking1');
+      expect(bookingsServiceEffect.getBookingById).toHaveBeenCalledWith(
+        'booking1',
+      );
       expect(rpc).toHaveBeenCalledWith('cancel_booking_with_refund', {
         p_booking_id: 'booking1',
         p_refund_amount: 200,
@@ -330,12 +353,14 @@ describe('BookingsService', () => {
 
     it('should throw an error if booking not found', async () => {
       jest
-        .spyOn(service, 'getBookingById')
-        .mockRejectedValue(new Error('Booking not found'));
+        .spyOn(bookingsServiceEffect, 'getBookingById')
+        .mockImplementationOnce(() =>
+          Effect.fail(BookingError.checkoutFailed('Booking not found')),
+        );
 
-      await expect(service.cancelBooking('booking1')).rejects.toThrow(
-        'Booking not found',
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.cancelBooking('booking1')),
+      ).rejects.toThrow('Booking not found');
     });
 
     it('should throw an error if booking already cancelled', async () => {
@@ -345,11 +370,13 @@ describe('BookingsService', () => {
         totalAmount: 200,
       } as Booking;
 
-      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+      jest
+        .spyOn(bookingsServiceEffect, 'getBookingById')
+        .mockImplementationOnce(() => Effect.succeed(mockBooking));
 
-      await expect(service.cancelBooking('booking1')).rejects.toThrow(
-        'Booking already cancelled',
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.cancelBooking('booking1')),
+      ).rejects.toThrow('Booking already cancelled');
     });
 
     it('should throw an error if RPC call fails', async () => {
@@ -361,10 +388,14 @@ describe('BookingsService', () => {
 
       const error = new Error('Refund failed');
 
-      jest.spyOn(service, 'getBookingById').mockResolvedValue(mockBooking);
+      jest
+        .spyOn(bookingsServiceEffect, 'getBookingById')
+        .mockImplementationOnce(() => Effect.succeed(mockBooking));
       rpc.mockResolvedValueOnce({ data: null, error });
 
-      await expect(service.cancelBooking('booking1')).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.cancelBooking('booking1')),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -383,7 +414,9 @@ describe('BookingsService', () => {
         error: null,
       });
 
-      const result = await service.reserveSeats('show1', 'user1', ['A1', 'A2']);
+      const result = await runEffectForQuery(
+        bookingsServiceEffect.reserveSeats('show1', 'user1', ['A1', 'A2']),
+      );
 
       expect(from).toHaveBeenCalledWith('seat_reservations');
       expect(mockQueryBuilder.insert).toHaveBeenCalledWith(
@@ -410,7 +443,9 @@ describe('BookingsService', () => {
         error: null,
       });
 
-      await service.reserveSeats('show1', 'user1', ['A1']);
+      await runEffectForQuery(
+        bookingsServiceEffect.reserveSeats('show1', 'user1', ['A1']),
+      );
 
       const insertCall = (mockQueryBuilder.insert as jest.Mock).mock
         .calls[0][0];
@@ -431,7 +466,9 @@ describe('BookingsService', () => {
       });
 
       await expect(
-        service.reserveSeats('show1', 'user1', ['A1']),
+        runEffectForQuery(
+          bookingsServiceEffect.reserveSeats('show1', 'user1', ['A1']),
+        ),
       ).rejects.toThrow(error);
     });
   });
@@ -442,7 +479,9 @@ describe('BookingsService', () => {
         resolve({ data: [], error: null }),
       );
 
-      await service.releaseSeats('reservation1');
+      await runEffectForQuery(
+        bookingsServiceEffect.releaseSeats('reservation1'),
+      );
 
       expect(from).toHaveBeenCalledWith('seat_reservations');
       expect(mockQueryBuilder.update).toHaveBeenCalledWith({
@@ -458,7 +497,9 @@ describe('BookingsService', () => {
         (_resolve, reject) => reject(error),
       );
 
-      await expect(service.releaseSeats('reservation1')).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.releaseSeats('reservation1')),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -473,11 +514,8 @@ describe('BookingsService', () => {
         resolve({ data: mockData, error: null }),
       );
 
-      const bookings = await service.getBookingsPaginated(
-        'user1',
-        undefined,
-        0,
-        10,
+      const bookings = await runEffectForQuery(
+        bookingsServiceEffect.getBookingsPaginated('user1', undefined, 0, 10),
       );
 
       expect(from).toHaveBeenCalledWith('bookings');
@@ -495,15 +533,21 @@ describe('BookingsService', () => {
       );
 
       // Page 0, limit 10
-      await service.getBookingsPaginated('user1', undefined, 0, 10);
+      await runEffectForQuery(
+        bookingsServiceEffect.getBookingsPaginated('user1', undefined, 0, 10),
+      );
       expect(mockQueryBuilder.range).toHaveBeenCalledWith(0, 9);
 
       // Page 1, limit 10
-      await service.getBookingsPaginated('user1', undefined, 1, 10);
+      await runEffectForQuery(
+        bookingsServiceEffect.getBookingsPaginated('user1', undefined, 1, 10),
+      );
       expect(mockQueryBuilder.range).toHaveBeenCalledWith(10, 19);
 
       // Page 2, limit 20
-      await service.getBookingsPaginated('user1', undefined, 2, 20);
+      await runEffectForQuery(
+        bookingsServiceEffect.getBookingsPaginated('user1', undefined, 2, 20),
+      );
       expect(mockQueryBuilder.range).toHaveBeenCalledWith(40, 59);
     });
 
@@ -512,7 +556,9 @@ describe('BookingsService', () => {
         resolve({ data: [], error: null }),
       );
 
-      await service.getBookingsPaginated('user1', 'active', 0, 10);
+      await runEffectForQuery(
+        bookingsServiceEffect.getBookingsPaginated('user1', 'active', 0, 10),
+      );
 
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('user_id', 'user1');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
@@ -528,9 +574,9 @@ describe('BookingsService', () => {
         (_resolve, reject) => reject(error),
       );
 
-      await expect(service.getBookingsPaginated('user1')).rejects.toThrow(
-        error,
-      );
+      await expect(
+        runEffectForQuery(bookingsServiceEffect.getBookingsPaginated('user1')),
+      ).rejects.toThrow(error);
     });
   });
 });

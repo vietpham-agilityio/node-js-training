@@ -4,6 +4,12 @@ import { BookingStatus } from '@/features/booking/schemas/booking';
 import { BOOKING_STATUS } from './status';
 
 export const ERROR_MESSAGES = {
+  CINEMA_LOAD_FAILED: 'Failed to load cinemas. Please try again later.',
+  CINEMA_NOT_FOUND: 'Cinema not found.',
+  CINEMA_HALL_NOT_FOUND: 'Cinema hall not found.',
+  MOVIE_NOT_FOUND: 'Movie not found.',
+  SHOWTIME_NOT_FOUND: 'Showtime not found.',
+  MOVIE_SEARCH_FAILED: 'Failed to search movies. Please try again.',
   INVALID_TICKET: 'Invalid ticket',
   TICKET_ALREADY_USED: 'Ticket already used',
   TICKET_EXPIRED: 'Ticket expired',
