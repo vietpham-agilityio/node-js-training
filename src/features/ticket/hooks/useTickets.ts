@@ -7,8 +7,11 @@ import { ticketsService } from '@/features/ticket/services/tickets';
 import { useAuthStore } from '@/features/auth/store/auth';
 
 // Types
-import { Ticket } from '@/features/booking/schemas/booking';
 import { BOOKING_STATUS } from '@/constants/status';
+import { Ticket } from '@/features/booking/schemas/booking';
+
+// Utils
+import { runEffectForQuery } from '@/utils/effect';
 
 import {
   useInfiniteQuery,
@@ -22,7 +25,7 @@ export const useTickets = () => {
 
   return useQuery({
     queryKey: queryKeys.tickets.list(user?.id),
-    queryFn: () => ticketsService.getTickets(user!.id),
+    queryFn: () => runEffectForQuery(ticketsService.getTickets(user!.id)),
     enabled: !!user,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
   });
@@ -34,10 +37,12 @@ export const useTicketsInfinite = () => {
   return useInfiniteQuery({
     queryKey: queryKeys.tickets.infinite(user?.id),
     queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) =>
-      ticketsService.getTicketsPaginated(
-        user!.id,
-        pageParam,
-        PAGINATION.PAGE_LIMIT_MAX,
+      runEffectForQuery(
+        ticketsService.getTicketsPaginated(
+          user!.id,
+          pageParam,
+          PAGINATION.PAGE_LIMIT_MAX,
+        ),
       ),
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.length < PAGINATION.PAGE_LIMIT_MAX) return undefined;
@@ -52,7 +57,7 @@ export const useTicketsInfinite = () => {
 export const useTicket = (ticketId: string) => {
   return useQuery({
     queryKey: queryKeys.tickets.detail(ticketId),
-    queryFn: () => ticketsService.getTicketById(ticketId),
+    queryFn: () => runEffectForQuery(ticketsService.getTicketById(ticketId)),
     enabled: !!ticketId,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
   });
@@ -62,7 +67,8 @@ export const useValidateTicket = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (qrData: string) => ticketsService.validateTicket(qrData),
+    mutationFn: (qrData: string) =>
+      runEffectForQuery(ticketsService.validateTicket(qrData)),
     onSuccess: result => {
       if (result.valid && result.ticket) {
         // Update ticket status in cache

@@ -11,6 +11,9 @@ import { useAuthStore } from '@/features/auth/store/auth';
 import { queryKeys } from '@/constants';
 import { BOOKING_STATUS } from '@/constants/status';
 
+// Utils
+import { runEffectForQuery } from '@/utils/effect';
+
 export const useTicketExpiration = () => {
   const queryClient = useQueryClient();
   const user = useAuthStore(state => state.user);
@@ -22,8 +25,9 @@ export const useTicketExpiration = () => {
     if (!user?.id) return 0;
 
     try {
-      const expiredCount =
-        await ticketExpirationService.checkAndExpireTickets();
+      const expiredCount = await runEffectForQuery(
+        ticketExpirationService.checkAndExpireTickets(),
+      );
 
       if (expiredCount > 0) {
         // Invalidate queries to refresh UI
@@ -47,8 +51,9 @@ export const useTicketExpiration = () => {
   const checkTicketStatus = useCallback(
     async (ticketId: string) => {
       try {
-        const status =
-          await ticketExpirationService.checkTicketStatus(ticketId);
+        const status = await runEffectForQuery(
+          ticketExpirationService.checkTicketStatus(ticketId),
+        );
 
         // Invalidate queries if status changed
         if (status === BOOKING_STATUS.EXPIRED) {

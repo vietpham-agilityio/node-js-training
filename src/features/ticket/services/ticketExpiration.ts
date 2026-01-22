@@ -1,6 +1,9 @@
 import { BOOKING_STATUS } from '@/constants/status';
 import { BookingStatus } from '@/features/booking/schemas/booking';
 import { supabase } from '@/services/supabase/client';
+import { runEffectForQuery } from '@/utils/effect';
+import { Effect } from 'effect';
+import { TicketError } from '../error';
 
 export class TicketExpirationService {
   private static instance: TicketExpirationService;
@@ -21,37 +24,41 @@ export class TicketExpirationService {
    * - User views tickets list
    * - User views ticket details
    */
-  async checkAndExpireTickets(): Promise<number> {
-    try {
-      // Call the database function to expire tickets
-      const { data, error } = await supabase.rpc('trigger_expire_tickets');
+  checkAndExpireTickets = () =>
+    Effect.tryPromise({
+      try: async () => {
+        // Call the database function to expire tickets
+        const { data, error } = await supabase.rpc('trigger_expire_tickets');
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      const expiredCount = data || 0;
+        const expiredCount = data || 0;
 
-      return expiredCount;
-    } catch {
-      return 0;
-    }
-  }
+        return expiredCount;
+      },
+      catch: (error: unknown) =>
+        TicketError.ticketExpirationFailed(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Check if a specific ticket has expired
    * Returns the computed status
    */
-  async checkTicketStatus(ticketId: string): Promise<BookingStatus> {
-    try {
-      // First, trigger expiration check
-      await this.checkAndExpireTickets();
+  checkTicketStatus = (ticketId: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        // First, trigger expiration check
+        await runEffectForQuery(this.checkAndExpireTickets());
 
-      // Fetch ticket with booking and showtime
-      const { data: ticket, error } = await supabase
-        .from('tickets')
-        .select(
-          `
+        // Fetch ticket with booking and showtime
+        const { data: ticket, error } = await supabase
+          .from('tickets')
+          .select(
+            `
           *,
           booking:bookings!inner(
             expires_at,
@@ -63,33 +70,36 @@ export class TicketExpirationService {
             )
           )
         `,
-        )
-        .eq('id', ticketId)
-        .single();
+          )
+          .eq('id', ticketId)
+          .single();
 
-      if (error || !ticket) {
-        return BOOKING_STATUS.EXPIRED as BookingStatus;
-      }
+        if (error || !ticket) {
+          return BOOKING_STATUS.EXPIRED as BookingStatus;
+        }
 
-      // Return current status from database
-      return ticket.status as BookingStatus;
-    } catch {
-      return BOOKING_STATUS.EXPIRED as BookingStatus;
-    }
-  }
+        // Return current status from database
+        return ticket.status as BookingStatus;
+      },
+      catch: (error: unknown) =>
+        TicketError.ticketExpirationFailed(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Get all expired tickets for a user
    */
-  async getExpiredTickets(userId: string) {
-    try {
-      // First check for any newly expired tickets
-      await this.checkAndExpireTickets();
+  getExpiredTickets = (userId: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        // First check for any newly expired tickets
+        await runEffectForQuery(this.checkAndExpireTickets());
 
-      const { data, error } = await supabase
-        .from('tickets')
-        .select(
-          `
+        const { data, error } = await supabase
+          .from('tickets')
+          .select(
+            `
           *,
           booking:bookings!inner(
             booking_number,
@@ -101,17 +111,19 @@ export class TicketExpirationService {
             )
           )
         `,
-        )
-        .eq('booking.user_id', userId)
-        .eq('status', 'expired')
-        .order('created_at', { ascending: false });
+          )
+          .eq('booking.user_id', userId)
+          .eq('status', 'expired')
+          .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
-    } catch {
-      return [];
-    }
-  }
+        if (error) throw error;
+        return data || [];
+      },
+      catch: (error: unknown) =>
+        TicketError.ticketNetworkError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Schedule periodic expiration check
@@ -119,12 +131,16 @@ export class TicketExpirationService {
    */
   startPeriodicCheck(intervalMinutes: number = 5): NodeJS.Timeout {
     // Initial check
-    this.checkAndExpireTickets();
+    runEffectForQuery(this.checkAndExpireTickets()).catch(() => {
+      // Silently fail
+    });
 
     // Schedule periodic checks
     const interval = setInterval(
       () => {
-        this.checkAndExpireTickets();
+        runEffectForQuery(this.checkAndExpireTickets()).catch(() => {
+          // Silently fail
+        });
       },
       intervalMinutes * 60 * 1000,
     ) as unknown as NodeJS.Timeout;

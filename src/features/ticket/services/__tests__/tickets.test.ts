@@ -2,6 +2,7 @@ import { ERROR_MESSAGES, MESSAGES } from '@/constants';
 import { BOOKING_STATUS } from '@/constants/status';
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
+import { runEffectForQuery } from '@/utils/effect';
 import { TicketsService, ticketsService } from '../tickets';
 
 // --- Mock Query Builder Factory ---
@@ -95,7 +96,7 @@ describe('TicketsService', () => {
           resolve({ data: mockTickets, error: null }),
         );
 
-      const tickets = await service.getTickets('user1');
+      const tickets = await runEffectForQuery(service.getTickets('user1'));
 
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets');
       expect(from).toHaveBeenCalledWith('bookings');
@@ -114,7 +115,7 @@ describe('TicketsService', () => {
         resolve({ data: [], error: null }),
       );
 
-      const tickets = await service.getTickets('user1');
+      const tickets = await runEffectForQuery(service.getTickets('user1'));
 
       expect(tickets).toEqual([]);
       expect(from).toHaveBeenCalledTimes(1); // Only bookings query
@@ -128,7 +129,9 @@ describe('TicketsService', () => {
         (_resolve, reject) => reject(error),
       );
 
-      await expect(service.getTickets('user1')).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(service.getTickets('user1')),
+      ).rejects.toThrow();
     });
 
     it('should call expireOldTickets before fetching', async () => {
@@ -138,7 +141,7 @@ describe('TicketsService', () => {
         resolve({ data: [], error: null }),
       );
 
-      await service.getTickets('user1');
+      await runEffectForQuery(service.getTickets('user1'));
 
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets');
     });
@@ -160,7 +163,7 @@ describe('TicketsService', () => {
         error: null,
       });
 
-      const ticket = await service.getTicketById('ticket1');
+      const ticket = await runEffectForQuery(service.getTicketById('ticket1'));
 
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets');
       expect(from).toHaveBeenCalledWith('tickets');
@@ -179,7 +182,9 @@ describe('TicketsService', () => {
         error,
       });
 
-      await expect(service.getTicketById('nonexistent')).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(service.getTicketById('nonexistent')),
+      ).rejects.toThrow();
     });
   });
 
@@ -212,7 +217,7 @@ describe('TicketsService', () => {
         resolve({ data: {}, error: null }),
       );
 
-      const result = await service.validateTicket(qrData);
+      const result = await runEffectForQuery(service.validateTicket(qrData));
 
       expect(result.valid).toBe(true);
       expect(result.message).toBe(MESSAGES.TICKET_VALIDATED_SUCCESS);
@@ -227,7 +232,9 @@ describe('TicketsService', () => {
 
       rpc.mockResolvedValueOnce({ data: 0, error: null });
 
-      const result = await service.validateTicket(invalidQrData);
+      const result = await runEffectForQuery(
+        service.validateTicket(invalidQrData),
+      );
 
       expect(result.valid).toBe(false);
       expect(result.message).toBe(ERROR_MESSAGES.TICKET_INVALID_FORMAT);
@@ -238,7 +245,7 @@ describe('TicketsService', () => {
 
       rpc.mockResolvedValueOnce({ data: 0, error: null });
 
-      const result = await service.validateTicket(qrData);
+      const result = await runEffectForQuery(service.validateTicket(qrData));
 
       expect(result.valid).toBe(false);
       expect(result.message).toBe(ERROR_MESSAGES.TICKET_INVALID_FORMAT);
@@ -263,7 +270,7 @@ describe('TicketsService', () => {
         error: null,
       });
 
-      const result = await service.validateTicket(qrData);
+      const result = await runEffectForQuery(service.validateTicket(qrData));
 
       expect(result.valid).toBe(false);
       expect(result.message).toBe(ERROR_MESSAGES.TICKET_ALREADY_USED);
@@ -289,7 +296,7 @@ describe('TicketsService', () => {
         error: null,
       });
 
-      const result = await service.validateTicket(qrData);
+      const result = await runEffectForQuery(service.validateTicket(qrData));
 
       expect(result.valid).toBe(false);
       expect(result.message).toBe(ERROR_MESSAGES.TICKET_EXPIRED);
@@ -317,7 +324,7 @@ describe('TicketsService', () => {
         error: null,
       });
 
-      const result = await service.validateTicket(qrData);
+      const result = await runEffectForQuery(service.validateTicket(qrData));
 
       expect(result.valid).toBe(false);
       expect(result.message).toBe('Booking has been cancelled');
@@ -335,7 +342,7 @@ describe('TicketsService', () => {
         new Error('Database error'),
       );
 
-      const result = await service.validateTicket(qrData);
+      const result = await runEffectForQuery(service.validateTicket(qrData));
 
       expect(result.valid).toBe(false);
       expect(result.message).toBe(ERROR_MESSAGES.TICKET_VALIDATION_FAILED);
@@ -359,7 +366,9 @@ describe('TicketsService', () => {
           resolve({ data: mockTickets, error: null }),
         );
 
-      const tickets = await service.getTicketsPaginated('user1', 0, 10);
+      const tickets = await runEffectForQuery(
+        service.getTicketsPaginated('user1', 0, 10),
+      );
 
       expect(from).toHaveBeenCalledWith('bookings');
       expect(from).toHaveBeenCalledWith('tickets');
@@ -376,15 +385,15 @@ describe('TicketsService', () => {
       );
 
       // Page 0, limit 10
-      await service.getTicketsPaginated('user1', 0, 10);
+      await runEffectForQuery(service.getTicketsPaginated('user1', 0, 10));
       expect(mockQueryBuilder.range).toHaveBeenCalledWith(0, 9);
 
       // Page 1, limit 10
-      await service.getTicketsPaginated('user1', 1, 10);
+      await runEffectForQuery(service.getTicketsPaginated('user1', 1, 10));
       expect(mockQueryBuilder.range).toHaveBeenCalledWith(10, 19);
 
       // Page 2, limit 20
-      await service.getTicketsPaginated('user1', 2, 20);
+      await runEffectForQuery(service.getTicketsPaginated('user1', 2, 20));
       expect(mockQueryBuilder.range).toHaveBeenCalledWith(40, 59);
     });
 
@@ -394,7 +403,9 @@ describe('TicketsService', () => {
         resolve({ data: [], error: null }),
       );
 
-      const tickets = await service.getTicketsPaginated('user1', 0, 10);
+      const tickets = await runEffectForQuery(
+        service.getTicketsPaginated('user1', 0, 10),
+      );
 
       expect(tickets).toEqual([]);
     });
@@ -409,7 +420,7 @@ describe('TicketsService', () => {
       );
 
       // Call any method that triggers expireOldTickets
-      await service.getTickets('user1');
+      await runEffectForQuery(service.getTickets('user1'));
 
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets');
     });
@@ -420,18 +431,21 @@ describe('TicketsService', () => {
         resolve({ data: [], error: null }),
       );
 
-      // Should not throw - error is caught and returns 0
-      await expect(service.getTickets('user1')).resolves.not.toThrow();
+      // Should throw - error is propagated
+      await expect(
+        runEffectForQuery(service.getTickets('user1')),
+      ).rejects.toThrow();
     });
 
-    it('should return 0 if RPC returns error', async () => {
+    it('should return empty array if RPC returns error', async () => {
       rpc.mockResolvedValueOnce({ data: null, error: new Error('RPC error') });
       (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
         resolve({ data: [], error: null }),
       );
 
-      // Should not throw - continues with 0 expired
-      await expect(service.getTickets('user1')).resolves.not.toThrow();
+      // Should not throw - continues with 0 expired, returns empty array
+      const tickets = await runEffectForQuery(service.getTickets('user1'));
+      expect(tickets).toEqual([]);
     });
   });
 });

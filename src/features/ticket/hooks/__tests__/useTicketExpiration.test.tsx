@@ -1,5 +1,5 @@
-import { renderHook, waitFor, act } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { ReactNode } from 'react';
 
 import { useTicketExpiration } from '../useTicketExpiration';
@@ -7,22 +7,20 @@ import { useTicketExpiration } from '../useTicketExpiration';
 // Constants
 import { BOOKING_STATUS } from '@/constants/status';
 
+// Effect
+import { Effect } from 'effect';
+
 // Type
 import { BookingStatus } from '@/features/booking/schemas/booking';
+import { ticketExpirationService } from '../../services/ticketExpiration';
 
-// Mock services
-const mockCheckAndExpireTickets = jest.fn();
-const mockCheckTicketStatus = jest.fn();
-const mockStartPeriodicCheck = jest.fn();
-const mockStopPeriodicCheck = jest.fn();
-
-jest.mock('@/features/ticket/services/ticketExpiration', () => ({
+// Mock ticketExpirationService
+jest.mock('../../services/ticketExpiration', () => ({
   ticketExpirationService: {
-    checkAndExpireTickets: () => mockCheckAndExpireTickets(),
-    checkTicketStatus: (ticketId: string) => mockCheckTicketStatus(ticketId),
-    startPeriodicCheck: (interval: number) => mockStartPeriodicCheck(interval),
-    stopPeriodicCheck: (interval: NodeJS.Timeout) =>
-      mockStopPeriodicCheck(interval),
+    checkAndExpireTickets: jest.fn(),
+    checkTicketStatus: jest.fn(),
+    startPeriodicCheck: jest.fn(),
+    stopPeriodicCheck: jest.fn(),
   },
 }));
 
@@ -86,9 +84,15 @@ describe('useTicketExpiration', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     mockUserState = mockUser;
-    mockCheckAndExpireTickets.mockResolvedValue(0);
-    mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.ACTIVE);
-    mockStartPeriodicCheck.mockReturnValue(123);
+    (
+      ticketExpirationService.checkAndExpireTickets as jest.Mock
+    ).mockReturnValue(Effect.succeed(0));
+    (ticketExpirationService.checkTicketStatus as jest.Mock).mockReturnValue(
+      Effect.succeed(BOOKING_STATUS.ACTIVE),
+    );
+    (ticketExpirationService.startPeriodicCheck as jest.Mock).mockReturnValue(
+      123,
+    );
   });
 
   afterEach(() => {
@@ -102,7 +106,9 @@ describe('useTicketExpiration', () => {
       });
 
       await waitFor(() => {
-        expect(mockCheckAndExpireTickets).toHaveBeenCalled();
+        expect(
+          ticketExpirationService.checkAndExpireTickets,
+        ).toHaveBeenCalled();
       });
     });
 
@@ -112,7 +118,9 @@ describe('useTicketExpiration', () => {
       });
 
       await waitFor(() => {
-        expect(mockStartPeriodicCheck).toHaveBeenCalledWith(5);
+        expect(ticketExpirationService.startPeriodicCheck).toHaveBeenCalledWith(
+          5,
+        );
       });
     });
 
@@ -123,8 +131,10 @@ describe('useTicketExpiration', () => {
         wrapper: createWrapper(),
       });
 
-      expect(mockCheckAndExpireTickets).not.toHaveBeenCalled();
-      expect(mockStartPeriodicCheck).not.toHaveBeenCalled();
+      expect(
+        ticketExpirationService.checkAndExpireTickets,
+      ).not.toHaveBeenCalled();
+      expect(ticketExpirationService.startPeriodicCheck).not.toHaveBeenCalled();
     });
 
     it('should stop periodic check on unmount', async () => {
@@ -133,18 +143,22 @@ describe('useTicketExpiration', () => {
       });
 
       await waitFor(() => {
-        expect(mockStartPeriodicCheck).toHaveBeenCalled();
+        expect(ticketExpirationService.startPeriodicCheck).toHaveBeenCalled();
       });
 
       unmount();
 
-      expect(mockStopPeriodicCheck).toHaveBeenCalledWith(123);
+      expect(ticketExpirationService.stopPeriodicCheck).toHaveBeenCalledWith(
+        123,
+      );
     });
   });
 
   describe('checkExpiredTickets', () => {
     it('should return 0 when no tickets expired', async () => {
-      mockCheckAndExpireTickets.mockResolvedValue(0);
+      (
+        ticketExpirationService.checkAndExpireTickets as jest.Mock
+      ).mockReturnValue(Effect.succeed(0));
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
@@ -160,7 +174,9 @@ describe('useTicketExpiration', () => {
     });
 
     it('should invalidate queries when tickets expired', async () => {
-      mockCheckAndExpireTickets.mockResolvedValue(3);
+      (
+        ticketExpirationService.checkAndExpireTickets as jest.Mock
+      ).mockReturnValue(Effect.succeed(3));
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
@@ -193,11 +209,15 @@ describe('useTicketExpiration', () => {
       });
 
       expect(expiredCount!).toBe(0);
-      expect(mockCheckAndExpireTickets).not.toHaveBeenCalled();
+      expect(
+        ticketExpirationService.checkAndExpireTickets,
+      ).not.toHaveBeenCalled();
     });
 
     it('should handle service error gracefully', async () => {
-      mockCheckAndExpireTickets.mockRejectedValue(new Error('Service error'));
+      (
+        ticketExpirationService.checkAndExpireTickets as jest.Mock
+      ).mockReturnValue(Effect.fail(new Error('Service error')));
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
@@ -214,7 +234,9 @@ describe('useTicketExpiration', () => {
 
   describe('checkTicketStatus', () => {
     it('should return ticket status', async () => {
-      mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.ACTIVE);
+      (ticketExpirationService.checkTicketStatus as jest.Mock).mockReturnValue(
+        Effect.succeed(BOOKING_STATUS.ACTIVE),
+      );
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
@@ -228,11 +250,15 @@ describe('useTicketExpiration', () => {
       });
 
       expect(status!).toBe(BOOKING_STATUS.ACTIVE);
-      expect(mockCheckTicketStatus).toHaveBeenCalledWith('ticket-123');
+      expect(ticketExpirationService.checkTicketStatus).toHaveBeenCalledWith(
+        'ticket-123',
+      );
     });
 
     it('should invalidate queries when ticket is expired', async () => {
-      mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.EXPIRED);
+      (ticketExpirationService.checkTicketStatus as jest.Mock).mockReturnValue(
+        Effect.succeed(BOOKING_STATUS.EXPIRED),
+      );
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
@@ -251,7 +277,9 @@ describe('useTicketExpiration', () => {
     });
 
     it('should not invalidate queries when ticket is active', async () => {
-      mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.ACTIVE);
+      (ticketExpirationService.checkTicketStatus as jest.Mock).mockReturnValue(
+        Effect.succeed(BOOKING_STATUS.ACTIVE),
+      );
       mockInvalidateQueries.mockClear();
 
       const { result } = renderHook(() => useTicketExpiration(), {
@@ -260,7 +288,7 @@ describe('useTicketExpiration', () => {
 
       // Wait for initial mount effects to complete
       await waitFor(() => {
-        expect(mockStartPeriodicCheck).toHaveBeenCalled();
+        expect(ticketExpirationService.startPeriodicCheck).toHaveBeenCalled();
       });
 
       mockInvalidateQueries.mockClear();
@@ -276,7 +304,9 @@ describe('useTicketExpiration', () => {
     });
 
     it('should return EXPIRED status when ticket is used', async () => {
-      mockCheckTicketStatus.mockResolvedValue(BOOKING_STATUS.USED);
+      (ticketExpirationService.checkTicketStatus as jest.Mock).mockReturnValue(
+        Effect.succeed(BOOKING_STATUS.USED),
+      );
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
@@ -293,7 +323,9 @@ describe('useTicketExpiration', () => {
     });
 
     it('should return EXPIRED on service error', async () => {
-      mockCheckTicketStatus.mockRejectedValue(new Error('Service error'));
+      (ticketExpirationService.checkTicketStatus as jest.Mock).mockReturnValue(
+        Effect.fail(new Error('Service error')),
+      );
 
       const { result } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
@@ -330,21 +362,22 @@ describe('useTicketExpiration', () => {
 
   describe('User authentication changes', () => {
     it('should restart periodic check when user changes', async () => {
-      const { rerender, unmount } = renderHook(() => useTicketExpiration(), {
+      const { unmount } = renderHook(() => useTicketExpiration(), {
         wrapper: createWrapper(),
       });
 
       await waitFor(() => {
-        expect(mockStartPeriodicCheck).toHaveBeenCalledTimes(1);
+        expect(
+          ticketExpirationService.startPeriodicCheck,
+        ).toHaveBeenCalledTimes(1);
       });
 
       // Simulate user change by unmounting and remounting
       unmount();
-      expect(mockStopPeriodicCheck).toHaveBeenCalled();
+      expect(ticketExpirationService.stopPeriodicCheck).toHaveBeenCalled();
 
-      // Clear mocks for clean state
-      mockStartPeriodicCheck.mockClear();
-      mockCheckAndExpireTickets.mockClear();
+      // Clear the call count before re-rendering
+      (ticketExpirationService.startPeriodicCheck as jest.Mock).mockClear();
 
       // Re-render with same user
       renderHook(() => useTicketExpiration(), {
@@ -352,7 +385,9 @@ describe('useTicketExpiration', () => {
       });
 
       await waitFor(() => {
-        expect(mockStartPeriodicCheck).toHaveBeenCalledTimes(1);
+        expect(
+          ticketExpirationService.startPeriodicCheck,
+        ).toHaveBeenCalledTimes(1);
       });
     });
   });

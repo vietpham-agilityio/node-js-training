@@ -7,6 +7,9 @@ import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
 
 // Utils
 import { keysToCamel } from '@/utils/convert';
+import { Effect } from 'effect';
+import { SettingError } from '../error';
+import { runEffectForQuery } from '@/utils/effect';
 
 export class ProfileService {
   private static instance: ProfileService;
@@ -23,105 +26,128 @@ export class ProfileService {
   /**
    * Get user profile by user ID
    */
-  async getProfile(userId: string): Promise<UserProfile> {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+  getProfile = (userId: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-    if (error) throw error;
-    return keysToCamel(data) as UserProfile;
-  }
+        if (error) throw error;
+        return keysToCamel(data) as UserProfile;
+      },
+      catch: (error: unknown) =>
+        SettingError.getProfileError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Update user profile
    */
-  async updateProfile(
-    userId: string,
-    data: UpdateProfileData,
-  ): Promise<UserProfile> {
-    const { data: profile, error } = await supabase
-      .from('user_profiles')
-      .update({
-        address: data.address,
-        email: data.email,
-        avatar_url: data.avatarUrl,
-        full_name: data.fullName,
-        phone_number: data.phoneNumber,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', userId)
-      .select()
-      .single();
+  updateProfile = (userId: string, data: UpdateProfileData) =>
+    Effect.tryPromise({
+      try: async () => {
+        const { data: profile, error } = await supabase
+          .from('user_profiles')
+          .update({
+            address: data.address,
+            email: data.email,
+            avatar_url: data.avatarUrl,
+            full_name: data.fullName,
+            phone_number: data.phoneNumber,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', userId)
+          .select()
+          .single();
 
-    if (error) throw error;
-    return keysToCamel(profile) as UserProfile;
-  }
+        if (error) throw error;
+        return keysToCamel(profile) as UserProfile;
+      },
+      catch: (error: unknown) =>
+        SettingError.updateProfileError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Upload avatar and return URL (doesn't update profile yet)
    */
-  async uploadAvatar(
+  uploadAvatar = (
     userId: string,
     file: { uri: string; type?: string; name?: string },
-  ): Promise<string> {
-    const profile = await this.getProfile(userId);
+  ) =>
+    Effect.tryPromise({
+      try: async () => {
+        const profile = await runEffectForQuery(this.getProfile(userId));
 
-    if (profile.avatarUrl) {
-      await this.deleteAvatar(profile.avatarUrl);
-    }
+        if (profile?.avatarUrl) {
+          await runEffectForQuery(this.deleteAvatar(profile.avatarUrl));
+        }
 
-    const fileExt = file.uri.split('.').pop() || 'jpg';
-    const fileName = `${userId}-${Date.now()}.${fileExt}`;
-    const filePath = `avatars/${fileName}`;
+        const fileExt = file.uri.split('.').pop() || 'jpg';
+        const fileName = `${userId}-${Date.now()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
 
-    // Read file as base64
-    const base64 = await FileSystem.readAsStringAsync(file.uri, {
-      encoding: FileSystem.EncodingType.Base64,
+        // Read file as base64
+        const base64 = await FileSystem.readAsStringAsync(file.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        // Convert base64 to ArrayBuffer
+        const arrayBuffer = decode(base64);
+
+        const { data, error: uploadError } = await supabase.storage
+          .from('user-avatar')
+          .upload(filePath, arrayBuffer, {
+            cacheControl: '3600',
+            contentType: file.type || 'image/jpeg',
+            upsert: true,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('user-avatar').getPublicUrl(data.path);
+
+        await runEffectForQuery(
+          this.updateProfile(userId, { avatarUrl: publicUrl }),
+        );
+
+        return publicUrl;
+      },
+      catch: (error: unknown) =>
+        SettingError.uploadAvatarError(
+          error instanceof Error ? error.message : '',
+        ),
     });
-
-    // Convert base64 to ArrayBuffer
-    const arrayBuffer = decode(base64);
-
-    const { data, error: uploadError } = await supabase.storage
-      .from('user-avatar')
-      .upload(filePath, arrayBuffer, {
-        cacheControl: '3600',
-        contentType: file.type || 'image/jpeg',
-        upsert: true,
-      });
-
-    if (uploadError) throw uploadError;
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('user-avatar').getPublicUrl(data.path);
-
-    await this.updateProfile(userId, { avatarUrl: publicUrl });
-
-    return publicUrl;
-  }
 
   /**
    * Delete old avatar from storage
    */
-  async deleteAvatar(avatarUrl: string): Promise<void> {
-    try {
-      const urlParts = avatarUrl.split('/avatars/');
-      if (urlParts.length < 2) return;
+  deleteAvatar = (avatarUrl: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        const urlParts = avatarUrl.split('/avatars/');
+        if (urlParts.length < 2) return;
 
-      const filePath = `avatars/${urlParts[1]}`;
+        const filePath = `avatars/${urlParts[1]}`;
 
-      const { error } = await supabase.storage
-        .from('user-avatar')
-        .remove([filePath]);
+        const { error } = await supabase.storage
+          .from('user-avatar')
+          .remove([filePath]);
 
-      if (error) throw error;
-    } catch (error) {
-      throw error;
-    }
-  }
+        if (error) throw error;
+      },
+      catch: (error: unknown) =>
+        SettingError.deleteAvatarError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 }
 
 export const profileService = ProfileService.getInstance();

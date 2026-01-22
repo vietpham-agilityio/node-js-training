@@ -9,6 +9,9 @@ import { useAuthStore } from '@/features/auth/store/auth';
 // Types
 import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
 
+// Utils
+import { runEffectForQuery } from '@/utils/effect';
+
 // React Query
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -17,7 +20,7 @@ export const useProfile = () => {
 
   return useQuery({
     queryKey: queryKeys.profile.detail(user!.id),
-    queryFn: () => profileService.getProfile(user!.id),
+    queryFn: () => runEffectForQuery(profileService.getProfile(user!.id)),
     enabled: !!user?.id,
     staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
@@ -29,7 +32,7 @@ export const useUpdateProfile = () => {
 
   return useMutation({
     mutationFn: (data: UpdateProfileData) =>
-      profileService.updateProfile(user!.id, data),
+      runEffectForQuery(profileService.updateProfile(user!.id, data)),
 
     onMutate: async newProfile => {
       await queryClient.cancelQueries({
@@ -74,7 +77,7 @@ export const useUploadAvatar = () => {
     }: {
       userId: string;
       file: { uri: string; name?: string; type?: string };
-    }) => profileService.uploadAvatar(userId, file),
+    }) => runEffectForQuery(profileService.uploadAvatar(userId, file)),
     onSuccess: (avatarUrl, variables) => {
       queryClient.setQueryData(
         queryKeys.profile.detail(variables.userId),
