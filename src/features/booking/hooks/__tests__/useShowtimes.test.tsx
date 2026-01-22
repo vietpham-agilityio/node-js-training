@@ -1,19 +1,22 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react-native';
+import { Effect } from 'effect';
 import React from 'react';
 
 // Hooks
 import { useShowtime, useShowtimes } from '../useShowtimes';
 
-// Mock dependencies
-const mockGetShowtimes = jest.fn();
-const mockGetShowtimeById = jest.fn();
+// Services
+import { moviesServiceEffect } from '../../services/movies';
+
+// Types
+import { MovieError } from '../../error/movie';
+import { Showtime } from '../../schemas/cinema';
 
 jest.mock('@/features/booking/services/movies', () => ({
-  moviesService: {
-    getShowtimes: (movieId: string, date: string) =>
-      mockGetShowtimes(movieId, date),
-    getShowtimeById: (id: string) => mockGetShowtimeById(id),
+  moviesServiceEffect: {
+    getShowtimes: jest.fn(),
+    getShowtimeById: jest.fn(),
   },
 }));
 
@@ -49,7 +52,9 @@ describe('useShowtimes', () => {
       { id: '1', movieId: 'movie1', startTime: '10:00' },
       { id: '2', movieId: 'movie1', startTime: '13:00' },
     ];
-    mockGetShowtimes.mockResolvedValue(mockShowtimes);
+    (moviesServiceEffect.getShowtimes as jest.Mock).mockReturnValue(
+      Effect.succeed(mockShowtimes as unknown as Showtime[]),
+    );
 
     const { result } = renderHook(() => useShowtimes('movie1', '2024-01-01'), {
       wrapper: createWrapper(),
@@ -59,8 +64,11 @@ describe('useShowtimes', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetShowtimes).toHaveBeenCalledWith('movie1', '2024-01-01');
-    expect(mockGetShowtimes).toHaveBeenCalledTimes(1);
+    expect(moviesServiceEffect.getShowtimes).toHaveBeenCalledWith(
+      'movie1',
+      '2024-01-01',
+    );
+    expect(moviesServiceEffect.getShowtimes).toHaveBeenCalledTimes(1);
     expect(result.current.data).toEqual(mockShowtimes);
   });
 
@@ -69,7 +77,7 @@ describe('useShowtimes', () => {
       wrapper: createWrapper(),
     });
 
-    expect(mockGetShowtimes).not.toHaveBeenCalled();
+    expect(moviesServiceEffect.getShowtimes).not.toHaveBeenCalled();
   });
 
   it('should not fetch when date is empty', () => {
@@ -77,12 +85,14 @@ describe('useShowtimes', () => {
       wrapper: createWrapper(),
     });
 
-    expect(mockGetShowtimes).not.toHaveBeenCalled();
+    expect(moviesServiceEffect.getShowtimes).not.toHaveBeenCalled();
   });
 
   it('should handle error when fetch fails', async () => {
-    const mockError = new Error('Failed to fetch showtimes');
-    mockGetShowtimes.mockRejectedValue(mockError);
+    const mockError = MovieError.movieNetworkError('Failed to fetch showtimes');
+    (moviesServiceEffect.getShowtimes as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
 
     const { result } = renderHook(() => useShowtimes('movie1', '2024-01-01'), {
       wrapper: createWrapper(),
@@ -92,7 +102,10 @@ describe('useShowtimes', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(result.current.error).toEqual(mockError);
+    expect(result.current.error).toBeInstanceOf(MovieError);
+    expect((result.current.error as MovieError).message).toBe(
+      'Failed to fetch showtimes',
+    );
   });
 
   it('should use correct query key', () => {
@@ -116,7 +129,9 @@ describe('useShowtime', () => {
       startTime: '10:00',
       availableSeats: 50,
     };
-    mockGetShowtimeById.mockResolvedValue(mockShowtime);
+    (moviesServiceEffect.getShowtimeById as jest.Mock).mockReturnValue(
+      Effect.succeed(mockShowtime),
+    );
 
     const { result } = renderHook(() => useShowtime('1'), {
       wrapper: createWrapper(),
@@ -126,8 +141,8 @@ describe('useShowtime', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetShowtimeById).toHaveBeenCalledWith('1');
-    expect(mockGetShowtimeById).toHaveBeenCalledTimes(1);
+    expect(moviesServiceEffect.getShowtimeById).toHaveBeenCalledWith('1');
+    expect(moviesServiceEffect.getShowtimeById).toHaveBeenCalledTimes(1);
     expect(result.current.data).toEqual(mockShowtime);
   });
 
@@ -136,12 +151,14 @@ describe('useShowtime', () => {
       wrapper: createWrapper(),
     });
 
-    expect(mockGetShowtimeById).not.toHaveBeenCalled();
+    expect(moviesServiceEffect.getShowtimeById).not.toHaveBeenCalled();
   });
 
   it('should handle error when fetch fails', async () => {
-    const mockError = new Error('Failed to fetch showtime');
-    mockGetShowtimeById.mockRejectedValue(mockError);
+    const mockError = MovieError.showtimeNotFound('Failed to fetch showtime');
+    (moviesServiceEffect.getShowtimeById as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
 
     const { result } = renderHook(() => useShowtime('1'), {
       wrapper: createWrapper(),
@@ -151,15 +168,18 @@ describe('useShowtime', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(result.current.error).toEqual(mockError);
+    expect(result.current.error).toBeInstanceOf(MovieError);
+    expect((result.current.error as MovieError).message).toBe(
+      'Failed to fetch showtime',
+    );
   });
 
   it('should refetch when id changes', async () => {
     const mockShowtime1 = { id: '1', movieId: 'movie1' };
     const mockShowtime2 = { id: '2', movieId: 'movie2' };
-    mockGetShowtimeById
-      .mockResolvedValueOnce(mockShowtime1)
-      .mockResolvedValueOnce(mockShowtime2);
+    (moviesServiceEffect.getShowtimeById as jest.Mock)
+      .mockReturnValueOnce(Effect.succeed(mockShowtime1))
+      .mockReturnValueOnce(Effect.succeed(mockShowtime2));
 
     const { result, rerender } = renderHook(
       ({ id }: { id: string }) => useShowtime(id),
@@ -181,6 +201,6 @@ describe('useShowtime', () => {
       expect(result.current.data).toEqual(mockShowtime2);
     });
 
-    expect(mockGetShowtimeById).toHaveBeenCalledTimes(2);
+    expect(moviesServiceEffect.getShowtimeById).toHaveBeenCalledTimes(2);
   });
 });

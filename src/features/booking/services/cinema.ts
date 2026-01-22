@@ -1,4 +1,8 @@
+// Supabase
 import { supabase } from '@/services/supabase/client';
+
+// Effect
+import { Effect } from 'effect';
 
 // Types
 import { Cinema } from '@/features/booking/schemas/cinema';
@@ -6,46 +10,74 @@ import { Cinema } from '@/features/booking/schemas/cinema';
 // Utils
 import { keysToCamel } from '@/utils/convert';
 
-export class CinemaService {
-  private static instance: CinemaService;
+// Error
+import { CinemaError } from '@/features/booking/error/cinema';
+
+export class CinemaServiceEffect {
+  private static instance: CinemaServiceEffect;
 
   private constructor() {}
 
-  static getInstance(): CinemaService {
-    if (!CinemaService.instance) {
-      CinemaService.instance = new CinemaService();
+  static getInstance(): CinemaServiceEffect {
+    if (!CinemaServiceEffect.instance) {
+      CinemaServiceEffect.instance = new CinemaServiceEffect();
     }
-    return CinemaService.instance;
+    return CinemaServiceEffect.instance;
   }
 
-  async getCinemas(): Promise<Cinema[]> {
-    const { data, error } = await supabase
-      .from('cinemas')
-      .select('*')
-      .eq('is_active', true);
-    if (error) throw error;
-    return keysToCamel(data) as Cinema[];
-  }
+  getCinemas = () =>
+    Effect.tryPromise({
+      try: async () => {
+        const { data, error } = await supabase
+          .from('cinemas')
+          .select('*')
+          .eq('is_active', true);
 
-  async getCinemaById(id: string): Promise<Cinema> {
-    const { data, error } = await supabase
-      .from('cinemas')
-      .select('*, cinema_halls(*)')
-      .eq('id', id)
-      .single();
-    if (error) throw error;
-    return keysToCamel(data) as Cinema;
-  }
+        if (error) throw error;
 
-  async getCinemasByCity(city: string): Promise<Cinema[]> {
-    const { data, error } = await supabase
-      .from('cinemas')
-      .select('*')
-      .eq('city', city)
-      .eq('is_active', true);
-    if (error) throw error;
-    return keysToCamel(data) as Cinema[];
-  }
+        return keysToCamel(data) as Cinema[];
+      },
+      catch: (error: unknown) =>
+        CinemaError.cinemaNetworkError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
+
+  getCinemaById = (id: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        const { data, error } = await supabase
+          .from('cinemas')
+          .select('*, cinema_halls(*)')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+
+        return keysToCamel(data) as Cinema;
+      },
+      catch: (error: unknown) =>
+        CinemaError.cinemaNotFound(error instanceof Error ? error.message : ''),
+    });
+
+  getCinemasByCity = (city: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        const { data, error } = await supabase
+          .from('cinemas')
+          .select('*')
+          .eq('city', city)
+          .eq('is_active', true);
+
+        if (error) throw error;
+
+        return keysToCamel(data) as Cinema[];
+      },
+      catch: (error: unknown) =>
+        CinemaError.cinemaNetworkError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 }
 
-export const cinemaService = CinemaService.getInstance();
+export const cinemaServiceEffect = CinemaServiceEffect.getInstance();

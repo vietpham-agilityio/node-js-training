@@ -1,4 +1,8 @@
+// Supabase
 import { supabase } from '@/services/supabase/client';
+
+// Effect
+import { Effect } from 'effect';
 
 // Types
 import { Booking } from '@/features/booking/schemas/booking';
@@ -10,6 +14,9 @@ import { keysToCamel } from '@/utils/convert';
 // Constants
 import { PAGINATION } from '@/constants';
 import { BOOKING_STATUS, SEAT_RESERVATION_STATUS } from '@/constants/status';
+
+// Error
+import { BookingError } from '@/features/booking/error/booking';
 
 export interface CreateBookingData {
   userId: string;
@@ -29,24 +36,25 @@ interface BookingTransactionResult {
   newWalletBalance: number;
 }
 
-export class BookingsService {
-  private static instance: BookingsService;
+export class BookingsServiceEffect {
+  private static instance: BookingsServiceEffect;
 
   private constructor() {}
 
-  static getInstance(): BookingsService {
-    if (!BookingsService.instance) {
-      BookingsService.instance = new BookingsService();
+  static getInstance(): BookingsServiceEffect {
+    if (!BookingsServiceEffect.instance) {
+      BookingsServiceEffect.instance = new BookingsServiceEffect();
     }
-    return BookingsService.instance;
+    return BookingsServiceEffect.instance;
   }
 
-  async getBookings(userId: string, status?: string): Promise<Booking[]> {
-    try {
-      let query = supabase
-        .from('bookings')
-        .select(
-          `
+  getBookings = (userId: string, status?: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        let query = supabase
+          .from('bookings')
+          .select(
+            `
           id,
           user_id,
           showtime_id,
@@ -89,32 +97,35 @@ export class BookingsService {
             )
           )
         `,
-        )
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+          )
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
 
-      if (status) {
-        query = query.eq('booking_status', status);
-      }
+        if (status) {
+          query = query.eq('booking_status', status);
+        }
 
-      const { data, error } = await query;
+        const { data, error } = await query;
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      return keysToCamel(data || []) as Booking[];
-    } catch (error) {
-      throw error;
-    }
-  }
+        return keysToCamel(data || []) as Booking[];
+      },
+      catch: (error: unknown) =>
+        BookingError.ticketNetworkError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
-  async getBookingById(bookingId: string): Promise<Booking> {
-    try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select(
-          `
+  getBookingById = (bookingId: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        const { data, error } = await supabase
+          .from('bookings')
+          .select(
+            `
           *,
           showtime:showtimes!inner(
             *,
@@ -126,148 +137,157 @@ export class BookingsService {
           ),
           tickets:tickets(*)
         `,
-        )
-        .eq('id', bookingId)
-        .single();
+          )
+          .eq('id', bookingId)
+          .single();
 
-      if (error) {
-        throw error;
-      }
-
-      return keysToCamel(data) as Booking;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async createBooking(data: CreateBookingData): Promise<Booking> {
-    try {
-      const subtotal = data.totalAmount + (data.discountAmount || 0);
-
-      const { data: result, error } = await supabase.rpc(
-        'create_booking_with_payment',
-        {
-          p_user_id: data.userId,
-          p_wallet_id: data.walletId,
-          p_showtime_id: data.showtimeId,
-          p_seat_numbers: data.seats,
-          p_subtotal: subtotal,
-          p_total_amount: data.totalAmount,
-          p_discount_amount: data.discountAmount || 0,
-          p_promo_code_id: data.promoCodeId,
-        },
-      );
-
-      if (error) {
-        if (error.message.includes('Insufficient wallet balance')) {
-          throw new Error('Insufficient wallet balance');
-        } else if (error.message.includes('Wallet not found')) {
-          throw new Error('Wallet not found or inactive');
-        } else {
-          throw new Error(error.message || 'Booking creation failed');
+        if (error) {
+          throw error;
         }
-      }
 
-      if (!result || result.length === 0) {
-        throw new Error('No result returned from booking transaction');
-      }
+        return keysToCamel(data) as Booking;
+      },
+      catch: (error: unknown) =>
+        BookingError.invalidTicket(error instanceof Error ? error.message : ''),
+    });
 
-      const txResult = keysToCamel(result[0]) as BookingTransactionResult;
+  createBooking = (data: CreateBookingData) =>
+    Effect.tryPromise({
+      try: async () => {
+        const subtotal = data.totalAmount + (data.discountAmount || 0);
 
-      // Fetch complete booking with all relations
-      return await this.getBookingById(txResult.bookingId);
-    } catch (error) {
-      throw error;
-    }
-  }
+        const { data: result, error } = await supabase.rpc(
+          'create_booking_with_payment',
+          {
+            p_user_id: data.userId,
+            p_wallet_id: data.walletId,
+            p_showtime_id: data.showtimeId,
+            p_seat_numbers: data.seats,
+            p_subtotal: subtotal,
+            p_total_amount: data.totalAmount,
+            p_discount_amount: data.discountAmount || 0,
+            p_promo_code_id: data.promoCodeId,
+          },
+        );
+
+        if (error) {
+          if (error.message.includes('Insufficient wallet balance')) {
+            throw new Error('Insufficient wallet balance');
+          } else if (error.message.includes('Wallet not found')) {
+            throw new Error('Wallet not found or inactive');
+          } else {
+            throw new Error(error.message || 'Booking creation failed');
+          }
+        }
+
+        if (!result || result.length === 0) {
+          throw new Error('No result returned from booking transaction');
+        }
+
+        const txResult = keysToCamel(result[0]) as BookingTransactionResult;
+
+        // Fetch complete booking with all relations
+        return await Effect.runPromise(this.getBookingById(txResult.bookingId));
+      },
+      catch: (error: unknown) =>
+        BookingError.checkoutFailed(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Cancel booking with refund using atomic transaction
    */
-  async cancelBooking(bookingId: string): Promise<void> {
-    try {
-      // Get booking to determine refund amount
-      const booking = await this.getBookingById(bookingId);
+  cancelBooking = (bookingId: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        // Get booking to determine refund amount
+        const booking = await Effect.runPromise(this.getBookingById(bookingId));
 
-      if (!booking) {
-        throw new Error('Booking not found');
-      }
+        if (!booking) {
+          throw new Error('Booking not found');
+        }
 
-      if (booking.bookingStatus === BOOKING_STATUS.CANCELLED) {
-        throw new Error('Booking already cancelled');
-      }
+        if (booking.bookingStatus === BOOKING_STATUS.CANCELLED) {
+          throw new Error('Booking already cancelled');
+        }
 
-      // Call stored procedure for atomic cancel + refund
-      const { error } = await supabase.rpc('cancel_booking_with_refund', {
-        p_booking_id: bookingId,
-        p_refund_amount: booking.totalAmount,
-      });
+        // Call stored procedure for atomic cancel + refund
+        const { error } = await supabase.rpc('cancel_booking_with_refund', {
+          p_booking_id: bookingId,
+          p_refund_amount: booking.totalAmount,
+        });
 
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
+        if (error) {
+          throw error;
+        }
+      },
+      catch: (error: unknown) =>
+        BookingError.checkoutFailed(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
-  async reserveSeats(
-    showtimeId: string,
-    userId: string,
-    seats: string[],
-  ): Promise<SeatReservation> {
-    try {
-      const reservedUntil = new Date();
-      reservedUntil.setMinutes(reservedUntil.getMinutes() + 10); // 10 minute expiry
+  reserveSeats = (showtimeId: string, userId: string, seats: string[]) =>
+    Effect.tryPromise({
+      try: async () => {
+        const reservedUntil = new Date();
+        reservedUntil.setMinutes(reservedUntil.getMinutes() + 10); // 10 minute expiry
 
-      const { data, error } = await supabase
-        .from('seat_reservations')
-        .insert({
-          showtime_id: showtimeId,
-          user_id: userId,
-          seat_numbers: seats,
-          reserved_until: reservedUntil.toISOString(),
-          status: SEAT_RESERVATION_STATUS.RESERVED,
-        })
-        .select()
-        .single();
+        const { data, error } = await supabase
+          .from('seat_reservations')
+          .insert({
+            showtime_id: showtimeId,
+            user_id: userId,
+            seat_numbers: seats,
+            reserved_until: reservedUntil.toISOString(),
+            status: SEAT_RESERVATION_STATUS.RESERVED,
+          })
+          .select()
+          .single();
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      return keysToCamel(data) as SeatReservation;
-    } catch (error) {
-      throw error;
-    }
-  }
+        return keysToCamel(data) as SeatReservation;
+      },
+      catch: (error: unknown) =>
+        BookingError.checkoutFailed(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
-  async releaseSeats(reservationId: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('seat_reservations')
-        .update({ status: SEAT_RESERVATION_STATUS.RELEASED })
-        .eq('id', reservationId);
+  releaseSeats = (reservationId: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        const { error } = await supabase
+          .from('seat_reservations')
+          .update({ status: SEAT_RESERVATION_STATUS.RELEASED })
+          .eq('id', reservationId);
 
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
+        if (error) {
+          throw error;
+        }
+      },
+      catch: (error: unknown) =>
+        BookingError.checkoutFailed(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
-  async getBookingsPaginated(
+  getBookingsPaginated = (
     userId: string,
     status?: string,
     page = PAGINATION.PAGE_OFFSET,
     limit = PAGINATION.PAGE_LIMIT,
-  ): Promise<Booking[]> {
-    try {
-      let query = supabase
-        .from('bookings')
-        .select(
-          `
+  ) =>
+    Effect.tryPromise({
+      try: async () => {
+        let query = supabase
+          .from('bookings')
+          .select(
+            `
           id,
           booking_number,
           total_seats,
@@ -299,26 +319,28 @@ export class BookingsService {
             )
           )
         `,
-        )
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .range(page * limit, (page + 1) * limit - 1);
+          )
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .range(page * limit, (page + 1) * limit - 1);
 
-      if (status) {
-        query = query.eq('booking_status', status);
-      }
+        if (status) {
+          query = query.eq('booking_status', status);
+        }
 
-      const { data, error } = await query;
+        const { data, error } = await query;
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      return keysToCamel(data || []) as Booking[];
-    } catch (error) {
-      throw error;
-    }
-  }
+        return keysToCamel(data || []) as Booking[];
+      },
+      catch: (error: unknown) =>
+        BookingError.ticketNetworkError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 }
 
-export const bookingsService = BookingsService.getInstance();
+export const bookingsServiceEffect = BookingsServiceEffect.getInstance();

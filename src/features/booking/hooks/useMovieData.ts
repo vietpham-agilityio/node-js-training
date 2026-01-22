@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { GenreMovie, MovieStatus } from '../schemas/movie';
+import { GenreMovie, MovieStatus } from '@/features/booking/schemas/movie';
 import { useMoviesByGenreInfinite, useMoviesInfinite } from './useMovies';
 import { MOVIE_STATUS } from '@/constants/status';
 

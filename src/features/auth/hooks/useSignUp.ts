@@ -1,5 +1,3 @@
-import { Cause, Chunk, Effect, Exit, pipe } from 'effect';
-
 // Services
 import { ERROR_MESSAGES, MESSAGES, ToastType } from '@/constants';
 
@@ -13,7 +11,7 @@ import { SignUpData } from '@/features/auth/types/auth';
 import { useToastAlert } from '@/hooks/useToast';
 
 // Utils
-import { logAuthError } from '@/utils/extract';
+import { runEffectForQuery } from '@/utils/effect';
 
 // React Query
 import { useMutation } from '@tanstack/react-query';
@@ -22,26 +20,8 @@ export const useSignUp = () => {
   const toast = useToastAlert();
 
   return useMutation({
-    mutationFn: async (data: SignUpData) => {
-      const signUpProgram = pipe(
-        authServiceEffect.signUp(data),
-        Effect.tapError(logAuthError), // Log errors in dev mode when fails
-      );
-
-      const exit = await Effect.runPromiseExit(signUpProgram);
-
-      return Exit.match(exit, {
-        onSuccess: value => value,
-        onFailure: cause => {
-          // Extract the actual error from the cause and rethrow it
-          const failures = Cause.failures(cause);
-          if (Chunk.size(failures) > 0) {
-            throw Chunk.unsafeGet(failures, 0);
-          }
-          throw new Error('Unknown error occurred');
-        },
-      });
-    },
+    mutationFn: async (data: SignUpData) =>
+      runEffectForQuery(authServiceEffect.signUp(data)),
     onSuccess: () => {
       toast.alert(
         MESSAGES.SIGNUP_SUCCESS,

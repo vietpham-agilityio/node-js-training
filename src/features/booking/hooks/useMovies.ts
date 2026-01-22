@@ -2,13 +2,16 @@
 import { API_CONFIG, PAGINATION, queryKeys } from '@/constants';
 
 // Services
-import { moviesService } from '@/features/booking/services/movies';
+import { moviesServiceEffect } from '@/features/booking/services/movies';
 
 // Types
-import { GenreMovie, MovieStatus } from '../schemas/movie';
+import { GenreMovie, MovieStatus } from '@/features/booking/schemas/movie';
 
 // React Query
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+
+// Utils
+import { runEffectForQuery } from '@/utils/effect';
 
 interface UseMoviesOptions {
   status?: MovieStatus;
@@ -28,7 +31,7 @@ export const useMovies = (options: UseMoviesOptions = {}) => {
 
   return useQuery({
     queryKey: queryKeys.movies.list({ status }),
-    queryFn: () => moviesService.getMovies(status),
+    queryFn: () => runEffectForQuery(moviesServiceEffect.getMovies(status)),
     enabled,
     staleTime: API_CONFIG.QUERY_STALE_TIME,
     gcTime: API_CONFIG.SEAT_RESERVATION_TIMEOUT,
@@ -41,10 +44,12 @@ export const useMoviesInfinite = (options: UseMoviesOptions = {}) => {
   return useInfiniteQuery({
     queryKey: queryKeys.movies.infinite({ status }),
     queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) =>
-      moviesService.getMoviesPaginated(
-        status,
-        pageParam,
-        PAGINATION.PAGE_LIMIT,
+      runEffectForQuery(
+        moviesServiceEffect.getMoviesPaginated(
+          status,
+          pageParam,
+          PAGINATION.PAGE_LIMIT,
+        ),
       ),
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.length < PAGINATION.PAGE_LIMIT) return undefined;
@@ -59,7 +64,7 @@ export const useMoviesInfinite = (options: UseMoviesOptions = {}) => {
 export const useMovie = (id: string) => {
   return useQuery({
     queryKey: queryKeys.movies.detail(id),
-    queryFn: () => moviesService.getMovieById(id),
+    queryFn: () => runEffectForQuery(moviesServiceEffect.getMovieById(id)),
     enabled: !!id,
     staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
@@ -80,18 +85,22 @@ export const useSearchMoviesInfinite = (
     queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) => {
       if (isSearching) {
         // Search with pagination
-        return moviesService.searchMoviesPaginated(
-          searchQuery!,
-          pageParam,
-          PAGINATION.PAGE_LIMIT,
+        return runEffectForQuery(
+          moviesServiceEffect.searchMoviesPaginated(
+            searchQuery!,
+            pageParam,
+            PAGINATION.PAGE_LIMIT,
+          ),
         );
       }
 
       // Regular browse with pagination
-      return moviesService.getMoviesPaginated(
-        status,
-        pageParam,
-        PAGINATION.PAGE_LIMIT,
+      return runEffectForQuery(
+        moviesServiceEffect.getMoviesPaginated(
+          status,
+          pageParam,
+          PAGINATION.PAGE_LIMIT,
+        ),
       );
     },
 
@@ -117,7 +126,8 @@ export const useSearchMoviesInfinite = (
 export const useMoviesByGenre = (genre: GenreMovie) => {
   return useQuery({
     queryKey: queryKeys.movies.list({ genre }),
-    queryFn: () => moviesService.getMoviesByGenre(genre),
+    queryFn: () =>
+      runEffectForQuery(moviesServiceEffect.getMoviesByGenre(genre)),
     enabled: genre !== 'all' && genre.length > 0,
     staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
@@ -129,11 +139,13 @@ export const useMoviesByGenreInfinite = (options: UseMoviesByGenreOptions) => {
   return useInfiniteQuery({
     queryKey: queryKeys.movies.infinite({ genre, status }),
     queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) =>
-      moviesService.getMoviesByGenrePaginated(
-        genre,
-        status,
-        pageParam,
-        PAGINATION.PAGE_LIMIT,
+      runEffectForQuery(
+        moviesServiceEffect.getMoviesByGenrePaginated(
+          genre,
+          status,
+          pageParam,
+          PAGINATION.PAGE_LIMIT,
+        ),
       ),
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.length < PAGINATION.PAGE_LIMIT) return undefined;

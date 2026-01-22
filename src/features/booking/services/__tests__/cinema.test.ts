@@ -1,7 +1,7 @@
-
-import { CinemaService, cinemaService } from '../cinema';
+import { CinemaServiceEffect, cinemaServiceEffect } from '../cinema';
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
+import { runEffectForQuery } from '@/utils/effect';
 
 const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
@@ -19,12 +19,12 @@ jest.mock('@/services/supabase/client', () => ({
 jest.unmock('@/utils/convert');
 
 describe('CinemaService', () => {
-  let service: CinemaService;
+  let service: CinemaServiceEffect;
   const from = supabase.from as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = CinemaService.getInstance();
+    service = CinemaServiceEffect.getInstance();
     // Default `then` for awaited queries
     (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
       resolve({ data: [], error: null }),
@@ -36,10 +36,10 @@ describe('CinemaService', () => {
   });
 
   it('should be a singleton', () => {
-    const instance1 = CinemaService.getInstance();
-    const instance2 = CinemaService.getInstance();
+    const instance1 = CinemaServiceEffect.getInstance();
+    const instance2 = CinemaServiceEffect.getInstance();
     expect(instance1).toBe(instance2);
-    expect(instance1).toBe(cinemaService);
+    expect(instance1).toBe(cinemaServiceEffect);
   });
 
   describe('getCinemas', () => {
@@ -49,7 +49,7 @@ describe('CinemaService', () => {
         resolve({ data: mockData, error: null }),
       );
 
-      const cinemas = await service.getCinemas();
+      const cinemas = await runEffectForQuery(cinemaServiceEffect.getCinemas());
 
       expect(from).toHaveBeenCalledWith('cinemas');
       expect(mockQueryBuilder.select).toHaveBeenCalledWith('*');
@@ -59,11 +59,13 @@ describe('CinemaService', () => {
 
     it('should throw an error if fetching fails', async () => {
       const error = new Error('Fetch failed');
-      (mockQueryBuilder.then as jest.Mock).mockImplementation((_resolve, reject) =>
-        reject(error),
+      (mockQueryBuilder.then as jest.Mock).mockImplementation(
+        (_resolve, reject) => reject(error),
       );
 
-      await expect(service.getCinemas()).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(cinemaServiceEffect.getCinemas()),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -75,7 +77,9 @@ describe('CinemaService', () => {
         error: null,
       });
 
-      const cinema = await service.getCinemaById('cinema1');
+      const cinema = await runEffectForQuery(
+        cinemaServiceEffect.getCinemaById('cinema1'),
+      );
 
       expect(from).toHaveBeenCalledWith('cinemas');
       expect(mockQueryBuilder.select).toHaveBeenCalledWith(
@@ -94,7 +98,9 @@ describe('CinemaService', () => {
         resolve({ data: mockData, error: null }),
       );
 
-      const cinemas = await service.getCinemasByCity('Test City');
+      const cinemas = await runEffectForQuery(
+        cinemaServiceEffect.getCinemasByCity('Test City'),
+      );
 
       expect(from).toHaveBeenCalledWith('cinemas');
       expect(mockQueryBuilder.select).toHaveBeenCalledWith('*');

@@ -1,9 +1,21 @@
+// Supabase
 import { supabase } from '@/services/supabase/client';
+
+// Utils
 import { keysToCamel } from '@/utils/convert';
-import { MoviesService, moviesService } from '../movies';
+
+// Services
+import { MoviesServiceEffect, moviesServiceEffect } from '../movies';
+
+// Constant
 import { MOVIE_STATUS } from '@/constants/status';
 import { GENRE_MOVIE } from '@/constants/movie';
+
+// Type
 import { GenreMovie } from '../../schemas/movie';
+
+// Utils
+import { runEffectForQuery } from '@/utils/effect';
 
 const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
@@ -26,12 +38,12 @@ jest.mock('@/services/supabase/client', () => ({
 jest.unmock('@/utils/convert');
 
 describe('MoviesService', () => {
-  let service: MoviesService;
+  let service: MoviesServiceEffect;
   const from = supabase.from as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = MoviesService.getInstance();
+    service = MoviesServiceEffect.getInstance();
     (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
       resolve({ data: [], error: null }),
     );
@@ -42,10 +54,10 @@ describe('MoviesService', () => {
   });
 
   it('should be a singleton', () => {
-    const instance1 = MoviesService.getInstance();
-    const instance2 = MoviesService.getInstance();
+    const instance1 = MoviesServiceEffect.getInstance();
+    const instance2 = MoviesServiceEffect.getInstance();
     expect(instance1).toBe(instance2);
-    expect(instance1).toBe(moviesService);
+    expect(instance1).toBe(moviesServiceEffect);
   });
 
   describe('getMovies', () => {
@@ -55,7 +67,9 @@ describe('MoviesService', () => {
         resolve({ data: mockData, error: null }),
       );
 
-      const movies = await service.getMovies(MOVIE_STATUS.NOW_PLAYING);
+      const movies = await runEffectForQuery(
+        moviesServiceEffect.getMovies(MOVIE_STATUS.NOW_PLAYING),
+      );
 
       expect(from).toHaveBeenCalledWith('movies');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
@@ -66,7 +80,7 @@ describe('MoviesService', () => {
     });
 
     it('should fetch now playing and coming soon if no status', async () => {
-      await service.getMovies();
+      await runEffectForQuery(moviesServiceEffect.getMovies());
       expect(mockQueryBuilder.in).toHaveBeenCalledWith('status', [
         MOVIE_STATUS.NOW_PLAYING,
         MOVIE_STATUS.COMING_SOON,
@@ -81,7 +95,9 @@ describe('MoviesService', () => {
         data: mockMovie,
         error: null,
       });
-      const movie = await service.getMovieById('movie1');
+      const movie = await runEffectForQuery(
+        moviesServiceEffect.getMovieById('movie1'),
+      );
       expect(from).toHaveBeenCalledWith('movies');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('id', 'movie1');
       expect(movie).toEqual(keysToCamel(mockMovie));
@@ -94,8 +110,8 @@ describe('MoviesService', () => {
       (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
         resolve({ data: mockData, error: null }),
       );
-      const movies = await service.getMoviesByGenre(
-        GENRE_MOVIE.ACTION as GenreMovie,
+      const movies = await runEffectForQuery(
+        moviesServiceEffect.getMoviesByGenre(GENRE_MOVIE.ACTION as GenreMovie),
       );
       expect(mockQueryBuilder.contains).toHaveBeenCalledWith('genre', [
         'action',
@@ -110,7 +126,9 @@ describe('MoviesService', () => {
       (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
         resolve({ data: mockData, error: null }),
       );
-      const showtimes = await service.getShowtimes('movie1', '2025-12-25');
+      const showtimes = await runEffectForQuery(
+        moviesServiceEffect.getShowtimes('movie1', '2025-12-25'),
+      );
       expect(from).toHaveBeenCalledWith('showtimes');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('movie_id', 'movie1');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
@@ -128,7 +146,9 @@ describe('MoviesService', () => {
         data: mockShowtime,
         error: null,
       });
-      const showtime = await service.getShowtimeById('show1');
+      const showtime = await runEffectForQuery(
+        moviesServiceEffect.getShowtimeById('show1'),
+      );
       expect(from).toHaveBeenCalledWith('showtimes');
       expect(mockQueryBuilder.eq).toHaveBeenCalledWith('id', 'show1');
       expect(showtime).toEqual(keysToCamel(mockShowtime));
@@ -142,10 +162,8 @@ describe('MoviesService', () => {
         resolve({ data: mockData, error: null }),
       );
 
-      const movies = await service.getMoviesPaginated(
-        MOVIE_STATUS.NOW_PLAYING,
-        0,
-        10,
+      const movies = await runEffectForQuery(
+        moviesServiceEffect.getMoviesPaginated(MOVIE_STATUS.NOW_PLAYING, 0, 10),
       );
 
       expect(from).toHaveBeenCalledWith('movies');

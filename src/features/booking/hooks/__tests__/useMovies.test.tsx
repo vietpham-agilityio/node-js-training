@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react-native';
+import { Effect } from 'effect';
 import React from 'react';
 
 // Hooks
@@ -10,26 +11,23 @@ import {
   useMoviesInfinite,
 } from '../useMovies';
 
-// Types
-import { GenreMovie, MovieStatus } from '@/features/booking/schemas/movie';
-import { MOVIE_STATUS } from '@/constants/status';
-import { GENRE_MOVIE } from '@/constants/movie';
+// Services
+import { moviesServiceEffect } from '@/features/booking/services/movies';
 
-// Mock dependencies
-const mockGetMovies = jest.fn();
-const mockGetMoviesPaginated = jest.fn();
-const mockGetMovieById = jest.fn();
-const mockSearchMovies = jest.fn();
-const mockGetMoviesByGenre = jest.fn();
+// Types
+import { GENRE_MOVIE } from '@/constants/movie';
+import { MOVIE_STATUS } from '@/constants/status';
+import { MovieError } from '@/features/booking/error/movie';
+import { GenreMovie } from '@/features/booking/schemas/movie';
 
 jest.mock('@/features/booking/services/movies', () => ({
-  moviesService: {
-    getMovies: (status?: MovieStatus) => mockGetMovies(status),
-    getMoviesPaginated: (status: MovieStatus, page: number, limit: number) =>
-      mockGetMoviesPaginated(status, page, limit),
-    getMovieById: (id: string) => mockGetMovieById(id),
-    searchMovies: (query: string) => mockSearchMovies(query),
-    getMoviesByGenre: (genre: string) => mockGetMoviesByGenre(genre),
+  moviesServiceEffect: {
+    getMovies: jest.fn(),
+    getMoviesPaginated: jest.fn(),
+    getMovieById: jest.fn(),
+    searchMoviesPaginated: jest.fn(),
+    getMoviesByGenre: jest.fn(),
+    getMoviesByGenrePaginated: jest.fn(),
   },
 }));
 
@@ -65,7 +63,9 @@ describe('useMovies', () => {
       { id: '1', title: 'Movie 1', status: MOVIE_STATUS.NOW_PLAYING },
       { id: '2', title: 'Movie 2', status: MOVIE_STATUS.NOW_PLAYING },
     ];
-    mockGetMovies.mockResolvedValue(mockMovies);
+    (moviesServiceEffect.getMovies as jest.Mock).mockReturnValue(
+      Effect.succeed(mockMovies),
+    );
 
     const { result } = renderHook(() => useMovies(), {
       wrapper: createWrapper(),
@@ -75,7 +75,7 @@ describe('useMovies', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMovies).toHaveBeenCalledWith(undefined);
+    expect(moviesServiceEffect.getMovies).toHaveBeenCalledWith(undefined);
     expect(result.current.data).toEqual(mockMovies);
   });
 
@@ -83,7 +83,9 @@ describe('useMovies', () => {
     const mockMovies = [
       { id: '1', title: 'Movie 1', status: MOVIE_STATUS.COMING_SOON },
     ];
-    mockGetMovies.mockResolvedValue(mockMovies);
+    (moviesServiceEffect.getMovies as jest.Mock).mockReturnValue(
+      Effect.succeed(mockMovies),
+    );
 
     const { result } = renderHook(
       () => useMovies({ status: MOVIE_STATUS.COMING_SOON }),
@@ -96,7 +98,9 @@ describe('useMovies', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMovies).toHaveBeenCalledWith(MOVIE_STATUS.COMING_SOON);
+    expect(moviesServiceEffect.getMovies).toHaveBeenCalledWith(
+      MOVIE_STATUS.COMING_SOON,
+    );
     expect(result.current.data).toEqual(mockMovies);
   });
 
@@ -105,12 +109,14 @@ describe('useMovies', () => {
       wrapper: createWrapper(),
     });
 
-    expect(mockGetMovies).not.toHaveBeenCalled();
+    expect(moviesServiceEffect.getMovies).not.toHaveBeenCalled();
   });
 
   it('should handle error when fetch fails', async () => {
-    const mockError = new Error('Failed to fetch movies');
-    mockGetMovies.mockRejectedValue(mockError);
+    const mockError = MovieError.movieNetworkError('Failed to fetch movies');
+    (moviesServiceEffect.getMovies as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
 
     const { result } = renderHook(() => useMovies(), {
       wrapper: createWrapper(),
@@ -120,7 +126,10 @@ describe('useMovies', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(result.current.error).toEqual(mockError);
+    expect(result.current.error).toBeInstanceOf(MovieError);
+    expect((result.current.error as MovieError).message).toBe(
+      'Failed to fetch movies',
+    );
   });
 });
 
@@ -134,7 +143,9 @@ describe('useMoviesInfinite', () => {
       { id: '1', title: 'Movie 1' },
       { id: '2', title: 'Movie 2' },
     ];
-    mockGetMoviesPaginated.mockResolvedValue(mockMovies);
+    (moviesServiceEffect.getMoviesPaginated as jest.Mock).mockReturnValue(
+      Effect.succeed(mockMovies),
+    );
 
     const { result } = renderHook(() => useMoviesInfinite(), {
       wrapper: createWrapper(),
@@ -144,7 +155,11 @@ describe('useMoviesInfinite', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMoviesPaginated).toHaveBeenCalledWith(undefined, 0, 10);
+    expect(moviesServiceEffect.getMoviesPaginated).toHaveBeenCalledWith(
+      undefined,
+      0,
+      10,
+    );
     expect(result.current.data?.pages[0]).toEqual(mockMovies);
   });
 
@@ -154,9 +169,9 @@ describe('useMoviesInfinite', () => {
       title: `Movie ${i + 1}`,
     })); // Exactly PAGE_LIMIT items to trigger next page
     const page2 = [{ id: '11', title: 'Movie 11' }];
-    mockGetMoviesPaginated
-      .mockResolvedValueOnce(page1)
-      .mockResolvedValueOnce(page2);
+    (moviesServiceEffect.getMoviesPaginated as jest.Mock)
+      .mockReturnValueOnce(Effect.succeed(page1))
+      .mockReturnValueOnce(Effect.succeed(page2));
 
     const { result } = renderHook(() => useMoviesInfinite(), {
       wrapper: createWrapper(),
@@ -175,7 +190,7 @@ describe('useMoviesInfinite', () => {
       expect(result.current.data?.pages.length).toBe(2);
     });
 
-    expect(mockGetMoviesPaginated).toHaveBeenCalledTimes(2);
+    expect(moviesServiceEffect.getMoviesPaginated).toHaveBeenCalledTimes(2);
     expect(result.current.data?.pages[1]).toEqual(page2);
   });
 
@@ -184,7 +199,9 @@ describe('useMoviesInfinite', () => {
       id: `${i + 1}`,
       title: `Movie ${i + 1}`,
     }));
-    mockGetMoviesPaginated.mockResolvedValue(fullPage);
+    (moviesServiceEffect.getMoviesPaginated as jest.Mock).mockReturnValue(
+      Effect.succeed(fullPage),
+    );
 
     const { result } = renderHook(() => useMoviesInfinite(), {
       wrapper: createWrapper(),
@@ -217,10 +234,10 @@ describe('useMoviesInfinite', () => {
       title: `Movie ${i + 21}`,
     }));
 
-    mockGetMoviesPaginated
-      .mockResolvedValueOnce(page1)
-      .mockResolvedValueOnce(page2)
-      .mockResolvedValueOnce(page3);
+    (moviesServiceEffect.getMoviesPaginated as jest.Mock)
+      .mockReturnValueOnce(Effect.succeed(page1))
+      .mockReturnValueOnce(Effect.succeed(page2))
+      .mockReturnValueOnce(Effect.succeed(page3));
 
     const { result } = renderHook(() => useMoviesInfinite(), {
       wrapper: createWrapper(),
@@ -249,12 +266,14 @@ describe('useMoviesInfinite', () => {
 
     // Page 3 has only 5 items (< PAGE_LIMIT), so no next page
     expect(result.current.hasNextPage).toBe(false);
-    expect(mockGetMoviesPaginated).toHaveBeenCalledTimes(3);
+    expect(moviesServiceEffect.getMoviesPaginated).toHaveBeenCalledTimes(3);
   });
 
   it('should return undefined for nextPageParam when last page has fewer items', async () => {
     const mockMovies = [{ id: '1', title: 'Movie 1' }]; // Less than page limit
-    mockGetMoviesPaginated.mockResolvedValue(mockMovies);
+    (moviesServiceEffect.getMoviesPaginated as jest.Mock).mockReturnValue(
+      Effect.succeed(mockMovies),
+    );
 
     const { result } = renderHook(() => useMoviesInfinite(), {
       wrapper: createWrapper(),
@@ -272,7 +291,7 @@ describe('useMoviesInfinite', () => {
       wrapper: createWrapper(),
     });
 
-    expect(mockGetMoviesPaginated).not.toHaveBeenCalled();
+    expect(moviesServiceEffect.getMoviesPaginated).not.toHaveBeenCalled();
   });
 });
 
@@ -287,7 +306,9 @@ describe('useMovie', () => {
       title: 'Movie 1',
       status: MOVIE_STATUS.NOW_PLAYING,
     };
-    mockGetMovieById.mockResolvedValue(mockMovie);
+    (moviesServiceEffect.getMovieById as jest.Mock).mockReturnValue(
+      Effect.succeed(mockMovie),
+    );
 
     const { result } = renderHook(() => useMovie('1'), {
       wrapper: createWrapper(),
@@ -297,7 +318,7 @@ describe('useMovie', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMovieById).toHaveBeenCalledWith('1');
+    expect(moviesServiceEffect.getMovieById).toHaveBeenCalledWith('1');
     expect(result.current.data).toEqual(mockMovie);
   });
 
@@ -306,12 +327,14 @@ describe('useMovie', () => {
       wrapper: createWrapper(),
     });
 
-    expect(mockGetMovieById).not.toHaveBeenCalled();
+    expect(moviesServiceEffect.getMovieById).not.toHaveBeenCalled();
   });
 
   it('should handle error when fetch fails', async () => {
-    const mockError = new Error('Failed to fetch movie');
-    mockGetMovieById.mockRejectedValue(mockError);
+    const mockError = MovieError.movieNotFound('Failed to fetch movie');
+    (moviesServiceEffect.getMovieById as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
 
     const { result } = renderHook(() => useMovie('1'), {
       wrapper: createWrapper(),
@@ -321,7 +344,10 @@ describe('useMovie', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(result.current.error).toEqual(mockError);
+    expect(result.current.error).toBeInstanceOf(MovieError);
+    expect((result.current.error as MovieError).message).toBe(
+      'Failed to fetch movie',
+    );
   });
 });
 
@@ -335,7 +361,9 @@ describe('useMoviesByGenre', () => {
       { id: '1', title: 'Movie 1', genre: ['Action'] },
       { id: '2', title: 'Movie 2', genre: ['Action'] },
     ];
-    mockGetMoviesByGenre.mockResolvedValue(mockMovies);
+    (moviesServiceEffect.getMoviesByGenre as jest.Mock).mockReturnValue(
+      Effect.succeed(mockMovies),
+    );
 
     const { result } = renderHook(
       () => useMoviesByGenre(GENRE_MOVIE.ACTION as GenreMovie),
@@ -348,7 +376,9 @@ describe('useMoviesByGenre', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetMoviesByGenre).toHaveBeenCalledWith(GENRE_MOVIE.ACTION);
+    expect(moviesServiceEffect.getMoviesByGenre).toHaveBeenCalledWith(
+      GENRE_MOVIE.ACTION,
+    );
     expect(result.current.data).toEqual(mockMovies);
   });
 
@@ -357,12 +387,16 @@ describe('useMoviesByGenre', () => {
       wrapper: createWrapper(),
     });
 
-    expect(mockGetMoviesByGenre).not.toHaveBeenCalled();
+    expect(moviesServiceEffect.getMoviesByGenre).not.toHaveBeenCalled();
   });
 
   it('should handle error when fetch fails', async () => {
-    const mockError = new Error('Failed to fetch movies by genre');
-    mockGetMoviesByGenre.mockRejectedValue(mockError);
+    const mockError = MovieError.movieNetworkError(
+      'Failed to fetch movies by genre',
+    );
+    (moviesServiceEffect.getMoviesByGenre as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
 
     const { result } = renderHook(
       () => useMoviesByGenre(GENRE_MOVIE.ACTION as GenreMovie),
@@ -375,6 +409,9 @@ describe('useMoviesByGenre', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    expect(result.current.error).toEqual(mockError);
+    expect(result.current.error).toBeInstanceOf(MovieError);
+    expect((result.current.error as MovieError).message).toBe(
+      'Failed to fetch movies by genre',
+    );
   });
 });
