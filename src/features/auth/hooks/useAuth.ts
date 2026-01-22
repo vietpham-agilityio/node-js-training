@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-// Services
-import { authService } from '@/features/auth/services/auth';
+// Effect
+import { authServiceEffect } from '@/features/auth/services/auth.effect';
 
 // Stores
 import { useAuthStore } from '@/features/auth/store/auth';
@@ -24,7 +24,7 @@ export const useAuth = () => {
 
     const {
       data: { subscription },
-    } = authService.onAuthStateChange((_event, session) => {
+    } = authServiceEffect.onAuthStateChange((_event, session) => {
       if (!isSigningUp) {
         setSession(session);
         setLoading(false);

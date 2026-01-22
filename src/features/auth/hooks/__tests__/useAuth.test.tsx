@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react-native';
 
 // Mock dependencies
-import { authService } from '@/features/auth/services/auth';
 import { useAuthStore } from '@/features/auth/store/auth';
 
+import { authServiceEffect } from '../../services/auth.effect';
 import { useAuth } from '../useAuth';
 
 const mockInitialize = jest.fn();
@@ -19,8 +19,8 @@ jest.mock('@/features/auth/store/auth', () => ({
   useAuthStore: jest.fn(),
 }));
 
-jest.mock('@/features/auth/services/auth', () => ({
-  authService: {
+jest.mock('@/features/auth/services/auth.effect', () => ({
+  authServiceEffect: {
     onAuthStateChange: jest.fn(),
   },
 }));
@@ -41,7 +41,7 @@ describe('useAuth', () => {
       signOut: mockSignOut,
     });
 
-    (authService.onAuthStateChange as jest.Mock).mockReturnValue({
+    (authServiceEffect.onAuthStateChange as jest.Mock).mockReturnValue({
       data: {
         subscription: {
           unsubscribe: mockUnsubscribe,
@@ -60,8 +60,8 @@ describe('useAuth', () => {
     it('should set up auth state change subscription on mount', () => {
       renderHook(() => useAuth());
 
-      expect(authService.onAuthStateChange).toHaveBeenCalledTimes(1);
-      expect(authService.onAuthStateChange).toHaveBeenCalledWith(
+      expect(authServiceEffect.onAuthStateChange).toHaveBeenCalledTimes(1);
+      expect(authServiceEffect.onAuthStateChange).toHaveBeenCalledWith(
         expect.any(Function),
       );
     });
@@ -81,7 +81,7 @@ describe('useAuth', () => {
     it('should call setSession and setLoading when auth state changes and not signing up', () => {
       let authStateChangeCallback: (event: string, session: any) => void;
 
-      (authService.onAuthStateChange as jest.Mock).mockImplementation(
+      (authServiceEffect.onAuthStateChange as jest.Mock).mockImplementation(
         callback => {
           authStateChangeCallback = callback;
           return {
@@ -118,7 +118,7 @@ describe('useAuth', () => {
 
       let authStateChangeCallback: (event: string, session: any) => void;
 
-      (authService.onAuthStateChange as jest.Mock).mockImplementation(
+      (authServiceEffect.onAuthStateChange as jest.Mock).mockImplementation(
         callback => {
           authStateChangeCallback = callback;
           return {
