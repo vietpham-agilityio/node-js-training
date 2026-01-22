@@ -1,5 +1,7 @@
+import { authServiceEffect } from '@/features/auth/services/auth.effect';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react-native';
+import { Effect } from 'effect';
 import React from 'react';
 import {
   useSignIn,
@@ -9,9 +11,6 @@ import {
 
 // Mock dependencies
 const mockSetSession = jest.fn();
-const mockSignIn = jest.fn();
-const mockSignInWithGoogle = jest.fn();
-const mockSignInWithFacebook = jest.fn();
 const mockToastSuccess = jest.fn();
 
 jest.mock('@/features/auth/store/auth', () => ({
@@ -23,11 +22,11 @@ jest.mock('@/features/auth/store/auth', () => ({
   },
 }));
 
-jest.mock('@/features/auth/services/auth', () => ({
-  authService: {
-    signIn: (data: any) => mockSignIn(data),
-    signInWithGoogle: () => mockSignInWithGoogle(),
-    signInWithFacebook: () => mockSignInWithFacebook(),
+jest.mock('@/features/auth/services/auth.effect', () => ({
+  authServiceEffect: {
+    signIn: jest.fn(),
+    signInWithGoogle: jest.fn(),
+    signInWithFacebook: jest.fn(),
   },
 }));
 
@@ -63,10 +62,12 @@ describe('useSignIn', () => {
     jest.clearAllMocks();
   });
 
-  it('should call authService.signIn with correct data', async () => {
+  it('should call authServiceEffect.signIn with correct data', async () => {
     const mockSession = { user: { id: '1' }, access_token: 'token' };
     const signInData = { email: 'test@example.com', password: 'password123' };
-    mockSignIn.mockResolvedValue({ session: mockSession });
+    (authServiceEffect.signIn as jest.Mock).mockReturnValue(
+      Effect.succeed({ session: mockSession }),
+    );
 
     const { result } = renderHook(() => useSignIn(), {
       wrapper: createWrapper(),
@@ -78,14 +79,16 @@ describe('useSignIn', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockSignIn).toHaveBeenCalledWith(signInData);
-    expect(mockSignIn).toHaveBeenCalledTimes(1);
+    expect(authServiceEffect.signIn).toHaveBeenCalledWith(signInData);
+    expect(authServiceEffect.signIn).toHaveBeenCalledTimes(1);
   });
 
   it('should call setSession and show success toast on success', async () => {
     const mockSession = { user: { id: '1' }, access_token: 'token' };
     const signInData = { email: 'test@example.com', password: 'password123' };
-    mockSignIn.mockResolvedValue({ session: mockSession });
+    (authServiceEffect.signIn as jest.Mock).mockReturnValue(
+      Effect.succeed({ session: mockSession }),
+    );
 
     const { result } = renderHook(() => useSignIn(), {
       wrapper: createWrapper(),
@@ -104,7 +107,9 @@ describe('useSignIn', () => {
   it('should handle error when signIn fails', async () => {
     const mockError = new Error('Sign in failed');
     const signInData = { email: 'test@example.com', password: 'password123' };
-    mockSignIn.mockRejectedValue(mockError);
+    (authServiceEffect.signIn as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
 
     const { result } = renderHook(() => useSignIn(), {
       wrapper: createWrapper(),
@@ -127,9 +132,11 @@ describe('useSignInWithGoogle', () => {
     jest.clearAllMocks();
   });
 
-  it('should call authService.signInWithGoogle', async () => {
+  it('should call authServiceEffect.signInWithGoogle', async () => {
     const mockSession = { user: { id: '1' }, access_token: 'token' };
-    mockSignInWithGoogle.mockResolvedValue({ session: mockSession });
+    (authServiceEffect.signInWithGoogle as jest.Mock).mockReturnValue(
+      Effect.succeed({ session: mockSession }),
+    );
 
     const { result } = renderHook(() => useSignInWithGoogle(), {
       wrapper: createWrapper(),
@@ -141,12 +148,14 @@ describe('useSignInWithGoogle', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockSignInWithGoogle).toHaveBeenCalledTimes(1);
+    expect(authServiceEffect.signInWithGoogle).toHaveBeenCalledTimes(1);
   });
 
   it('should call setSession and show success toast when session exists', async () => {
     const mockSession = { user: { id: '1' }, access_token: 'token' };
-    mockSignInWithGoogle.mockResolvedValue({ session: mockSession });
+    (authServiceEffect.signInWithGoogle as jest.Mock).mockReturnValue(
+      Effect.succeed({ session: mockSession }),
+    );
 
     const { result } = renderHook(() => useSignInWithGoogle(), {
       wrapper: createWrapper(),
@@ -163,7 +172,9 @@ describe('useSignInWithGoogle', () => {
   });
 
   it('should not call setSession or show toast when session does not exist', async () => {
-    mockSignInWithGoogle.mockResolvedValue({ session: null });
+    (authServiceEffect.signInWithGoogle as jest.Mock).mockReturnValue(
+      Effect.succeed({ session: null }),
+    );
 
     const { result } = renderHook(() => useSignInWithGoogle(), {
       wrapper: createWrapper(),
@@ -181,7 +192,9 @@ describe('useSignInWithGoogle', () => {
 
   it('should handle error when signInWithGoogle fails', async () => {
     const mockError = new Error('Google sign in failed');
-    mockSignInWithGoogle.mockRejectedValue(mockError);
+    (authServiceEffect.signInWithGoogle as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
 
     const { result } = renderHook(() => useSignInWithGoogle(), {
       wrapper: createWrapper(),
@@ -202,9 +215,11 @@ describe('useSignInWithFacebook', () => {
     jest.clearAllMocks();
   });
 
-  it('should call authService.signInWithFacebook', async () => {
+  it('should call authServiceEffect.signInWithFacebook', async () => {
     const mockSession = { user: { id: '1' }, access_token: 'token' };
-    mockSignInWithFacebook.mockResolvedValue({ session: mockSession });
+    (authServiceEffect.signInWithFacebook as jest.Mock).mockReturnValue(
+      Effect.succeed({ session: mockSession }),
+    );
 
     const { result } = renderHook(() => useSignInWithFacebook(), {
       wrapper: createWrapper(),
@@ -216,12 +231,14 @@ describe('useSignInWithFacebook', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockSignInWithFacebook).toHaveBeenCalledTimes(1);
+    expect(authServiceEffect.signInWithFacebook).toHaveBeenCalledTimes(1);
   });
 
   it('should call setSession and show success toast when session exists', async () => {
     const mockSession = { user: { id: '1' }, access_token: 'token' };
-    mockSignInWithFacebook.mockResolvedValue({ session: mockSession });
+    (authServiceEffect.signInWithFacebook as jest.Mock).mockReturnValue(
+      Effect.succeed({ session: mockSession }),
+    );
 
     const { result } = renderHook(() => useSignInWithFacebook(), {
       wrapper: createWrapper(),
@@ -238,7 +255,9 @@ describe('useSignInWithFacebook', () => {
   });
 
   it('should not call setSession or show toast when session does not exist', async () => {
-    mockSignInWithFacebook.mockResolvedValue({ session: null });
+    (authServiceEffect.signInWithFacebook as jest.Mock).mockReturnValue(
+      Effect.succeed({ session: null }),
+    );
 
     const { result } = renderHook(() => useSignInWithFacebook(), {
       wrapper: createWrapper(),
@@ -256,7 +275,9 @@ describe('useSignInWithFacebook', () => {
 
   it('should handle error when signInWithFacebook fails', async () => {
     const mockError = new Error('Facebook sign in failed');
-    mockSignInWithFacebook.mockRejectedValue(mockError);
+    (authServiceEffect.signInWithFacebook as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
 
     const { result } = renderHook(() => useSignInWithFacebook(), {
       wrapper: createWrapper(),

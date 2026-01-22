@@ -1,8 +1,10 @@
-import { AuthService, authService } from '../auth';
-import { supabase } from '@/services/supabase/client';
-import * as WebBrowser from 'expo-web-browser';
-import { makeRedirectUri } from 'expo-auth-session';
 import { ROUTES } from '@/constants';
+import { AuthenticationError } from '@/features/auth/error/auth';
+import { supabase } from '@/services/supabase/client';
+import { Cause, Chunk, Effect, Exit } from 'effect';
+import { makeRedirectUri } from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+import { authServiceEffect } from '../auth.effect';
 
 // Mocking supabase client
 jest.mock('@/services/supabase/client', () => ({
@@ -28,20 +30,39 @@ jest.mock('expo-web-browser');
 // Mocking expo-auth-session
 jest.mock('expo-auth-session');
 
+// Helper to test Effect failures
+const expectEffectFailure = async <A, E>(
+  effect: Effect.Effect<A, E>,
+  assertion: (error: E) => void,
+) => {
+  const exit = await Effect.runPromiseExit(effect);
+
+  Exit.match(exit, {
+    onFailure: cause => {
+      const failures = Cause.failures(cause);
+      const firstFailure = Chunk.unsafeGet(failures, 0);
+      assertion(firstFailure);
+    },
+    onSuccess: () => {
+      fail('Expected effect to fail');
+    },
+  });
+};
+
 describe('AuthService', () => {
-  let service: AuthService;
+  let service: typeof authServiceEffect;
 
   beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
-    service = AuthService.getInstance();
+    service = authServiceEffect;
   });
 
   it('should be a singleton', () => {
-    const instance1 = AuthService.getInstance();
-    const instance2 = AuthService.getInstance();
+    const instance1 = authServiceEffect;
+    const instance2 = authServiceEffect;
     expect(instance1).toBe(instance2);
-    expect(instance1).toBe(authService);
+    expect(instance1).toBe(authServiceEffect);
   });
 
   // Test for signUp
@@ -58,7 +79,7 @@ describe('AuthService', () => {
         error: null,
       });
 
-      const result = await service.signUp(signUpData);
+      const result = await Effect.runPromise(service.signUp(signUpData));
 
       expect(supabase.auth.signUp).toHaveBeenCalledWith({
         email: signUpData.email,
@@ -72,7 +93,7 @@ describe('AuthService', () => {
       expect(result).toEqual(expectedAuthData);
     });
 
-    it('should throw an error if sign up fails', async () => {
+    it('should throw AuthenticationError if sign up fails', async () => {
       const signUpData = { email: 'test@example.com', password: 'password' };
       const error = new Error('Sign up failed');
       (supabase.auth.signUp as jest.Mock).mockResolvedValue({
@@ -80,7 +101,10 @@ describe('AuthService', () => {
         error,
       });
 
-      await expect(service.signUp(signUpData)).rejects.toThrow(error);
+      await expectEffectFailure(service.signUp(signUpData), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe('Sign up failed');
+      });
     });
   });
 
@@ -97,13 +121,13 @@ describe('AuthService', () => {
         error: null,
       });
 
-      const result = await service.signIn(signInData);
+      const result = await Effect.runPromise(service.signIn(signInData));
 
       expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith(signInData);
       expect(result).toEqual(expectedAuthData);
     });
 
-    it('should throw an error if sign in fails', async () => {
+    it('should throw AuthenticationError if sign in fails', async () => {
       const signInData = { email: 'test@example.com', password: 'password' };
       const error = new Error('Sign in failed');
       (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
@@ -111,7 +135,10 @@ describe('AuthService', () => {
         error,
       });
 
-      await expect(service.signIn(signInData)).rejects.toThrow(error);
+      await expectEffectFailure(service.signIn(signInData), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe('Sign in failed');
+      });
     });
   });
 
@@ -119,14 +146,18 @@ describe('AuthService', () => {
   describe('signOut', () => {
     it('should sign out a user successfully', async () => {
       (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null });
-      await service.signOut();
+      await Effect.runPromise(service.signOut());
       expect(supabase.auth.signOut).toHaveBeenCalled();
     });
 
-    it('should throw an error if sign out fails', async () => {
+    it('should throw AuthenticationError if sign out fails', async () => {
       const error = new Error('Sign out failed');
       (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error });
-      await expect(service.signOut()).rejects.toThrow(error);
+
+      await expectEffectFailure(service.signOut(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe('Sign out failed');
+      });
     });
   });
 
@@ -139,20 +170,23 @@ describe('AuthService', () => {
         error: null,
       });
 
-      const result = await service.getSession();
+      const result = await Effect.runPromise(service.getSession());
 
       expect(supabase.auth.getSession).toHaveBeenCalled();
       expect(result).toEqual(session);
     });
 
-    it('should throw an error if getSession fails', async () => {
+    it('should throw AuthenticationError if getSession fails', async () => {
       const error = new Error('Get session failed');
       (supabase.auth.getSession as jest.Mock).mockResolvedValue({
         data: { session: null },
         error,
       });
 
-      await expect(service.getSession()).rejects.toThrow(error);
+      await expectEffectFailure(service.getSession(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe('Get session failed');
+      });
     });
   });
 
@@ -165,18 +199,24 @@ describe('AuthService', () => {
         error: null,
       });
 
-      const result = await service.refreshSession();
+      const result = await Effect.runPromise(service.refreshSession());
       expect(supabase.auth.refreshSession).toHaveBeenCalled();
       expect(result).toEqual(session);
     });
 
-    it('should throw an error if refreshSession fails', async () => {
+    it('should throw AuthenticationError if refreshSession fails', async () => {
       const error = new Error('Refresh session failed');
       (supabase.auth.refreshSession as jest.Mock).mockResolvedValue({
         data: { session: null },
         error,
       });
-      await expect(service.refreshSession()).rejects.toThrow(error);
+
+      await expectEffectFailure(service.refreshSession(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Refresh session failed',
+        );
+      });
     });
   });
 
@@ -194,21 +234,26 @@ describe('AuthService', () => {
         error: null,
       });
 
-      await service.resetPassword(email);
+      await Effect.runPromise(service.resetPassword(email));
 
       expect(supabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(email, {
         redirectTo: `movieticketbooking://${ROUTES.RESET_PASSWORD}`,
       });
     });
 
-    it('should throw an error if reset password fails', async () => {
+    it('should throw AuthenticationError if reset password fails', async () => {
       const email = 'test@example.com';
       const error = new Error('Reset password failed');
       (supabase.auth.resetPasswordForEmail as jest.Mock).mockResolvedValue({
         error,
       });
 
-      await expect(service.resetPassword(email)).rejects.toThrow(error);
+      await expectEffectFailure(service.resetPassword(email), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Reset password failed',
+        );
+      });
     });
   });
 
@@ -220,19 +265,24 @@ describe('AuthService', () => {
         error: null,
       });
 
-      await service.updatePassword(newPassword);
+      await Effect.runPromise(service.updatePassword(newPassword));
 
       expect(supabase.auth.updateUser).toHaveBeenCalledWith({
         password: newPassword,
       });
     });
 
-    it('should throw an error if update password fails', async () => {
+    it('should throw AuthenticationError if update password fails', async () => {
       const newPassword = 'newPassword123';
       const error = new Error('Update password failed');
       (supabase.auth.updateUser as jest.Mock).mockResolvedValue({ error });
 
-      await expect(service.updatePassword(newPassword)).rejects.toThrow(error);
+      await expectEffectFailure(service.updatePassword(newPassword), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Update password failed',
+        );
+      });
     });
   });
 
@@ -245,7 +295,9 @@ describe('AuthService', () => {
       (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
         error: null,
       });
-      const result = await service.verifyCurrentPassword(email, password);
+      const result = await Effect.runPromise(
+        service.verifyCurrentPassword(email, password),
+      );
       expect(result).toBe(true);
       expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
         email,
@@ -253,13 +305,19 @@ describe('AuthService', () => {
       });
     });
 
-    it('should throw error for incorrect password', async () => {
-      const error = new Error('Current password is incorrect');
+    it('should throw AuthenticationError for incorrect password', async () => {
       (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
         error: new Error('invalid credentials'),
       });
-      await expect(service.verifyCurrentPassword(email, password)).rejects.toThrow(
-        error,
+
+      await expectEffectFailure(
+        service.verifyCurrentPassword(email, password),
+        err => {
+          expect(err).toBeInstanceOf(AuthenticationError);
+          expect((err as AuthenticationError).message).toBe(
+            'Current password is incorrect',
+          );
+        },
       );
     });
   });
@@ -301,7 +359,7 @@ describe('AuthService', () => {
         error: null,
       });
 
-      const result = await service.signInWithGoogle();
+      const result = await Effect.runPromise(service.signInWithGoogle());
 
       expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
         provider: 'google',
@@ -321,17 +379,19 @@ describe('AuthService', () => {
       expect(result).toEqual(sessionData);
     });
 
-    it('should throw error if signInWithOAuth fails', async () => {
+    it('should throw AuthenticationError if signInWithOAuth fails', async () => {
       const error = new Error('OAuth provider error');
       (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
         data: { url: null },
         error,
       });
 
-      await expect(service.signInWithGoogle()).rejects.toThrow(error);
+      await expectEffectFailure(service.signInWithGoogle(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+      });
     });
 
-    it('should throw error if user cancels auth session', async () => {
+    it('should throw AuthenticationError if user cancels auth session', async () => {
       (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
         data: { url: oAuthUrl },
         error: null,
@@ -341,12 +401,15 @@ describe('AuthService', () => {
         type: 'cancel',
       });
 
-      await expect(service.signInWithGoogle()).rejects.toThrow(
-        'Authentication was cancelled',
-      );
+      await expectEffectFailure(service.signInWithGoogle(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Authentication was cancelled',
+        );
+      });
     });
 
-    it('should throw error if OAuth callback has an error', async () => {
+    it('should throw AuthenticationError if OAuth callback has an error', async () => {
       (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
         data: { url: oAuthUrl },
         error: null,
@@ -358,10 +421,13 @@ describe('AuthService', () => {
         url: `${redirectUrl}?error_description=${errorMessage}`,
       });
 
-      await expect(service.signInWithGoogle()).rejects.toThrow(errorMessage);
+      await expectEffectFailure(service.signInWithGoogle(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(errorMessage);
+      });
     });
 
-    it('should throw error if tokens are not in callback URL', async () => {
+    it('should throw AuthenticationError if tokens are not in callback URL', async () => {
       (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
         data: { url: oAuthUrl },
         error: null,
@@ -372,12 +438,15 @@ describe('AuthService', () => {
         url: redirectUrl,
       });
 
-      await expect(service.signInWithGoogle()).rejects.toThrow(
-        'Failed to parse authentication tokens from callback URL',
-      );
+      await expectEffectFailure(service.signInWithGoogle(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Failed to parse authentication tokens from callback URL',
+        );
+      });
     });
 
-    it('should throw error if setSession fails', async () => {
+    it('should throw AuthenticationError if setSession fails', async () => {
       (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
         data: { url: oAuthUrl },
         error: null,
@@ -394,7 +463,12 @@ describe('AuthService', () => {
         error: sessionError,
       });
 
-      await expect(service.signInWithGoogle()).rejects.toThrow(sessionError);
+      await expectEffectFailure(service.signInWithGoogle(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Failed to set session',
+        );
+      });
     });
   });
 
@@ -426,7 +500,7 @@ describe('AuthService', () => {
         error: null,
       });
 
-      const result = await service.signInWithFacebook();
+      const result = await Effect.runPromise(service.signInWithFacebook());
 
       expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
         provider: 'facebook',
@@ -446,7 +520,7 @@ describe('AuthService', () => {
       expect(result).toEqual(sessionData);
     });
 
-    it('should throw error if user cancels auth session', async () => {
+    it('should throw AuthenticationError if user cancels auth session', async () => {
       (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
         data: { url: oAuthUrl },
         error: null,
@@ -456,9 +530,12 @@ describe('AuthService', () => {
         type: 'cancel',
       });
 
-      await expect(service.signInWithFacebook()).rejects.toThrow(
-        'Authentication was cancelled',
-      );
+      await expectEffectFailure(service.signInWithFacebook(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Authentication was cancelled',
+        );
+      });
     });
   });
 });
