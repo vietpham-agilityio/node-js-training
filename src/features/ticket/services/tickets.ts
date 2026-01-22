@@ -3,6 +3,7 @@ import { Ticket } from '@/features/booking/schemas/booking';
 
 // Utils
 import { keysToCamel } from '@/utils/convert';
+import { runEffectForQuery } from '@/utils/effect';
 
 // Constants
 import { ERROR_MESSAGES, MESSAGES, PAGINATION } from '@/constants';
@@ -10,6 +11,10 @@ import { BOOKING_STATUS } from '@/constants/status';
 
 // Supabase
 import { supabase } from '@/services/supabase/client';
+
+// Effect
+import { Effect } from 'effect';
+import { TicketError } from '../error';
 
 export class TicketsService {
   private static instance: TicketsService;
@@ -23,33 +28,34 @@ export class TicketsService {
     return TicketsService.instance;
   }
 
-  async getTickets(userId: string): Promise<Ticket[]> {
-    try {
-      // First, expire any old tickets
-      await this.expireOldTickets();
+  getTickets = (userId: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        // First, expire any old tickets
+        await runEffectForQuery(this.expireOldTickets());
 
-      // Get all bookings for user first (RLS will filter automatically)
-      const { data: bookings, error: bookingsError } = await supabase
-        .from('bookings')
-        .select('id')
-        .eq('user_id', userId);
+        // Get all bookings for user first (RLS will filter automatically)
+        const { data: bookings, error: bookingsError } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('user_id', userId);
 
-      if (bookingsError) {
-        throw bookingsError;
-      }
+        if (bookingsError) {
+          throw bookingsError;
+        }
 
-      if (!bookings || bookings.length === 0) {
-        return [];
-      }
+        if (!bookings || bookings.length === 0) {
+          return [];
+        }
 
-      const bookingIds = bookings.map(b => b.id);
+        const bookingIds = bookings.map(b => b.id);
 
-      // Now get tickets for these bookings
-      // Optimized: Only select needed fields
-      const { data, error } = await supabase
-        .from('tickets')
-        .select(
-          `
+        // Now get tickets for these bookings
+        // Optimized: Only select needed fields
+        const { data, error } = await supabase
+          .from('tickets')
+          .select(
+            `
           id,
           booking_id,
           seat_number,
@@ -95,33 +101,36 @@ export class TicketsService {
             )
           )
         `,
-        )
-        .in('booking_id', bookingIds)
-        .order('created_at', { ascending: false });
+          )
+          .in('booking_id', bookingIds)
+          .order('created_at', { ascending: false });
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      return keysToCamel(data || []) as Ticket[];
-    } catch (error) {
-      throw error;
-    }
-  }
+        return keysToCamel(data || []) as Ticket[];
+      },
+      catch: (error: unknown) =>
+        TicketError.ticketNetworkError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Get ticket by ID
    * Automatically checks for expiration first
    */
-  async getTicketById(ticketId: string): Promise<Ticket> {
-    try {
-      // First, expire any old tickets
-      await this.expireOldTickets();
+  getTicketById = (ticketId: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        // First, expire any old tickets
+        await runEffectForQuery(this.expireOldTickets());
 
-      const { data, error } = await supabase
-        .from('tickets')
-        .select(
-          `
+        const { data, error } = await supabase
+          .from('tickets')
+          .select(
+            `
           id,
           booking_id,
           seat_number,
@@ -173,148 +182,156 @@ export class TicketsService {
             )
           )
         `,
-        )
-        .eq('id', ticketId)
-        .single();
+          )
+          .eq('id', ticketId)
+          .single();
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      return keysToCamel(data) as Ticket;
-    } catch (error) {
-      throw error;
-    }
-  }
+        return keysToCamel(data) as Ticket;
+      },
+      catch: (error: unknown) =>
+        TicketError.ticketNotFound(error instanceof Error ? error.message : ''),
+    });
 
   /**
    * Validate ticket QR code
    * Checks expiration before validation
    */
-  async validateTicket(qrData: string) {
-    try {
-      // First, expire any old tickets
-      await this.expireOldTickets();
+  validateTicket = (qrData: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        try {
+          // First, expire any old tickets
+          await runEffectForQuery(this.expireOldTickets());
 
-      // Parse QR data
-      let parsedData;
-      try {
-        parsedData = JSON.parse(qrData);
-      } catch {
-        return {
-          valid: false,
-          message: ERROR_MESSAGES.TICKET_INVALID_FORMAT,
-        };
-      }
+          // Parse QR data
+          let parsedData;
+          try {
+            parsedData = JSON.parse(qrData);
+          } catch {
+            return {
+              valid: false,
+              message: ERROR_MESSAGES.TICKET_INVALID_FORMAT,
+            };
+          }
 
-      const { booking_id, seat, timestamp } = parsedData;
+          const { booking_id, seat } = parsedData;
 
-      if (!booking_id || !seat) {
-        return {
-          valid: false,
-          message: ERROR_MESSAGES.TICKET_INVALID_FORMAT,
-        };
-      }
+          if (!booking_id || !seat) {
+            return {
+              valid: false,
+              message: ERROR_MESSAGES.TICKET_INVALID_FORMAT,
+            };
+          }
 
-      // Get ticket with booking info
-      const { data: ticket, error } = await supabase
-        .from('tickets')
-        .select(
-          `
+          // Get ticket with booking info
+          const { data: ticket, error } = await supabase
+            .from('tickets')
+            .select(
+              `
           *,
           booking:bookings!inner(
             booking_status,
             expires_at
           )
         `,
-        )
-        .eq('booking_id', booking_id)
-        .eq('seat_number', seat)
-        .single();
+            )
+            .eq('booking_id', booking_id)
+            .eq('seat_number', seat)
+            .single();
 
-      if (error || !ticket) {
-        return { valid: false, message: ERROR_MESSAGES.INVALID_TICKET };
-      }
+          if (error || !ticket) {
+            return { valid: false, message: ERROR_MESSAGES.INVALID_TICKET };
+          }
 
-      // Check if already scanned
-      if (ticket.scanned_at) {
-        return {
-          valid: false,
-          message: ERROR_MESSAGES.TICKET_ALREADY_USED,
-          scannedAt: ticket.scanned_at,
-        };
-      }
+          // Check if already scanned
+          if (ticket.scanned_at) {
+            return {
+              valid: false,
+              message: ERROR_MESSAGES.TICKET_ALREADY_USED,
+              scannedAt: ticket.scanned_at,
+            };
+          }
 
-      // Check if expired
-      if (ticket.status === BOOKING_STATUS.EXPIRED) {
-        return { valid: false, message: ERROR_MESSAGES.TICKET_EXPIRED };
-      }
+          // Check if expired
+          if (ticket.status === BOOKING_STATUS.EXPIRED) {
+            return { valid: false, message: ERROR_MESSAGES.TICKET_EXPIRED };
+          }
 
-      // Check booking status
-      if (ticket.booking.booking_status === BOOKING_STATUS.CANCELLED) {
-        return { valid: false, message: 'Booking has been cancelled' };
-      }
+          // Check booking status
+          if (ticket.booking.booking_status === BOOKING_STATUS.CANCELLED) {
+            return { valid: false, message: 'Booking has been cancelled' };
+          }
 
-      // Update ticket as scanned
-      const { error: updateError } = await supabase
-        .from('tickets')
-        .update({
-          scanned_at: new Date().toISOString(),
-          status: BOOKING_STATUS.USED,
-        })
-        .eq('id', ticket.id);
+          // Update ticket as scanned
+          const { error: updateError } = await supabase
+            .from('tickets')
+            .update({
+              scanned_at: new Date().toISOString(),
+              status: BOOKING_STATUS.USED,
+            })
+            .eq('id', ticket.id);
 
-      if (updateError) {
-        throw updateError;
-      }
+          if (updateError) {
+            throw updateError;
+          }
 
-      return {
-        valid: true,
-        ticket: keysToCamel(ticket),
-        message: MESSAGES.TICKET_VALIDATED_SUCCESS,
-      };
-    } catch {
-      return {
-        valid: false,
-        message: ERROR_MESSAGES.TICKET_VALIDATION_FAILED,
-      };
-    }
-  }
+          return {
+            valid: true,
+            ticket: keysToCamel(ticket),
+            message: MESSAGES.TICKET_VALIDATED_SUCCESS,
+          };
+        } catch {
+          return {
+            valid: false,
+            message: ERROR_MESSAGES.TICKET_VALIDATION_FAILED,
+          };
+        }
+      },
+      catch: (error: unknown) =>
+        TicketError.ticketValidationFailed(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Get paginated tickets
    * Automatically checks for expired tickets first
    */
-  async getTicketsPaginated(
+  getTicketsPaginated = (
     userId: string,
     page = PAGINATION.PAGE_OFFSET,
     limit = PAGINATION.PAGE_LIMIT_MAX,
-  ): Promise<Ticket[]> {
-    try {
-      // First, expire any old tickets
-      await this.expireOldTickets();
+  ) =>
+    Effect.tryPromise({
+      try: async () => {
+        // First, expire any old tickets
+        await runEffectForQuery(this.expireOldTickets());
 
-      // Get bookings first (RLS filters automatically)
-      const { data: bookings, error: bookingsError } = await supabase
-        .from('bookings')
-        .select('id')
-        .eq('user_id', userId);
+        // Get bookings first (RLS filters automatically)
+        const { data: bookings, error: bookingsError } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('user_id', userId);
 
-      if (bookingsError) {
-        throw bookingsError;
-      }
+        if (bookingsError) {
+          throw bookingsError;
+        }
 
-      if (!bookings || bookings.length === 0) {
-        return [];
-      }
+        if (!bookings || bookings.length === 0) {
+          return [];
+        }
 
-      const bookingIds = bookings.map(b => b.id);
+        const bookingIds = bookings.map(b => b.id);
 
-      // Get paginated tickets
-      const { data, error } = await supabase
-        .from('tickets')
-        .select(
-          `
+        // Get paginated tickets
+        const { data, error } = await supabase
+          .from('tickets')
+          .select(
+            `
           id,
           booking_id,
           seat_number,
@@ -353,39 +370,44 @@ export class TicketsService {
             )
           )
         `,
-        )
-        .in('booking_id', bookingIds)
-        .order('created_at', { ascending: false })
-        .range(page * limit, (page + 1) * limit - 1);
+          )
+          .in('booking_id', bookingIds)
+          .order('created_at', { ascending: false })
+          .range(page * limit, (page + 1) * limit - 1);
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          throw error;
+        }
 
-      return keysToCamel(data || []) as Ticket[];
-    } catch (error) {
-      throw error;
-    }
-  }
+        return keysToCamel(data || []) as Ticket[];
+      },
+      catch: (error: unknown) =>
+        TicketError.ticketNetworkError(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 
   /**
    * Helper method to call the database function
    */
-  private async expireOldTickets(): Promise<number> {
-    try {
-      const { data, error } = await supabase.rpc('trigger_expire_tickets');
+  private expireOldTickets = () =>
+    Effect.tryPromise({
+      try: async () => {
+        const { data, error } = await supabase.rpc('trigger_expire_tickets');
 
-      if (error) {
-        return 0;
-      }
+        if (error) {
+          return 0;
+        }
 
-      const count = data || 0;
+        const count = data || 0;
 
-      return count;
-    } catch {
-      return 0;
-    }
-  }
+        return count;
+      },
+      catch: (error: unknown) =>
+        TicketError.ticketExpirationFailed(
+          error instanceof Error ? error.message : '',
+        ),
+    });
 }
 
 export const ticketsService = TicketsService.getInstance();

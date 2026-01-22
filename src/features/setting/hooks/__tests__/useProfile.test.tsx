@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
+import { Effect } from 'effect';
 import React from 'react';
 
 // Constants
@@ -11,19 +12,14 @@ import { useProfile, useUpdateProfile, useUploadAvatar } from '../useProfile';
 // Types
 import { UserProfile } from '@/features/auth/types/auth';
 
-import { Option } from 'effect';
-
-// Mock dependencies
-const mockGetProfile = jest.fn();
-const mockUpdateProfile = jest.fn();
-const mockUploadAvatar = jest.fn();
+// Utils
+import { profileService } from '../../services/profile';
 
 jest.mock('@/features/setting/services/profile', () => ({
   profileService: {
-    getProfile: (userId: string) => mockGetProfile(userId),
-    updateProfile: (userId: string, data: any) =>
-      mockUpdateProfile(userId, data),
-    uploadAvatar: (userId: string, file: any) => mockUploadAvatar(userId, file),
+    getProfile: jest.fn(),
+    updateProfile: jest.fn(),
+    uploadAvatar: jest.fn(),
   },
 }));
 
@@ -85,7 +81,9 @@ describe('useProfile', () => {
   });
 
   it('should fetch profile when user exists', async () => {
-    mockGetProfile.mockResolvedValue(mockProfile);
+    (profileService.getProfile as jest.Mock).mockReturnValue(
+      Effect.succeed(mockProfile),
+    );
     const { Wrapper } = createWrapper();
 
     const { result } = renderHook(() => useProfile(), {
@@ -96,13 +94,15 @@ describe('useProfile', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockGetProfile).toHaveBeenCalledWith('user-123');
+    expect(profileService.getProfile).toHaveBeenCalledWith('user-123');
     expect(result.current.data).toEqual(mockProfile);
   });
 
   it('should handle error when fetch fails', async () => {
     const mockError = new Error('Failed to fetch profile');
-    mockGetProfile.mockRejectedValue(mockError);
+    (profileService.getProfile as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
     const { Wrapper } = createWrapper();
 
     const { result } = renderHook(() => useProfile(), {
@@ -117,7 +117,9 @@ describe('useProfile', () => {
   });
 
   it('should use correct query key', async () => {
-    mockGetProfile.mockResolvedValue(mockProfile);
+    (profileService.getProfile as jest.Mock).mockReturnValue(
+      Effect.succeed(mockProfile),
+    );
     const { Wrapper, queryClient } = createWrapper();
 
     renderHook(() => useProfile(), {
@@ -140,7 +142,9 @@ describe('useUpdateProfile', () => {
 
   it('should update profile successfully', async () => {
     const updatedProfile = { ...mockProfile, fullName: 'Jane Doe' };
-    mockUpdateProfile.mockResolvedValue(updatedProfile);
+    (profileService.updateProfile as jest.Mock).mockReturnValue(
+      Effect.succeed(updatedProfile),
+    );
     const { Wrapper, queryClient } = createWrapper();
 
     queryClient.setQueryData(queryKeys.profile.detail('user-123'), mockProfile);
@@ -157,7 +161,7 @@ describe('useUpdateProfile', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockUpdateProfile).toHaveBeenCalledWith('user-123', {
+    expect(profileService.updateProfile).toHaveBeenCalledWith('user-123', {
       fullName: 'Jane Doe',
     });
     expect(result.current.data).toEqual(updatedProfile);
@@ -165,7 +169,9 @@ describe('useUpdateProfile', () => {
 
   it('should perform optimistic update', async () => {
     const updatedProfile = { ...mockProfile, fullName: 'Jane Doe' };
-    mockUpdateProfile.mockResolvedValue(updatedProfile);
+    (profileService.updateProfile as jest.Mock).mockReturnValue(
+      Effect.succeed(updatedProfile),
+    );
     const { Wrapper, queryClient } = createWrapper();
 
     queryClient.setQueryData(queryKeys.profile.detail('user-123'), mockProfile);
@@ -190,7 +196,9 @@ describe('useUpdateProfile', () => {
 
   it('should invalidate queries on settled', async () => {
     const updatedProfile = { ...mockProfile, fullName: 'Jane Doe' };
-    mockUpdateProfile.mockResolvedValue(updatedProfile);
+    (profileService.updateProfile as jest.Mock).mockReturnValue(
+      Effect.succeed(updatedProfile),
+    );
     const { Wrapper, queryClient } = createWrapper();
 
     queryClient.setQueryData(queryKeys.profile.detail('user-123'), mockProfile);
@@ -215,7 +223,9 @@ describe('useUpdateProfile', () => {
 
   it('should handle null previous profile in optimistic update', async () => {
     const updatedProfile = { ...mockProfile, fullName: 'Jane Doe' };
-    mockUpdateProfile.mockResolvedValue(updatedProfile);
+    (profileService.updateProfile as jest.Mock).mockReturnValue(
+      Effect.succeed(updatedProfile),
+    );
     const { Wrapper } = createWrapper();
 
     // Don't set initial query data - should handle null case
@@ -232,7 +242,7 @@ describe('useUpdateProfile', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockUpdateProfile).toHaveBeenCalledWith('user-123', {
+    expect(profileService.updateProfile).toHaveBeenCalledWith('user-123', {
       fullName: 'Jane Doe',
     });
   });
@@ -246,7 +256,9 @@ describe('useUploadAvatar', () => {
 
   it('should upload avatar successfully', async () => {
     const newAvatarUrl = 'https://example.com/new-avatar.jpg';
-    mockUploadAvatar.mockResolvedValue(newAvatarUrl);
+    (profileService.uploadAvatar as jest.Mock).mockReturnValue(
+      Effect.succeed(newAvatarUrl),
+    );
     const { Wrapper, queryClient } = createWrapper();
 
     queryClient.setQueryData(queryKeys.profile.detail('user-123'), mockProfile);
@@ -269,13 +281,18 @@ describe('useUploadAvatar', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(mockUploadAvatar).toHaveBeenCalledWith('user-123', mockFile);
+    expect(profileService.uploadAvatar).toHaveBeenCalledWith(
+      'user-123',
+      mockFile,
+    );
     expect(result.current.data).toBe(newAvatarUrl);
   });
 
   it('should handle error when upload fails', async () => {
     const mockError = new Error('Upload failed');
-    mockUploadAvatar.mockRejectedValue(mockError);
+    (profileService.uploadAvatar as jest.Mock).mockReturnValue(
+      Effect.fail(mockError),
+    );
     const { Wrapper } = createWrapper();
 
     const { result } = renderHook(() => useUploadAvatar(), {
@@ -301,7 +318,9 @@ describe('useUploadAvatar', () => {
 
   it('should invalidate profile query on success', async () => {
     const newAvatarUrl = 'https://example.com/new-avatar.jpg';
-    mockUploadAvatar.mockResolvedValue(newAvatarUrl);
+    (profileService.uploadAvatar as jest.Mock).mockReturnValue(
+      Effect.succeed(newAvatarUrl),
+    );
     const { Wrapper, queryClient } = createWrapper();
 
     queryClient.setQueryData(queryKeys.profile.detail('user-123'), mockProfile);
@@ -332,7 +351,9 @@ describe('useUploadAvatar', () => {
 
   it('should handle null profile in cache gracefully', async () => {
     const newAvatarUrl = 'https://example.com/new-avatar.jpg';
-    mockUploadAvatar.mockResolvedValue(newAvatarUrl);
+    (profileService.uploadAvatar as jest.Mock).mockReturnValue(
+      Effect.succeed(newAvatarUrl),
+    );
     const { Wrapper, queryClient } = createWrapper();
 
     // Don't set initial query data - profile is null

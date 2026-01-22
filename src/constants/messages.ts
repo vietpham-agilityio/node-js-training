@@ -4,6 +4,10 @@ import { BookingStatus } from '@/features/booking/schemas/booking';
 import { BOOKING_STATUS } from './status';
 
 export const ERROR_MESSAGES = {
+  UPDATE_PROFILE_ERROR: 'Failed to update profile. Please try again later.',
+  GET_PROFILE_ERROR: 'Failed to get profile. Please try again later.',
+  DELETE_AVATAR_ERROR: 'Failed to delete avatar. Please try again later.',
+  UPLOAD_AVATAR_ERROR: 'Failed to upload avatar. Please try again later.',
   CINEMA_LOAD_FAILED: 'Failed to load cinemas. Please try again later.',
   CINEMA_NOT_FOUND: 'Cinema not found.',
   CINEMA_HALL_NOT_FOUND: 'Cinema hall not found.',

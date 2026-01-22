@@ -4,6 +4,7 @@ import {
 } from '../ticketExpiration';
 import { supabase } from '@/services/supabase/client';
 import { BOOKING_STATUS } from '@/constants/status';
+import { runEffectForQuery } from '@/utils/effect';
 
 jest.mock('@/services/supabase/client', () => ({
   supabase: {
@@ -46,15 +47,16 @@ describe('TicketExpirationService', () => {
   describe('checkAndExpireTickets', () => {
     it('should call the trigger_expire_tickets RPC', async () => {
       rpc.mockResolvedValue({ data: 5, error: null });
-      const count = await service.checkAndExpireTickets();
+      const count = await runEffectForQuery(service.checkAndExpireTickets());
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets');
       expect(count).toBe(5);
     });
 
-    it('should return 0 if RPC fails', async () => {
+    it('should throw TicketError if RPC fails', async () => {
       rpc.mockResolvedValue({ data: null, error: new Error('RPC Error') });
-      const count = await service.checkAndExpireTickets();
-      expect(count).toBe(0);
+      await expect(
+        runEffectForQuery(service.checkAndExpireTickets()),
+      ).rejects.toThrow();
     });
   });
 
@@ -66,7 +68,9 @@ describe('TicketExpirationService', () => {
         error: null,
       });
 
-      const status = await service.checkTicketStatus('ticket1');
+      const status = await runEffectForQuery(
+        service.checkTicketStatus('ticket1'),
+      );
 
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets'); // check first
       expect(from).toHaveBeenCalledWith('tickets');
@@ -79,7 +83,9 @@ describe('TicketExpirationService', () => {
         data: null,
         error: new Error('Fetch failed'),
       });
-      const status = await service.checkTicketStatus('ticket1');
+      const status = await runEffectForQuery(
+        service.checkTicketStatus('ticket1'),
+      );
       expect(status).toBe(BOOKING_STATUS.EXPIRED);
     });
   });
@@ -92,7 +98,9 @@ describe('TicketExpirationService', () => {
         error: null,
       });
 
-      const tickets = await service.getExpiredTickets('user1');
+      const tickets = await runEffectForQuery(
+        service.getExpiredTickets('user1'),
+      );
 
       expect(rpc).toHaveBeenCalledWith('trigger_expire_tickets');
       expect(from).toHaveBeenCalledWith('tickets');

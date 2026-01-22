@@ -1,6 +1,8 @@
 import { supabase } from '@/services/supabase/client';
 import { keysToCamel } from '@/utils/convert';
+import { runEffectForQuery } from '@/utils/effect';
 import { decode } from 'base64-arraybuffer';
+import { Effect } from 'effect';
 import * as FileSystem from 'expo-file-system/legacy';
 import { ProfileService, profileService } from '../profile';
 
@@ -94,7 +96,7 @@ describe('ProfileService', () => {
         error: null,
       });
 
-      const profile = await service.getProfile('user1');
+      const profile = await runEffectForQuery(service.getProfile('user1'));
       expect(from).toHaveBeenCalledWith('user_profiles');
       expect(mockQueryBuilderInstance.eq).toHaveBeenCalledWith('id', 'user1');
       expect(profile).toEqual(keysToCamel(mockProfile));
@@ -107,7 +109,9 @@ describe('ProfileService', () => {
         error,
       });
 
-      await expect(service.getProfile('user1')).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(service.getProfile('user1')),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -120,7 +124,9 @@ describe('ProfileService', () => {
         error: null,
       });
 
-      const profile = await service.updateProfile('user1', updateData);
+      const profile = await runEffectForQuery(
+        service.updateProfile('user1', updateData),
+      );
       expect(from).toHaveBeenCalledWith('user_profiles');
       expect(mockQueryBuilderInstance.update).toHaveBeenCalledWith(
         expect.objectContaining({ full_name: 'New Name' }),
@@ -135,7 +141,9 @@ describe('ProfileService', () => {
         error,
       });
 
-      await expect(service.updateProfile('user1', {})).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(service.updateProfile('user1', {})),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -147,18 +155,20 @@ describe('ProfileService', () => {
     const arrayBuffer = new ArrayBuffer(8);
 
     beforeEach(() => {
-      jest.spyOn(service, 'getProfile').mockResolvedValue(mockProfile);
+      jest
+        .spyOn(service, 'getProfile')
+        .mockReturnValue(Effect.succeed(mockProfile));
       (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValue(
         'base64str',
       );
       (decode as jest.Mock).mockReturnValue(arrayBuffer);
       jest
         .spyOn(service, 'updateProfile')
-        .mockResolvedValue({ id: '', avatarUrl: publicUrl });
+        .mockReturnValue(Effect.succeed({ id: '', avatarUrl: publicUrl }));
     });
 
     it('should upload an avatar and return the public URL', async () => {
-      const url = await service.uploadAvatar(userId, file);
+      const url = await runEffectForQuery(service.uploadAvatar(userId, file));
 
       expect(service.getProfile).toHaveBeenCalledWith(userId);
       expect(FileSystem.readAsStringAsync).toHaveBeenCalledWith(file.uri, {
@@ -181,16 +191,18 @@ describe('ProfileService', () => {
     it('should delete old avatar if one exists', async () => {
       const oldUrl = 'http://supabase.io/public/avatars/old.jpg';
 
-      jest.spyOn(service, 'getProfile').mockResolvedValue({
-        ...mockProfile,
-        avatarUrl: oldUrl,
-      });
+      jest.spyOn(service, 'getProfile').mockReturnValue(
+        Effect.succeed({
+          ...mockProfile,
+          avatarUrl: oldUrl,
+        }),
+      );
 
       const deleteSpy = jest
         .spyOn(service, 'deleteAvatar')
-        .mockResolvedValue(undefined);
+        .mockReturnValue(Effect.succeed(undefined));
 
-      await service.uploadAvatar(userId, file);
+      await runEffectForQuery(service.uploadAvatar(userId, file));
 
       expect(deleteSpy).toHaveBeenCalledWith(oldUrl);
     });
@@ -199,7 +211,9 @@ describe('ProfileService', () => {
       const error = new Error('Upload failed');
       mockStorageBuilder.upload.mockResolvedValueOnce({ data: null, error });
 
-      await expect(service.uploadAvatar(userId, file)).rejects.toThrow(error);
+      await expect(
+        runEffectForQuery(service.uploadAvatar(userId, file)),
+      ).rejects.toThrow(error);
     });
   });
 
@@ -211,7 +225,7 @@ describe('ProfileService', () => {
     it('should remove an avatar from storage', async () => {
       const avatarUrl = 'http://example.com/avatars/user1-123.jpg';
 
-      await service.deleteAvatar(avatarUrl);
+      await runEffectForQuery(service.deleteAvatar(avatarUrl));
 
       expect(storageFrom).toHaveBeenCalledWith('user-avatar');
       expect(mockStorageBuilder.remove).toHaveBeenCalledWith([
@@ -221,7 +235,9 @@ describe('ProfileService', () => {
 
     it('should not throw error if avatarUrl is malformed', async () => {
       const avatarUrl = 'malformed-url';
-      await expect(service.deleteAvatar(avatarUrl)).resolves.not.toThrow();
+      await expect(
+        runEffectForQuery(service.deleteAvatar(avatarUrl)),
+      ).resolves.not.toThrow();
     });
   });
 });
