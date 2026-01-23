@@ -1,10 +1,11 @@
+import { Effect } from 'effect';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 // Constants
 import { API_CONFIG } from '@/constants';
 
 // Service
-import { authService } from '@/features/auth/services/auth';
+import { authServiceEffect } from '@/features/auth/services/auth.effect';
 
 // Store
 import { useAuthStore } from '@/features/auth/store/auth';
@@ -15,14 +16,14 @@ import { ChangePasswordData } from '@/features/auth/types/auth';
 export const useSession = () => {
   return useQuery({
     queryKey: ['session'],
-    queryFn: () => authService.getSession(),
+    queryFn: () => Effect.runPromise(authServiceEffect.getSession()),
     staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
 };
 
 export const useRefreshSession = () => {
   return useMutation({
-    mutationFn: () => authService.refreshSession(),
+    mutationFn: () => Effect.runPromise(authServiceEffect.refreshSession()),
   });
 };
 
@@ -33,13 +34,8 @@ export const useRefreshSession = () => {
 export const useResetPassword = () => {
   return useMutation({
     mutationFn: async (email: string) => {
-      try {
-        await authService.resetPassword(email);
-
-        return { success: true };
-      } catch (error) {
-        throw error;
-      }
+      await Effect.runPromise(authServiceEffect.resetPassword(email));
+      return { success: true };
     },
   });
 };
@@ -58,22 +54,18 @@ export const useUpdatePassword = () => {
       }
 
       // Step 1: Verify current password
-      try {
-        await authService.verifyCurrentPassword(
+      await Effect.runPromise(
+        authServiceEffect.verifyCurrentPassword(
           user.email,
           data.currentPassword,
-        );
-      } catch {
-        throw new Error('Current password is incorrect');
-      }
+        ),
+      );
 
       // Step 2: Update to new password
-      try {
-        await authService.updatePassword(data.newPassword);
-        return { success: true };
-      } catch (error) {
-        throw error;
-      }
+      await Effect.runPromise(
+        authServiceEffect.updatePassword(data.newPassword),
+      );
+      return { success: true };
     },
   });
 };

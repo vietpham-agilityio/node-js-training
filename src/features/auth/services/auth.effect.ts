@@ -1,16 +1,12 @@
-import { supabase } from '@/services/supabase/client';
 import { Effect } from 'effect';
+import { supabase } from '@/services/supabase/client';
 import { makeRedirectUri } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 
 // Type
 import { SignInData, SignUpData } from '@/features/auth/types/auth';
-
-// Constants
-import { ERROR_MESSAGES, ROUTES } from '@/constants';
-
-// Error
-import { AuthenticationError } from '@/features/auth/error/auth';
+import { AuthenticationError } from '../error/auth';
+import { ROUTES } from '@/constants';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -26,53 +22,58 @@ export class AuthServiceEffect {
     return AuthServiceEffect.instance;
   }
 
-  signUp = (data: SignUpData) =>
-    Effect.tryPromise({
-      try: async () => {
-        const { data: authData, error } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-          options: {
-            data: {
-              full_name: data.fullName ? data.fullName : undefined,
+  signUp(data: SignUpData) {
+    return Effect.gen(function* () {
+      const result = yield* Effect.tryPromise({
+        try: async () =>
+          await supabase.auth.signUp({
+            email: data.email,
+            password: data.password,
+            options: {
+              data: {
+                full_name: data.fullName ? data.fullName : undefined,
+              },
             },
-          },
-        });
+          }),
+        catch: error =>
+          AuthenticationError.signUpFailed(
+            error instanceof Error ? error.message : '',
+          ),
+      });
 
-        if (error) {
-          if (error.message.includes('Already'))
-            throw AuthenticationError.signUpWithEmailRegistered();
-          throw AuthenticationError.signUpFailed(error.message);
-        }
-        return authData;
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.signUpFailed(
-          error instanceof Error ? error.message : '',
-        ),
+      if (result.error) {
+        return yield* Effect.fail(
+          AuthenticationError.signUpFailed(result.error.message),
+        );
+      }
+
+      return result.data;
     });
+  }
 
-  signIn = (data: SignInData) =>
-    Effect.tryPromise({
-      try: async () => {
-        const { data: authData, error } =
+  signIn(data: SignInData) {
+    return Effect.gen(function* () {
+      const { data: authData, error } = yield* Effect.tryPromise({
+        try: async () =>
           await supabase.auth.signInWithPassword({
             email: data.email,
             password: data.password,
-          });
+          }),
+        catch: error =>
+          AuthenticationError.loginFailed(
+            error instanceof Error ? error.message : '',
+          ),
+      });
 
-        if (error) {
-          if (error.message.includes(ERROR_MESSAGES.INVALID_CREDENTIALS))
-            throw AuthenticationError.invalidEmailPassword(error.message);
-          throw AuthenticationError.loginFailed(error.message);
-        }
-        return authData;
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.loginFailed(
-          error instanceof Error ? error.message : '',
-        ),
+      if (error) {
+        return yield* Effect.fail(
+          AuthenticationError.loginFailed(error.message),
+        );
+      }
+
+      return authData;
     });
+  }
 
   /**
    * Parse OAuth callback URL and extract tokens
@@ -132,218 +133,364 @@ export class AuthServiceEffect {
     }
   }
 
-  signInWithGoogle = () =>
-    Effect.tryPromise({
-      try: async () => {
-        const redirectUrl = makeRedirectUri({
-          scheme: 'movieticketbooking',
-        });
+  signInWithGoogle() {
+    const self = this;
 
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: redirectUrl,
-            skipBrowserRedirect: true,
-          },
-        });
+    return Effect.gen(function* () {
+      const redirectUrl = yield* Effect.try({
+        try: () =>
+          makeRedirectUri({
+            scheme: 'movieticketbooking',
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error
+              ? error.message
+              : 'Failed to create redirect URL',
+          ),
+      });
 
-        if (error) {
-          throw error;
-        }
+      const oauthData = yield* Effect.tryPromise({
+        try: async () =>
+          await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: redirectUrl,
+              skipBrowserRedirect: true,
+            },
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error
+              ? error.message
+              : 'OAuth initialization failed',
+          ),
+      });
 
-        const result = await WebBrowser.openAuthSessionAsync(
-          data.url,
-          redirectUrl,
+      if (oauthData.error) {
+        return yield* Effect.fail(
+          AuthenticationError.oauthFailed(oauthData.error.message),
         );
+      }
 
-        if (result.type === 'success') {
-          const { url } = result;
+      const result = yield* Effect.tryPromise({
+        try: async () =>
+          await WebBrowser.openAuthSessionAsync(
+            oauthData.data.url,
+            redirectUrl,
+          ),
+        catch: (error: unknown) =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error ? error.message : 'Browser session failed',
+          ),
+      });
 
-          // Check for errors in callback URL
-          const oauthError = this.getOAuthError(url);
-          if (oauthError) {
-            throw new Error(oauthError);
-          }
-
-          // Parse tokens from URL
-          const tokens = this.parseOAuthCallbackUrl(url);
-          if (!tokens) {
-            throw new Error(
-              'Failed to parse authentication tokens from callback URL',
-            );
-          }
-
-          // Set session with the tokens
-          const { data: sessionData, error: sessionError } =
-            await supabase.auth.setSession({
-              access_token: tokens.access_token,
-              refresh_token: tokens.refresh_token,
-            });
-
-          if (sessionError) {
-            throw sessionError;
-          }
-
-          return sessionData;
-        } else if (result.type === 'cancel') {
-          throw new Error('Authentication was cancelled');
-        } else {
-          throw new Error('OAuth authentication failed');
-        }
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.googleSignInFailed(
-          error instanceof Error ? error.message : '',
-        ),
-    });
-
-  signInWithFacebook = () =>
-    Effect.tryPromise({
-      try: async () => {
-        const redirectUrl = makeRedirectUri({
-          scheme: 'movieticketbooking',
-        });
-
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'facebook',
-          options: {
-            redirectTo: redirectUrl,
-            skipBrowserRedirect: true,
-          },
-        });
-
-        if (error) {
-          throw error;
-        }
-
-        const result = await WebBrowser.openAuthSessionAsync(
-          data.url,
-          redirectUrl,
+      if (result.type === 'cancel') {
+        return yield* Effect.fail(
+          AuthenticationError.oauthCancelled('Authentication was cancelled'),
         );
+      }
 
-        if (result.type === 'success') {
-          const { url } = result;
+      if (result.type !== 'success') {
+        return yield* Effect.fail(
+          AuthenticationError.oauthFailed('OAuth authentication failed'),
+        );
+      }
 
-          // Check for errors in callback URL
-          const oauthError = this.getOAuthError(url);
-          if (oauthError) {
-            throw new Error(oauthError);
-          }
+      const { url } = result;
 
-          // Parse tokens from URL
-          const tokens = this.parseOAuthCallbackUrl(url);
-          if (!tokens) {
-            throw new Error(
-              'Failed to parse authentication tokens from callback URL',
-            );
-          }
+      const oauthError = yield* Effect.try({
+        try: () => self.getOAuthError(url),
+        catch: error =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error
+              ? error.message
+              : 'Failed to get OAuth error',
+          ),
+      });
 
-          // Set session with the tokens
-          const { data: sessionData, error: sessionError } =
-            await supabase.auth.setSession({
-              access_token: tokens.access_token,
-              refresh_token: tokens.refresh_token,
-            });
+      if (oauthError) {
+        return yield* Effect.fail(AuthenticationError.oauthFailed(oauthError));
+      }
 
-          if (sessionError) {
-            throw sessionError;
-          }
+      const tokens = yield* Effect.try({
+        try: () => self.parseOAuthCallbackUrl(url),
+        catch: error =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error
+              ? error.message
+              : 'Failed to parse OAuth callback URL',
+          ),
+      });
 
-          return sessionData;
-        } else if (result.type === 'cancel') {
-          throw new Error('Authentication was cancelled');
-        } else {
-          throw new Error('OAuth authentication failed');
-        }
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.facebookSignInFailed(
-          error instanceof Error ? error.message : '',
-        ),
+      if (!tokens) {
+        return yield* Effect.fail(
+          AuthenticationError.oauthFailed(
+            'Failed to parse authentication tokens from callback URL',
+          ),
+        );
+      }
+
+      const sessionResult = yield* Effect.tryPromise({
+        try: async () =>
+          await supabase.auth.setSession({
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token,
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.sessionFailed(
+            error instanceof Error ? error.message : 'Failed to set session',
+          ),
+      });
+
+      if (sessionResult.error) {
+        return yield* Effect.fail(
+          AuthenticationError.sessionFailed(sessionResult.error.message),
+        );
+      }
+
+      return sessionResult.data;
     });
+  }
 
-  signOut = () =>
-    Effect.tryPromise({
-      try: async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.signOutFailed(
-          error instanceof Error ? error.message : '',
-        ),
+  signInWithFacebook() {
+    const self = this;
+
+    return Effect.gen(function* () {
+      const redirectUrl = yield* Effect.try({
+        try: () =>
+          makeRedirectUri({
+            scheme: 'movieticketbooking',
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error
+              ? error.message
+              : 'Failed to create redirect URL',
+          ),
+      });
+
+      const oauthData = yield* Effect.tryPromise({
+        try: async () =>
+          await supabase.auth.signInWithOAuth({
+            provider: 'facebook',
+            options: {
+              redirectTo: redirectUrl,
+              skipBrowserRedirect: true,
+            },
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error
+              ? error.message
+              : 'OAuth initialization failed',
+          ),
+      });
+
+      if (oauthData.error) {
+        return yield* Effect.fail(
+          AuthenticationError.oauthFailed(oauthData.error.message),
+        );
+      }
+
+      const result = yield* Effect.tryPromise({
+        try: async () =>
+          await WebBrowser.openAuthSessionAsync(
+            oauthData.data.url,
+            redirectUrl,
+          ),
+        catch: (error: unknown) =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error ? error.message : 'Browser session failed',
+          ),
+      });
+
+      if (result.type === 'cancel') {
+        return yield* Effect.fail(
+          AuthenticationError.oauthCancelled('Authentication was cancelled'),
+        );
+      }
+
+      if (result.type !== 'success') {
+        return yield* Effect.fail(
+          AuthenticationError.oauthFailed('OAuth authentication failed'),
+        );
+      }
+
+      const { url } = result;
+
+      const oauthError = yield* Effect.try({
+        try: () => self.getOAuthError(url),
+        catch: error =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error
+              ? error.message
+              : 'Failed to get OAuth error',
+          ),
+      });
+      if (oauthError) {
+        return yield* Effect.fail(AuthenticationError.oauthFailed(oauthError));
+      }
+
+      const tokens = yield* Effect.try({
+        try: () => self.parseOAuthCallbackUrl(url),
+        catch: error =>
+          AuthenticationError.oauthFailed(
+            error instanceof Error
+              ? error.message
+              : 'Failed to parse OAuth callback URL',
+          ),
+      });
+      if (!tokens) {
+        return yield* Effect.fail(
+          AuthenticationError.oauthFailed(
+            'Failed to parse authentication tokens from callback URL',
+          ),
+        );
+      }
+
+      const sessionResult = yield* Effect.tryPromise({
+        try: async () =>
+          await supabase.auth.setSession({
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token,
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.sessionFailed(
+            error instanceof Error ? error.message : 'Failed to set session',
+          ),
+      });
+
+      if (sessionResult.error) {
+        return yield* Effect.fail(
+          AuthenticationError.sessionFailed(sessionResult.error.message),
+        );
+      }
+
+      return sessionResult.data;
     });
+  }
 
-  getSession = () =>
-    Effect.tryPromise({
-      try: async () => {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        if (error) throw error;
-        return session;
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.loginFailed(
-          error instanceof Error ? error.message : '',
-        ),
+  signOut() {
+    return Effect.gen(function* () {
+      const result = yield* Effect.tryPromise({
+        try: async () => await supabase.auth.signOut(),
+        catch: (error: unknown) =>
+          AuthenticationError.signOutFailed(
+            error instanceof Error ? error.message : 'Sign out failed',
+          ),
+      });
+
+      if (result.error) {
+        return yield* Effect.fail(
+          AuthenticationError.signOutFailed(result.error.message),
+        );
+      }
+
+      return result;
     });
+  }
 
-  refreshSession = () =>
-    Effect.tryPromise({
-      try: async () => {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.refreshSession();
-        if (error) throw error;
-        return session;
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.loginFailed(
-          error instanceof Error ? error.message : '',
-        ),
+  getSession() {
+    return Effect.gen(function* () {
+      const {
+        data: { session },
+        error,
+      } = yield* Effect.tryPromise({
+        try: async () => await supabase.auth.getSession(),
+        catch: (error: unknown) =>
+          AuthenticationError.sessionFailed(
+            error instanceof Error ? error.message : 'Failed to get session',
+          ),
+      });
+
+      if (error) {
+        return yield* Effect.fail(
+          AuthenticationError.sessionFailed(error.message),
+        );
+      }
+
+      return session;
     });
+  }
 
-  resetPassword = (email: string) =>
-    Effect.tryPromise({
-      try: async () => {
-        const redirectUrl = makeRedirectUri({
-          scheme: 'movieticketbooking',
-          path: ROUTES.RESET_PASSWORD,
-        });
+  refreshSession() {
+    return Effect.gen(function* () {
+      const {
+        data: { session },
+        error,
+      } = yield* Effect.tryPromise({
+        try: async () => await supabase.auth.refreshSession(),
+        catch: (error: unknown) =>
+          AuthenticationError.sessionFailed(
+            error instanceof Error ? error.message : '',
+          ),
+      });
 
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: redirectUrl,
-        });
-
-        if (error) {
-          throw AuthenticationError.updatePasswordFailed(error.message);
-        }
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.updatePasswordFailed(
-          error instanceof Error ? error.message : '',
-        ),
+      if (error) {
+        return yield* Effect.fail(
+          AuthenticationError.sessionFailed(error.message),
+        );
+      }
+      return session;
     });
+  }
 
-  updatePassword = (newPassword: string) =>
-    Effect.tryPromise({
-      try: async () => {
-        const { error } = await supabase.auth.updateUser({
-          password: newPassword,
-        });
+  resetPassword(email: string) {
+    return Effect.gen(function* () {
+      const redirectUrl = yield* Effect.try({
+        try: () =>
+          makeRedirectUri({
+            scheme: 'movieticketbooking',
+            path: ROUTES.RESET_PASSWORD,
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.updatePasswordFailed(
+            error instanceof Error ? error.message : '',
+          ),
+      });
 
-        if (error) {
-          throw AuthenticationError.updatePasswordFailed(error.message);
-        }
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.updatePasswordFailed(
-          error instanceof Error ? error.message : '',
-        ),
+      const result = yield* Effect.tryPromise({
+        try: async () =>
+          await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectUrl,
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.updatePasswordFailed(
+            error instanceof Error ? error.message : '',
+          ),
+      });
+
+      if (result.error) {
+        return yield* Effect.fail(
+          AuthenticationError.updatePasswordFailed(result.error.message),
+        );
+      }
     });
+  }
+
+  updatePassword(newPassword: string) {
+    return Effect.gen(function* () {
+      const { error } = yield* Effect.tryPromise({
+        try: async () =>
+          await supabase.auth.updateUser({
+            password: newPassword,
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.updatePasswordFailed(
+            error instanceof Error ? error.message : '',
+          ),
+      });
+
+      if (error) {
+        return yield* Effect.fail(
+          AuthenticationError.updatePasswordFailed(error.message),
+        );
+      }
+
+      return true;
+    });
+  }
 
   /**
    * Verify user's current password by attempting to sign in
@@ -353,25 +500,29 @@ export class AuthServiceEffect {
    * @returns true if password is correct
    * @throws Error if password is incorrect
    */
-  verifyCurrentPassword = (email: string, password: string) =>
-    Effect.tryPromise({
-      try: async () => {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+  verifyCurrentPassword(email: string, password: string) {
+    return Effect.gen(function* () {
+      const { error } = yield* Effect.tryPromise({
+        try: async () =>
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          }),
+        catch: (error: unknown) =>
+          AuthenticationError.currentPasswordIncorrect(
+            error instanceof Error ? error.message : '',
+          ),
+      });
 
-        if (error) {
-          throw AuthenticationError.currentPasswordIncorrect(error.message);
-        }
+      if (error) {
+        return yield* Effect.fail(
+          AuthenticationError.currentPasswordIncorrect(error.message),
+        );
+      }
 
-        return true;
-      },
-      catch: (error: unknown) =>
-        AuthenticationError.currentPasswordIncorrect(
-          error instanceof Error ? error.message : '',
-        ),
+      return true;
     });
+  }
 
   onAuthStateChange(callback: (event: string, session: any) => void) {
     return supabase.auth.onAuthStateChange(callback);

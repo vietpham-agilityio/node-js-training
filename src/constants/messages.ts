@@ -70,6 +70,9 @@ export const ERROR_MESSAGES = {
   CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
   SOMETHING_WENT_WRONG: 'Something went wrong. Please try again later.',
   TICKET_VALIDATION_FAILED: 'Failed to validate ticket. Please try again.',
+  SESSION_FAILED: 'Failed to set session',
+  OAUTH_CANCELLED: 'Authentication was cancelled',
+  OAUTH_FAILED: 'OAuth authentication failed',
 };
 
 export const MESSAGES = {

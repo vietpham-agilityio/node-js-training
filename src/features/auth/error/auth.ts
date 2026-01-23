@@ -110,4 +110,22 @@ export class AuthenticationError extends Data.TaggedError(
       message: message || ERROR_MESSAGES.CURRENT_PASSWORD_INCORRECT,
     });
   };
+
+  static oauthFailed = (message: string) => {
+    return new AuthenticationError({
+      message: message || ERROR_MESSAGES.GOOGLE_SIGN_IN_FAILED,
+    });
+  };
+
+  static sessionFailed = (message: string) => {
+    return new AuthenticationError({
+      message: message || ERROR_MESSAGES.SESSION_FAILED,
+    });
+  };
+
+  static oauthCancelled = (message: string) => {
+    return new AuthenticationError({
+      message: message || ERROR_MESSAGES.OAUTH_CANCELLED,
+    });
+  };
 }
