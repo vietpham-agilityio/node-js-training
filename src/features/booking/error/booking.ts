@@ -72,4 +72,52 @@ export class BookingError extends Data.TaggedError('BookingError')<{
       message: message || ERROR_MESSAGES.TICKET_VALIDATION_FAILED,
     });
   };
+
+  static noResultReturnedFromBookingTransaction = () => {
+    return new BookingError({
+      message: ERROR_MESSAGES.NO_RESULT_RETURNED,
+    });
+  };
+
+  static bookingFailed = (message: string) => {
+    return new BookingError({
+      message: message || ERROR_MESSAGES.CHECKOUT_FAILED,
+    });
+  };
+
+  static insufficientWalletBalance = (message: string) => {
+    return new BookingError({
+      message: message || ERROR_MESSAGES.INSUFFICIENT_WALLET_BALANCE,
+    });
+  };
+
+  static walletNotFound = (message: string) => {
+    return new BookingError({
+      message: message || ERROR_MESSAGES.WALLET_NOT_FOUND,
+    });
+  };
+
+  static bookingNotFound = () => {
+    return new BookingError({
+      message: ERROR_MESSAGES.BOOKING_NOT_FOUND,
+    });
+  };
+
+  static bookingAlreadyCancelled = () => {
+    return new BookingError({
+      message: ERROR_MESSAGES.CANCEL_BOOKING_FAILED,
+    });
+  };
+
+  static reserveSeatsFailed = (message: string) => {
+    return new BookingError({
+      message: message || ERROR_MESSAGES.RESERVE_SEATS_FAILED,
+    });
+  };
+
+  static releaseSeatsFailed = (message: string) => {
+    return new BookingError({
+      message: message || ERROR_MESSAGES.RELEASE_SEATS_FAILED,
+    });
+  };
 }

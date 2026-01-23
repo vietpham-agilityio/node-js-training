@@ -63,6 +63,12 @@ export class AuthenticationError extends Data.TaggedError(
     });
   };
 
+  static signUpWithEmailRegistered = () => {
+    return new AuthenticationError({
+      message: ERROR_MESSAGES.EMAIL_ALREADY_REGISTERED,
+    });
+  };
+
   static createAccountFailed = (message: string) => {
     return new AuthenticationError({
       message: message || ERROR_MESSAGES.CREATE_ACCOUNT_FAILED,

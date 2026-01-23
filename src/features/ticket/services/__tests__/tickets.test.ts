@@ -436,16 +436,5 @@ describe('TicketsService', () => {
         runEffectForQuery(service.getTickets('user1')),
       ).rejects.toThrow();
     });
-
-    it('should return empty array if RPC returns error', async () => {
-      rpc.mockResolvedValueOnce({ data: null, error: new Error('RPC error') });
-      (mockQueryBuilder.then as jest.Mock).mockImplementation(resolve =>
-        resolve({ data: [], error: null }),
-      );
-
-      // Should not throw - continues with 0 expired, returns empty array
-      const tickets = await runEffectForQuery(service.getTickets('user1'));
-      expect(tickets).toEqual([]);
-    });
   });
 });

@@ -7,7 +7,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { SignInData, SignUpData } from '@/features/auth/types/auth';
 
 // Constants
-import { ROUTES } from '@/constants';
+import { ERROR_MESSAGES, ROUTES } from '@/constants';
 
 // Error
 import { AuthenticationError } from '@/features/auth/error/auth';
@@ -39,7 +39,11 @@ export class AuthServiceEffect {
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes('Already'))
+            throw AuthenticationError.signUpWithEmailRegistered();
+          throw AuthenticationError.signUpFailed(error.message);
+        }
         return authData;
       },
       catch: (error: unknown) =>
@@ -57,7 +61,11 @@ export class AuthServiceEffect {
             password: data.password,
           });
 
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes(ERROR_MESSAGES.INVALID_CREDENTIALS))
+            throw AuthenticationError.invalidEmailPassword(error.message);
+          throw AuthenticationError.loginFailed(error.message);
+        }
         return authData;
       },
       catch: (error: unknown) =>
@@ -311,7 +319,7 @@ export class AuthServiceEffect {
         });
 
         if (error) {
-          throw error;
+          throw AuthenticationError.updatePasswordFailed(error.message);
         }
       },
       catch: (error: unknown) =>
@@ -328,7 +336,7 @@ export class AuthServiceEffect {
         });
 
         if (error) {
-          throw error;
+          throw AuthenticationError.updatePasswordFailed(error.message);
         }
       },
       catch: (error: unknown) =>
@@ -354,7 +362,7 @@ export class AuthServiceEffect {
         });
 
         if (error) {
-          throw new Error('Current password is incorrect');
+          throw AuthenticationError.currentPasswordIncorrect(error.message);
         }
 
         return true;

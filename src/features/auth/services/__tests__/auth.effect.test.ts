@@ -315,7 +315,7 @@ describe('AuthService', () => {
         err => {
           expect(err).toBeInstanceOf(AuthenticationError);
           expect((err as AuthenticationError).message).toBe(
-            'Current password is incorrect',
+            'invalid credentials',
           );
         },
       );

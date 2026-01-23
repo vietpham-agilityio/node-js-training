@@ -33,14 +33,12 @@ export class CinemaServiceEffect {
           .select('*')
           .eq('is_active', true);
 
-        if (error) throw error;
+        if (error) throw CinemaError.cinemaNotFound(error.message);
 
         return keysToCamel(data) as Cinema[];
       },
       catch: (error: unknown) =>
-        CinemaError.cinemaNetworkError(
-          error instanceof Error ? error.message : '',
-        ),
+        CinemaError.cinemaNotFound(error instanceof Error ? error.message : ''),
     });
 
   getCinemaById = (id: string) =>
@@ -52,7 +50,7 @@ export class CinemaServiceEffect {
           .eq('id', id)
           .single();
 
-        if (error) throw error;
+        if (error) throw CinemaError.cinemaNotFound(error.message);
 
         return keysToCamel(data) as Cinema;
       },
@@ -69,14 +67,12 @@ export class CinemaServiceEffect {
           .eq('city', city)
           .eq('is_active', true);
 
-        if (error) throw error;
+        if (error) throw CinemaError.cinemaNotFound(error.message);
 
         return keysToCamel(data) as Cinema[];
       },
       catch: (error: unknown) =>
-        CinemaError.cinemaNetworkError(
-          error instanceof Error ? error.message : '',
-        ),
+        CinemaError.cinemaNotFound(error instanceof Error ? error.message : ''),
     });
 }
 
