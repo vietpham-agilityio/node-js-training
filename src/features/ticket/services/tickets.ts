@@ -187,7 +187,7 @@ export class TicketsService {
           .single();
 
         if (error) {
-          throw error;
+          throw TicketError.ticketNotFound(error.message);
         }
 
         return keysToCamel(data) as Ticket;
@@ -276,7 +276,7 @@ export class TicketsService {
             .eq('id', ticket.id);
 
           if (updateError) {
-            throw updateError;
+            throw TicketError.ticketValidationFailed(updateError.message);
           }
 
           return {
@@ -376,7 +376,7 @@ export class TicketsService {
           .range(page * limit, (page + 1) * limit - 1);
 
         if (error) {
-          throw error;
+          throw TicketError.ticketNetworkError(error.message);
         }
 
         return keysToCamel(data || []) as Ticket[];
@@ -396,7 +396,7 @@ export class TicketsService {
         const { data, error } = await supabase.rpc('trigger_expire_tickets');
 
         if (error) {
-          return 0;
+          throw TicketError.ticketExpirationFailed(error.message);
         }
 
         const count = data || 0;

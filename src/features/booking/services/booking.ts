@@ -12,7 +12,7 @@ import { SeatReservation } from '@/features/booking/schemas/cinema';
 import { keysToCamel } from '@/utils/convert';
 
 // Constants
-import { PAGINATION } from '@/constants';
+import { ERROR_MESSAGES, PAGINATION } from '@/constants';
 import { BOOKING_STATUS, SEAT_RESERVATION_STATUS } from '@/constants/status';
 
 // Error
@@ -108,15 +108,13 @@ export class BookingsServiceEffect {
         const { data, error } = await query;
 
         if (error) {
-          throw error;
+          throw BookingError.bookingFailed(error.message);
         }
 
         return keysToCamel(data || []) as Booking[];
       },
       catch: (error: unknown) =>
-        BookingError.ticketNetworkError(
-          error instanceof Error ? error.message : '',
-        ),
+        BookingError.bookingFailed(error instanceof Error ? error.message : ''),
     });
 
   getBookingById = (bookingId: string) =>
@@ -142,13 +140,13 @@ export class BookingsServiceEffect {
           .single();
 
         if (error) {
-          throw error;
+          throw BookingError.bookingFailed(error.message);
         }
 
         return keysToCamel(data) as Booking;
       },
       catch: (error: unknown) =>
-        BookingError.invalidTicket(error instanceof Error ? error.message : ''),
+        BookingError.bookingFailed(error instanceof Error ? error.message : ''),
     });
 
   createBooking = (data: CreateBookingData) =>
@@ -171,17 +169,19 @@ export class BookingsServiceEffect {
         );
 
         if (error) {
-          if (error.message.includes('Insufficient wallet balance')) {
-            throw new Error('Insufficient wallet balance');
-          } else if (error.message.includes('Wallet not found')) {
-            throw new Error('Wallet not found or inactive');
+          if (
+            error.message.includes(ERROR_MESSAGES.INSUFFICIENT_WALLET_BALANCE)
+          ) {
+            throw BookingError.insufficientWalletBalance(error.message);
+          } else if (error.message.includes(ERROR_MESSAGES.WALLET_NOT_FOUND)) {
+            throw BookingError.walletNotFound(error.message);
           } else {
-            throw new Error(error.message || 'Booking creation failed');
+            throw BookingError.bookingFailed(error.message);
           }
         }
 
         if (!result || result.length === 0) {
-          throw new Error('No result returned from booking transaction');
+          throw BookingError.noResultReturnedFromBookingTransaction();
         }
 
         const txResult = keysToCamel(result[0]) as BookingTransactionResult;
@@ -205,11 +205,11 @@ export class BookingsServiceEffect {
         const booking = await Effect.runPromise(this.getBookingById(bookingId));
 
         if (!booking) {
-          throw new Error('Booking not found');
+          throw BookingError.bookingNotFound();
         }
 
         if (booking.bookingStatus === BOOKING_STATUS.CANCELLED) {
-          throw new Error('Booking already cancelled');
+          throw BookingError.bookingAlreadyCancelled();
         }
 
         // Call stored procedure for atomic cancel + refund
@@ -247,13 +247,13 @@ export class BookingsServiceEffect {
           .single();
 
         if (error) {
-          throw error;
+          throw BookingError.reserveSeatsFailed(error.message);
         }
 
         return keysToCamel(data) as SeatReservation;
       },
       catch: (error: unknown) =>
-        BookingError.checkoutFailed(
+        BookingError.reserveSeatsFailed(
           error instanceof Error ? error.message : '',
         ),
     });
@@ -267,11 +267,11 @@ export class BookingsServiceEffect {
           .eq('id', reservationId);
 
         if (error) {
-          throw error;
+          throw BookingError.releaseSeatsFailed(error.message);
         }
       },
       catch: (error: unknown) =>
-        BookingError.checkoutFailed(
+        BookingError.releaseSeatsFailed(
           error instanceof Error ? error.message : '',
         ),
     });
@@ -331,15 +331,13 @@ export class BookingsServiceEffect {
         const { data, error } = await query;
 
         if (error) {
-          throw error;
+          throw BookingError.bookingFailed(error.message);
         }
 
         return keysToCamel(data || []) as Booking[];
       },
       catch: (error: unknown) =>
-        BookingError.ticketNetworkError(
-          error instanceof Error ? error.message : '',
-        ),
+        BookingError.bookingFailed(error instanceof Error ? error.message : ''),
     });
 }
 

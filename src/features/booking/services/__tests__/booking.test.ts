@@ -10,6 +10,7 @@ import {
   bookingsServiceEffect,
   CreateBookingData,
 } from '../booking';
+import { ERROR_MESSAGES } from '@/constants/messages';
 
 const createMockQueryBuilder = () => ({
   select: jest.fn().mockReturnThis(),
@@ -315,7 +316,7 @@ describe('BookingsService', () => {
 
       await expect(
         runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
-      ).rejects.toThrow('No result returned from booking transaction');
+      ).rejects.toThrow(ERROR_MESSAGES.NO_RESULT_RETURNED);
     });
 
     it('should throw an error if result is null', async () => {
@@ -323,7 +324,7 @@ describe('BookingsService', () => {
 
       await expect(
         runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
-      ).rejects.toThrow('No result returned from booking transaction');
+      ).rejects.toThrow(ERROR_MESSAGES.NO_RESULT_RETURNED);
     });
   });
 
@@ -376,7 +377,7 @@ describe('BookingsService', () => {
 
       await expect(
         runEffectForQuery(bookingsServiceEffect.cancelBooking('booking1')),
-      ).rejects.toThrow('Booking already cancelled');
+      ).rejects.toThrow('Failed to cancel booking');
     });
 
     it('should throw an error if RPC call fails', async () => {

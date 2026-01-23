@@ -23,12 +23,6 @@ export class CinemaError extends Data.TaggedError('CinemaError')<{
     };
   }
 
-  static cinemaNetworkError = (message: string) => {
-    return new CinemaError({
-      message: message || ERROR_MESSAGES.CINEMA_LOAD_FAILED,
-    });
-  };
-
   static cinemaNotFound = (message: string) => {
     return new CinemaError({
       message: message || ERROR_MESSAGES.CINEMA_NOT_FOUND,

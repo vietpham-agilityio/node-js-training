@@ -31,7 +31,7 @@ export class TicketExpirationService {
         const { data, error } = await supabase.rpc('trigger_expire_tickets');
 
         if (error) {
-          throw error;
+          throw TicketError.ticketExpirationFailed(error.message);
         }
 
         const expiredCount = data || 0;
@@ -116,11 +116,11 @@ export class TicketExpirationService {
           .eq('status', 'expired')
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) throw TicketError.ticketExpirationFailed(error.message);
         return data || [];
       },
       catch: (error: unknown) =>
-        TicketError.ticketNetworkError(
+        TicketError.ticketExpirationFailed(
           error instanceof Error ? error.message : '',
         ),
     });

@@ -49,14 +49,12 @@ export class MoviesServiceEffect {
 
         const { data, error } = await query;
 
-        if (error) throw error;
+        if (error) throw MovieError.movieNotFound(error.message);
 
         return keysToCamel(data) as Movie[];
       },
       catch: (error: unknown) =>
-        MovieError.movieNetworkError(
-          error instanceof Error ? error.message : '',
-        ),
+        MovieError.movieNotFound(error instanceof Error ? error.message : ''),
     });
 
   getMovieById = (id: string) =>
@@ -68,7 +66,7 @@ export class MoviesServiceEffect {
           .eq('id', id)
           .single();
 
-        if (error) throw error;
+        if (error) throw MovieError.movieNotFound(error.message);
 
         return keysToCamel(data) as Movie;
       },
@@ -94,7 +92,7 @@ export class MoviesServiceEffect {
           .order('release_date', { ascending: false })
           .range(page * limit, (page + 1) * limit - 1);
 
-        if (error) throw error;
+        if (error) throw MovieError.searchFailed(error.message);
 
         return keysToCamel(data) as Movie[];
       },
@@ -114,7 +112,7 @@ export class MoviesServiceEffect {
             MOVIE_STATUS.COMING_SOON as MovieStatus,
           ]);
 
-        if (error) throw error;
+        if (error) throw MovieError.movieNetworkError(error.message);
 
         return keysToCamel(data) as Movie[];
       },
@@ -150,14 +148,12 @@ export class MoviesServiceEffect {
 
         const { data, error } = await query;
 
-        if (error) throw error;
+        if (error) throw MovieError.movieNotFound(error.message);
 
         return keysToCamel(data) as Movie[];
       },
       catch: (error: unknown) =>
-        MovieError.movieNetworkError(
-          error instanceof Error ? error.message : '',
-        ),
+        MovieError.movieNotFound(error instanceof Error ? error.message : ''),
     });
 
   getShowtimes = (movieId: string, date: string) =>
@@ -171,12 +167,12 @@ export class MoviesServiceEffect {
           .eq('status', SHOWTIME_STATUS.ACTIVE as ShowtimeStatus)
           .order('show_time', { ascending: true });
 
-        if (error) throw error;
+        if (error) throw MovieError.showtimeNotFound(error.message);
 
         return keysToCamel(data) as Showtime[];
       },
       catch: (error: unknown) =>
-        MovieError.movieNetworkError(
+        MovieError.showtimeNotFound(
           error instanceof Error ? error.message : '',
         ),
     });
@@ -192,7 +188,7 @@ export class MoviesServiceEffect {
           .eq('id', id)
           .single();
 
-        if (error) throw error;
+        if (error) throw MovieError.showtimeNotFound(error.message);
 
         return keysToCamel(data) as Showtime;
       },
@@ -226,14 +222,12 @@ export class MoviesServiceEffect {
 
         const { data, error } = await query;
 
-        if (error) throw error;
+        if (error) throw MovieError.movieNotFound(error.message);
 
         return keysToCamel(data) as Movie[];
       },
       catch: (error: unknown) =>
-        MovieError.movieNetworkError(
-          error instanceof Error ? error.message : '',
-        ),
+        MovieError.movieNotFound(error instanceof Error ? error.message : ''),
     });
 }
 

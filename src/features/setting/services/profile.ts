@@ -35,7 +35,7 @@ export class ProfileService {
           .eq('id', userId)
           .single();
 
-        if (error) throw error;
+        if (error) throw SettingError.getProfileError(error.message);
         return keysToCamel(data) as UserProfile;
       },
       catch: (error: unknown) =>
@@ -64,7 +64,7 @@ export class ProfileService {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) throw SettingError.updateProfileError(error.message);
         return keysToCamel(profile) as UserProfile;
       },
       catch: (error: unknown) =>
@@ -108,7 +108,8 @@ export class ProfileService {
             upsert: true,
           });
 
-        if (uploadError) throw uploadError;
+        if (uploadError)
+          throw SettingError.uploadAvatarError(uploadError.message);
 
         const {
           data: { publicUrl },
@@ -141,7 +142,7 @@ export class ProfileService {
           .from('user-avatar')
           .remove([filePath]);
 
-        if (error) throw error;
+        if (error) throw SettingError.deleteAvatarError(error.message);
       },
       catch: (error: unknown) =>
         SettingError.deleteAvatarError(
