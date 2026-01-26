@@ -1,73 +1,66 @@
 // Effect
-import { Effect, Context } from 'effect';
+import { Effect } from 'effect';
 
 // Supabase
-import { AuthError, Session, User } from '@supabase/supabase-js';
-
-// Error
-import { AuthenticationError } from '../../error/auth';
+import { Session } from '@supabase/supabase-js';
 
 // Types
 import { SignInData, SignUpData } from '../../types/auth';
 
-export class AuthService extends Context.Tag('AuthServiceTag')<
-  AuthService,
+// Services
+import { authServiceEffect } from '../../services/auth.effect';
+
+export class AuthService extends Effect.Service<AuthService>()(
+  'AuthServiceTag',
   {
-    readonly signUp: (data: SignUpData) => Effect.Effect<
-      {
-        user: User | null;
-        session: Session | null;
-      },
-      AuthenticationError,
-      never
-    >;
-    readonly signIn: (data: SignInData) => Effect.Effect<
-      {
-        user: User;
-        session: Session;
-      },
-      AuthenticationError,
-      never
-    >;
-    readonly singInWithGoogle: () => Effect.Effect<
-      {
-        user: User | null;
-        session: Session | null;
-      },
-      AuthenticationError,
-      never
-    >;
-    readonly singInWithFacebook: () => Effect.Effect<
-      {
-        user: User | null;
-        session: Session | null;
-      },
-      AuthenticationError,
-      never
-    >;
-    readonly signOut: () => Effect.Effect<void, AuthenticationError, never>;
-    readonly getSession: () => Effect.Effect<
-      Session | null,
-      AuthenticationError,
-      never
-    >;
-    readonly refreshSession: () => Effect.Effect<
-      Session | null,
-      AuthenticationError,
-      never
-    >;
-    readonly resetPassword: (
-      email: string,
-    ) => Effect.Effect<void, AuthenticationError, never>;
-    readonly verifyCurrentPassword: (
-      email: string,
-      password: string,
-    ) => Effect.Effect<boolean, AuthenticationError, never>;
-    readonly updatePassword: (
-      newPassword: string,
-    ) => Effect.Effect<void, AuthenticationError, never>;
-    readonly onAuthStateChange: (
-      callback: (event: string, session: Session) => void,
-    ) => Effect.Effect<void, AuthenticationError, never>;
-  }
->() {}
+    effect: Effect.gen(function* () {
+      return {
+        signUp: (data: SignUpData) =>
+          Effect.map(authServiceEffect.signUp(data), authData => ({
+            user: authData.user,
+            session: authData.session,
+          })),
+
+        signIn: (data: SignInData) =>
+          Effect.map(authServiceEffect.signIn(data), authData => ({
+            user: authData.user,
+            session: authData.session,
+          })),
+
+        singInWithGoogle: () =>
+          Effect.map(authServiceEffect.signInWithGoogle(), authData => ({
+            user: authData.user,
+            session: authData.session,
+          })),
+
+        singInWithFacebook: () =>
+          Effect.map(authServiceEffect.signInWithFacebook(), authData => ({
+            user: authData.user,
+            session: authData.session,
+          })),
+
+        signOut: () => authServiceEffect.signOut(),
+
+        getSession: () => authServiceEffect.getSession(),
+
+        refreshSession: () => authServiceEffect.refreshSession(),
+
+        resetPassword: (email: string) =>
+          authServiceEffect.resetPassword(email),
+
+        verifyCurrentPassword: (email: string, password: string) =>
+          authServiceEffect.verifyCurrentPassword(email, password),
+
+        updatePassword: (newPassword: string) =>
+          authServiceEffect.updatePassword(newPassword),
+
+        onAuthStateChange: (
+          callback: (event: string, session: Session) => void,
+        ) =>
+          Effect.sync(() => {
+            authServiceEffect.onAuthStateChange(callback);
+          }),
+      } as const;
+    }),
+  },
+) {}
