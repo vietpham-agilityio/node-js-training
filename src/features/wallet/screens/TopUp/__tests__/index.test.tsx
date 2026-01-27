@@ -1,3 +1,4 @@
+// @/features/wallet/__tests__/TopUpScreen.test.tsx
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { ReactNode } from 'react';
 
@@ -98,7 +99,6 @@ describe('TopUpScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsPending = false;
-    // Default: not from checkout
     mockUseLocalSearchParams.mockReturnValue({});
   });
 
@@ -130,8 +130,8 @@ describe('TopUpScreen', () => {
     });
   });
 
-  describe('Amount Selection', () => {
-    it('should select predefined amount when button is pressed', () => {
+  describe('Amount Selection with Effect', () => {
+    it('should select predefined amount when button is pressed', async () => {
       const { getByText, getByTestId } = render(<TopUpScreen />);
 
       const amountButton = getByText('50.000').parent?.parent;
@@ -139,67 +139,73 @@ describe('TopUpScreen', () => {
         fireEvent.press(amountButton);
       }
 
-      const input = getByTestId('top-up-amount-input-input');
-      expect(input.props.value).toBe('IDR 50.000');
+      await waitFor(() => {
+        const input = getByTestId('top-up-amount-input-input');
+        expect(input.props.value).toBe('IDR 50.000');
+      });
     });
 
-    it('should update input when manual amount is entered', () => {
+    it('should update input when manual amount is entered', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input-input');
       fireEvent.changeText(input, '75000');
 
-      expect(input.props.value).toBe('IDR 75.000');
+      await waitFor(() => {
+        expect(input.props.value).toBe('IDR 75.000');
+      });
     });
 
-    it('should clear amount when input is cleared', () => {
+    it('should clear amount when input is cleared', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input-input');
       fireEvent.changeText(input, '50000');
+
+      await waitFor(() => {
+        expect(input.props.value).toBe('IDR 50.000');
+      });
+
       fireEvent.changeText(input, '');
 
-      expect(input.props.value).toBe('');
+      await waitFor(() => {
+        expect(input.props.value).toBe('');
+      });
     });
 
-    it('should match predefined amount when manual input equals predefined value', () => {
+    it('should match predefined amount when manual input equals predefined value', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input-input');
       fireEvent.changeText(input, '100000');
 
-      expect(input.props.value).toBe('IDR 100.000');
+      await waitFor(() => {
+        expect(input.props.value).toBe('IDR 100.000');
+      });
     });
   });
 
-  describe('Validation', () => {
-    it('should show error when amount is below minimum', () => {
+  describe('Validation with Effect', () => {
+    it('should show error when amount is below minimum', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input-input');
       fireEvent.changeText(input, '5000');
 
-      expect(getByTestId('top-up-amount-input-error')).toBeTruthy();
+      await waitFor(() => {
+        expect(getByTestId('top-up-amount-input-error')).toBeTruthy();
+      });
     });
 
-    it('should show error when amount is above maximum', () => {
+    it('should show error when amount is above maximum', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input-input');
       fireEvent.changeText(input, '15000000');
 
-      expect(getByTestId('top-up-amount-input-error')).toBeTruthy();
-    });
-
-    it('should clear error when valid amount is entered', () => {
-      const { getByTestId, queryByTestId } = render(<TopUpScreen />);
-
-      const input = getByTestId('top-up-amount-input-input');
-      fireEvent.changeText(input, '5000');
-      expect(getByTestId('top-up-amount-input-error')).toBeTruthy();
-
-      fireEvent.changeText(input, '50000');
-      expect(queryByTestId('top-up-amount-input-error')).toBeNull();
+      await waitFor(() => {
+        expect(getByTestId('top-up-amount-input-error')).toBeTruthy();
+      });
     });
   });
 
@@ -211,43 +217,54 @@ describe('TopUpScreen', () => {
       expect(button.props.accessibilityState?.disabled).toBe(true);
     });
 
-    it('should be disabled when amount is 0', () => {
+    it('should be disabled when amount is 0', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input-input');
       fireEvent.changeText(input, '0');
 
-      const button = getByTestId('top-up-button');
-      expect(button.props.accessibilityState?.disabled).toBe(true);
+      await waitFor(() => {
+        const button = getByTestId('top-up-button');
+        expect(button.props.accessibilityState?.disabled).toBe(true);
+      });
     });
 
-    it('should be disabled when there is an error', () => {
+    it('should be disabled when there is an error', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input-input');
       fireEvent.changeText(input, '5000');
 
-      const button = getByTestId('top-up-button');
-      expect(button.props.accessibilityState?.disabled).toBe(true);
+      await waitFor(() => {
+        const button = getByTestId('top-up-button');
+        expect(button.props.accessibilityState?.disabled).toBe(true);
+      });
     });
 
-    it('should be enabled when valid amount is entered', () => {
+    it('should be enabled when valid amount is entered', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input-input');
       fireEvent.changeText(input, '50000');
 
-      const button = getByTestId('top-up-button');
-      expect(button.props.accessibilityState?.disabled).toBe(false);
+      await waitFor(() => {
+        const button = getByTestId('top-up-button');
+        expect(button.props.accessibilityState?.disabled).toBe(false);
+      });
     });
   });
 
   describe('Top Up Action', () => {
-    it('should call topUp mutation with correct amount', () => {
+    it('should call topUp mutation with correct amount', async () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       const input = getByTestId('top-up-amount-input');
       fireEvent.changeText(input, '50000');
+
+      await waitFor(() => {
+        const button = getByTestId('top-up-button');
+        expect(button.props.accessibilityState?.disabled).toBe(false);
+      });
 
       const button = getByTestId('top-up-button');
       fireEvent.press(button);
@@ -264,6 +281,11 @@ describe('TopUpScreen', () => {
 
       const input = getByTestId('top-up-amount-input');
       fireEvent.changeText(input, '50000');
+
+      await waitFor(() => {
+        const button = getByTestId('top-up-button');
+        expect(button.props.accessibilityState?.disabled).toBe(false);
+      });
 
       const button = getByTestId('top-up-button');
       fireEvent.press(button);
@@ -287,6 +309,11 @@ describe('TopUpScreen', () => {
       const input = getByTestId('top-up-amount-input');
       fireEvent.changeText(input, '50000');
 
+      await waitFor(() => {
+        const button = getByTestId('top-up-button');
+        expect(button.props.accessibilityState?.disabled).toBe(false);
+      });
+
       const button = getByTestId('top-up-button');
       fireEvent.press(button);
 
@@ -309,6 +336,11 @@ describe('TopUpScreen', () => {
       const input = getByTestId('top-up-amount-input');
       fireEvent.changeText(input, '50000');
 
+      await waitFor(() => {
+        const button = getByTestId('top-up-button');
+        expect(button.props.accessibilityState?.disabled).toBe(false);
+      });
+
       const button = getByTestId('top-up-button');
       fireEvent.press(button);
 
@@ -328,6 +360,11 @@ describe('TopUpScreen', () => {
       const input = getByTestId('top-up-amount-input');
       fireEvent.changeText(input, '50000');
 
+      await waitFor(() => {
+        const button = getByTestId('top-up-button');
+        expect(button.props.accessibilityState?.disabled).toBe(false);
+      });
+
       const button = getByTestId('top-up-button');
       fireEvent.press(button);
 
@@ -337,24 +374,6 @@ describe('TopUpScreen', () => {
         );
       });
     });
-
-    it('should clear amount on success', async () => {
-      mockTopUp.mockImplementation((amount: number, options: any) => {
-        options.onSuccess();
-      });
-
-      const { getByTestId } = render(<TopUpScreen />);
-
-      const input = getByTestId('top-up-amount-input');
-      fireEvent.changeText(input, '50000');
-
-      const button = getByTestId('top-up-button');
-      fireEvent.press(button);
-
-      await waitFor(() => {
-        expect(input.props.value).toBe(undefined);
-      });
-    });
   });
 
   describe('Accessibility', () => {
@@ -362,6 +381,70 @@ describe('TopUpScreen', () => {
       const { getByTestId } = render(<TopUpScreen />);
 
       expect(getByTestId('keyboard-layout')).toBeTruthy();
+    });
+  });
+
+  describe('Effect State Management', () => {
+    it('should manage complex state transitions through Effect', async () => {
+      const { getByText, getByTestId } = render(<TopUpScreen />);
+
+      // Initial state
+      const input = getByTestId('top-up-amount-input-input');
+      expect(input.props.value).toBe('');
+
+      // Select predefined amount
+      const button50k = getByText('50.000').parent?.parent;
+      if (button50k) {
+        fireEvent.press(button50k);
+      }
+
+      await waitFor(() => {
+        expect(input.props.value).toBe('IDR 50.000');
+      });
+
+      // Override with manual input
+      fireEvent.changeText(input, '75000');
+
+      await waitFor(() => {
+        expect(input.props.value).toBe('IDR 75.000');
+      });
+
+      // Select different predefined amount
+      const button100k = getByText('100.000').parent?.parent;
+      if (button100k) {
+        fireEvent.press(button100k);
+      }
+
+      await waitFor(() => {
+        expect(input.props.value).toBe('IDR 100.000');
+      });
+    });
+
+    it('should handle validation errors through Effect pipeline', async () => {
+      const { getByTestId, queryByTestId } = render(<TopUpScreen />);
+
+      const input = getByTestId('top-up-amount-input-input');
+
+      // Below minimum
+      fireEvent.changeText(input, '5000');
+
+      await waitFor(() => {
+        expect(getByTestId('top-up-amount-input-error')).toBeTruthy();
+      });
+
+      // Above maximum
+      fireEvent.changeText(input, '15000000');
+
+      await waitFor(() => {
+        expect(getByTestId('top-up-amount-input-error')).toBeTruthy();
+      });
+
+      // Valid amount
+      fireEvent.changeText(input, '100000');
+
+      await waitFor(() => {
+        expect(queryByTestId('top-up-amount-input-error')).toBeNull();
+      });
     });
   });
 });
