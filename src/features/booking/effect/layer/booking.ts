@@ -22,8 +22,8 @@ export const BookingServiceLayer = Layer.effect(
       createBooking: (data: CreateBookingData) =>
         bookingsServiceEffect.createBooking(data),
 
-      cancelBooking: (showtimeId: string, userId: string, seats: string[]) =>
-        bookingsServiceEffect.reserveSeats(showtimeId, userId, seats),
+      cancelBooking: (bookingId: string) =>
+        bookingsServiceEffect.cancelBooking(bookingId),
 
       reserveSeats: (showtimeId: string, userId: string, seats: string[]) =>
         bookingsServiceEffect.reserveSeats(showtimeId, userId, seats),

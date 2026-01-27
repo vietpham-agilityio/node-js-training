@@ -1,7 +1,7 @@
-import { API_CONFIG, queryKeys } from '@/constants';
+// Effect
+import { Effect } from 'effect';
 
-// Services
-import { profileService } from '@/features/setting/services/profile';
+import { API_CONFIG, queryKeys } from '@/constants';
 
 // Stores
 import { useAuthStore } from '@/features/auth/store/auth';
@@ -15,12 +15,23 @@ import { runEffectForQuery } from '@/utils/effect';
 // React Query
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+// Effect Services
+import { ProfileService } from '@/features/setting/effect/services/profile';
+import { ProfileServiceLayer } from '@/features/setting/effect/layer/profile';
+
 export const useProfile = () => {
   const user = useAuthStore(state => state.user);
 
   return useQuery({
     queryKey: queryKeys.profile.detail(user!.id),
-    queryFn: () => runEffectForQuery(profileService.getProfile(user!.id)),
+    queryFn: () =>
+      runEffectForQuery(
+        Effect.gen(function* () {
+          const profileService = yield* ProfileService;
+          return yield* profileService.getProfile(user!.id);
+        }),
+        ProfileServiceLayer,
+      ),
     enabled: !!user?.id,
     staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
@@ -32,7 +43,13 @@ export const useUpdateProfile = () => {
 
   return useMutation({
     mutationFn: (data: UpdateProfileData) =>
-      runEffectForQuery(profileService.updateProfile(user!.id, data)),
+      runEffectForQuery(
+        Effect.gen(function* () {
+          const profileService = yield* ProfileService;
+          return yield* profileService.updateProfile(user!.id, data);
+        }),
+        ProfileServiceLayer,
+      ),
 
     onMutate: async newProfile => {
       await queryClient.cancelQueries({
@@ -77,7 +94,14 @@ export const useUploadAvatar = () => {
     }: {
       userId: string;
       file: { uri: string; name?: string; type?: string };
-    }) => runEffectForQuery(profileService.uploadAvatar(userId, file)),
+    }) =>
+      runEffectForQuery(
+        Effect.gen(function* () {
+          const profileService = yield* ProfileService;
+          return yield* profileService.uploadAvatar(userId, file);
+        }),
+        ProfileServiceLayer,
+      ),
     onSuccess: (avatarUrl, variables) => {
       queryClient.setQueryData(
         queryKeys.profile.detail(variables.userId),

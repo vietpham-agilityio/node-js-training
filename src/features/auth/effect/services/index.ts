@@ -27,13 +27,13 @@ export class AuthService extends Effect.Service<AuthService>()(
             session: authData.session,
           })),
 
-        singInWithGoogle: () =>
+        signInWithGoogle: () =>
           Effect.map(authServiceEffect.signInWithGoogle(), authData => ({
             user: authData.user,
             session: authData.session,
           })),
 
-        singInWithFacebook: () =>
+        signInWithFacebook: () =>
           Effect.map(authServiceEffect.signInWithFacebook(), authData => ({
             user: authData.user,
             session: authData.session,
@@ -58,7 +58,8 @@ export class AuthService extends Effect.Service<AuthService>()(
           callback: (event: string, session: Session) => void,
         ) =>
           Effect.sync(() => {
-            authServiceEffect.onAuthStateChange(callback);
+            const result = authServiceEffect.onAuthStateChange(callback);
+            return result;
           }),
       } as const;
     }),
