@@ -1,4 +1,4 @@
-import { Cause, Effect, Exit, Chunk } from 'effect';
+import { Cause, Effect, Exit, Chunk, Layer } from 'effect';
 
 /**
  * Helper to unwrap Effect for React Query
@@ -11,15 +11,23 @@ import { Cause, Effect, Exit, Chunk } from 'effect';
  *
  * @template A - The success type of the Effect
  * @template E - The error type of the Effect
+ * @template R - The requirements type of the Effect
  * @param effect - The Effect to run and unwrap
+ * @param layer - Optional Layer to provide when running the Effect
  * @returns A Promise that resolves with the success value or rejects with an error
  *
  */
-export const runEffectForQuery = async <A, E>(
-  effect: Effect.Effect<A, E>,
+export const runEffectForQuery = async <A, E, R>(
+  effect: Effect.Effect<A, E, R>,
+  layer?: Layer.Layer<R, never, never>,
 ): Promise<A> => {
+  // Provide the layer if given, otherwise run the effect as-is
+  const effectToRun = layer
+    ? Effect.provide(effect, layer)
+    : (effect as Effect.Effect<A, E>);
+
   // Run the Effect and get an Exit (success or failure)
-  const exit = await Effect.runPromiseExit(effect);
+  const exit = await Effect.runPromiseExit(effectToRun);
 
   // Match on the Exit to handle both success and failure cases
   return Exit.match(exit, {

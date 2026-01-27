@@ -27,22 +27,8 @@ export class BookingService extends Context.Tag('BookingServiceTag')<
     ) => Effect.Effect<Booking, BookingError, never>;
 
     readonly cancelBooking: (
-      showtimeId: string,
-      userId: string,
-      seats: string[],
-    ) => Effect.Effect<
-      {
-        readonly id: string;
-        readonly status: 'reserved' | 'confirmed' | 'released';
-        readonly createdAt: string;
-        readonly userId: string;
-        readonly showtimeId: string;
-        readonly seatNumbers: readonly string[];
-        readonly reservedUntil: string;
-      },
-      BookingError,
-      never
-    >;
+      bookingId: string,
+    ) => Effect.Effect<void, BookingError, never>;
 
     readonly reserveSeats: (
       showtimeId: string,

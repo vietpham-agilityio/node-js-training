@@ -4,26 +4,44 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 // Constants
 import { API_CONFIG } from '@/constants';
 
-// Service
-import { authServiceEffect } from '@/features/auth/services/auth.effect';
-
 // Store
 import { useAuthStore } from '@/features/auth/store/auth';
 
 // Types
 import { ChangePasswordData } from '@/features/auth/types/auth';
 
+// Utils
+import { runEffectForQuery } from '@/utils/effect';
+
+// Effect Services
+import { AuthService } from '@/features/auth/effect/services';
+import { AuthServiceLayer } from '@/features/auth/layer';
+
 export const useSession = () => {
   return useQuery({
     queryKey: ['session'],
-    queryFn: () => Effect.runPromise(authServiceEffect.getSession()),
+    queryFn: () =>
+      runEffectForQuery(
+        Effect.gen(function* () {
+          const authService = yield* AuthService;
+          return yield* authService.getSession();
+        }),
+        AuthServiceLayer,
+      ),
     staleTime: API_CONFIG.QUERY_STALE_TIME,
   });
 };
 
 export const useRefreshSession = () => {
   return useMutation({
-    mutationFn: () => Effect.runPromise(authServiceEffect.refreshSession()),
+    mutationFn: () =>
+      runEffectForQuery(
+        Effect.gen(function* () {
+          const authService = yield* AuthService;
+          return yield* authService.refreshSession();
+        }),
+        AuthServiceLayer,
+      ),
   });
 };
 
@@ -34,7 +52,13 @@ export const useRefreshSession = () => {
 export const useResetPassword = () => {
   return useMutation({
     mutationFn: async (email: string) => {
-      await Effect.runPromise(authServiceEffect.resetPassword(email));
+      await runEffectForQuery(
+        Effect.gen(function* () {
+          const authService = yield* AuthService;
+          return yield* authService.resetPassword(email);
+        }),
+        AuthServiceLayer,
+      );
       return { success: true };
     },
   });
@@ -54,16 +78,24 @@ export const useUpdatePassword = () => {
       }
 
       // Step 1: Verify current password
-      await Effect.runPromise(
-        authServiceEffect.verifyCurrentPassword(
-          user.email,
-          data.currentPassword,
-        ),
+      await runEffectForQuery(
+        Effect.gen(function* () {
+          const authService = yield* AuthService;
+          return yield* authService.verifyCurrentPassword(
+            user.email!,
+            data.currentPassword,
+          );
+        }),
+        AuthServiceLayer,
       );
 
       // Step 2: Update to new password
-      await Effect.runPromise(
-        authServiceEffect.updatePassword(data.newPassword),
+      await runEffectForQuery(
+        Effect.gen(function* () {
+          const authService = yield* AuthService;
+          return yield* authService.updatePassword(data.newPassword);
+        }),
+        AuthServiceLayer,
       );
       return { success: true };
     },

@@ -5,6 +5,9 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
+// Effect
+import { Effect } from 'effect';
+
 // Utils
 import { generateUUIDSync } from '@/utils/uuid';
 import { runEffectForQuery } from '@/utils/effect';
@@ -14,11 +17,12 @@ import { API_CONFIG, PAGINATION, queryKeys } from '@/constants';
 import { BOOKING_STATUS } from '@/constants/status';
 
 // Services
-import {
-  bookingsServiceEffect,
-  CreateBookingData,
-} from '@/features/booking/services/booking';
+import { CreateBookingData } from '@/features/booking/services/booking';
 import { walletService } from '@/features/wallet/services/wallet';
+
+// Effect Services
+import { BookingService } from '@/features/booking/effect/services/booking';
+import { BookingServiceLayer } from '@/features/booking/effect/layer/booking';
 
 // Stores
 import { useAuthStore } from '@/features/auth/store/auth';
@@ -39,7 +43,13 @@ export const useBookings = (status?: string) => {
   return useQuery({
     queryKey: queryKeys.bookings.list(user?.id, status),
     queryFn: () =>
-      runEffectForQuery(bookingsServiceEffect.getBookings(user!.id, status)),
+      runEffectForQuery(
+        Effect.gen(function* () {
+          const bookingService = yield* BookingService;
+          return yield* bookingService.getBookings(user!.id, status);
+        }),
+        BookingServiceLayer,
+      ),
     enabled: !!user,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
     gcTime: API_CONFIG.QUERY_STALE_TIME,
@@ -58,12 +68,16 @@ export const useBookingsInfinite = (status?: string) => {
     queryKey: queryKeys.bookings.infinite(user?.id, status),
     queryFn: ({ pageParam = PAGINATION.PAGE_OFFSET }) =>
       runEffectForQuery(
-        bookingsServiceEffect.getBookingsPaginated(
-          user!.id,
-          status,
-          pageParam,
-          PAGINATION.PAGE_LIMIT,
-        ),
+        Effect.gen(function* () {
+          const bookingService = yield* BookingService;
+          return yield* bookingService.getBookingsPaginated(
+            user!.id,
+            status,
+            pageParam,
+            PAGINATION.PAGE_LIMIT,
+          );
+        }),
+        BookingServiceLayer,
       ),
     getNextPageParam: (lastPage, allPages) => {
       // If last page has fewer items than page size, we've reached the end
@@ -89,7 +103,13 @@ export const useBooking = (bookingId: string) => {
   return useQuery({
     queryKey: queryKeys.bookings.detail(bookingId),
     queryFn: () =>
-      runEffectForQuery(bookingsServiceEffect.getBookingById(bookingId)),
+      runEffectForQuery(
+        Effect.gen(function* () {
+          const bookingService = yield* BookingService;
+          return yield* bookingService.getBookingById(bookingId);
+        }),
+        BookingServiceLayer,
+      ),
     enabled: !!bookingId,
     staleTime: API_CONFIG.BOOKING_STALE_TIME,
     gcTime: API_CONFIG.QUERY_STALE_TIME,
@@ -113,10 +133,14 @@ export const useCreateBooking = () => {
 
       // Create booking
       const booking = await runEffectForQuery(
-        bookingsServiceEffect.createBooking({
-          ...data,
-          walletId: wallet.id,
+        Effect.gen(function* () {
+          const bookingService = yield* BookingService;
+          return yield* bookingService.createBooking({
+            ...data,
+            walletId: wallet.id,
+          });
         }),
+        BookingServiceLayer,
       );
 
       return booking;
@@ -277,7 +301,13 @@ export const useCancelBooking = () => {
       bookingId: string;
       amount: number;
     }) => {
-      await runEffectForQuery(bookingsServiceEffect.cancelBooking(bookingId));
+      await runEffectForQuery(
+        Effect.gen(function* () {
+          const bookingService = yield* BookingService;
+          return yield* bookingService.cancelBooking(bookingId);
+        }),
+        BookingServiceLayer,
+      );
 
       if (wallet) {
         await walletService.refund(wallet.id, amount, bookingId);
@@ -393,7 +423,15 @@ export const useReserveSeats = () => {
       seats: string[];
     }) =>
       runEffectForQuery(
-        bookingsServiceEffect.reserveSeats(showtimeId, user!.id, seats),
+        Effect.gen(function* () {
+          const bookingService = yield* BookingService;
+          return yield* bookingService.reserveSeats(
+            showtimeId,
+            user!.id,
+            seats,
+          );
+        }),
+        BookingServiceLayer,
       ),
 
     onSuccess: data => {
@@ -423,7 +461,13 @@ export const useReleaseSeats = () => {
 
   return useMutation({
     mutationFn: (reservationId: string) =>
-      runEffectForQuery(bookingsServiceEffect.releaseSeats(reservationId)),
+      runEffectForQuery(
+        Effect.gen(function* () {
+          const bookingService = yield* BookingService;
+          return yield* bookingService.releaseSeats(reservationId);
+        }),
+        BookingServiceLayer,
+      ),
 
     onSuccess: () => {
       setReservationId(null);

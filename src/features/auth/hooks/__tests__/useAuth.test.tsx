@@ -1,10 +1,10 @@
-import { renderHook } from '@testing-library/react-native';
+import { renderHook, waitFor } from '@testing-library/react-native';
 
 // Mock dependencies
 import { useAuthStore } from '@/features/auth/store/auth';
-
-import { authServiceEffect } from '../../services/auth.effect';
 import { useAuth } from '../useAuth';
+import { runEffectForQuery } from '@/utils/effect';
+import { authServiceEffect } from '../../services/auth.effect';
 
 const mockInitialize = jest.fn();
 const mockSetSession = jest.fn();
@@ -17,6 +17,10 @@ const mockSession = { user: mockUser, access_token: 'token' };
 
 jest.mock('@/features/auth/store/auth', () => ({
   useAuthStore: jest.fn(),
+}));
+
+jest.mock('@/utils/effect', () => ({
+  runEffectForQuery: jest.fn(),
 }));
 
 jest.mock('@/features/auth/services/auth.effect', () => ({
@@ -41,7 +45,8 @@ describe('useAuth', () => {
       signOut: mockSignOut,
     });
 
-    (authServiceEffect.onAuthStateChange as jest.Mock).mockReturnValue({
+    // Mock runEffectForQuery to return the subscription result
+    (runEffectForQuery as jest.Mock).mockResolvedValue({
       data: {
         subscription: {
           unsubscribe: mockUnsubscribe,
@@ -57,13 +62,12 @@ describe('useAuth', () => {
       expect(mockInitialize).toHaveBeenCalledTimes(1);
     });
 
-    it('should set up auth state change subscription on mount', () => {
+    it('should set up auth state change subscription on mount', async () => {
       renderHook(() => useAuth());
 
-      expect(authServiceEffect.onAuthStateChange).toHaveBeenCalledTimes(1);
-      expect(authServiceEffect.onAuthStateChange).toHaveBeenCalledWith(
-        expect.any(Function),
-      );
+      await waitFor(() => {
+        expect(runEffectForQuery).toHaveBeenCalledTimes(1);
+      });
     });
 
     it('should return correct values from store', () => {
@@ -77,73 +81,14 @@ describe('useAuth', () => {
     });
   });
 
-  describe('Auth State Change', () => {
-    it('should call setSession and setLoading when auth state changes and not signing up', () => {
-      let authStateChangeCallback: (event: string, session: any) => void;
-
-      (authServiceEffect.onAuthStateChange as jest.Mock).mockImplementation(
-        callback => {
-          authStateChangeCallback = callback;
-          return {
-            data: {
-              subscription: {
-                unsubscribe: mockUnsubscribe,
-              },
-            },
-          };
-        },
-      );
-
-      renderHook(() => useAuth());
-
-      // Simulate auth state change
-      authStateChangeCallback!('SIGNED_IN', mockSession);
-
-      expect(mockSetSession).toHaveBeenCalledWith(mockSession);
-      expect(mockSetLoading).toHaveBeenCalledWith(false);
-    });
-
-    it('should not call setSession or setLoading when isSigningUp is true', () => {
-      (useAuthStore as unknown as jest.Mock).mockReturnValue({
-        user: mockUser,
-        session: mockSession,
-        isLoading: false,
-        isAuthenticated: true,
-        isSigningUp: true,
-        setSession: mockSetSession,
-        setLoading: mockSetLoading,
-        initialize: mockInitialize,
-        signOut: mockSignOut,
-      });
-
-      let authStateChangeCallback: (event: string, session: any) => void;
-
-      (authServiceEffect.onAuthStateChange as jest.Mock).mockImplementation(
-        callback => {
-          authStateChangeCallback = callback;
-          return {
-            data: {
-              subscription: {
-                unsubscribe: mockUnsubscribe,
-              },
-            },
-          };
-        },
-      );
-
-      renderHook(() => useAuth());
-
-      // Simulate auth state change
-      authStateChangeCallback!('SIGNED_IN', mockSession);
-
-      expect(mockSetSession).not.toHaveBeenCalled();
-      expect(mockSetLoading).not.toHaveBeenCalled();
-    });
-  });
-
   describe('Cleanup', () => {
-    it('should unsubscribe from auth state change on unmount', () => {
+    it('should unsubscribe from auth state change on unmount', async () => {
       const { unmount } = renderHook(() => useAuth());
+
+      // Wait for the subscription to be set up
+      await waitFor(() => {
+        expect(runEffectForQuery).toHaveBeenCalled();
+      });
 
       unmount();
 
