@@ -2,9 +2,6 @@ import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { Fragment, useEffect, useRef } from 'react';
 
-// Effect
-import { Effect, Layer } from 'effect';
-
 // Uniwind
 import { Uniwind, useUniwind } from 'uniwind';
 
@@ -36,12 +33,8 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 // Components
 import { Loading } from '@/components/Loading';
 import { Toast } from '@/components/Toast';
-
-// Context
-import { BuildPokemonUrl } from '@/context/buildPokemonUrl';
-import { PokeApi } from '@/context/pokemon';
-import { PokemonCollection } from '@/context/pokemonCollection';
-import { PokemonUrl } from '@/context/pokemonUrl';
+import { Effect, Schedule } from 'effect';
+import { cron } from '@/utils/repeat';
 
 // Error Boundary
 export { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -70,26 +63,6 @@ const RootLayout = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
-
-  const mainLayer = Layer.mergeAll(PokeApi.Default);
-
-  const printPokemon = Effect.gen(function* () {
-    const pokemonApi = yield* PokeApi; // yield* to get the service from the context
-
-    return yield* pokemonApi.getPokemon; // yield* to run the effect
-  });
-
-  const handlePrintPokemon = printPokemon.pipe(Effect.provide(mainLayer));
-
-  const runHandlePrintPokemon = handlePrintPokemon.pipe(
-    Effect.catchTags({
-      FetchPokemonErr: err => Effect.succeed(err.customMessage),
-      ExtractResponseErr: () => Effect.succeed('Extract Response went wrong'),
-      ParseError: () => Effect.succeed('Parse Pokemon Error'),
-    }),
-  );
-
-  Effect.runPromise(runHandlePrintPokemon).then(console.log);
 
   // Track previous authentication state to detect logout vs fresh install
   const prevIsAuthenticatedRef = useRef<boolean | null>(null);
