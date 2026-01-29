@@ -2,7 +2,8 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { useAuthStore } from '../auth';
 
 // Import the mocked modules to get references to the mock functions
-import { authService } from '@/features/auth/services/auth';
+import { authServiceEffect } from '@/features/auth/services/auth.effect';
+import { Effect } from 'effect';
 import { secureStorage } from '@/services/storage/secure';
 
 // Mock dependencies - declare but don't initialize yet
@@ -10,8 +11,8 @@ let mockGetSession: jest.Mock;
 let mockSignOut: jest.Mock;
 let mockClear: jest.Mock;
 
-jest.mock('@/features/auth/services/auth', () => ({
-  authService: {
+jest.mock('@/features/auth/services/auth.effect', () => ({
+  authServiceEffect: {
     getSession: jest.fn(),
     signOut: jest.fn(),
   },
@@ -26,8 +27,8 @@ jest.mock('@/services/storage/secure', () => ({
 describe('useAuthStore', () => {
   beforeEach(() => {
     // Get references to the mocked functions
-    mockGetSession = authService.getSession as jest.Mock;
-    mockSignOut = authService.signOut as jest.Mock;
+    mockGetSession = authServiceEffect.getSession as jest.Mock;
+    mockSignOut = authServiceEffect.signOut as jest.Mock;
     mockClear = secureStorage.clear as jest.Mock;
 
     // Clear all mocks
@@ -133,7 +134,7 @@ describe('useAuthStore', () => {
 
   describe('initialize', () => {
     it('should set loading to false even when session is null', async () => {
-      mockGetSession.mockResolvedValue(null);
+      mockGetSession.mockReturnValue(Effect.succeed(null));
 
       const { result } = renderHook(() => useAuthStore());
 
@@ -157,7 +158,7 @@ describe('useAuthStore', () => {
         access_token: 'token',
       } as any;
 
-      mockGetSession.mockResolvedValue(mockSession);
+      mockGetSession.mockReturnValue(Effect.succeed(mockSession));
 
       const { result } = renderHook(() => useAuthStore());
 
@@ -173,7 +174,9 @@ describe('useAuthStore', () => {
     });
 
     it('should handle initialization error and reset state', async () => {
-      mockGetSession.mockRejectedValue(new Error('Session fetch failed'));
+      mockGetSession.mockReturnValue(
+        Effect.fail(new Error('Session fetch failed')),
+      );
 
       const { result } = renderHook(() => useAuthStore());
 
@@ -199,7 +202,7 @@ describe('useAuthStore', () => {
         access_token: 'token',
       } as any;
 
-      mockSignOut.mockResolvedValue(undefined);
+      mockSignOut.mockReturnValue(Effect.succeed(undefined));
       mockClear.mockResolvedValue(undefined);
 
       act(() => {

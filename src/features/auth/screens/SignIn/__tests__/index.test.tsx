@@ -162,7 +162,7 @@ describe('LoginScreen', () => {
 
       expect(mockToastAlert).toHaveBeenCalledWith(
         'Login failed. Please try again.',
-        'Invalid email or password. Please try again.',
+        '', // Empty message propagated from error.message
         [],
         {
           type: 'error',

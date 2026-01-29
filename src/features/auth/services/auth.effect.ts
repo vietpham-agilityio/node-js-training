@@ -24,7 +24,7 @@ export class AuthServiceEffect {
 
   signUp(data: SignUpData) {
     return Effect.gen(function* () {
-      const result = yield* Effect.tryPromise({
+      const { data: authData, error } = yield* Effect.tryPromise({
         try: async () =>
           await supabase.auth.signUp({
             email: data.email,
@@ -41,13 +41,13 @@ export class AuthServiceEffect {
           ),
       });
 
-      if (result.error) {
+      if (error) {
         return yield* Effect.fail(
-          AuthenticationError.signUpFailed(result.error.message),
+          AuthenticationError.signUpFailed(error.message),
         );
       }
 
-      return result.data;
+      return authData;
     });
   }
 
@@ -61,13 +61,13 @@ export class AuthServiceEffect {
           }),
         catch: error =>
           AuthenticationError.loginFailed(
-            error instanceof Error ? error.message : '',
+            error instanceof Error ? error.message : '', // Error in case of API failure
           ),
       });
 
       if (error) {
         return yield* Effect.fail(
-          AuthenticationError.loginFailed(error.message),
+          AuthenticationError.loginFailed(error.message), // Error when reponse is error
         );
       }
 

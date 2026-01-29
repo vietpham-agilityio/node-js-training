@@ -4,7 +4,6 @@ import { renderHook, waitFor } from '@testing-library/react-native';
 import { useAuthStore } from '@/features/auth/store/auth';
 import { useAuth } from '../useAuth';
 import { runEffectForQuery } from '@/utils/effect';
-import { authServiceEffect } from '../../services/auth.effect';
 
 const mockInitialize = jest.fn();
 const mockSetSession = jest.fn();

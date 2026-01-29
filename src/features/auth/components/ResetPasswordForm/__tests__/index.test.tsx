@@ -1,4 +1,5 @@
-import { authService } from '@/features/auth/services/auth';
+import { authServiceEffect } from '@/features/auth/services/auth.effect';
+import { Effect } from 'effect';
 import { supabase } from '@/services/supabase/client';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { TextInput } from 'react-native';
@@ -37,8 +38,8 @@ jest.mock('@/services/supabase/client', () => ({
   },
 }));
 
-jest.mock('@/features/auth/services/auth', () => ({
-  authService: {
+jest.mock('@/features/auth/services/auth.effect', () => ({
+  authServiceEffect: {
     updatePassword: jest.fn(),
   },
 }));
@@ -47,7 +48,9 @@ describe('ResetPasswordForm Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (supabase.auth.setSession as jest.Mock).mockResolvedValue({ error: null });
-    (authService.updatePassword as jest.Mock).mockResolvedValue(undefined);
+    (authServiceEffect.updatePassword as jest.Mock).mockReturnValue(
+      Effect.succeed(true),
+    );
   });
 
   describe('Rendering', () => {
@@ -186,7 +189,9 @@ describe('ResetPasswordForm Component', () => {
           access_token: 'mock-access-token',
           refresh_token: 'mock-refresh-token',
         });
-        expect(authService.updatePassword).toHaveBeenCalledWith('NewPass123!@');
+        expect(authServiceEffect.updatePassword).toHaveBeenCalledWith(
+          'NewPass123!@',
+        );
       });
     });
 
@@ -266,7 +271,7 @@ describe('ResetPasswordForm Component', () => {
       });
 
       // Ensure updatePassword was not called
-      expect(authService.updatePassword).not.toHaveBeenCalled();
+      expect(authServiceEffect.updatePassword).not.toHaveBeenCalled();
     });
 
     it('should show generic error message when setSession fails with non-Error object', async () => {
@@ -294,8 +299,8 @@ describe('ResetPasswordForm Component', () => {
     });
 
     it('should show error toast when updatePassword fails with Error', async () => {
-      (authService.updatePassword as jest.Mock).mockRejectedValueOnce(
-        new Error('Update failed'),
+      (authServiceEffect.updatePassword as jest.Mock).mockReturnValueOnce(
+        Effect.fail(new Error('Update failed')),
       );
 
       const { getByTestId } = render(<ResetPasswordForm />);
@@ -318,8 +323,8 @@ describe('ResetPasswordForm Component', () => {
     });
 
     it('should show generic error message when updatePassword fails with non-Error', async () => {
-      (authService.updatePassword as jest.Mock).mockRejectedValueOnce(
-        'String error',
+      (authServiceEffect.updatePassword as jest.Mock).mockReturnValueOnce(
+        Effect.fail('String error'),
       );
 
       const { getByTestId } = render(<ResetPasswordForm />);
@@ -345,8 +350,12 @@ describe('ResetPasswordForm Component', () => {
   describe('Form State', () => {
     it('should disable submit button while submitting', async () => {
       // Make updatePassword take some time
-      (authService.updatePassword as jest.Mock).mockImplementation(
-        () => new Promise(resolve => setTimeout(resolve, 100)),
+      (authServiceEffect.updatePassword as jest.Mock).mockImplementation(() =>
+        Effect.tryPromise({
+          try: async () =>
+            await new Promise(resolve => setTimeout(resolve, 100)),
+          catch: (e: unknown) => e,
+        }),
       );
 
       const { getByTestId } = render(<ResetPasswordForm />);
@@ -396,7 +405,9 @@ describe('ResetPasswordForm Component', () => {
           access_token: 'mock-access-token',
           refresh_token: 'mock-refresh-token',
         });
-        expect(authService.updatePassword).toHaveBeenCalledWith('NewPass123!@');
+        expect(authServiceEffect.updatePassword).toHaveBeenCalledWith(
+          'NewPass123!@',
+        );
       });
     });
 
@@ -476,7 +487,7 @@ describe('ResetPasswordForm Component', () => {
       });
 
       // Ensure updatePassword was not called
-      expect(authService.updatePassword).not.toHaveBeenCalled();
+      expect(authServiceEffect.updatePassword).not.toHaveBeenCalled();
     });
 
     it('should show generic error message when setSession fails with non-Error object', async () => {
@@ -504,8 +515,8 @@ describe('ResetPasswordForm Component', () => {
     });
 
     it('should show error toast when updatePassword fails with Error', async () => {
-      (authService.updatePassword as jest.Mock).mockRejectedValueOnce(
-        new Error('Update failed'),
+      (authServiceEffect.updatePassword as jest.Mock).mockReturnValueOnce(
+        Effect.fail(new Error('Update failed')),
       );
 
       const { getByTestId } = render(<ResetPasswordForm />);
@@ -528,8 +539,8 @@ describe('ResetPasswordForm Component', () => {
     });
 
     it('should show generic error message when updatePassword fails with non-Error', async () => {
-      (authService.updatePassword as jest.Mock).mockRejectedValueOnce(
-        'String error',
+      (authServiceEffect.updatePassword as jest.Mock).mockReturnValueOnce(
+        Effect.fail('String error'),
       );
 
       const { getByTestId } = render(<ResetPasswordForm />);

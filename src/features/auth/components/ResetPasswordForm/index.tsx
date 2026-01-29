@@ -23,8 +23,11 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useToastAlert } from '@/hooks/useToast';
 
 // Services
-import { authService } from '@/features/auth/services/auth';
 import { supabase } from '@/services/supabase/client';
+import { runEffectForQuery } from '@/utils/effect';
+import { Effect } from 'effect';
+import { AuthService } from '../../effect/services';
+import { AuthServiceLayer } from '../../layer';
 
 export const ResetPasswordForm = () => {
   const params = useLocalSearchParams<{
@@ -81,7 +84,13 @@ export const ResetPasswordForm = () => {
 
       try {
         // Update password
-        await authService.updatePassword(data.newPassword);
+        await runEffectForQuery(
+          Effect.gen(function* () {
+            const authService = yield* AuthService;
+            return yield* authService.updatePassword(data.newPassword);
+          }),
+          AuthServiceLayer,
+        );
 
         toast.alert(
           MESSAGES.UPDATE_SUCCESS,

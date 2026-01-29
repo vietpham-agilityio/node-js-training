@@ -1,11 +1,16 @@
 import { Session, User } from '@supabase/supabase-js';
 import { create } from 'zustand';
+import { Effect } from 'effect';
 
-// Service
-import { authService } from '@/features/auth/services/auth';
+// Effect
+import { AuthService } from '../effect/services';
+import { AuthServiceLayer } from '../layer';
 
 // Store
 import { secureStorage } from '@/services/storage/secure';
+
+// Utils
+import { runEffectForQuery } from '@/utils/effect';
 
 interface AuthState {
   user: User | null;
@@ -46,7 +51,13 @@ export const useAuthStore = create<AuthState>(set => ({
   initialize: async () => {
     try {
       set({ isLoading: true });
-      const session = await authService.getSession();
+      const session = await runEffectForQuery(
+        Effect.gen(function* () {
+          const authService = yield* AuthService;
+          return yield* authService.getSession();
+        }),
+        AuthServiceLayer,
+      );
 
       if (session) {
         set({
@@ -64,7 +75,13 @@ export const useAuthStore = create<AuthState>(set => ({
 
   signOut: async () => {
     try {
-      await authService.signOut();
+      await runEffectForQuery(
+        Effect.gen(function* () {
+          const authService = yield* AuthService;
+          return yield* authService.signOut();
+        }),
+        AuthServiceLayer,
+      );
       await secureStorage.clear();
       set({
         user: null,
