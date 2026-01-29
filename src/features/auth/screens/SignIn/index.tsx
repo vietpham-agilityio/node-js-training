@@ -49,15 +49,10 @@ const LoginScreen = () => {
   const handleSubmit = useCallback(
     (data: SignInData) => {
       signIn(data, {
-        onError: (error: Error) => {
-          toast.alert(
-            ERROR_MESSAGES.LOGIN_FAILED,
-            error.message || ERROR_MESSAGES.INVALID_EMAIL_PASSWORD,
-            [],
-            {
-              type: ToastType.ERROR,
-            },
-          );
+        onError: error => {
+          toast.alert(ERROR_MESSAGES.LOGIN_FAILED, error.message, [], {
+            type: ToastType.ERROR,
+          });
         },
       });
     },
