@@ -16,6 +16,11 @@
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "@effect/language-service"
+      }
+    ],
     "paths": {
       "@/*": ["./src/*"],
       "@assets/*": ["./assets/*"]

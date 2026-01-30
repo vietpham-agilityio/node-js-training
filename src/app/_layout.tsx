@@ -33,8 +33,6 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 // Components
 import { Loading } from '@/components/Loading';
 import { Toast } from '@/components/Toast';
-import { Effect, Schedule } from 'effect';
-import { cron } from '@/utils/repeat';
 
 // Error Boundary
 export { ErrorBoundary } from '@/components/ErrorBoundary';
