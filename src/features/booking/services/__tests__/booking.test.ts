@@ -377,7 +377,7 @@ describe('BookingsService', () => {
 
       await expect(
         runEffectForQuery(bookingsServiceEffect.cancelBooking('booking1')),
-      ).rejects.toThrow('Failed to cancel booking');
+      ).rejects.toThrow(ERROR_MESSAGES.CANCEL_BOOKING_FAILED);
     });
 
     it('should throw an error if RPC call fails', async () => {

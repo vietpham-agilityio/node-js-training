@@ -1,8 +1,5 @@
 import { Data } from 'effect';
 
-// Constants
-import { ERROR_MESSAGES } from '@/constants/messages';
-
 export class BookingError extends Data.TaggedError('BookingError')<{
   message: string;
 }> {
@@ -33,91 +30,97 @@ export class BookingError extends Data.TaggedError('BookingError')<{
 
   static invalidTicket = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.INVALID_TICKET,
+      message: message,
     });
   };
 
   static ticketAlreadyUsed = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.TICKET_ALREADY_USED,
+      message: message,
     });
   };
 
   static ticketExpired = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.TICKET_EXPIRED,
+      message: message,
     });
   };
 
   static ticketInvalidFormat = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.TICKET_INVALID_FORMAT,
+      message: message,
     });
   };
 
   static ticketNetworkError = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.TICKET_NETWORK_ERROR,
+      message: message,
     });
   };
 
   static checkoutFailed = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.CHECKOUT_FAILED,
+      message: message,
     });
   };
 
   static ticketValidationFailed = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.TICKET_VALIDATION_FAILED,
+      message: message,
     });
   };
 
-  static noResultReturnedFromBookingTransaction = () => {
+  static noResultReturnedFromBookingTransaction = (message: string) => {
     return new BookingError({
-      message: ERROR_MESSAGES.NO_RESULT_RETURNED,
+      message: message,
     });
   };
 
   static bookingFailed = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.CHECKOUT_FAILED,
+      message: message,
+    });
+  };
+
+  static cancelBookingFailed = (message: string) => {
+    return new BookingError({
+      message: message,
     });
   };
 
   static insufficientWalletBalance = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.INSUFFICIENT_WALLET_BALANCE,
+      message: message,
     });
   };
 
   static walletNotFound = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.WALLET_NOT_FOUND,
+      message: message,
     });
   };
 
-  static bookingNotFound = () => {
+  static bookingNotFound = (message: string) => {
     return new BookingError({
-      message: ERROR_MESSAGES.BOOKING_NOT_FOUND,
+      message: message,
     });
   };
 
-  static bookingAlreadyCancelled = () => {
+  static bookingAlreadyCancelled = (message: string) => {
     return new BookingError({
-      message: ERROR_MESSAGES.CANCEL_BOOKING_FAILED,
+      message: message,
     });
   };
 
   static reserveSeatsFailed = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.RESERVE_SEATS_FAILED,
+      message: message,
     });
   };
 
   static releaseSeatsFailed = (message: string) => {
     return new BookingError({
-      message: message || ERROR_MESSAGES.RELEASE_SEATS_FAILED,
+      message: message,
     });
   };
 }
