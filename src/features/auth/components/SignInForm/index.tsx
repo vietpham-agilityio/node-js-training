@@ -1,7 +1,7 @@
-import { valibotResolver } from '@hookform/resolvers/valibot';
 import { memo, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { Resolver, useForm } from 'react-hook-form';
 import { TextInput, TouchableOpacity, View } from 'react-native';
+import { effectTsResolver } from '@hookform/resolvers/effect-ts';
 
 // Components
 import { Button } from '@/components/Button';
@@ -10,7 +10,10 @@ import { PasswordInput } from '@/components/PasswordInput';
 import { Typo } from '@/components/Typo';
 
 // Constants
-import { SignInFormData, signInSchema } from '@/constants';
+import {
+  SignInFormData,
+  signInSchema as signInSchemaEffect,
+} from '@/constants';
 
 interface SignInFormProps {
   isPending: boolean;
@@ -28,7 +31,9 @@ export const SignInForm = memo(
       handleSubmit,
       formState: { errors, isSubmitting, isDirty },
     } = useForm<SignInFormData>({
-      resolver: valibotResolver(signInSchema),
+      resolver: effectTsResolver(
+        signInSchemaEffect,
+      ) as unknown as Resolver<SignInFormData>,
       mode: 'onBlur',
       reValidateMode: 'onBlur',
       defaultValues: {

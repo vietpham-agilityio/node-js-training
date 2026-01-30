@@ -1,13 +1,12 @@
-import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useRouter } from 'expo-router';
 import { useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { Resolver, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 
 // Constants
 import {
   ForgotPasswordFormData,
-  forgotPasswordSchema,
+  forgotPasswordSchema as forgotPasswordSchemaEffect,
   ROUTES,
   ToastType,
 } from '@/constants';
@@ -24,6 +23,9 @@ import { Typo } from '@/components/Typo';
 import { Button } from '@/components/Button';
 import { AccessLayout } from '@/layouts/AccessLayout';
 
+// Utils
+import { effectTsResolver } from '@hookform/resolvers/effect-ts';
+
 const ForgotPasswordScreen = () => {
   const toast = useToastAlert();
   const router = useRouter();
@@ -34,7 +36,9 @@ const ForgotPasswordScreen = () => {
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<ForgotPasswordFormData>({
-    resolver: valibotResolver(forgotPasswordSchema),
+    resolver: effectTsResolver(
+      forgotPasswordSchemaEffect,
+    ) as unknown as Resolver<ForgotPasswordFormData>,
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     defaultValues: {

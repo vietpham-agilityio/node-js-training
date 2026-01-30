@@ -1,7 +1,7 @@
-import { valibotResolver } from '@hookform/resolvers/valibot';
+import { effectTsResolver } from '@hookform/resolvers/effect-ts';
 import { useRouter } from 'expo-router';
 import { memo, useCallback, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { Resolver, useForm } from 'react-hook-form';
 import { TextInput, View } from 'react-native';
 
 // Components
@@ -15,7 +15,7 @@ import { useToastAlert } from '@/hooks/useToast';
 // Constants
 import {
   ChangePasswordFormData,
-  changePasswordSchema,
+  changePasswordSchema as changePasswordSchemaEffect,
   ERROR_MESSAGES,
   MESSAGES,
   ToastType,
@@ -35,7 +35,9 @@ export const ChangePasswordForm = memo(() => {
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<ChangePasswordFormData>({
-    resolver: valibotResolver(changePasswordSchema),
+    resolver: effectTsResolver(
+      changePasswordSchemaEffect,
+    ) as unknown as Resolver<ChangePasswordFormData>,
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     defaultValues: {

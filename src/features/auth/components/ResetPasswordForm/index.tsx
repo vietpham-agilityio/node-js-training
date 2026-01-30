@@ -1,20 +1,23 @@
-import { valibotResolver } from '@hookform/resolvers/valibot';
+import { effectTsResolver } from '@hookform/resolvers/effect-ts';
 import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Resolver, useForm } from 'react-hook-form';
 import { TextInput, View } from 'react-native';
 
 // Components
 import { Button } from '@/components/Button';
-import { Typo } from '@/components/Typo';
 import { PasswordInput } from '@/components/PasswordInput';
+import { Typo } from '@/components/Typo';
+
+// Utils
+import { runEffectForQuery } from '@/utils/effect';
 
 // Constants
 import {
   ERROR_MESSAGES,
   MESSAGES,
   ResetPasswordFormData,
-  resetPasswordSchema,
+  resetPasswordSchema as resetPasswordSchemaEffect,
   ToastType,
 } from '@/constants';
 
@@ -24,7 +27,6 @@ import { useToastAlert } from '@/hooks/useToast';
 
 // Services
 import { supabase } from '@/services/supabase/client';
-import { runEffectForQuery } from '@/utils/effect';
 import { Effect } from 'effect';
 import { AuthService } from '../../effect/services';
 import { AuthServiceLayer } from '../../layer';
@@ -47,7 +49,9 @@ export const ResetPasswordForm = () => {
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<ResetPasswordFormData>({
-    resolver: valibotResolver(resetPasswordSchema),
+    resolver: effectTsResolver(
+      resetPasswordSchemaEffect,
+    ) as unknown as Resolver<ResetPasswordFormData>,
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     defaultValues: {

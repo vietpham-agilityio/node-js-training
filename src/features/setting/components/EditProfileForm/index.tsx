@@ -1,19 +1,22 @@
-import { valibotResolver } from '@hookform/resolvers/valibot';
+import { effectTsResolver } from '@hookform/resolvers/effect-ts';
 import { memo, useCallback, useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, type Resolver } from 'react-hook-form';
 import { TextInput, View } from 'react-native';
 
 // Components
 import { Button } from '@/components/Button';
+import { EmailInput } from '@/components/EmailInput';
 import { Input } from '@/components/Input';
 import { EditableAvatar } from '@/features/camera/components/EditableAvatar';
-import { EmailInput } from '@/components/EmailInput';
 
 // Types
 import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
 
 // Constants
-import { EditProfileFormData, editProfileSchema } from '@/constants';
+import {
+  EditProfileFormData,
+  editProfileSchema as editProfileSchemaEffect,
+} from '@/constants';
 
 interface EditProfileProps {
   userInfo?: UserProfile;
@@ -33,7 +36,9 @@ export const EditProfileForm = memo(
       handleSubmit,
       formState: { errors, isSubmitting, isDirty, dirtyFields },
     } = useForm<EditProfileFormData>({
-      resolver: valibotResolver(editProfileSchema),
+      resolver: effectTsResolver(
+        editProfileSchemaEffect,
+      ) as unknown as Resolver<EditProfileFormData>,
       mode: 'onBlur',
       reValidateMode: 'onBlur',
       defaultValues: {
