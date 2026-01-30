@@ -1,193 +1,150 @@
-import * as v from 'valibot';
 import { Schema } from 'effect';
 
-// Constans
+// Constants
 import { ERROR_MESSAGES } from './messages';
-import { LOWERCASE_REGEX, SPECIAL_CHAR_REGEX, UPPERCASE_REGEX } from './regex';
+import {
+  LOWERCASE_REGEX,
+  SPECIAL_CHAR_REGEX,
+  UPPERCASE_REGEX,
+  EMAIL_REGEX,
+} from './regex';
 
-// Custom password validations
-const hasUppercase = (input: string) => UPPERCASE_REGEX.test(input);
-const hasLowercase = (input: string) => LOWERCASE_REGEX.test(input);
-const hasSpecialChar = (input: string) => SPECIAL_CHAR_REGEX.test(input);
+// Email Brand
+export const EmailBrand = Schema.String.pipe(
+  Schema.minLength(1, { message: () => ERROR_MESSAGES.EMAIL_REQUIRED }),
+  Schema.filter(s => EMAIL_REGEX.test(s), {
+    message: () => ERROR_MESSAGES.EMAIL_INVALID,
+  }),
+  Schema.brand('Email'),
+);
+export type EmailType = Schema.Schema.Type<typeof EmailBrand>;
 
-export const signInSchema = v.object({
-  email: v.pipe(
-    v.string(ERROR_MESSAGES.EMAIL_REQUIRED),
-    v.nonEmpty(ERROR_MESSAGES.EMAIL_REQUIRED),
-    v.email(ERROR_MESSAGES.EMAIL_INVALID),
+// Password Brand
+export const PasswordBrand = Schema.String.pipe(
+  Schema.minLength(1, { message: () => ERROR_MESSAGES.PASSWORD_REQUIRED }),
+  Schema.minLength(8, {
+    message: () => ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8),
+  }),
+  Schema.filter(s => UPPERCASE_REGEX.test(s), {
+    message: () => ERROR_MESSAGES.PASSWORD_UPPERCASE,
+  }),
+  Schema.filter(s => LOWERCASE_REGEX.test(s), {
+    message: () => ERROR_MESSAGES.PASSWORD_LOWERCASE,
+  }),
+  Schema.filter(s => SPECIAL_CHAR_REGEX.test(s), {
+    message: () => ERROR_MESSAGES.PASSWORD_SPECIAL_CHAR,
+  }),
+  Schema.brand('Password'),
+);
+export type PasswordType = Schema.Schema.Type<typeof PasswordBrand>;
+
+// Full Name Brand
+export const FullNameBrand = Schema.String.pipe(
+  Schema.minLength(1, { message: () => ERROR_MESSAGES.FULL_NAME_REQUIRED }),
+  Schema.minLength(2, {
+    message: () => ERROR_MESSAGES.FULL_NAME_MIN_LENGTH(2),
+  }),
+  Schema.maxLength(50, {
+    message: () => ERROR_MESSAGES.FULL_NAME_MAX_LENGTH(50),
+  }),
+  Schema.brand('FullName'),
+);
+export type FullNameType = Schema.Schema.Type<typeof FullNameBrand>;
+
+// Phone Number Brand
+export const PhoneNumberBrand = Schema.NullOr(Schema.String).pipe(
+  Schema.transform(Schema.String, {
+    decode: val => val ?? '',
+    encode: val => val,
+  }),
+  Schema.filter(
+    val =>
+      val.length === 0 ||
+      (/^\+?[1-9]\d{1,14}$/.test(val) && val.replace(/\D/g, '').length >= 9),
+    {
+      message: () => ERROR_MESSAGES.INVALID_PHONE_NUMBER,
+    },
   ),
-  password: v.pipe(
-    v.string(ERROR_MESSAGES.PASSWORD_REQUIRED),
-    v.nonEmpty(ERROR_MESSAGES.PASSWORD_REQUIRED),
-    v.minLength(8, ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8)),
-    v.check(hasUppercase, ERROR_MESSAGES.PASSWORD_UPPERCASE),
-    v.check(hasLowercase, ERROR_MESSAGES.PASSWORD_LOWERCASE),
-    v.check(hasSpecialChar, ERROR_MESSAGES.PASSWORD_SPECIAL_CHAR),
-  ),
+  Schema.brand('PhoneNumber'),
+);
+export type PhoneNumberType = Schema.Schema.Type<typeof PhoneNumberBrand>;
+
+// Address Brand
+export const AddressBrand = Schema.NullOr(Schema.String).pipe(
+  Schema.transform(Schema.String, {
+    decode: val => (val ?? '').trim(),
+    encode: val => val,
+  }),
+  Schema.brand('Address'),
+);
+export type AddressType = Schema.Schema.Type<typeof AddressBrand>;
+
+// Sign In Schema
+export const signInSchema = Schema.Struct({
+  email: EmailBrand,
+  password: PasswordBrand,
 });
+export type SignInFormData = Schema.Schema.Type<typeof signInSchema>;
 
-export interface SignUpData {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  avatarUrl?: string;
-}
-
-export const signUpSchema = v.pipe(
-  v.object({
-    fullName: v.pipe(
-      v.string(),
-      v.minLength(1, ERROR_MESSAGES.FULL_NAME_REQUIRED),
-      v.minLength(2, ERROR_MESSAGES.FULL_NAME_MIN_LENGTH(2)),
-      v.maxLength(50, ERROR_MESSAGES.FULL_NAME_MAX_LENGTH(50)),
-    ),
-    email: v.pipe(
-      v.string(),
-      v.minLength(1, ERROR_MESSAGES.EMAIL_REQUIRED),
-      v.email(ERROR_MESSAGES.EMAIL_INVALID),
-    ),
-    password: v.pipe(
-      v.string(ERROR_MESSAGES.PASSWORD_REQUIRED),
-      v.nonEmpty(ERROR_MESSAGES.PASSWORD_REQUIRED),
-      v.minLength(8, ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8)),
-      v.check(hasUppercase, ERROR_MESSAGES.PASSWORD_UPPERCASE),
-      v.check(hasLowercase, ERROR_MESSAGES.PASSWORD_LOWERCASE),
-      v.check(hasSpecialChar, ERROR_MESSAGES.PASSWORD_SPECIAL_CHAR),
-    ),
-    confirmPassword: v.pipe(
-      v.string(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
-      v.nonEmpty(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
-    ),
-    avatarUrl: v.optional(v.string()),
-  }),
-  v.forward(
-    v.partialCheck(
-      [['password'], ['confirmPassword']],
-      input => input.password === input.confirmPassword,
-      ERROR_MESSAGES.PASSWORD_NOT_MATCH,
-    ),
-    ['confirmPassword'],
+// Sign Up Schema with password confirmation
+export const signUpSchema = Schema.Struct({
+  fullName: FullNameBrand,
+  email: EmailBrand,
+  password: PasswordBrand,
+  confirmPassword: Schema.String.pipe(
+    Schema.minLength(1, {
+      message: () => ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED,
+    }),
   ),
-);
-
-export const editProfileSchema = v.pipe(
-  v.object({
-    fullName: v.pipe(
-      v.string(),
-      v.minLength(1, ERROR_MESSAGES.FULL_NAME_REQUIRED),
-      v.minLength(2, ERROR_MESSAGES.FULL_NAME_MIN_LENGTH(2)),
-      v.maxLength(50, ERROR_MESSAGES.FULL_NAME_MAX_LENGTH(50)),
-    ),
-
-    email: v.pipe(
-      v.string(),
-      v.minLength(1, ERROR_MESSAGES.EMAIL_REQUIRED),
-      v.email(ERROR_MESSAGES.EMAIL_INVALID),
-    ),
-
-    address: v.pipe(
-      v.union([v.string(), v.null()]),
-      v.transform(val => (val ?? '').trim()),
-    ),
-
-    phoneNumber: v.pipe(
-      v.union([v.string(), v.null()]),
-      v.transform(val => val ?? ''),
-      v.check(
-        val =>
-          val.length === 0 ||
-          (/^\+?[1-9]\d{1,14}$/.test(val) &&
-            val.replace(/\D/g, '').length >= 9),
-        ERROR_MESSAGES.INVALID_PHONE_NUMBER,
-      ),
-    ),
-
-    avatarUrl: v.pipe(v.union([v.string(), v.null()])),
+  avatarUrl: Schema.optional(Schema.String),
+}).pipe(
+  Schema.filter(data => data.password === data.confirmPassword, {
+    message: () => ERROR_MESSAGES.PASSWORD_NOT_MATCH,
   }),
 );
+export type SignUpFormData = Schema.Schema.Type<typeof signUpSchema>;
 
-export const changePasswordSchema = v.pipe(
-  v.object({
-    currentPassword: v.pipe(
-      v.string(ERROR_MESSAGES.PASSWORD_REQUIRED),
-      v.nonEmpty(ERROR_MESSAGES.PASSWORD_REQUIRED),
-    ),
-    newPassword: v.pipe(
-      v.string(ERROR_MESSAGES.PASSWORD_REQUIRED),
-      v.nonEmpty(ERROR_MESSAGES.PASSWORD_REQUIRED),
-      v.minLength(8, ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8)),
-      v.check(hasUppercase, ERROR_MESSAGES.PASSWORD_UPPERCASE),
-      v.check(hasLowercase, ERROR_MESSAGES.PASSWORD_LOWERCASE),
-      v.check(hasSpecialChar, ERROR_MESSAGES.PASSWORD_SPECIAL_CHAR),
-    ),
-    confirmPassword: v.pipe(
-      v.string(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
-      v.nonEmpty(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
-    ),
-  }),
-  v.forward(
-    v.partialCheck(
-      [['newPassword'], ['confirmPassword']],
-      input => input.newPassword === input.confirmPassword,
-      ERROR_MESSAGES.PASSWORD_NOT_MATCH,
-    ),
-    ['confirmPassword'],
-  ),
-);
+// Edit Profile Schema
+export const editProfileSchema = Schema.Struct({
+  fullName: FullNameBrand,
+  email: EmailBrand,
+  address: AddressBrand,
+  phoneNumber: PhoneNumberBrand,
+  avatarUrl: Schema.NullOr(Schema.String),
+});
+export type EditProfileFormData = Schema.Schema.Type<typeof editProfileSchema>;
 
-// Validation schema
-export const resetPasswordSchema = v.pipe(
-  v.object({
-    newPassword: v.pipe(
-      v.string(ERROR_MESSAGES.PASSWORD_REQUIRED),
-      v.nonEmpty(ERROR_MESSAGES.PASSWORD_REQUIRED),
-      v.minLength(8, ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8)),
-      v.check(hasUppercase, ERROR_MESSAGES.PASSWORD_UPPERCASE),
-      v.check(hasLowercase, ERROR_MESSAGES.PASSWORD_LOWERCASE),
-      v.check(hasSpecialChar, ERROR_MESSAGES.PASSWORD_SPECIAL_CHAR),
-    ),
-    confirmPassword: v.pipe(
-      v.string(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
-      v.nonEmpty(ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
-    ),
-  }),
-  v.forward(
-    v.partialCheck(
-      [['newPassword'], ['confirmPassword']],
-      input => input.newPassword === input.confirmPassword,
-      ERROR_MESSAGES.PASSWORD_NOT_MATCH,
-    ),
-    ['confirmPassword'],
-  ),
-);
-
-export const forgotPasswordSchema = v.pipe(
-  v.object({
-    email: v.pipe(
-      v.string(),
-      v.minLength(1, ERROR_MESSAGES.EMAIL_REQUIRED),
-      v.email(ERROR_MESSAGES.EMAIL_INVALID),
-    ),
+// Change Password Schema
+export const changePasswordSchema = Schema.Struct({
+  currentPassword: PasswordBrand,
+  newPassword: PasswordBrand,
+  confirmPassword: PasswordBrand,
+}).pipe(
+  Schema.filter(data => data.newPassword === data.confirmPassword, {
+    message: () => ERROR_MESSAGES.PASSWORD_NOT_MATCH,
   }),
 );
+export type ChangePasswordFormData = Schema.Schema.Type<
+  typeof changePasswordSchema
+>;
 
-export class Pokemon extends Schema.Class<Pokemon>('Pokemon')({
-  id: Schema.Number,
-  order: Schema.Number,
-  name: Schema.String,
-  height: Schema.Number,
-  weight: Schema.Number,
-}) {}
+// Reset Password Schema
+export const resetPasswordSchema = Schema.Struct({
+  newPassword: PasswordBrand,
+  confirmPassword: PasswordBrand,
+}).pipe(
+  Schema.filter(data => data.newPassword === data.confirmPassword, {
+    message: () => ERROR_MESSAGES.PASSWORD_NOT_MATCH,
+  }),
+);
+export type ResetPasswordFormData = Schema.Schema.Type<
+  typeof resetPasswordSchema
+>;
 
-export type ResetPasswordFormData = v.InferOutput<typeof resetPasswordSchema>;
-
-export type ChangePasswordFormData = v.InferOutput<typeof changePasswordSchema>;
-
-export type SignUpFormData = v.InferOutput<typeof signUpSchema>;
-
-export type SignInFormData = v.InferInput<typeof signInSchema>;
-
-export type EditProfileFormData = v.InferInput<typeof editProfileSchema>;
-
-export type ForgotPasswordFormData = v.InferInput<typeof forgotPasswordSchema>;
+// Forgot Password Schema
+export const forgotPasswordSchema = Schema.Struct({
+  email: EmailBrand,
+});
+export type ForgotPasswordFormData = Schema.Schema.Type<
+  typeof forgotPasswordSchema
+>;

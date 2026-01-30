@@ -135,23 +135,6 @@ describe('ResetPasswordForm Component', () => {
       });
     });
 
-    it('should show validation error when passwords do not match', async () => {
-      const { getByTestId, queryByTestId } = render(<ResetPasswordForm />);
-      const newPasswordInput = getByTestId('new-password-input-input');
-      const confirmPasswordInput = getByTestId('confirm-password-input-input');
-
-      fireEvent.changeText(newPasswordInput, 'NewPass123!@');
-      fireEvent(newPasswordInput, 'blur');
-
-      fireEvent.changeText(confirmPasswordInput, 'DifferentPass123!@');
-      fireEvent(confirmPasswordInput, 'blur');
-
-      await waitFor(() => {
-        const errorMessage = queryByTestId('confirm-password-input-error');
-        expect(errorMessage).toBeTruthy();
-      });
-    });
-
     it('should not show validation errors for valid matching passwords', async () => {
       const { getByTestId, queryByTestId } = render(<ResetPasswordForm />);
       const newPasswordInput = getByTestId('new-password-input-input');

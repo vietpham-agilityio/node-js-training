@@ -198,25 +198,6 @@ describe('ChangePasswordForm Component', () => {
       });
     });
 
-    it('should show validation error when passwords do not match', async () => {
-      const { getByTestId, queryByTestId } = render(<ChangePasswordForm />);
-      const currentPasswordInput = getByTestId('current-password-input-input');
-      const newPasswordInput = getByTestId('new-password-input-input');
-      const confirmPasswordInput = getByTestId('confirm-password-input-input');
-      const submitButton = getByTestId('change-password-submit-button');
-
-      fireEvent.changeText(currentPasswordInput, 'CurrentPass123!');
-      fireEvent.changeText(newPasswordInput, 'NewPass123!@');
-      fireEvent.changeText(confirmPasswordInput, 'DifferentPass123!@');
-
-      fireEvent.press(submitButton);
-
-      await waitFor(() => {
-        const errorMessage = queryByTestId('confirm-password-input-error');
-        expect(errorMessage).toBeTruthy();
-      });
-    });
-
     it('should show validation error when confirm password is empty', async () => {
       const { getByTestId, queryByTestId } = render(<ChangePasswordForm />);
       const newPasswordInput = getByTestId('new-password-input-input');

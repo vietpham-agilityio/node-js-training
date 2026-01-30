@@ -1,12 +1,12 @@
-import { valibotResolver } from '@hookform/resolvers/valibot';
 import { memo, useCallback, useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, Resolver, useForm } from 'react-hook-form';
 import { TextInput, View } from 'react-native';
+import { effectTsResolver } from '@hookform/resolvers/effect-ts';
 
 // Components
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
 import { EmailInput } from '@/components/EmailInput';
+import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
 import { EditableAvatar } from '@/features/camera/components/EditableAvatar';
 
@@ -14,7 +14,10 @@ import { EditableAvatar } from '@/features/camera/components/EditableAvatar';
 import { SignUpData } from '@/features/auth/types/auth';
 
 // Constants
-import { SignUpFormData, signUpSchema } from '@/constants';
+import {
+  SignUpFormData,
+  signUpSchema as signUpSchemaEffect,
+} from '@/constants';
 
 interface SignUpFormProps {
   isPending: boolean;
@@ -32,7 +35,9 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<SignUpFormData>({
-    resolver: valibotResolver(signUpSchema),
+    resolver: effectTsResolver(
+      signUpSchemaEffect,
+    ) as unknown as Resolver<SignUpFormData>,
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     defaultValues: {
