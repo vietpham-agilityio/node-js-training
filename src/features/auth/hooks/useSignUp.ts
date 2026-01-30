@@ -45,16 +45,13 @@ export const useSignUp = () => {
       );
     },
     onError: error => {
-      toast.alert(
-        ERROR_MESSAGES.SIGNUP_FAILED,
-        error instanceof Error
+      const message =
+        error instanceof Error && error.message
           ? error.message
-          : ERROR_MESSAGES.CREATE_ACCOUNT_FAILED,
-        [],
-        {
-          type: ToastType.ERROR,
-        },
-      );
+          : ERROR_MESSAGES.SIGNUP_FAILED;
+      toast.alert(ERROR_MESSAGES.SIGNUP_FAILED, message, [], {
+        type: ToastType.ERROR,
+      });
     },
   });
 };

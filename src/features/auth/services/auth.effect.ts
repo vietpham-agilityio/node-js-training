@@ -6,7 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 // Type
 import { SignInData, SignUpData } from '@/features/auth/types/auth';
 import { AuthenticationError } from '../error/auth';
-import { ROUTES } from '@/constants';
+import { ERROR_MESSAGES, ROUTES } from '@/constants';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -37,7 +37,9 @@ export class AuthServiceEffect {
           }),
         catch: error =>
           AuthenticationError.signUpFailed(
-            error instanceof Error ? error.message : '',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -61,13 +63,14 @@ export class AuthServiceEffect {
           }),
         catch: error =>
           AuthenticationError.loginFailed(
-            error instanceof Error ? error.message : '', // Error in case of API failure
+            (error instanceof Error && error.message) ||
+              ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
       if (error) {
         return yield* Effect.fail(
-          AuthenticationError.loginFailed(error.message), // Error when reponse is error
+          AuthenticationError.loginFailed(error.message),
         );
       }
 
@@ -163,7 +166,7 @@ export class AuthServiceEffect {
           AuthenticationError.oauthFailed(
             error instanceof Error
               ? error.message
-              : 'OAuth initialization failed',
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -181,19 +184,25 @@ export class AuthServiceEffect {
           ),
         catch: (error: unknown) =>
           AuthenticationError.oauthFailed(
-            error instanceof Error ? error.message : 'Browser session failed',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
       if (result.type === 'cancel') {
         return yield* Effect.fail(
-          AuthenticationError.oauthCancelled('Authentication was cancelled'),
+          AuthenticationError.oauthCancelled(
+            ERROR_MESSAGES.AUTHENTICATION_CANCELLED,
+          ),
         );
       }
 
       if (result.type !== 'success') {
         return yield* Effect.fail(
-          AuthenticationError.oauthFailed('OAuth authentication failed'),
+          AuthenticationError.oauthFailed(
+            ERROR_MESSAGES.OAUTH_AUTHENTICATION_FAILED,
+          ),
         );
       }
 
@@ -219,14 +228,14 @@ export class AuthServiceEffect {
           AuthenticationError.oauthFailed(
             error instanceof Error
               ? error.message
-              : 'Failed to parse OAuth callback URL',
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
       if (!tokens) {
         return yield* Effect.fail(
           AuthenticationError.oauthFailed(
-            'Failed to parse authentication tokens from callback URL',
+            ERROR_MESSAGES.FAILED_TO_PARSE_AUTHENTICATION_TOKENS_FROM_CALLBACK_URL,
           ),
         );
       }
@@ -239,7 +248,9 @@ export class AuthServiceEffect {
           }),
         catch: (error: unknown) =>
           AuthenticationError.sessionFailed(
-            error instanceof Error ? error.message : 'Failed to set session',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -266,7 +277,7 @@ export class AuthServiceEffect {
           AuthenticationError.oauthFailed(
             error instanceof Error
               ? error.message
-              : 'Failed to create redirect URL',
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -283,7 +294,7 @@ export class AuthServiceEffect {
           AuthenticationError.oauthFailed(
             error instanceof Error
               ? error.message
-              : 'OAuth initialization failed',
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -301,19 +312,25 @@ export class AuthServiceEffect {
           ),
         catch: (error: unknown) =>
           AuthenticationError.oauthFailed(
-            error instanceof Error ? error.message : 'Browser session failed',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
       if (result.type === 'cancel') {
         return yield* Effect.fail(
-          AuthenticationError.oauthCancelled('Authentication was cancelled'),
+          AuthenticationError.oauthCancelled(
+            ERROR_MESSAGES.AUTHENTICATION_CANCELLED,
+          ),
         );
       }
 
       if (result.type !== 'success') {
         return yield* Effect.fail(
-          AuthenticationError.oauthFailed('OAuth authentication failed'),
+          AuthenticationError.oauthFailed(
+            ERROR_MESSAGES.OAUTH_AUTHENTICATION_FAILED,
+          ),
         );
       }
 
@@ -325,7 +342,7 @@ export class AuthServiceEffect {
           AuthenticationError.oauthFailed(
             error instanceof Error
               ? error.message
-              : 'Failed to get OAuth error',
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
       if (oauthError) {
@@ -338,13 +355,13 @@ export class AuthServiceEffect {
           AuthenticationError.oauthFailed(
             error instanceof Error
               ? error.message
-              : 'Failed to parse OAuth callback URL',
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
       if (!tokens) {
         return yield* Effect.fail(
           AuthenticationError.oauthFailed(
-            'Failed to parse authentication tokens from callback URL',
+            ERROR_MESSAGES.FAILED_TO_PARSE_AUTHENTICATION_TOKENS_FROM_CALLBACK_URL,
           ),
         );
       }
@@ -357,7 +374,9 @@ export class AuthServiceEffect {
           }),
         catch: (error: unknown) =>
           AuthenticationError.sessionFailed(
-            error instanceof Error ? error.message : 'Failed to set session',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -377,7 +396,9 @@ export class AuthServiceEffect {
         try: async () => await supabase.auth.signOut(),
         catch: (error: unknown) =>
           AuthenticationError.signOutFailed(
-            error instanceof Error ? error.message : 'Sign out failed',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -400,7 +421,9 @@ export class AuthServiceEffect {
         try: async () => await supabase.auth.getSession(),
         catch: (error: unknown) =>
           AuthenticationError.sessionFailed(
-            error instanceof Error ? error.message : 'Failed to get session',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -423,7 +446,9 @@ export class AuthServiceEffect {
         try: async () => await supabase.auth.refreshSession(),
         catch: (error: unknown) =>
           AuthenticationError.sessionFailed(
-            error instanceof Error ? error.message : '',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -446,7 +471,9 @@ export class AuthServiceEffect {
           }),
         catch: (error: unknown) =>
           AuthenticationError.updatePasswordFailed(
-            error instanceof Error ? error.message : '',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -457,7 +484,9 @@ export class AuthServiceEffect {
           }),
         catch: (error: unknown) =>
           AuthenticationError.updatePasswordFailed(
-            error instanceof Error ? error.message : '',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -478,7 +507,9 @@ export class AuthServiceEffect {
           }),
         catch: (error: unknown) =>
           AuthenticationError.updatePasswordFailed(
-            error instanceof Error ? error.message : '',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 
@@ -510,7 +541,9 @@ export class AuthServiceEffect {
           }),
         catch: (error: unknown) =>
           AuthenticationError.currentPasswordIncorrect(
-            error instanceof Error ? error.message : '',
+            error instanceof Error
+              ? error.message
+              : ERROR_MESSAGES.UNKNOWN_ERROR,
           ),
       });
 

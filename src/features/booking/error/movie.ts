@@ -1,8 +1,5 @@
 import { Data } from 'effect';
 
-// Constants
-import { ERROR_MESSAGES } from '@/constants/messages';
-
 export class MovieError extends Data.TaggedError('MovieError')<{
   message: string;
 }> {
@@ -25,25 +22,25 @@ export class MovieError extends Data.TaggedError('MovieError')<{
 
   static movieNetworkError = (message: string) => {
     return new MovieError({
-      message: message || ERROR_MESSAGES.MOVIE_NETWORK_ERROR,
+      message: message,
     });
   };
 
   static movieNotFound = (message: string) => {
     return new MovieError({
-      message: message || ERROR_MESSAGES.MOVIE_NOT_FOUND,
+      message: message,
     });
   };
 
   static showtimeNotFound = (message: string) => {
     return new MovieError({
-      message: message || ERROR_MESSAGES.SHOWTIME_NOT_FOUND,
+      message: message,
     });
   };
 
   static searchFailed = (message: string) => {
     return new MovieError({
-      message: message || ERROR_MESSAGES.MOVIE_SEARCH_FAILED,
+      message: message,
     });
   };
 }

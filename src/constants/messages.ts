@@ -4,29 +4,22 @@ import { BookingStatus } from '@/features/booking/schemas/booking';
 import { BOOKING_STATUS } from './status';
 
 export const ERROR_MESSAGES = {
+  UNKNOWN_ERROR: 'Something went wrong. Please try again later.',
+  AUTHENTICATION_CANCELLED: 'Authentication was cancelled',
+  OAUTH_AUTHENTICATION_FAILED: 'OAuth authentication failed',
+  FAILED_TO_PARSE_AUTHENTICATION_TOKENS_FROM_CALLBACK_URL:
+    'Failed to parse authentication tokens from callback URL',
   UPDATE_PROFILE_ERROR: 'Failed to update profile. Please try again later.',
   GET_PROFILE_ERROR: 'Failed to get profile. Please try again later.',
   DELETE_AVATAR_ERROR: 'Failed to delete avatar. Please try again later.',
   UPLOAD_AVATAR_ERROR: 'Failed to upload avatar. Please try again later.',
-  CINEMA_LOAD_FAILED: 'Failed to load cinemas. Please try again later.',
-  CINEMA_NOT_FOUND: 'Cinema not found.',
-  CINEMA_HALL_NOT_FOUND: 'Cinema hall not found.',
-  MOVIE_NOT_FOUND: 'Movie not found.',
-  SHOWTIME_NOT_FOUND: 'Showtime not found.',
-  MOVIE_SEARCH_FAILED: 'Failed to search movies. Please try again.',
   INVALID_TICKET: 'Invalid ticket',
   TICKET_ALREADY_USED: 'Ticket already used',
-  EMAIL_ALREADY_REGISTERED: 'Email already registerd',
-  INVALID_CREDENTIALS: 'Invalid',
   INSUFFICIENT_WALLET_BALANCE: 'Insufficient wallet',
   WALLET_NOT_FOUND: 'Wallet not found',
   NO_RESULT_RETURNED: 'No result returned',
   NOT_FOUND: 'not found',
-  BOOKING_CANCELLED: 'Booking cancelled',
   BOOKING_NOT_FOUND: 'Booking not found',
-  FAILED_TO: 'Failed to',
-  RESERVE_SEATS_FAILED: 'Failed to reserve seats',
-  RELEASE_SEATS_FAILED: 'Failed to release seats',
   CANCEL_BOOKING_FAILED: 'Failed to cancel booking',
   TICKET_EXPIRED: 'Ticket expired',
   TICKET_INVALID_FORMAT: 'Invalid QR code format',
@@ -51,9 +44,6 @@ export const ERROR_MESSAGES = {
   GOOGLE_SIGN_IN_FAILED: 'Google Sign In Failed',
   FACEBOOK_SIGN_IN_FAILED: 'Facebook Sign In Failed',
   SIGNUP_FAILED: 'Sign Up Failed',
-  CREATE_ACCOUNT_FAILED: 'Failed to create account',
-  SIGN_OUT_FAILED: 'Failed to sign out',
-  CONFIRM_ACCOUNT_FAILED: 'Failed to confirm account',
   MOVIE_NETWORK_ERROR:
     'We’re having trouble loading movies. Please try again later.',
   TICKET_NETWORK_ERROR:
@@ -67,17 +57,11 @@ export const ERROR_MESSAGES = {
   TOP_UP_MIN_AMOUNT: 'Minimum top-up amount is IDR 10.000',
   TOP_UP_MAX_AMOUNT: 'Maximum top-up amount is IDR 10.000.000',
   UPDATE_PASSWORD_FAILED: 'Failed to update password. Please try again.',
-  CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
   SOMETHING_WENT_WRONG: 'Something went wrong. Please try again later.',
   TICKET_VALIDATION_FAILED: 'Failed to validate ticket. Please try again.',
-  SESSION_FAILED: 'Failed to set session',
-  OAUTH_CANCELLED: 'Authentication was cancelled',
-  OAUTH_FAILED: 'OAuth authentication failed',
 };
 
 export const MESSAGES = {
-  NO_SHOWTIMES_AVAILABLE_TITLE: 'No showtimes available',
-  NO_SHOWTIMES_AVAILABLE_DESCRIPTION: 'Please select a different date',
   TICKET_VALIDATED_SUCCESS: 'Ticket validated successfully',
   PERMISSION_REQUIRED: 'Permission Required',
   CAMERA_ROLL_PERMISSION_REQUIRED:
@@ -88,10 +72,6 @@ export const MESSAGES = {
   SIGNIN_SUCCESS: 'Successfully signed in!',
   ACCOUNT_VERIFICATION_SUCCESS:
     'Account created successfully! Please check your email to verify your account.',
-  SIGN_OUT: 'Sign Out',
-  SIGN_OUT_MESSAGE: 'Are you sure you want to sign out?',
-  CONFIRM_SUCCESS: 'Confirm account successful',
-  CONFIRM_SUCCESS_MESSAGE: 'Your account is ready! Welcome aboard.',
   NO_RESULT_FOUND: 'No results found. Please try a different search.',
   NO_TICKETS: 'Start your movie journey by booking a ticket',
   NO_ACTIVE_TICKETS: 'Book a movie to see your active tickets here',

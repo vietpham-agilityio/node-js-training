@@ -181,7 +181,9 @@ export class BookingsServiceEffect {
         }
 
         if (!result || result.length === 0) {
-          throw BookingError.noResultReturnedFromBookingTransaction();
+          throw BookingError.noResultReturnedFromBookingTransaction(
+            ERROR_MESSAGES.NO_RESULT_RETURNED,
+          );
         }
 
         const txResult = keysToCamel(result[0]) as BookingTransactionResult;
@@ -205,11 +207,13 @@ export class BookingsServiceEffect {
         const booking = await Effect.runPromise(this.getBookingById(bookingId));
 
         if (!booking) {
-          throw BookingError.bookingNotFound();
+          throw BookingError.bookingNotFound(ERROR_MESSAGES.BOOKING_NOT_FOUND);
         }
 
         if (booking.bookingStatus === BOOKING_STATUS.CANCELLED) {
-          throw BookingError.bookingAlreadyCancelled();
+          throw BookingError.cancelBookingFailed(
+            ERROR_MESSAGES.CANCEL_BOOKING_FAILED,
+          );
         }
 
         // Call stored procedure for atomic cancel + refund
@@ -219,7 +223,7 @@ export class BookingsServiceEffect {
         });
 
         if (error) {
-          throw error;
+          throw BookingError.cancelBookingFailed(error.message);
         }
       },
       catch: (error: unknown) =>

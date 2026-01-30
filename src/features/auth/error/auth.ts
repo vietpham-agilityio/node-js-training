@@ -1,8 +1,5 @@
 import { Data } from 'effect';
 
-// Constants
-import { ERROR_MESSAGES } from '@/constants/messages';
-
 export class AuthenticationError extends Data.TaggedError(
   'AuthenticationError',
 )<{
@@ -35,97 +32,97 @@ export class AuthenticationError extends Data.TaggedError(
 
   static loginFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.LOGIN_FAILED,
+      message: message,
     });
   };
 
   static invalidEmailPassword = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.INVALID_EMAIL_PASSWORD,
+      message: message,
     });
   };
 
   static googleSignInFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.GOOGLE_SIGN_IN_FAILED,
+      message: message,
     });
   };
 
   static facebookSignInFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.FACEBOOK_SIGN_IN_FAILED,
+      message: message,
     });
   };
 
   static signUpFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.SIGNUP_FAILED,
+      message: message,
     });
   };
 
-  static signUpWithEmailRegistered = () => {
+  static signUpWithEmailRegistered = (message: string) => {
     return new AuthenticationError({
-      message: ERROR_MESSAGES.EMAIL_ALREADY_REGISTERED,
+      message: message,
     });
   };
 
   static createAccountFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.CREATE_ACCOUNT_FAILED,
+      message: message,
     });
   };
 
   static signOutFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.SIGN_OUT_FAILED,
+      message: message,
     });
   };
 
   static confirmAccountFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.CONFIRM_ACCOUNT_FAILED,
+      message: message,
     });
   };
 
   static updateFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.UPDATE_FAILED,
+      message: message,
     });
   };
 
   static updateProfileFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.UPDATE_PROFILE_FAILED,
+      message: message,
     });
   };
 
   static updatePasswordFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.UPDATE_PASSWORD_FAILED,
+      message: message,
     });
   };
 
   static currentPasswordIncorrect = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.CURRENT_PASSWORD_INCORRECT,
+      message: message,
     });
   };
 
   static oauthFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.GOOGLE_SIGN_IN_FAILED,
+      message: message,
     });
   };
 
   static sessionFailed = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.SESSION_FAILED,
+      message: message,
     });
   };
 
   static oauthCancelled = (message: string) => {
     return new AuthenticationError({
-      message: message || ERROR_MESSAGES.OAUTH_CANCELLED,
+      message: message,
     });
   };
 }

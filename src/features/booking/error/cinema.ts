@@ -1,8 +1,5 @@
 import { Data } from 'effect';
 
-// Constants
-import { ERROR_MESSAGES } from '@/constants/messages';
-
 export class CinemaError extends Data.TaggedError('CinemaError')<{
   message: string;
 }> {
@@ -25,13 +22,13 @@ export class CinemaError extends Data.TaggedError('CinemaError')<{
 
   static cinemaNotFound = (message: string) => {
     return new CinemaError({
-      message: message || ERROR_MESSAGES.CINEMA_NOT_FOUND,
+      message: message,
     });
   };
 
   static cinemaHallNotFound = (message: string) => {
     return new CinemaError({
-      message: message || ERROR_MESSAGES.CINEMA_HALL_NOT_FOUND,
+      message: message,
     });
   };
 }
