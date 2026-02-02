@@ -2,7 +2,7 @@
 import { supabase } from '@/services/supabase/client';
 
 // Effect
-import { Effect } from 'effect';
+import { Duration, Effect, Schedule } from 'effect';
 
 // Types
 import { Booking } from '@/features/booking/schemas/booking';
@@ -48,13 +48,26 @@ export class BookingsServiceEffect {
     return BookingsServiceEffect.instance;
   }
 
+  private static readonly getBookingsRetryPolicy = Schedule.recurs(2).pipe(
+    Schedule.addDelay(
+      (count: number) => Duration.millis(Math.min(1000 * 2 ** count, 30000)), // 30 seconds
+    ),
+  );
+
+  private static readonly createBookingRetryPolicy = Schedule.recurs(2).pipe(
+    Schedule.addDelay(
+      (count: number) => Duration.millis(Math.min(1000 * 2 ** count, 30000)), // 30 seconds
+    ),
+  );
+
   getBookings = (userId: string, status?: string) =>
-    Effect.tryPromise({
-      try: async () => {
-        let query = supabase
-          .from('bookings')
-          .select(
-            `
+    Effect.retry(
+      Effect.tryPromise({
+        try: async () => {
+          let query = supabase
+            .from('bookings')
+            .select(
+              `
           id,
           user_id,
           showtime_id,
@@ -97,25 +110,29 @@ export class BookingsServiceEffect {
             )
           )
         `,
-          )
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
+            )
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
 
-        if (status) {
-          query = query.eq('booking_status', status);
-        }
+          if (status) {
+            query = query.eq('booking_status', status);
+          }
 
-        const { data, error } = await query;
+          const { data, error } = await query;
 
-        if (error) {
-          throw BookingError.bookingFailed(error.message);
-        }
+          if (error) {
+            throw BookingError.bookingFailed(error.message);
+          }
 
-        return keysToCamel(data || []) as Booking[];
-      },
-      catch: (error: unknown) =>
-        BookingError.bookingFailed(error instanceof Error ? error.message : ''),
-    });
+          return keysToCamel(data || []) as Booking[];
+        },
+        catch: (error: unknown) =>
+          BookingError.bookingFailed(
+            error instanceof Error ? error.message : '',
+          ),
+      }),
+      BookingsServiceEffect.getBookingsRetryPolicy,
+    );
 
   getBookingById = (bookingId: string) =>
     Effect.tryPromise({
@@ -150,52 +167,59 @@ export class BookingsServiceEffect {
     });
 
   createBooking = (data: CreateBookingData) =>
-    Effect.tryPromise({
-      try: async () => {
-        const subtotal = data.totalAmount + (data.discountAmount || 0);
+    Effect.retry(
+      Effect.tryPromise({
+        try: async () => {
+          const subtotal = data.totalAmount + (data.discountAmount || 0);
 
-        const { data: result, error } = await supabase.rpc(
-          'create_booking_with_payment',
-          {
-            p_user_id: data.userId,
-            p_wallet_id: data.walletId,
-            p_showtime_id: data.showtimeId,
-            p_seat_numbers: data.seats,
-            p_subtotal: subtotal,
-            p_total_amount: data.totalAmount,
-            p_discount_amount: data.discountAmount || 0,
-            p_promo_code_id: data.promoCodeId,
-          },
-        );
-
-        if (error) {
-          if (
-            error.message.includes(ERROR_MESSAGES.INSUFFICIENT_WALLET_BALANCE)
-          ) {
-            throw BookingError.insufficientWalletBalance(error.message);
-          } else if (error.message.includes(ERROR_MESSAGES.WALLET_NOT_FOUND)) {
-            throw BookingError.walletNotFound(error.message);
-          } else {
-            throw BookingError.bookingFailed(error.message);
-          }
-        }
-
-        if (!result || result.length === 0) {
-          throw BookingError.noResultReturnedFromBookingTransaction(
-            ERROR_MESSAGES.NO_RESULT_RETURNED,
+          const { data: result, error } = await supabase.rpc(
+            'create_booking_with_payment',
+            {
+              p_user_id: data.userId,
+              p_wallet_id: data.walletId,
+              p_showtime_id: data.showtimeId,
+              p_seat_numbers: data.seats,
+              p_subtotal: subtotal,
+              p_total_amount: data.totalAmount,
+              p_discount_amount: data.discountAmount || 0,
+              p_promo_code_id: data.promoCodeId,
+            },
           );
-        }
 
-        const txResult = keysToCamel(result[0]) as BookingTransactionResult;
+          if (error) {
+            if (
+              error.message.includes(ERROR_MESSAGES.INSUFFICIENT_WALLET_BALANCE)
+            ) {
+              throw BookingError.insufficientWalletBalance(error.message);
+            } else if (
+              error.message.includes(ERROR_MESSAGES.WALLET_NOT_FOUND)
+            ) {
+              throw BookingError.walletNotFound(error.message);
+            } else {
+              throw BookingError.bookingFailed(error.message);
+            }
+          }
 
-        // Fetch complete booking with all relations
-        return await Effect.runPromise(this.getBookingById(txResult.bookingId));
-      },
-      catch: (error: unknown) =>
-        BookingError.checkoutFailed(
-          error instanceof Error ? error.message : '',
-        ),
-    });
+          if (!result || result.length === 0) {
+            throw BookingError.noResultReturnedFromBookingTransaction(
+              ERROR_MESSAGES.NO_RESULT_RETURNED,
+            );
+          }
+
+          const txResult = keysToCamel(result[0]) as BookingTransactionResult;
+
+          // Fetch complete booking with all relations
+          return await Effect.runPromise(
+            this.getBookingById(txResult.bookingId),
+          );
+        },
+        catch: (error: unknown) =>
+          BookingError.checkoutFailed(
+            error instanceof Error ? error.message : '',
+          ),
+      }),
+      BookingsServiceEffect.createBookingRetryPolicy,
+    );
 
   /**
    * Cancel booking with refund using atomic transaction

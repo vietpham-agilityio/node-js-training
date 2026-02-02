@@ -1,3 +1,4 @@
+import { ERROR_MESSAGES } from '@/constants/messages';
 import { BOOKING_STATUS, SEAT_RESERVATION_STATUS } from '@/constants/status';
 import { Booking } from '@/features/booking/schemas/booking';
 import { supabase } from '@/services/supabase/client';
@@ -10,7 +11,6 @@ import {
   bookingsServiceEffect,
   CreateBookingData,
 } from '../booking';
-import { ERROR_MESSAGES } from '@/constants/messages';
 
 const createMockQueryBuilder = () => ({
   select: jest.fn().mockReturnThis(),
@@ -129,8 +129,10 @@ describe('BookingsService', () => {
     it('should throw an error if fetching bookings fails', async () => {
       const error = new Error('Database error');
 
-      (mockQueryBuilder.then as jest.Mock).mockImplementationOnce(
-        (_resolve, reject) => reject(error),
+      // Retry policy runs up to 3 attempts; mock every call to reject
+      (mockQueryBuilder.then as jest.Mock).mockImplementation(
+        (_resolve: (v: unknown) => void, reject: (e: Error) => void) =>
+          reject(error),
       );
 
       await expect(
@@ -284,7 +286,8 @@ describe('BookingsService', () => {
     it('should throw an error with custom message for insufficient balance', async () => {
       const error = { message: 'Insufficient wallet balance for booking' };
 
-      rpc.mockResolvedValueOnce({ data: null, error });
+      // Retry policy runs up to 3 attempts; mock every call to return the same error
+      rpc.mockResolvedValue({ data: null, error });
 
       await expect(
         runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
@@ -294,7 +297,7 @@ describe('BookingsService', () => {
     it('should throw an error with custom message for wallet not found', async () => {
       const error = { message: 'Wallet not found or inactive' };
 
-      rpc.mockResolvedValueOnce({ data: null, error });
+      rpc.mockResolvedValue({ data: null, error });
 
       await expect(
         runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
@@ -304,7 +307,7 @@ describe('BookingsService', () => {
     it('should throw generic error for other RPC failures', async () => {
       const error = { message: 'Some database error' };
 
-      rpc.mockResolvedValueOnce({ data: null, error });
+      rpc.mockResolvedValue({ data: null, error });
 
       await expect(
         runEffectForQuery(bookingsServiceEffect.createBooking(createData)),
