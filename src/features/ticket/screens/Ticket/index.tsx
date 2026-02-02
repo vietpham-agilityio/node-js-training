@@ -102,7 +102,7 @@ const TicketDetailScreen = () => {
       },
       {
         label: 'Status',
-        value: capitalize(ticketDetail?.status),
+        value: capitalize(ticketDetail?.status || ''),
         testID: 'ticket-status',
       },
     ],

@@ -1,19 +1,19 @@
 import { create } from 'zustand';
 
 // Types
-import { Showtime } from '@/features/booking/schemas/cinema';
+import { ShowTime } from '@/features/booking/schemas/cinema';
 import { Movie } from '../schemas/movie';
 
 interface BookingState {
   selectedMovie: Movie | null;
-  selectedShowtime: Showtime | null;
+  selectedShowtime: ShowTime | null;
   selectedSeats: string[];
   reservationId: string | null;
   promoCode: string | null;
   discountAmount: number;
 
   setMovie: (movie: Movie) => void;
-  setShowtime: (showtime: Showtime) => void;
+  setShowtime: (showtime: ShowTime) => void;
   setSeats: (seats: string[]) => void;
   addSeat: (seat: string) => void;
   removeSeat: (seat: string) => void;

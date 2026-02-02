@@ -4,7 +4,7 @@ import { Effect, Context } from 'effect';
 // Schema
 import { GenreMovie, Movie, MovieStatus } from '../../schemas/movie';
 import { MovieError } from '../../error/movie';
-import { Showtime } from '../../schemas/cinema';
+import { ShowTime } from '../../schemas/cinema';
 
 export class MoviesService extends Context.Tag('MoviesServiceTag')<
   MoviesService,
@@ -37,11 +37,11 @@ export class MoviesService extends Context.Tag('MoviesServiceTag')<
     readonly getShowtimes: (
       movieId: string,
       date: string,
-    ) => Effect.Effect<Showtime[], MovieError, never>;
+    ) => Effect.Effect<ShowTime[], MovieError, never>;
 
     readonly getShowtimeById: (
       id: string,
-    ) => Effect.Effect<Showtime, MovieError, never>;
+    ) => Effect.Effect<ShowTime, MovieError, never>;
 
     readonly getMoviesPaginated: (
       status?: MovieStatus,

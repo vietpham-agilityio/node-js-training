@@ -5,7 +5,7 @@ import { supabase } from '@/services/supabase/client';
 import { Effect } from 'effect';
 
 // Types
-import { Showtime, ShowtimeStatus } from '@/features/booking/schemas/cinema';
+import { ShowtimeStatus } from '@/features/booking/schemas/cinema';
 import { GenreMovie, Movie, MovieStatus } from '../schemas/movie';
 
 // Utils
@@ -169,7 +169,7 @@ export class MoviesServiceEffect {
 
         if (error) throw MovieError.showtimeNotFound(error.message);
 
-        return keysToCamel(data) as Showtime[];
+        return keysToCamel(data);
       },
       catch: (error: unknown) =>
         MovieError.showtimeNotFound(
@@ -190,7 +190,7 @@ export class MoviesServiceEffect {
 
         if (error) throw MovieError.showtimeNotFound(error.message);
 
-        return keysToCamel(data) as Showtime;
+        return keysToCamel(data);
       },
       catch: (error: unknown) =>
         MovieError.showtimeNotFound(

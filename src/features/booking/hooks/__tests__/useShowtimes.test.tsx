@@ -11,7 +11,7 @@ import { moviesServiceEffect } from '../../services/movies';
 
 // Types
 import { MovieError } from '../../error/movie';
-import { Showtime } from '../../schemas/cinema';
+import { ShowTime } from '../../schemas/cinema';
 
 jest.mock('@/features/booking/services/movies', () => ({
   moviesServiceEffect: {
@@ -53,7 +53,7 @@ describe('useShowtimes', () => {
       { id: '2', movieId: 'movie1', startTime: '13:00' },
     ];
     (moviesServiceEffect.getShowtimes as jest.Mock).mockReturnValue(
-      Effect.succeed(mockShowtimes as unknown as Showtime[]),
+      Effect.succeed(mockShowtimes as unknown as ShowTime[]),
     );
 
     const { result } = renderHook(() => useShowtimes('movie1', '2024-01-01'), {

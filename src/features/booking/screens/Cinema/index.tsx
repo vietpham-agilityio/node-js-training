@@ -29,7 +29,7 @@ import { useShowtimes } from '@/features/booking/hooks/useShowtimes';
 import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 
 // Utils
-import { formatShowtimes, getDayOfWeekLabels } from '@/utils/dates';
+import { formatShowTimes, getDayOfWeekLabels } from '@/utils/dates';
 import { formatTime } from '@/utils/formats';
 
 // Store
@@ -38,8 +38,8 @@ import { useToastStore } from '@/stores/toast';
 
 // Types
 import {
-  CinemaWithShowtimes,
-  Showtime,
+  CinemaWithShowTimes,
+  ShowTime,
 } from '@/features/booking/schemas/cinema';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
@@ -78,7 +78,7 @@ const CinemaScreen = () => {
   const cinemasWithShowtimes = useMemo(() => {
     if (!showtimesData || showtimesData.length === 0) return [];
 
-    return formatShowtimes(showtimesData, showDate);
+    return formatShowTimes(showtimesData, showDate);
   }, [showtimesData, showDate]);
 
   const isDisabled = useMemo(
@@ -110,7 +110,7 @@ const CinemaScreen = () => {
     (cinemaId: string, showtimeId: string) => {
       const showtime = cinemasWithShowtimes
         .find(cinema => cinema.cinema.id === cinemaId)
-        ?.showtimes.find((showtime: Showtime) => showtime.id === showtimeId);
+        ?.showTimes.find((showtime: ShowTime) => showtime.id === showtimeId);
       setSelectedShowtime({ cinemaId, showtimeId });
 
       if (showtime) {
@@ -124,9 +124,9 @@ const CinemaScreen = () => {
     setSelectedLocation(value);
   }, []);
 
-  const keyShowtimeExtractor = useCallback((item: Showtime) => item.id, []);
+  const keyShowtimeExtractor = useCallback((item: ShowTime) => item.id, []);
   const keyExtractor = useCallback(
-    (item: CinemaWithShowtimes) => item.cinema.id,
+    (item: CinemaWithShowTimes) => item.cinema.id,
     [],
   );
 
@@ -229,8 +229,8 @@ const CinemaScreen = () => {
   );
 
   const renderCinema = useCallback(
-    ({ item }: { item: CinemaWithShowtimes }) => {
-      const { cinema, showtimes } = item;
+    ({ item }: { item: CinemaWithShowTimes }) => {
+      const { cinema, showTimes } = item;
 
       return (
         <View className="gap-6 pl-6">
@@ -238,7 +238,7 @@ const CinemaScreen = () => {
             {cinema.name}
           </Typo>
           <FlashList
-            data={showtimes}
+            data={showTimes}
             renderItem={({ item: showtime }) =>
               renderShowtime({
                 item: showtime,
