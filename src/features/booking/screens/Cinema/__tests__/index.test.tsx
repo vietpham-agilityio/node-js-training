@@ -71,15 +71,15 @@ jest.mock('@/utils/dates', () => ({
     { id: '2024-01-16', label: 'Tomorrow' },
     { id: '2024-01-17', label: 'Wed' },
   ],
-  formatShowtimes: (showtimes: any[], date: string) => {
-    if (!showtimes || showtimes.length === 0) return [];
+  formatShowTimes: (showTimes: any[], date: string) => {
+    if (!showTimes || showTimes.length === 0) return [];
     return [
       {
         cinema: {
           id: 'cinema1',
           name: 'Cinema 1',
         },
-        showtimes: showtimes.filter((s: any) => s.showDate === date),
+        showTimes: showTimes.filter((s: any) => s.showDate === date),
       },
     ];
   },
@@ -485,7 +485,7 @@ describe('CinemaScreen', () => {
       });
 
       expect(getByText('Cinema 1')).toBeTruthy();
-      // Note: formatShowtimes groups by cinema, so both should be visible
+      // Note: formatShowTimes groups by cinema, so both should be visible
     });
   });
 

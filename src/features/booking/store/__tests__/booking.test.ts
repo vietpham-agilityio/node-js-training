@@ -1,4 +1,4 @@
-import { Showtime, ShowtimeStatus } from '@/features/booking/schemas/cinema';
+import { ShowTime, ShowtimeStatus } from '@/features/booking/schemas/cinema';
 import {
   GenreMovie,
   Movie,
@@ -31,7 +31,7 @@ describe('useBookingStore', () => {
     updatedAt: '2024-01-01',
   };
 
-  const mockShowtime: Showtime = {
+  const mockShowtime: ShowTime = {
     id: 'showtime1',
     movieId: 'movie1',
     cinemaHallId: 'hall1',
@@ -104,7 +104,7 @@ describe('useBookingStore', () => {
     });
 
     it('should replace existing showtime when setting a new one', () => {
-      const newShowtime: Showtime = {
+      const newShowtime: ShowTime = {
         ...mockShowtime,
         id: 'showtime2',
         showTime: '16:00',
@@ -353,7 +353,7 @@ describe('useBookingStore', () => {
     });
 
     it('should recalculate when showtime changes', () => {
-      const newShowtime: Showtime = {
+      const newShowtime: ShowTime = {
         ...mockShowtime,
         price: 75000,
       };

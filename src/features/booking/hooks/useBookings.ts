@@ -34,7 +34,7 @@ import {
   Booking,
   InfiniteBookingsData,
 } from '@/features/booking/schemas/booking';
-import { Showtime } from '@/features/booking/schemas/cinema';
+import { ShowTime } from '@/features/booking/schemas/cinema';
 import { Wallet } from '@/features/wallet/schemas/wallet';
 
 export const useBookings = (status?: string) => {
@@ -446,7 +446,7 @@ export const useReserveSeats = () => {
       // Optimistically reduce available seats
       queryClient.setQueryData(
         queryKeys.showtimes.detail(data.showtimeId),
-        (old: Showtime) => ({
+        (old: ShowTime) => ({
           ...old,
           availableSeats: old.availableSeats - data.seatNumbers.length,
         }),

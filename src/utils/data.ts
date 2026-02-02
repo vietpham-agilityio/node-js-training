@@ -1,26 +1,39 @@
+import { Effect } from 'effect';
+
+// Constants
 import { SEAT_STATUS } from '@/constants/status';
+import { ROWS, COLUMN_COUNT, BOOKED_PROBABILITY } from '@/constants/configs';
+
+// Schemas
 import { Seat, SeatStatus } from '@/features/booking/schemas/cinema';
 
-// Generate seat layout: Rows A-J, Columns 1-10
-export const generateSeats = (): Seat[] => {
-  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-  const seats: Seat[] = [];
-
-  rows.forEach(row => {
-    for (let num = 1; num <= 10; num++) {
-      const seatId = `${row}${num}`;
-      // Randomly mark some seats as booked (about 20%)
-      const isBooked = Math.random() < 0.2;
-      seats.push({
-        id: seatId,
-        row,
-        number: num,
-        status: isBooked
-          ? (SEAT_STATUS.BOOKED as SeatStatus)
-          : (SEAT_STATUS.AVAILABLE as SeatStatus),
-      });
+/**
+ * Effect that generates a seat layout: rows A–J, columns 1–10.
+ * Randomly marks about 20% of seats as booked.
+ */
+export const generateSeatsEffect = (): Effect.Effect<Seat[]> =>
+  Effect.sync(() => {
+    const seats: Seat[] = [];
+    for (const row of ROWS) {
+      for (let num = 1; num <= COLUMN_COUNT; num++) {
+        const seatId = `${row}${num}`;
+        const isBooked = Math.random() < BOOKED_PROBABILITY;
+        seats.push({
+          id: seatId,
+          row,
+          number: num,
+          status: isBooked
+            ? (SEAT_STATUS.BOOKED as SeatStatus)
+            : (SEAT_STATUS.AVAILABLE as SeatStatus),
+        });
+      }
     }
+    return seats;
   });
 
-  return seats;
-};
+/**
+ * Generate seat layout: rows A–J, columns 1–10.
+ * Randomly marks about 20% of seats as booked.
+ */
+export const generateSeats = (): Seat[] =>
+  Effect.runSync(generateSeatsEffect());

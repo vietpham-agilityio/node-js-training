@@ -74,6 +74,21 @@ export const TOP_UP_AMOUNTS = [
   50000, 100000, 150000, 200000, 250000, 500000, 750000, 1000000,
 ];
 
+export const ROWS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] as const;
+export const COLUMN_COUNT = 10;
+export const BOOKED_PROBABILITY = 0.2;
+export const DAY_LABELS = [
+  'SUN',
+  'MON',
+  'TUE',
+  'WED',
+  'THU',
+  'FRI',
+  'SAT',
+] as const;
+export const DAY_COUNT = 5;
+export const MAX_MINUTES = 23 * 60;
+
 export const SETTING_ITEMS = [
   {
     TITLE: 'Edit',

@@ -3,7 +3,7 @@
 import { Schema } from 'effect';
 
 // Type
-import { Showtime } from './cinema';
+import { ShowTime } from './cinema';
 
 export const BookingStatusSchema = Schema.Literal(
   'active',
@@ -59,7 +59,7 @@ export interface TicketBase extends Schema.Schema.Type<typeof TicketSchema> {}
 export interface BookingBase extends Schema.Schema.Type<typeof BookingSchema> {}
 
 export interface Booking extends BookingBase {
-  showtime?: Showtime;
+  showtime?: ShowTime;
   tickets?: TicketBase[];
 }
 

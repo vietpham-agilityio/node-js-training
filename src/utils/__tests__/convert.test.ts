@@ -1,9 +1,11 @@
 import {
   getHeaderTitle,
+  getHeaderTitleEffect,
   isScreenPathname,
   keysToCamel,
   toCamelCase,
 } from '../convert';
+import { Effect } from 'effect';
 
 // Mock constants
 jest.mock('@/constants', () => ({
@@ -138,6 +140,28 @@ describe('getHeaderTitle', () => {
   it('should return first matching title when multiple keys match', () => {
     // This tests the find() behavior - returns first match
     expect(getHeaderTitle('/profile/edit')).toBe('Edit Your Profile');
+  });
+});
+
+describe('getHeaderTitleEffect', () => {
+  it('should return title for exact pathname match', () => {
+    expect(Effect.runSync(getHeaderTitleEffect('/signup'))).toBe(
+      'Create New Your Account',
+    );
+  });
+
+  it('should return title for pathname that starts with key', () => {
+    expect(Effect.runSync(getHeaderTitleEffect('/tickets/123'))).toBe(
+      'Ticket Details',
+    );
+  });
+
+  it('should return undefined for non-matching pathname', () => {
+    expect(Effect.runSync(getHeaderTitleEffect('/unknown'))).toBeUndefined();
+  });
+
+  it('should return undefined for empty string', () => {
+    expect(Effect.runSync(getHeaderTitleEffect(''))).toBeUndefined();
   });
 });
 

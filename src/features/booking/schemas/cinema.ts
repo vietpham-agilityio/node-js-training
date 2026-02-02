@@ -94,7 +94,7 @@ export type SeatStatus = Schema.Schema.Type<typeof SeatStatusSchema>;
 // Base types derived from schemas
 export type Cinema = Schema.Schema.Type<typeof CinemaSchema>;
 export type CinemaHallBase = Schema.Schema.Type<typeof CinemaHallSchema>;
-export type ShowtimeBase = Schema.Schema.Type<typeof ShowtimeSchema>;
+export type ShowTimeBase = Schema.Schema.Type<typeof ShowtimeSchema>;
 export type SeatReservationBase = Schema.Schema.Type<
   typeof SeatReservationSchema
 >;
@@ -105,7 +105,7 @@ export interface CinemaHall extends CinemaHallBase {
   cinema?: Cinema;
 }
 
-export interface Showtime extends ShowtimeBase {
+export interface ShowTime extends ShowTimeBase {
   cinemaHall?: CinemaHall;
   movie?: Movie;
 }
@@ -113,8 +113,8 @@ export interface Showtime extends ShowtimeBase {
 export type SeatReservation = SeatReservationBase;
 export type Seat = SeatBase;
 
-export interface CinemaWithShowtimes {
+export interface CinemaWithShowTimes {
   cinema: Cinema;
   cinemaHall: CinemaHall;
-  showtimes: Showtime[];
+  showTimes: ShowTime[];
 }
