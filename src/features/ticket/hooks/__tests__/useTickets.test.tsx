@@ -10,15 +10,8 @@ import {
   useValidateTicket,
 } from '../useTickets';
 
-// Types
-import { Ticket } from '@/features/booking/schemas/booking';
-
-// Constants
-import { BOOKING_STATUS, PAYMENT_STATUS } from '@/constants/status';
-import { GENRE_MOVIE } from '@/constants/movie';
-
-// Services
 import { ticketsService } from '@/features/ticket/services/tickets';
+import { MOCK_TICKET } from '@/mocks';
 
 jest.mock('@/features/ticket/services/tickets', () => ({
   ticketsService: {
@@ -81,62 +74,6 @@ const createWrapper = () => {
   return Wrapper;
 };
 
-// Mock ticket data
-const mockTicket: Ticket = {
-  id: 'ticket-1',
-  bookingId: 'booking-1',
-  seatNumber: 'A1',
-  ticketNumber: 'TKT-001',
-  qrCodeData: '{"booking_id":"booking-1","seat":"A1"}',
-  price: 50000,
-  status: BOOKING_STATUS.ACTIVE,
-  scannedAt: undefined,
-  createdAt: '2025-01-01T00:00:00Z',
-  booking: {
-    id: 'booking-1',
-    userId: 'user-123',
-    showtimeId: 'showtime-1',
-    bookingNumber: 'BKG-001',
-    bookingStatus: BOOKING_STATUS.USED,
-    totalSeats: 1,
-    seatNumbers: ['A1'],
-    subtotal: 50000,
-    discountAmount: 0,
-    totalAmount: 50000,
-    paymentMethod: 'wallet',
-    paymentStatus: PAYMENT_STATUS.PAID,
-    expiresAt: '2025-01-15T16:00:00Z',
-    createdAt: '2025-01-01T00:00:00Z',
-    updatedAt: '2025-01-01T00:00:00Z',
-    showtime: {
-      id: 'showtime-1',
-      showDate: '2025-01-15',
-      showTime: '14:00',
-      endTime: '16:00',
-      price: 50000,
-      movie: {
-        id: 'movie-1',
-        title: 'Test Movie',
-        posterUrl: 'https://example.com/poster.jpg',
-        genre: [GENRE_MOVIE.ACTION],
-        durationMinutes: 120,
-        rating: 8.5,
-      },
-      cinemaHall: {
-        id: 'hall-1',
-        name: 'Hall 1',
-        hallType: 'Standard',
-        cinema: {
-          id: 'cinema-1',
-          name: 'Test Cinema',
-          city: 'Jakarta',
-          address: '123 Test St',
-        },
-      },
-    },
-  },
-} as unknown as Ticket;
-
 describe('useTickets', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -146,7 +83,7 @@ describe('useTickets', () => {
   describe('useTickets hook', () => {
     it('should fetch tickets when user is authenticated', async () => {
       (ticketsService.getTickets as jest.Mock).mockReturnValue(
-        Effect.succeed([mockTicket]),
+        Effect.succeed([MOCK_TICKET]),
       );
 
       const { result } = renderHook(() => useTickets(), {
@@ -158,7 +95,7 @@ describe('useTickets', () => {
       });
 
       expect(ticketsService.getTickets).toHaveBeenCalledWith('user-123');
-      expect(result.current.data).toEqual([mockTicket]);
+      expect(result.current.data).toEqual([MOCK_TICKET]);
     });
 
     it('should not fetch tickets when user is not authenticated', () => {
@@ -209,7 +146,7 @@ describe('useTickets', () => {
   describe('useTicketsInfinite hook', () => {
     it('should fetch paginated tickets', async () => {
       (ticketsService.getTicketsPaginated as jest.Mock).mockReturnValue(
-        Effect.succeed([mockTicket]),
+        Effect.succeed([MOCK_TICKET]),
       );
 
       const { result } = renderHook(() => useTicketsInfinite(), {
@@ -225,7 +162,7 @@ describe('useTickets', () => {
         0,
         10,
       );
-      expect(result.current.data?.pages[0]).toEqual([mockTicket]);
+      expect(result.current.data?.pages[0]).toEqual([MOCK_TICKET]);
     });
 
     it('should not fetch when user is not authenticated', () => {
@@ -240,7 +177,7 @@ describe('useTickets', () => {
     });
 
     it('should have next page when page is full', async () => {
-      const fullPage = Array(10).fill(mockTicket);
+      const fullPage = Array(10).fill(MOCK_TICKET);
       (ticketsService.getTicketsPaginated as jest.Mock).mockReturnValue(
         Effect.succeed(fullPage),
       );
@@ -257,7 +194,7 @@ describe('useTickets', () => {
     });
 
     it('should not have next page when page is not full', async () => {
-      const partialPage = Array(5).fill(mockTicket);
+      const partialPage = Array(5).fill(MOCK_TICKET);
       (ticketsService.getTicketsPaginated as jest.Mock).mockReturnValue(
         Effect.succeed(partialPage),
       );
@@ -274,8 +211,8 @@ describe('useTickets', () => {
     });
 
     it('should fetch next page correctly', async () => {
-      const firstPage = Array(10).fill(mockTicket);
-      const secondPage = Array(5).fill({ ...mockTicket, id: 'ticket-2' });
+      const firstPage = Array(10).fill(MOCK_TICKET);
+      const secondPage = Array(5).fill({ ...MOCK_TICKET, id: 'ticket-2' });
 
       (ticketsService.getTicketsPaginated as jest.Mock)
         .mockReturnValueOnce(Effect.succeed(firstPage))
@@ -307,7 +244,7 @@ describe('useTickets', () => {
   describe('useTicket hook', () => {
     it('should fetch single ticket by ID', async () => {
       (ticketsService.getTicketById as jest.Mock).mockReturnValue(
-        Effect.succeed(mockTicket),
+        Effect.succeed(MOCK_TICKET),
       );
 
       const { result } = renderHook(() => useTicket('ticket-1'), {
@@ -319,7 +256,7 @@ describe('useTickets', () => {
       });
 
       expect(ticketsService.getTicketById).toHaveBeenCalledWith('ticket-1');
-      expect(result.current.data).toEqual(mockTicket);
+      expect(result.current.data).toEqual(MOCK_TICKET);
     });
 
     it('should not fetch when ticketId is empty', () => {
@@ -360,7 +297,7 @@ describe('useTickets', () => {
       (ticketsService.validateTicket as jest.Mock).mockReturnValue(
         Effect.succeed({
           valid: true,
-          ticket: mockTicket,
+          ticket: MOCK_TICKET,
           message: 'Ticket validated successfully',
         }),
       );
