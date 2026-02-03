@@ -55,3 +55,7 @@ movies_120_insert.sql
 # google-services files
 google-services.json
 movies-ticket-booking.json
+
+# rule
+.agents/
+.cursor/

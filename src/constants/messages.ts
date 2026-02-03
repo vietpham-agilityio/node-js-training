@@ -4,6 +4,7 @@ import { BookingStatus } from '@/features/booking/schemas/booking';
 import { BOOKING_STATUS } from './status';
 
 export const ERROR_MESSAGES = {
+  PHONE_NUMBER_REQUIRED: 'Phone number is required',
   UNKNOWN_ERROR: 'Something went wrong. Please try again later.',
   AUTHENTICATION_CANCELLED: 'Authentication was cancelled',
   OAUTH_AUTHENTICATION_FAILED: 'OAuth authentication failed',

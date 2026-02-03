@@ -7,21 +7,29 @@ import {
   SPECIAL_CHAR_REGEX,
   UPPERCASE_REGEX,
   EMAIL_REGEX,
+  PHONE_NUMBER_REGEX,
 } from './regex';
 
 // Email Brand
 export const EmailBrand = Schema.String.pipe(
-  Schema.minLength(1, { message: () => ERROR_MESSAGES.EMAIL_REQUIRED }),
+  Schema.nonEmptyString({ message: () => ERROR_MESSAGES.EMAIL_REQUIRED }),
   Schema.filter(s => EMAIL_REGEX.test(s), {
     message: () => ERROR_MESSAGES.EMAIL_INVALID,
   }),
   Schema.brand('Email'),
-);
+).annotations({
+  identifier: 'email',
+  title: 'Email',
+  description: 'Email of the user',
+  type: 'string',
+  required: true,
+  example: ['john.doe@example.com', 'kimi.johnson@example.com'],
+});
 export type EmailType = Schema.Schema.Type<typeof EmailBrand>;
 
 // Password Brand
 export const PasswordBrand = Schema.String.pipe(
-  Schema.minLength(1, { message: () => ERROR_MESSAGES.PASSWORD_REQUIRED }),
+  Schema.nonEmptyString({ message: () => ERROR_MESSAGES.PASSWORD_REQUIRED }),
   Schema.minLength(8, {
     message: () => ERROR_MESSAGES.PASSWORD_MIN_LENGTH(8),
   }),
@@ -35,12 +43,20 @@ export const PasswordBrand = Schema.String.pipe(
     message: () => ERROR_MESSAGES.PASSWORD_SPECIAL_CHAR,
   }),
   Schema.brand('Password'),
-);
+).annotations({
+  identifier: 'password',
+  title: 'Password',
+  description:
+    'Password of the user needs to be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character',
+  type: 'string',
+  required: true,
+  example: ['!Password123', 'StrongPassword123!'],
+});
 export type PasswordType = Schema.Schema.Type<typeof PasswordBrand>;
 
 // Full Name Brand
 export const FullNameBrand = Schema.String.pipe(
-  Schema.minLength(1, { message: () => ERROR_MESSAGES.FULL_NAME_REQUIRED }),
+  Schema.nonEmptyString({ message: () => ERROR_MESSAGES.FULL_NAME_REQUIRED }),
   Schema.minLength(2, {
     message: () => ERROR_MESSAGES.FULL_NAME_MIN_LENGTH(2),
   }),
@@ -48,35 +64,59 @@ export const FullNameBrand = Schema.String.pipe(
     message: () => ERROR_MESSAGES.FULL_NAME_MAX_LENGTH(50),
   }),
   Schema.brand('FullName'),
-);
+).annotations({
+  identifier: 'fullName',
+  title: 'Full Name',
+  description: 'Full name of the user',
+  type: 'string',
+  required: true,
+  example: ['John Doe', 'Kimi Johnson'],
+});
 export type FullNameType = Schema.Schema.Type<typeof FullNameBrand>;
 
 // Phone Number Brand
-export const PhoneNumberBrand = Schema.NullOr(Schema.String).pipe(
-  Schema.transform(Schema.String, {
-    decode: val => val ?? '',
-    encode: val => val,
-  }),
-  Schema.filter(
-    val =>
-      val.length === 0 ||
-      (/^\+?[1-9]\d{1,14}$/.test(val) && val.replace(/\D/g, '').length >= 9),
-    {
+export const PhoneNumberBrand = Schema.NullOr(Schema.String)
+  .pipe(
+    Schema.transform(Schema.String, {
+      decode: val => val ?? '',
+      encode: val => val,
+    }),
+    Schema.nonEmptyString({
+      message: () => ERROR_MESSAGES.PHONE_NUMBER_REQUIRED,
+    }),
+    Schema.pattern(PHONE_NUMBER_REGEX, {
       message: () => ERROR_MESSAGES.INVALID_PHONE_NUMBER,
-    },
-  ),
-  Schema.brand('PhoneNumber'),
-);
+    }),
+    Schema.brand('PhoneNumber'),
+  )
+  .annotations({
+    identifier: 'phoneNumber',
+    title: 'Phone Number',
+    description:
+      'Phone number of the user as leat 9 digits long and start with 0',
+    type: 'string',
+    required: false,
+    example: '099898379',
+  });
 export type PhoneNumberType = Schema.Schema.Type<typeof PhoneNumberBrand>;
 
 // Address Brand
-export const AddressBrand = Schema.NullOr(Schema.String).pipe(
-  Schema.transform(Schema.String, {
-    decode: val => (val ?? '').trim(),
-    encode: val => val,
-  }),
-  Schema.brand('Address'),
-);
+export const AddressBrand = Schema.NullOr(Schema.String)
+  .pipe(
+    Schema.transform(Schema.String, {
+      decode: val => (val ?? '').trim(),
+      encode: val => val,
+    }),
+    Schema.brand('Address'),
+  )
+  .annotations({
+    identifier: 'address',
+    title: 'Address',
+    description: 'Address of the user',
+    type: 'string',
+    required: false,
+    example: '123 Main St, Anytown, USA',
+  });
 export type AddressType = Schema.Schema.Type<typeof AddressBrand>;
 
 // Sign In Schema
