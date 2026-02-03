@@ -1,10 +1,21 @@
+import { secureStorage } from '@/services/storage/secure';
 import { Database } from '@/types/database';
 import { createClient } from '@supabase/supabase-js';
+import { Redacted } from 'effect';
 import 'react-native-url-polyfill/auto';
-import { secureStorage } from '@/services/storage/secure';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+/** Sensitive Supabase config stored in Redacted; wipe with wipeSupabaseSecrets() when needed (e.g. logout). */
+export const supabaseUrlRedacted = Redacted.make(
+  process.env.EXPO_PUBLIC_SUPABASE_URL!,
+);
+export const supabaseAnonKeyRedacted = Redacted.make(
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
+);
+
+export const wipeSupabaseSecrets = (): void => {
+  Redacted.unsafeWipe(supabaseUrlRedacted);
+  Redacted.unsafeWipe(supabaseAnonKeyRedacted);
+};
 
 /**
  * Custom storage adapter for Supabase Auth
@@ -71,11 +82,15 @@ const secureStorageAdapter = {
   },
 };
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: secureStorageAdapter,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
+export const supabase = createClient<Database>(
+  Redacted.value(supabaseUrlRedacted),
+  Redacted.value(supabaseAnonKeyRedacted),
+  {
+    auth: {
+      storage: secureStorageAdapter,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
   },
-});
+);

@@ -1,6 +1,6 @@
 import { Session, User } from '@supabase/supabase-js';
-import { create } from 'zustand';
 import { Effect } from 'effect';
+import { create } from 'zustand';
 
 // Effect
 import { AuthService } from '../effect/services';
@@ -10,6 +10,7 @@ import { AuthServiceLayer } from '../layer';
 import { secureStorage } from '@/services/storage/secure';
 
 // Utils
+import { wipeSupabaseSecrets } from '@/services/supabase/client';
 import { runEffectForQuery } from '@/utils/effect';
 
 interface AuthState {
@@ -88,6 +89,7 @@ export const useAuthStore = create<AuthState>(set => ({
         session: null,
         isAuthenticated: false,
       });
+      wipeSupabaseSecrets();
     } catch (error) {
       throw error;
     }
