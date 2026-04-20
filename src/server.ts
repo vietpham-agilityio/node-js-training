@@ -1,11 +1,17 @@
 import 'dotenv/config';
 
+// Datasource
+import { AppDataSource } from '@/config/database.ts';
+
+// Constant
+import { PORT } from './constants/environments.ts';
+
 import createApp from './app.ts';
 
-const PORT = 3001;
-
 const bootstrap = async (): Promise<void> => {
-  const app = createApp();
+   await AppDataSource.initialize();
+
+   const app = createApp(AppDataSource);
 
   app.listen(PORT, () => {
    console.log(`Server is running on http://localhost:${PORT}`);
