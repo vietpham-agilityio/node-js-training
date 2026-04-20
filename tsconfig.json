@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    // Compilation target & libraries
+    "target": "ESNext",
+    "lib": ["ESNext"],
+
+    // Module system — NodeNext for native ESM + .ts import support
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    // Input / output
+    "rootDir": "src",
+    "outDir": "dist",
+
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    // Import rules
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
+    // Type checking — strict mode on
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "scripts", "vitest.setup.ts"]
+}
