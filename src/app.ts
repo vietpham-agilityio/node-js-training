@@ -1,9 +1,11 @@
+import 'reflect-metadata';
 import express from 'express';
+import { DataSource } from 'typeorm';
 
 // Types
 import type { Express, Request, Response, NextFunction } from 'express';
 
-const createApp = (): Express => {
+const createApp = (_dataSource: DataSource): Express => {
   const app = express();
 
   // Middleware
