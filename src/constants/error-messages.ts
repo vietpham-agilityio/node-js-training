@@ -21,3 +21,14 @@ export const ERROR_CODE_WITH_STATUS_CODE: Record<number, string> = {
   [STATUS_CODE.CONFLICT]: 'CONFLICT',
   [STATUS_CODE.INTERNAL_SERVER_ERROR]: 'INTERNAL_SERVER_ERROR',
 }
+
+export const USER_ERROR = {
+  USER_NOT_FOUND: 'User not found',
+  USER_INVALID_EMAIL: 'Email is required and must be non-empty',
+  USER_INVALID_PASSWORD: 'Password is required',
+  USER_ID_NOT_FOUND: 'User ID not found',
+  FAILED_TO_CREATE_USER: 'Failed to create user',
+  FAILED_TO_GET_ALL_USERS: 'Failed to get all users',
+  FAILED_TO_UPDATE_USER: 'Failed to update user',
+  USER_ALREADY_ADMIN: 'User already has the admin role.',
+}
