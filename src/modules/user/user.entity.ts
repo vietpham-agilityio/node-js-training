@@ -17,18 +17,18 @@ export class UserEntity {
   @Column({ type: 'text', unique: true })
   email!: string;
 
-  @Column({ type: 'text', nullable: true })
-  firstName?: string;
+  @Column({ type: 'text' })
+  firstName!: string;
 
-  @Column({ type: 'text', nullable: true })
-  lastName?: string;
+  @Column({ type: 'text' })
+  lastName!: string;
 
   @Column({ type: 'text', default: USER_ROLE.USER })
   role!: string;
 
   @CreateDateColumn({ type: 'datetime' })
-  createAt!: Date
+  createdAt!: Date
 
   @UpdateDateColumn({ type: 'datetime' })
-  updateAt!: Date
+  updatedAt!: Date
 }
