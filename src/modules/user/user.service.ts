@@ -30,7 +30,7 @@ export class UserService {
   async syncUserProfile(input: UserCreateInput): Promise<APIResponse<User>> {
     const { id, email, firstName, lastName } = input;
 
-    const existing = await this.userRepository.getById(id);
+    const existing = await this.userRepository.findById(id);
 
     if (existing !== null) {
       const updated = await this.userRepository.updateById(id, {
@@ -53,20 +53,11 @@ export class UserService {
   }
 
   async findAll(): Promise<APIResponse<User>[]> {
-    const listUsers = await this.userRepository.findAll();
-
-    if (listUsers === null) {
-      throw new AppError(
-        STATUS_CODE.INTERNAL_SERVER_ERROR,
-        USER_ERROR.FAILED_TO_GET_ALL_USERS,
-      );
-    }
-
-    return listUsers;
+    return await this.userRepository.findAll();
   }
 
   async findById(id: string): Promise<APIResponse<User>> {
-    const user = await this.userRepository.getById(id);
+    const user = await this.userRepository.findById(id);
 
     if (user === null) {
       throw new AppError(STATUS_CODE.NOT_FOUND, USER_ERROR.USER_NOT_FOUND);
@@ -78,7 +69,7 @@ export class UserService {
   async promoteUserToAdmin(id: string): Promise<APIResponse<User>> {
     const existing = await this.findById(id);
 
-    if (existing!.role === USER_ROLE.ADMIN) {
+    if (existing.role === USER_ROLE.ADMIN) {
       throw new AppError(
         STATUS_CODE.CONFLICT,
         USER_ERROR.USER_ALREADY_ADMIN,
@@ -101,6 +92,6 @@ export class UserService {
 
   async deleteUserById(id: string): Promise<void> {
     await this.findById(id);
-    await this.userRepository.delete(id);
+    await this.userRepository.deleteById(id);
   }
 }
