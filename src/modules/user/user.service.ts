@@ -30,7 +30,7 @@ export class UserService {
   async syncUserProfile(input: UserCreateInput): Promise<APIResponse<User>> {
     const { id, email, firstName, lastName } = input;
 
-    const existing = await this.findById(id);
+    const existing = await this.userRepository.getById(id);
 
     if (existing !== null) {
       const updated = await this.userRepository.updateById(id, {
