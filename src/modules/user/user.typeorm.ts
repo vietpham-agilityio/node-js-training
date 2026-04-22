@@ -29,7 +29,7 @@ export class UserTypeORMRepository implements UserRepository {
     };
   }
 
-  async getById(id: string): Promise<APIResponse<User> | null> {
+  async findById(id: string): Promise<APIResponse<User> | null> {
     const user = await this.repository.findOne({ where: { id } })
 
     return user ? this.mapToResponse(user) : null
@@ -66,7 +66,7 @@ export class UserTypeORMRepository implements UserRepository {
     return users.map(user => this.mapToResponse(user));
   }
 
-  async delete(id: string): Promise<void> {
+  async deleteById(id: string): Promise<void> {
     await this.repository.delete(id);
   }
 }
