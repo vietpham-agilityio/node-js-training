@@ -21,6 +21,7 @@ import { CourseService } from '@/modules/course/course.service.ts';
 
 // Middleware
 import { globalErrorHandler } from '@/middlewares/error-handler.ts';
+import { corsHandler } from '@/middlewares/cors-handler.ts';
 
 // Types
 import { AppError } from '@/types/error.ts';
@@ -34,6 +35,7 @@ const createApp = (dataSource: DataSource): Express => {
 
   // Middleware
   app.use(express.json());
+  app.use(corsHandler);
   app.use(pinoHttp({ logger: createLogger() }))
   app.use(clerkMiddleware());
 
