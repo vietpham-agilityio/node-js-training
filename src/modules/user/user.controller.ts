@@ -50,4 +50,12 @@ export class UserController {
 
     res.status(STATUS_CODE.OK).json(user);
   };
+
+   deleteById = async (req: Request, res: Response): Promise<void> => {
+    const targetId = req.params.id as string;
+
+    await this.userService.deleteUserById(targetId);
+
+    res.status(STATUS_CODE.OK).json({ message: 'User is deleted successfully' });
+  };
 }
