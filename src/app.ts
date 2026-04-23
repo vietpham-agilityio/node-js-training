@@ -15,6 +15,9 @@ import { UserTypeORMRepository } from '@/modules/user/user.typeorm.ts';
 import { UserService } from '@/modules/user/user.service.ts';
 import { createUserRoutes } from '@/modules/user/user.route.ts';
 import { createAuthRouter } from '@/modules/auth/auth.route.ts';
+import { createCourseRouter } from '@/modules/course/course.route.ts';
+import { CourseTypeORMRepository } from '@/modules/course/course.typeorm.ts';
+import { CourseService } from '@/modules/course/course.service.ts';
 
 // Middleware
 import { globalErrorHandler } from '@/middlewares/error-handler.ts';
@@ -37,7 +40,11 @@ const createApp = (dataSource: DataSource): Express => {
   const userRepository = new UserTypeORMRepository(dataSource)
   const userService = new UserService(userRepository)
 
-   app.use(ROUTES.AUTH, createAuthRouter({ userService }));
+
+  const courseRepository = new CourseTypeORMRepository(dataSource);
+  const courseService = new CourseService(courseRepository);
+
+  app.use(ROUTES.AUTH, createAuthRouter({ userService }));
 
   app.use(
     ROUTES.USERS,
@@ -45,6 +52,14 @@ const createApp = (dataSource: DataSource): Express => {
       userService,
     }),
   );
+
+  app.use(
+    ROUTES.COURSES,
+    createCourseRouter({
+      courseService,
+    }),
+  );
+
 
   // Not-found handler
   app.use((_req: Request, _res: Response, next: NextFunction): void => {
