@@ -32,3 +32,11 @@ export const USER_ERROR = {
   FAILED_TO_UPDATE_USER: 'Failed to update user',
   USER_ALREADY_ADMIN: 'User already has the admin role.',
 }
+
+export const COURSE_ERROR = {
+  COURSE_NOT_FOUND: 'Course not found',
+  FAILED_TO_CREATE_COURSE: 'Failed to create course',
+  FAILED_TO_GET_ALL_COURSES: 'Failed to get courses',
+  FAILED_TO_UPDATE_COURSE: 'Failed to update course',
+  COURSE_DELETED: 'Course deleted successfully.',
+}
