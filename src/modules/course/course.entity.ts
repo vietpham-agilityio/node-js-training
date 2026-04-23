@@ -29,8 +29,8 @@ export class CourseEntity {
   status!: string;
 
   @CreateDateColumn({ type: 'datetime' })
-  createAt!: Date
+  createdAt!: Date
 
   @UpdateDateColumn({ type: 'datetime' })
-  updateAt!: Date
+  updatedAt!: Date
 }
