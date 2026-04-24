@@ -18,6 +18,8 @@ import { createAuthRouter } from '@/modules/auth/auth.route.ts';
 import { createCourseRouter } from '@/modules/course/course.route.ts';
 import { CourseTypeORMRepository } from '@/modules/course/course.typeorm.ts';
 import { CourseService } from '@/modules/course/course.service.ts';
+import { createCoursePaymentRouter } from '@/modules/payment/payment.route.ts';
+import { createStripeWebhookHandler } from '@/modules/payment/stripe/stripe-webhooks.ts';
 
 // Middleware
 import { globalErrorHandler } from '@/middlewares/error-handler.ts';
@@ -35,6 +37,12 @@ import { ROUTES } from '@/constants/route.ts';
 const createApp = (dataSource: DataSource): Express => {
   const app = express();
 
+  app.post(
+    ROUTES.STRIPE_WEBHOOK,
+    express.raw({ type: 'application/json' }),
+    createStripeWebhookHandler(),
+  );
+
   // Middleware
   app.use(express.json());
   app.use(corsHandler);
@@ -50,6 +58,11 @@ const createApp = (dataSource: DataSource): Express => {
   const requireAdmin = createRequireAdmin(userService);
 
   app.use(ROUTES.AUTH, createAuthRouter({ userService }));
+
+  app.use(
+    ROUTES.COURSES,
+    createCoursePaymentRouter({ courseService, requireAuth }),
+  );
 
   app.use(
     ROUTES.USERS,
