@@ -6,11 +6,12 @@ import { STATUS_CODE } from '@/constants/status-code.ts';
 
 // Services
 import { getStripeInstance } from '@/modules/payment/stripe/stripe-config.ts';
+import { UserCourseService } from '@/modules/userCourse/user-course.service.ts';
 
 import { handleStripeWebhookEvent } from './stripe-webhooks-handler.ts';
 
 export const createStripeWebhookHandler =
-  (): RequestHandler =>
+  ( userCourseService: UserCourseService ): RequestHandler =>
     async (req: Request, res: Response): Promise<void> => {
       console.info(
         {
@@ -57,7 +58,7 @@ export const createStripeWebhookHandler =
       }
 
       try {
-        await handleStripeWebhookEvent(event);
+        await handleStripeWebhookEvent(event, userCourseService);
       } catch (err: unknown) {
         console.error({ err }, 'Stripe webhook handler error');
         res

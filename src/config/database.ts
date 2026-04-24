@@ -6,7 +6,7 @@ import { NODE_ENV } from "@/constants/environments.ts";
 // Entity
 import { UserEntity } from "@/modules/user/user.entity.ts";
 import { CourseEntity } from "@/modules/course/course.entity.ts";
-import { UserCourseEntity } from "@/modules/userCourse/userCourse.entity.ts";
+import { UserCourseEntity } from "@/modules/userCourse/user-course.entity.ts";
 
 // Migration
 import { CreateCoursesTable1709000000007 } from "@/migrations/CreateCoursesTable1709000000007.ts";

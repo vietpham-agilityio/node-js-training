@@ -31,9 +31,9 @@ export class UserCourseEntity {
   @RelationId((userCourse: UserCourseEntity) => userCourse.course)
   courseId!: number;
 
-  @Column({type: 'text', nullable: true})
+  @Column({ type: 'text', nullable: true })
   stripeSessionId?: string | null;
 
-  @CreateDateColumn({type: 'date'})
+  @CreateDateColumn({ name: 'grantedAt' })
   grantedAt!: Date;
 }
