@@ -1,5 +1,8 @@
 import type Stripe from 'stripe';
 
+// Service
+import { UserCourseService } from '@/modules/userCourse/user-course.service.ts';
+
 const shouldProcessCheckoutPayment = (
   session: Stripe.Checkout.Session,
 ): boolean => {
@@ -15,6 +18,7 @@ const shouldProcessCheckoutPayment = (
 
 const processPaidCourseCheckout = async (
   session: Stripe.Checkout.Session,
+  userCourseService: UserCourseService,
 ): Promise<void> => {
 
   if (!shouldProcessCheckoutPayment(session)) {
@@ -46,10 +50,18 @@ const processPaidCourseCheckout = async (
     return;
   }
 
+  const { id: userCourseId } = await userCourseService.grantCourseAccess(
+    clerkUserId,
+    Number(courseId),
+    session.id,
+  );
+
+
   console.info(
     {
       event: 'course_checkout_paid',
       stripeSessionId: session.id,
+      userCourseId: userCourseId,
       courseId: courseId,
       clerkUserId,
       amountTotal: session.amount_total,
@@ -62,12 +74,14 @@ const processPaidCourseCheckout = async (
 
 export const handleStripeWebhookEvent = async (
   event: Stripe.Event,
+  userCourseService: UserCourseService,
 ): Promise<void> => {
   switch (event.type) {
     case 'checkout.session.completed':
     case 'checkout.session.async_payment_succeeded':
       await processPaidCourseCheckout(
         event.data.object as Stripe.Checkout.Session,
+        userCourseService,
       );
       break;
     default:

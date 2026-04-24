@@ -20,6 +20,8 @@ import { CourseTypeORMRepository } from '@/modules/course/course.typeorm.ts';
 import { CourseService } from '@/modules/course/course.service.ts';
 import { createCoursePaymentRouter } from '@/modules/payment/payment.route.ts';
 import { createStripeWebhookHandler } from '@/modules/payment/stripe/stripe-webhooks.ts';
+import { UserCourseTypeORMRepository } from '@/modules/userCourse/user-course.typeorm.ts';
+import { UserCourseService } from '@/modules/userCourse/user-course.service.ts';
 
 // Middleware
 import { globalErrorHandler } from '@/middlewares/error-handler.ts';
@@ -37,10 +39,13 @@ import { ROUTES } from '@/constants/route.ts';
 const createApp = (dataSource: DataSource): Express => {
   const app = express();
 
+  const userCourseRepository = new UserCourseTypeORMRepository(dataSource);
+  const userCourseService = new UserCourseService(userCourseRepository);
+
   app.post(
     ROUTES.STRIPE_WEBHOOK,
     express.raw({ type: 'application/json' }),
-    createStripeWebhookHandler(),
+    createStripeWebhookHandler(userCourseService),
   );
 
   // Middleware
@@ -68,6 +73,7 @@ const createApp = (dataSource: DataSource): Express => {
     ROUTES.USERS,
     createUserRoutes({
       userService,
+      userCourseService,
       requireAuth,
       requireAdmin
     }),
