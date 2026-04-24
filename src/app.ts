@@ -22,6 +22,8 @@ import { CourseService } from '@/modules/course/course.service.ts';
 // Middleware
 import { globalErrorHandler } from '@/middlewares/error-handler.ts';
 import { corsHandler } from '@/middlewares/cors-handler.ts';
+import { createRequireAdmin } from '@/middlewares/require-admin.ts';
+import { requireAuth } from '@/middlewares/require-auth.ts';
 
 // Types
 import { AppError } from '@/types/error.ts';
@@ -42,9 +44,10 @@ const createApp = (dataSource: DataSource): Express => {
   const userRepository = new UserTypeORMRepository(dataSource)
   const userService = new UserService(userRepository)
 
-
   const courseRepository = new CourseTypeORMRepository(dataSource);
   const courseService = new CourseService(courseRepository);
+
+  const requireAdmin = createRequireAdmin(userService);
 
   app.use(ROUTES.AUTH, createAuthRouter({ userService }));
 
@@ -52,6 +55,8 @@ const createApp = (dataSource: DataSource): Express => {
     ROUTES.USERS,
     createUserRoutes({
       userService,
+      requireAuth,
+      requireAdmin
     }),
   );
 
@@ -59,6 +64,8 @@ const createApp = (dataSource: DataSource): Express => {
     ROUTES.COURSES,
     createCourseRouter({
       courseService,
+      requireAuth,
+      requireAdmin
     }),
   );
 

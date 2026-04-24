@@ -40,3 +40,9 @@ export const COURSE_ERROR = {
   FAILED_TO_UPDATE_COURSE: 'Failed to update course',
   COURSE_DELETED: 'Course deleted successfully.',
 }
+
+export const AUTH_ERROR = {
+  AUTH_TOKEN_REQUIRED:
+    'Authentication required. Please send request with valid token.',
+  ADMIN_REQUIRED: 'Admin role required to perform this action.',
+}
