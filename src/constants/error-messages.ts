@@ -39,6 +39,14 @@ export const COURSE_ERROR = {
   FAILED_TO_GET_ALL_COURSES: 'Failed to get courses',
   FAILED_TO_UPDATE_COURSE: 'Failed to update course',
   COURSE_DELETED: 'Course deleted successfully.',
+  COURSE_INVALID_ID: 'Course id must be a positive integer.',
+}
+
+export const PAYMENT_ERROR = {
+  CHECKOUT_FAILED: 'Could not create checkout session.',
+  CHECKOUT_AMOUNT_TOO_LOW:
+    'Amount is below the minimum allowed for this currency.',
+  CHECKOUT_STRIPE_NOT_CONFIGURED: 'Stripe is not configured on the server.',
 }
 
 export const AUTH_ERROR = {
