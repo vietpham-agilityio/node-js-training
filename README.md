@@ -45,7 +45,7 @@ STRIPE_CANCEL_URL=http://localhost:3000/payment/cancel
 pnpm dev
 ```
 
-Server runs at `http://localhost:3000` (or `PORT` env variable).
+Server run at `http://localhost:3000` (or `PORT` env variable).
 
 ### 4. Build & run production
 
@@ -58,14 +58,15 @@ pnpm start
 
 ## Scripts
 
-| Script              | Description                      |
-| ------------------- | -------------------------------- |
-| `pnpm dev`          | Run with tsx (no build)          |
-| `pnpm dev:watch`    | Run with tsx watch (auto-reload) |
-| `pnpm build`        | Compile TypeScript to `dist/`    |
-| `pnpm start`        | Run compiled `dist/server.js`    |
-| `pnpm test`         | Run Jest test suite              |
-| `pnpm format:check` | Prettier check                   |
+| Script               | Description                      |
+| -------------------- | -------------------------------- |
+| `pnpm dev`           | Run with tsx (no build)          |
+| `pnpm dev:watch`     | Run with tsx watch (auto-reload) |
+| `pnpm build`         | Compile TypeScript to `dist/`    |
+| `pnpm start`         | Run compiled `dist/server.js`    |
+| `pnpm test`          | Run test suite                   |
+| `pnpm test:coverage` | Run test coverage                |
+| `pnpm format:check`  | Prettier check                   |
 
 ---
 
@@ -82,18 +83,18 @@ GET  /users/me            → requires Authorization: Bearer <token>
 
 ### Public vs protected routes
 
-| Route                         | Auth required |
-| ----------------------------- | ------------- |
-| `POST /auth/webhook`          | ❌ (svix sig) |
-| `GET  /users/me`              | ✅            |
-| `GET  /users/me/courses`      | ✅            |
-| `GET  /courses`               | ✅            |
-| `GET  /courses/:id`           | ✅            |
-| `POST /courses`               | ✅ Admin      |
-| `PUT  /courses/:id`           | ✅ Admin      |
-| `DELETE /courses/:id`         | ✅ Admin      |
-| `POST /payments/checkout`     | ✅            |
-| `POST /payments/webhook`      | ❌ (stripe sig)|
+| Route                     | Auth required   |
+| ------------------------- | --------------- |
+| `POST /auth/webhook`      | ❌ (svix sig)   |
+| `GET  /users/me`          | ✅              |
+| `GET  /users/me/courses`  | ✅              |
+| `GET  /courses`           | ✅              |
+| `GET  /courses/:id`       | ✅              |
+| `POST /courses`           | ✅ Admin        |
+| `PUT  /courses/:id`       | ✅ Admin        |
+| `DELETE /courses/:id`     | ✅ Admin        |
+| `POST /payments/checkout` | ✅              |
+| `POST /payments/webhook`  | ❌ (stripe sig) |
 
 ### Using the token
 
@@ -146,7 +147,7 @@ Content-Type: application/json
 
 ```
 src/modules/<module>/
-└── <module>.ts            # Domain interface (input shape + response type) & Repository interface (abstraction)
+└── <module>.repository.ts # Domain interface (input shape + response type) & Repository interface (abstraction)
 └── <module>.router.ts     # HTTP layer: root entry
 └── <module>.controller.ts # Parse request, validate, respond and call specific service
 └── <module>.service.ts    # Use-case orchestration, error mapping
@@ -158,13 +159,13 @@ src/modules/<module>/
 
 ### Layer responsibilities
 
-| Layer          | File pattern                              | Responsibility                                                                    |
-| -------------- | ----------------------------------------- | --------------------------------------------------------------------------------- |
-| **Entry**      | `*.router.ts`                       | The entry point for every HTTP request.                                           |
-| **Controller** | `*.controller.ts`                   | Parses request body/params, validates input with Zod, calls service, returns JSON.|
-| **Service**    | `*.service.ts`                      | Implements use cases; validates cross-entity rules; maps errors to `AppError`.    |
-| **Repository** | `*.typeorm.ts`                      | Abstracts data access; TypeORM implementation maps entities to domain types.      |
-| **Domain**     | `*.entity.ts`                       | Domain shape (interfaces) + TypeORM column/relation decorators.                   |
+| Layer          | File pattern      | Responsibility                                                                     |
+| -------------- | ----------------- | ---------------------------------------------------------------------------------- |
+| **Route**      | `*.router.ts`     | The entry point for every HTTP request.                                            |
+| **Controller** | `*.controller.ts` | Parses request body/params, validates input with Zod, calls service, returns JSON. |
+| **Service**    | `*.service.ts`    | Implements use cases; validates cross-entity rules; maps errors to `AppError`.     |
+| **Repository** | `*.typeorm.ts`    | Abstracts data access; TypeORM implementation maps entities to domain types.       |
+| **Entity**     | `*.entity.ts`     | Domain shape (interfaces) + TypeORM column/relation decorators.                    |
 
 ### Error handling
 
