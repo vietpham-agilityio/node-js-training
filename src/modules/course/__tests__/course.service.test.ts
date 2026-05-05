@@ -22,7 +22,7 @@ const dates = {
   updatedAt: new Date('2020-01-02'),
 };
 
-const courseResponce = (
+const courseResponse = (
   overrides: Partial<APIResponse<Course>> = {},
 ): APIResponse<Course> => {
   return {
@@ -53,75 +53,77 @@ const makeRepo = (
 
 describe('CourseService', () => {
   it('create returns row when repository succeeds', async () => {
-    const row = courseResponce();
+    const row = courseResponse();
     const repo = makeRepo({ create: vi.fn().mockResolvedValue(row) });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.create(row)).resolves.toEqual(row);
+    await expect(courseService.create(row)).resolves.toEqual(row);
     expect(repo.create).toHaveBeenCalledWith(row);
   });
 
   it('create throws when repository returns null', async () => {
     const repo = makeRepo({ create: vi.fn().mockResolvedValue(null) });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.create(courseResponce())).rejects.toMatchObject({
+    await expect(courseService.create(courseResponse())).rejects.toMatchObject({
       status: STATUS_CODE.INTERNAL_SERVER_ERROR,
       message: COURSE_ERROR.FAILED_TO_CREATE_COURSE,
     });
   });
 
   it('findAll returns published courses', async () => {
-    const rows = [courseResponce()];
+    const rows = [courseResponse()];
     const repo = makeRepo({
       findAllPublished: vi.fn().mockResolvedValue(rows),
     });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.findAll()).resolves.toEqual(rows);
+    await expect(courseService.findAll()).resolves.toEqual(rows);
   });
 
   it('findAll throws when repository returns null', async () => {
     const repo = makeRepo({
       findAllPublished: vi.fn().mockResolvedValue(null),
     });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.findAll()).rejects.toMatchObject({
+    await expect(courseService.findAll()).rejects.toMatchObject({
       status: STATUS_CODE.INTERNAL_SERVER_ERROR,
       message: COURSE_ERROR.FAILED_TO_GET_ALL_COURSES,
     });
   });
 
   it('findAllForAdmin delegates to findAll', async () => {
-    const rows = [courseResponce()];
+    const rows = [courseResponse()];
     const repo = makeRepo({ findAll: vi.fn().mockResolvedValue(rows) });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.findAllForAdmin()).resolves.toEqual(rows);
+    await expect(courseService.findAllForAdmin()).resolves.toEqual(rows);
     expect(repo.findAll).toHaveBeenCalled();
   });
 
   it('findById returns course or throws NOT_FOUND', async () => {
-    const row = courseResponce();
+    const row = courseResponse();
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(row) });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.findById('course-1')).resolves.toEqual(row);
+    await expect(courseService.findById('course-1')).resolves.toEqual(row);
 
     repo.findById = vi.fn().mockResolvedValue(null);
-    await expect(svc.findById('missing')).rejects.toMatchObject({
+    await expect(courseService.findById('missing')).rejects.toMatchObject({
       status: STATUS_CODE.NOT_FOUND,
       message: COURSE_ERROR.COURSE_NOT_FOUND,
     });
   });
 
   it('findPublishedById returns published course', async () => {
-    const row = courseResponce({ status: COURSE_STATUS.PUBLISHED });
+    const row = courseResponse({ status: COURSE_STATUS.PUBLISHED });
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(row) });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.findPublishedById('course-1')).resolves.toEqual(row);
+    await expect(courseService.findPublishedById('course-1')).resolves.toEqual(
+      row,
+    );
   });
 
   it('findPublishedById rejects draft or missing', async () => {
@@ -129,26 +131,28 @@ describe('CourseService', () => {
       findById: vi
         .fn()
         .mockResolvedValue(
-          courseResponce({ status: COURSE_STATUS.UNPUBLISHED }),
+          courseResponse({ status: COURSE_STATUS.UNPUBLISHED }),
         ),
     });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.findPublishedById('course-1')).rejects.toMatchObject({
+    await expect(
+      courseService.findPublishedById('course-1'),
+    ).rejects.toMatchObject({
       status: STATUS_CODE.NOT_FOUND,
       message: COURSE_ERROR.COURSE_NOT_FOUND,
     });
   });
 
   it('update returns row or throws on failure', async () => {
-    const row = courseResponce();
+    const row = courseResponse();
     const repo = makeRepo({ updateById: vi.fn().mockResolvedValue(row) });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.update('course-1', row)).resolves.toEqual(row);
+    await expect(courseService.update('course-1', row)).resolves.toEqual(row);
 
     repo.updateById = vi.fn().mockResolvedValue(null);
-    await expect(svc.update('course-1', row)).rejects.toMatchObject({
+    await expect(courseService.update('course-1', row)).rejects.toMatchObject({
       status: STATUS_CODE.INTERNAL_SERVER_ERROR,
       message: COURSE_ERROR.FAILED_TO_UPDATE_COURSE,
     });
@@ -156,23 +160,23 @@ describe('CourseService', () => {
 
   it('delete throws when course missing', async () => {
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(null) });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await expect(svc.delete('x')).rejects.toMatchObject({
+    await expect(courseService.delete('x')).rejects.toMatchObject({
       status: STATUS_CODE.NOT_FOUND,
       message: COURSE_ERROR.COURSE_NOT_FOUND,
     });
   });
 
   it('delete removes existing course', async () => {
-    const row = courseResponce();
+    const row = courseResponse();
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(row),
       deleteById: vi.fn().mockResolvedValue(undefined),
     });
-    const svc = new CourseService(repo);
+    const courseService = new CourseService(repo);
 
-    await svc.delete('course-1');
+    await courseService.delete('course-1');
     expect(repo.deleteById).toHaveBeenCalledWith('course-1');
   });
 });
