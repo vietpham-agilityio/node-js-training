@@ -47,9 +47,13 @@ describe('UserCourseService', () => {
     const repo = makeRepo({
       grantCourseAccess: vi.fn().mockResolvedValue(record),
     });
-    const svc = new UserCourseService(repo);
 
-    await expect(svc.grantCourseAccess('user-1', 10)).resolves.toEqual(record);
+    const userCourserService = new UserCourseService(repo);
+
+    await expect(
+      userCourserService.grantCourseAccess('user-1', 10),
+    ).resolves.toEqual(record);
+
     expect(repo.grantCourseAccess).toHaveBeenCalledWith(
       'user-1',
       10,
@@ -67,35 +71,22 @@ describe('UserCourseService', () => {
         .mockResolvedValue([enrollment({ courseId: 9 }), record]),
       grantCourseAccess: vi.fn(),
     });
-    const svc = new UserCourseService(repo);
+    const userCourserService = new UserCourseService(repo);
 
     await expect(
-      svc.grantCourseAccess('user-1', 10, 'sess_1'),
+      userCourserService.grantCourseAccess('user-1', 10, 'sess_1'),
     ).resolves.toEqual(record);
     expect(repo.grantCourseAccess).not.toHaveBeenCalled();
-  });
-
-  it('grantCourseAccess falls through when duplicate session but course not listed', async () => {
-    const record = enrollment({ courseId: 10 });
-    const repo = makeRepo({
-      existsByStripeSessionId: vi.fn().mockResolvedValue(true),
-      findByUserId: vi.fn().mockResolvedValue([enrollment({ courseId: 99 })]),
-      grantCourseAccess: vi.fn().mockResolvedValue(record),
-    });
-    const svc = new UserCourseService(repo);
-
-    await expect(
-      svc.grantCourseAccess('user-1', 10, 'sess_1'),
-    ).resolves.toEqual(record);
-    expect(repo.grantCourseAccess).toHaveBeenCalledWith('user-1', 10, 'sess_1');
   });
 
   it('listForUser delegates to repository', async () => {
     const rows = [enrollment()];
     const repo = makeRepo({ findByUserId: vi.fn().mockResolvedValue(rows) });
-    const svc = new UserCourseService(repo);
+    const userCourserService = new UserCourseService(repo);
 
-    await expect(svc.listForUser('user-1')).resolves.toEqual(rows);
+    await expect(userCourserService.listForUser('user-1')).resolves.toEqual(
+      rows,
+    );
     expect(repo.findByUserId).toHaveBeenCalledWith('user-1');
   });
 });

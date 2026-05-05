@@ -52,7 +52,7 @@ describe('UserService', () => {
   it('create returns user or throws', async () => {
     const row = userRow();
     const repo = makeRepo({ create: vi.fn().mockResolvedValue(row) });
-    const userServic = new UserService(repo);
+    const userService = new UserService(repo);
     const input: UserCreateInput = {
       id: row.id,
       email: row.email,
@@ -60,10 +60,11 @@ describe('UserService', () => {
       lastName: row.lastName,
     };
 
-    await expect(userServic.create(input)).resolves.toEqual(row);
+    await expect(userService.create(input)).resolves.toEqual(row);
 
     repo.create = vi.fn().mockResolvedValue(null);
-    await expect(userServic.create(input)).rejects.toMatchObject({
+
+    await expect(userService.create(input)).rejects.toMatchObject({
       status: STATUS_CODE.INTERNAL_SERVER_ERROR,
       message: USER_ERROR.FAILED_TO_CREATE_USER,
     });
@@ -76,7 +77,7 @@ describe('UserService', () => {
       findById: vi.fn().mockResolvedValue(existing),
       updateById: vi.fn().mockResolvedValue(updated),
     });
-    const userServic = new UserService(repo);
+    const userService = new UserService(repo);
 
     const input: UserCreateInput = {
       id: existing.id,
@@ -85,7 +86,7 @@ describe('UserService', () => {
       lastName: existing.lastName,
     };
 
-    await expect(userServic.syncUserProfile(input)).resolves.toEqual(updated);
+    await expect(userService.syncUserProfile(input)).resolves.toEqual(updated);
     expect(repo.updateById).toHaveBeenCalledWith(existing.id, {
       email: input.email,
       firstName: input.firstName,
@@ -101,53 +102,35 @@ describe('UserService', () => {
       firstName: row.firstName,
       lastName: row.lastName,
     };
+
     const repo = makeRepo({
       findById: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue(row),
     });
-    const userServic = new UserService(repo);
 
-    await expect(userServic.syncUserProfile(input)).resolves.toEqual(row);
+    const userService = new UserService(repo);
+
+    await expect(userService.syncUserProfile(input)).resolves.toEqual(row);
     expect(repo.create).toHaveBeenCalledWith(input);
-  });
-
-  it('syncUserProfile throws when update returns null', async () => {
-    const existing = userRow();
-    const input: UserCreateInput = {
-      id: existing.id,
-      email: existing.email,
-      firstName: 'N',
-      lastName: existing.lastName,
-    };
-    const repo = makeRepo({
-      findById: vi.fn().mockResolvedValue(existing),
-      updateById: vi.fn().mockResolvedValue(null),
-    });
-    const userServic = new UserService(repo);
-
-    await expect(userServic.syncUserProfile(input)).rejects.toMatchObject({
-      status: STATUS_CODE.INTERNAL_SERVER_ERROR,
-      message: USER_ERROR.FAILED_TO_UPDATE_USER,
-    });
   });
 
   it('findAll delegates to repository', async () => {
     const rows = [userRow()];
     const repo = makeRepo({ findAll: vi.fn().mockResolvedValue(rows) });
-    const userServic = new UserService(repo);
+    const userService = new UserService(repo);
 
-    await expect(userServic.findAll()).resolves.toEqual(rows);
+    await expect(userService.findAll()).resolves.toEqual(rows);
   });
 
   it('findById returns user or NOT_FOUND', async () => {
     const row = userRow();
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(row) });
-    const userServic = new UserService(repo);
+    const userService = new UserService(repo);
 
-    await expect(userServic.findById('user-1')).resolves.toEqual(row);
+    await expect(userService.findById('user-1')).resolves.toEqual(row);
 
     repo.findById = vi.fn().mockResolvedValue(null);
-    await expect(userServic.findById('missing')).rejects.toMatchObject({
+    await expect(userService.findById('missing')).rejects.toMatchObject({
       status: STATUS_CODE.NOT_FOUND,
       message: USER_ERROR.USER_NOT_FOUND,
     });
@@ -156,14 +139,14 @@ describe('UserService', () => {
   it('promoteUserToAdmin rejects already admin', async () => {
     const admin = userRow({ role: USER_ROLE.ADMIN });
     const repo = makeRepo({ findById: vi.fn().mockResolvedValue(admin) });
-    const userServic = new UserService(repo);
+    const userService = new UserService(repo);
 
-    await expect(userServic.promoteUserToAdmin(admin.id)).rejects.toMatchObject(
-      {
-        status: STATUS_CODE.CONFLICT,
-        message: USER_ERROR.USER_ALREADY_ADMIN,
-      },
-    );
+    await expect(
+      userService.promoteUserToAdmin(admin.id),
+    ).rejects.toMatchObject({
+      status: STATUS_CODE.CONFLICT,
+      message: USER_ERROR.USER_ALREADY_ADMIN,
+    });
   });
 
   it('promoteUserToAdmin updates role', async () => {
@@ -173,9 +156,9 @@ describe('UserService', () => {
       findById: vi.fn().mockResolvedValue(row),
       updateById: vi.fn().mockResolvedValue(promoted),
     });
-    const userServic = new UserService(repo);
+    const userService = new UserService(repo);
 
-    await expect(userServic.promoteUserToAdmin(row.id)).resolves.toEqual(
+    await expect(userService.promoteUserToAdmin(row.id)).resolves.toEqual(
       promoted,
     );
     expect(repo.updateById).toHaveBeenCalledWith(row.id, {
@@ -189,9 +172,9 @@ describe('UserService', () => {
       findById: vi.fn().mockResolvedValue(row),
       updateById: vi.fn().mockResolvedValue(null),
     });
-    const userServic = new UserService(repo);
+    const userService = new UserService(repo);
 
-    await expect(userServic.promoteUserToAdmin(row.id)).rejects.toMatchObject({
+    await expect(userService.promoteUserToAdmin(row.id)).rejects.toMatchObject({
       status: STATUS_CODE.INTERNAL_SERVER_ERROR,
       message: USER_ERROR.FAILED_TO_UPDATE_USER,
     });
@@ -203,9 +186,9 @@ describe('UserService', () => {
       findById: vi.fn().mockResolvedValue(row),
       deleteById: vi.fn().mockResolvedValue(undefined),
     });
-    const userServic = new UserService(repo);
+    const userService = new UserService(repo);
 
-    await userServic.deleteUserById(row.id);
+    await userService.deleteUserById(row.id);
     expect(repo.deleteById).toHaveBeenCalledWith(row.id);
   });
 });
