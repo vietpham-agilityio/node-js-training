@@ -8,7 +8,7 @@ import { clerkMiddleware } from '@clerk/express';
 
 // Logger
 import { pinoHttp } from 'pino-http';
-import { createLogger } from '@/middlewares/logging.ts'
+import { createLogger } from '@/middlewares/logging.ts';
 
 // Module
 import { UserTypeORMRepository } from '@/modules/user/user.typeorm.ts';
@@ -29,6 +29,9 @@ import { corsHandler } from '@/middlewares/cors-handler.ts';
 import { createRequireAdmin } from '@/middlewares/require-admin.ts';
 import { requireAuth } from '@/middlewares/require-auth.ts';
 
+// Document
+import { implementSwaggerUI } from '@/docs/swagger.config.ts';
+
 // Types
 import { AppError } from '@/types/error.ts';
 
@@ -48,14 +51,17 @@ const createApp = (dataSource: DataSource): Express => {
     createStripeWebhookHandler(userCourseService),
   );
 
+  // Swagger
+  implementSwaggerUI(app);
+
   // Middleware
   app.use(express.json());
   app.use(corsHandler);
-  app.use(pinoHttp({ logger: createLogger() }))
+  app.use(pinoHttp({ logger: createLogger() }));
   app.use(clerkMiddleware());
 
-  const userRepository = new UserTypeORMRepository(dataSource)
-  const userService = new UserService(userRepository)
+  const userRepository = new UserTypeORMRepository(dataSource);
+  const userService = new UserService(userRepository);
 
   const courseRepository = new CourseTypeORMRepository(dataSource);
   const courseService = new CourseService(courseRepository);
@@ -75,7 +81,7 @@ const createApp = (dataSource: DataSource): Express => {
       userService,
       userCourseService,
       requireAuth,
-      requireAdmin
+      requireAdmin,
     }),
   );
 
@@ -84,17 +90,16 @@ const createApp = (dataSource: DataSource): Express => {
     createCourseRouter({
       courseService,
       requireAuth,
-      requireAdmin
+      requireAdmin,
     }),
   );
-
 
   // Not-found handler
   app.use((_req: Request, _res: Response, next: NextFunction): void => {
     next(new AppError(STATUS_CODE.NOT_FOUND));
   });
 
-  app.use(globalErrorHandler)
+  app.use(globalErrorHandler);
 
   return app;
 };
