@@ -25,7 +25,7 @@
  *         role:
  *           type: string
  *           enum: [user, admin]
- *           example: user
+ *           example: admin
  *         createdAt:
  *           type: string
  *           format: date-time
