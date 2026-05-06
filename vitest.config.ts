@@ -22,6 +22,7 @@ export default defineConfig({
         'src/migrations/**',
         'src/config/**',
         'src/docs/**',
+        'src/types/**',
         'src/**/entities/**',
         '**/*.d.ts',
         '**/*.config.{ts,js,cjs}',
