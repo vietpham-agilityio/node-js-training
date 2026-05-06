@@ -62,7 +62,6 @@ export const createCourseCheckoutSession = async (
       ],
       success_url: CHECKOUT_FALLBACK.SUCCESS_URL,
       cancel_url: CHECKOUT_FALLBACK.CANCEL_URL,
-      client_reference_id: course.id,
       metadata: {
         courseId: course.id,
         clerkUserId: clerkUserId,
