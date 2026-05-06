@@ -20,7 +20,6 @@ const processPaidCourseCheckout = async (
   session: Stripe.Checkout.Session,
   userCourseService: UserCourseService,
 ): Promise<void> => {
-
   if (!shouldProcessCheckoutPayment(session)) {
     console.warn(
       {
@@ -56,7 +55,6 @@ const processPaidCourseCheckout = async (
     session.id,
   );
 
-
   console.info(
     {
       event: 'course_checkout_paid',
@@ -79,10 +77,7 @@ export const handleStripeWebhookEvent = async (
   switch (event.type) {
     case 'checkout.session.completed':
     case 'checkout.session.async_payment_succeeded':
-      await processPaidCourseCheckout(
-        event.data.object as Stripe.Checkout.Session,
-        userCourseService,
-      );
+      await processPaidCourseCheckout(event.data.object, userCourseService);
       break;
     default:
       console.warn(
