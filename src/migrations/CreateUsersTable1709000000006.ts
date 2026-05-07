@@ -5,12 +5,12 @@ export class CreateUsersTable1709000000006 implements MigrationInterface {
     await queryRunner.query(`
       CREATE TABLE IF NOT EXISTS users (
         id        TEXT     PRIMARY KEY NOT NULL,
-        email     TEXT     NOT NULL UNIQUE,
-        firstName TEXT     NOT NULL,
-        lastName  TEXT     NOT NULL,
+        email     TEXT          NOT NULL UNIQUE,
+        "firstName" TEXT        NOT NULL,
+        "lastName"  TEXT        NOT NULL,
         role      TEXT     NOT NULL DEFAULT 'user',
-        createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `);
   }

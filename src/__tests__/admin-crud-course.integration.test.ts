@@ -39,8 +39,12 @@ describe('Admin course CRUD (integration)', () => {
 
   beforeAll(async () => {
     dataSource = new DataSource({
-      type: 'better-sqlite3',
-      database: ':memory:',
+      type: 'postgres',
+      port: 5433,
+      host: 'localhost',
+      username: 'postgres',
+      password: '121234',
+      database: 'english-learning-platform',
       entities: { UserEntity, CourseEntity, UserCourseEntity },
       migrations: {
         CreateUsersTable1709000000006,
