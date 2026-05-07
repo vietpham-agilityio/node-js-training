@@ -11,9 +11,9 @@ import { COURSE_STATUS } from '@/constants/enum.ts';
 @Entity('courses')
 export class CourseEntity {
   @PrimaryGeneratedColumn()
-  id!: number
+  id!: number;
 
-  @Column({ type: 'text', length: 80 })
+  @Column({ type: 'text' })
   title!: string;
 
   @Column({ type: 'text' })
@@ -23,14 +23,14 @@ export class CourseEntity {
   price!: number;
 
   @Column({ type: 'boolean', default: false })
-  isFree!: boolean
+  isFree!: boolean;
 
-  @Column({ type: "text", default: COURSE_STATUS.UNPUBLISHED })
+  @Column({ type: 'text', default: COURSE_STATUS.UNPUBLISHED })
   status!: string;
 
-  @CreateDateColumn({ type: 'datetime' })
-  createdAt!: Date
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt!: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
-  updatedAt!: Date
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt!: Date;
 }

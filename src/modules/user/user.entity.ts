@@ -4,10 +4,10 @@ import {
   PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
-} from 'typeorm'
+} from 'typeorm';
 
 // Constant
-import { USER_ROLE } from '@/constants/enum.ts'
+import { USER_ROLE } from '@/constants/enum.ts';
 
 @Entity('users')
 export class UserEntity {
@@ -26,9 +26,9 @@ export class UserEntity {
   @Column({ type: 'text', default: USER_ROLE.USER })
   role!: string;
 
-  @CreateDateColumn({ type: 'datetime' })
-  createdAt!: Date
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt!: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
-  updatedAt!: Date
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt!: Date;
 }

@@ -34,6 +34,6 @@ export class UserCourseEntity {
   @Column({ type: 'text', nullable: true })
   stripeSessionId?: string | null;
 
-  @CreateDateColumn({ name: 'grantedAt' })
+  @CreateDateColumn({ name: 'grantedAt', type: 'timestamptz' })
   grantedAt!: Date;
 }

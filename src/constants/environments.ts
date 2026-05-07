@@ -1,5 +1,10 @@
 export const NODE_ENV = process.env.NODE_ENV || 'dev';
-export const PORT = process.env.PORT || '3000';
+export const DB_PORT = parseInt(process.env.DB_PORT || '5432');
+export const DB_HOST = process.env.DB_HOST || '127.0.0.1';
+export const DB_USER = process.env.DB_USER || 'postgres';
+export const DB_PASSWORD = process.env.DB_PASSWORD || 'postgres';
+export const DB_NAME = process.env.DB_NAME || 'english-learning-platform';
+export const PORT = process.env.PORT || '3001';
 export const API_VERSION = process.env.API_VERSION || 'v1';
 export const CLIENT_URL = process.env.CLIENT_URL;
 export const ENABLE_API_DOCS = process.env.ENABLE_API_DOCS;
