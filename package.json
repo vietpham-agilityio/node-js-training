@@ -12,9 +12,9 @@
     "dev": "tsx src/server.ts",
     "dev:watch": "tsx watch src/server.ts",
     "dev:debug": "node --inspect-brk dist/server.js",
-    "test": "vitest run",
+    "test": "vitest run --silent",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage --silent",
     "prepare": "husky",
     "format:check": "prettier --check .",
     "lint:staged": "lint-staged"

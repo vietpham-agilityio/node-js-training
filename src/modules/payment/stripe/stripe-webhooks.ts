@@ -8,7 +8,7 @@ import { STATUS_CODE } from '@/constants/status-code.ts';
 import { getStripeInstance } from '@/modules/payment/stripe/stripe-config.ts';
 import { UserCourseService } from '@/modules/userCourse/user-course.service.ts';
 
-import { handleStripeWebhookEvent } from './stripe-webhooks-handler.ts';
+import { handleStripeWebhookEvent } from '@/modules/payment/stripe/stripe-webhooks-handler.ts';
 
 export const createStripeWebhookHandler =
   (userCourseService: UserCourseService): RequestHandler =>
