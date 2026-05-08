@@ -1,2 +1,2 @@
-bunx tsc --noEmit
-bunx lint-staged
+pnpm exec tsc --noEmit
+pnpm exec lint-staged

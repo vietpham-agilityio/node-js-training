@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage --silent",
     "prepare": "husky",
+    "lint": "eslint src/**/*.ts",
     "format:check": "prettier --check .",
     "lint:staged": "lint-staged"
   },
