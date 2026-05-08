@@ -68,7 +68,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       # Step 3: Setup pnpm package manager
       - name: Setup pnpm
@@ -109,7 +108,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       # Step 3: Setup pnpm package manager
       - name: Setup pnpm
