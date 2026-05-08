@@ -1,4 +1,8 @@
-export interface BaseRepository<T, TCreateInput = T, TUpdateInput = Partial<T>> {
+export interface BaseRepository<
+  T,
+  TCreateInput = T,
+  TUpdateInput = Partial<T>,
+> {
   /** Create a new entity. */
   create(data: TCreateInput): Promise<T | null>;
 

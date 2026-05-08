@@ -49,6 +49,8 @@ export class CourseController {
 
   remove = async (req: Request, res: Response): Promise<void> => {
     await this.courseService.delete(req.params.id as string);
-    res.status(STATUS_CODE.OK).json({ message: 'Course is deleted successfully' });
+    res
+      .status(STATUS_CODE.OK)
+      .json({ message: 'Course is deleted successfully' });
   };
 }

@@ -1,9 +1,9 @@
 // Type
-import type { UserCourseRepository } from "./user-course.repository.ts";
-import type { UserCourseResponse } from "./user-course.repository.ts";
+import type { UserCourseRepository } from './user-course.repository.ts';
+import type { UserCourseResponse } from './user-course.repository.ts';
 
 export class UserCourseService {
-  constructor(private readonly userCourseRepository: UserCourseRepository) { }
+  constructor(private readonly userCourseRepository: UserCourseRepository) {}
 
   async grantCourseAccess(
     userId: string,
@@ -44,7 +44,6 @@ export class UserCourseService {
 
     return record;
   }
-
 
   async listForUser(userId: string): Promise<readonly UserCourseResponse[]> {
     return this.userCourseRepository.findByUserId(userId);

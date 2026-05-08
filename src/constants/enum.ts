@@ -5,5 +5,5 @@ export enum USER_ROLE {
 
 export enum COURSE_STATUS {
   PUBLISHED = 'published',
-  UNPUBLISHED = 'unpublished'
+  UNPUBLISHED = 'unpublished',
 }

@@ -1,11 +1,10 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from 'express';
 
 // Constant
-import { STATUS_CODE, VALID_STATUS_CODES } from "@/constants/status-code.ts";
+import { STATUS_CODE, VALID_STATUS_CODES } from '@/constants/status-code.ts';
 
 // Types
-import { AppError } from "@/types/error.ts";
-
+import { AppError } from '@/types/error.ts';
 
 export const globalErrorHandler = (
   err: AppError,
@@ -19,5 +18,7 @@ export const globalErrorHandler = (
 
   console.error(err);
 
-  res.status(status).json({ status, errorCode: err.errorCode, message: err.message });
-}
+  res
+    .status(status)
+    .json({ status, errorCode: err.errorCode, message: err.message });
+};

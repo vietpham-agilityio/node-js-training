@@ -3,18 +3,16 @@ import { AppError } from '@/types/error.ts';
 
 // Constants
 import { COURSE_STATUS } from '@/constants/enum.ts';
-import { STATUS_CODE } from '@/constants/status-code.ts'
+import { STATUS_CODE } from '@/constants/status-code.ts';
 import { COURSE_ERROR } from '@/constants/error-messages.ts';
 
 // Types
 import type { CourseRepository } from '@/modules/course/course.repository.ts';
-import type {
-  Course,
-} from '@/modules/course/course.repository.ts';
+import type { Course } from '@/modules/course/course.repository.ts';
 import { APIResponse } from '@/types/response.ts';
 
 export class CourseService {
-  constructor(private courseRepository: CourseRepository) { }
+  constructor(private courseRepository: CourseRepository) {}
 
   async create(course: Course): Promise<APIResponse<Course>> {
     const result = await this.courseRepository.create(course);
@@ -66,10 +64,7 @@ export class CourseService {
     return course;
   }
 
-  async update(
-    id: string,
-    course: Course,
-  ): Promise<APIResponse<Course>> {
+  async update(id: string, course: Course): Promise<APIResponse<Course>> {
     const updated = await this.courseRepository.updateById(id, course);
 
     if (updated === null) {

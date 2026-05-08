@@ -3,7 +3,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 // Constants
 import { USER_ROLE } from '@/constants/enum.ts';
-import { STATUS_CODE } from '@/constants/status-code.ts'
+import { STATUS_CODE } from '@/constants/status-code.ts';
 
 // Services
 import type { UserService } from '@/modules/user/user.service.js';

@@ -1,4 +1,4 @@
- import type { DataSource, Repository } from 'typeorm';
+import type { DataSource, Repository } from 'typeorm';
 
 // Types
 import type { UserCourseRepository } from './user-course.repository.ts';

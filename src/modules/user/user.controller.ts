@@ -12,16 +12,13 @@ import { USER_ERROR } from '@/constants/error-messages.ts';
 import type { UserService } from '@/modules/user/user.service.js';
 
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   getMe = async (req: Request, res: Response): Promise<void> => {
     const { userId } = getAuth(req);
 
     if (!userId) {
-      throw new AppError(
-        STATUS_CODE.UNAUTHORIZED,
-        USER_ERROR.USER_NOT_FOUND,
-      );
+      throw new AppError(STATUS_CODE.UNAUTHORIZED, USER_ERROR.USER_NOT_FOUND);
     }
 
     const user = await this.userService.findById(userId);
@@ -51,11 +48,13 @@ export class UserController {
     res.status(STATUS_CODE.OK).json(user);
   };
 
-   deleteById = async (req: Request, res: Response): Promise<void> => {
+  deleteById = async (req: Request, res: Response): Promise<void> => {
     const targetId = req.params.id as string;
 
     await this.userService.deleteUserById(targetId);
 
-    res.status(STATUS_CODE.OK).json({ message: 'User is deleted successfully' });
+    res
+      .status(STATUS_CODE.OK)
+      .json({ message: 'User is deleted successfully' });
   };
 }

@@ -1,11 +1,15 @@
 import type { DataSource, Repository } from 'typeorm';
 
 // Type
-import type { UserRepository, UserCreateInput, User } from "./user.repository.ts";
-import type { APIResponse } from "@/types/response.ts";
+import type {
+  UserRepository,
+  UserCreateInput,
+  User,
+} from './user.repository.ts';
+import type { APIResponse } from '@/types/response.ts';
 
 // Entities
-import { UserEntity } from "./user.entity.ts";
+import { UserEntity } from './user.entity.ts';
 
 // Constants
 import { USER_ROLE } from '@/constants/enum.ts';
@@ -14,7 +18,7 @@ export class UserTypeORMRepository implements UserRepository {
   private readonly repository: Repository<UserEntity>;
 
   constructor(dataSource: DataSource) {
-    this.repository = dataSource.getRepository(UserEntity)
+    this.repository = dataSource.getRepository(UserEntity);
   }
 
   private mapToResponse(entity: UserEntity): APIResponse<User> {
@@ -30,12 +34,15 @@ export class UserTypeORMRepository implements UserRepository {
   }
 
   async findById(id: string): Promise<APIResponse<User> | null> {
-    const user = await this.repository.findOne({ where: { id } })
+    const user = await this.repository.findOne({ where: { id } });
 
-    return user ? this.mapToResponse(user) : null
+    return user ? this.mapToResponse(user) : null;
   }
 
-  async updateById(id: string, user: Partial<User>): Promise<APIResponse<User> | null> {
+  async updateById(
+    id: string,
+    user: Partial<User>,
+  ): Promise<APIResponse<User> | null> {
     const entity = await this.repository.findOne({ where: { id } });
 
     if (!entity) return null;

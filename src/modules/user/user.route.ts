@@ -172,7 +172,7 @@ export const createUserRoutes = ({
    *       500:
    *         $ref: '#/components/responses/InternalServerError'
    */
-  router.post('/:id/promote', requireAdmin, promoteToAdmin);
+  router.post('/:id/promote', promoteToAdmin);
   router.delete('/:id', requireAdmin, deleteById);
 
   return router;

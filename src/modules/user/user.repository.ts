@@ -1,8 +1,8 @@
 // Types
-import { BaseRepository } from "@/types/repository.ts";
-import type { APIResponse } from "@/types/response.ts";
+import { BaseRepository } from '@/types/repository.ts';
+import type { APIResponse } from '@/types/response.ts';
 
-import { USER_ROLE } from "@/constants/enum.ts";
+import { USER_ROLE } from '@/constants/enum.ts';
 
 export interface User {
   id: string;
@@ -14,4 +14,4 @@ export interface User {
 
 export type UserCreateInput = Omit<User, 'role'>;
 
-export type UserRepository = BaseRepository<APIResponse<User>, UserCreateInput>
+export type UserRepository = BaseRepository<APIResponse<User>, UserCreateInput>;

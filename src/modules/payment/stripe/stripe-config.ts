@@ -5,7 +5,7 @@ import { AppError } from '@/types/error.ts';
 
 // Constant
 import { STATUS_CODE } from '@/constants/status-code.ts';
-import { PAYMENT_ERROR } from '@/constants/error-messages.ts'
+import { PAYMENT_ERROR } from '@/constants/error-messages.ts';
 
 let stripe: Stripe | null = null;
 
@@ -24,4 +24,4 @@ export const getStripeInstance = (): Stripe => {
   }
 
   return stripe;
-}
+};

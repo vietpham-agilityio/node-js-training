@@ -9,15 +9,15 @@ import { ERROR_MESSAGE_WITH_STATUS_CODE } from '@/constants/error-messages.ts';
 import type { UserCourseService } from '@/modules/userCourse/user-course.service.ts';
 
 export class UserCourseController {
-  constructor(private readonly userCourseService: UserCourseService) { }
+  constructor(private readonly userCourseService: UserCourseService) {}
 
   getMyCourses = async (req: Request, res: Response): Promise<void> => {
     const { userId } = getAuth(req);
 
     if (!userId) {
-      res
-        .status(STATUS_CODE.UNAUTHORIZED)
-        .json({ error: ERROR_MESSAGE_WITH_STATUS_CODE[STATUS_CODE.UNAUTHORIZED] });
+      res.status(STATUS_CODE.UNAUTHORIZED).json({
+        error: ERROR_MESSAGE_WITH_STATUS_CODE[STATUS_CODE.UNAUTHORIZED],
+      });
 
       return;
     }

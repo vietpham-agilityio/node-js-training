@@ -12,7 +12,7 @@ import type { UserCreateInput } from '@/modules/user/user.repository.ts';
 import type { User, UserRepository } from '@/modules/user/user.repository.ts';
 
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) { }
+  constructor(private readonly userRepository: UserRepository) {}
 
   async create(input: UserCreateInput): Promise<APIResponse<User>> {
     const result = await this.userRepository.create(input);
@@ -70,10 +70,7 @@ export class UserService {
     const existing = await this.findById(id);
 
     if (existing.role === USER_ROLE.ADMIN) {
-      throw new AppError(
-        STATUS_CODE.CONFLICT,
-        USER_ERROR.USER_ALREADY_ADMIN,
-      );
+      throw new AppError(STATUS_CODE.CONFLICT, USER_ERROR.USER_ALREADY_ADMIN);
     }
 
     const updated = await this.userRepository.updateById(id, {

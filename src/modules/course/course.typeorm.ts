@@ -2,7 +2,10 @@ import type { DataSource, Repository } from 'typeorm';
 
 // Types
 import type { APIResponse } from '@/types/response.ts';
-import type { CourseRepository, Course } from '@/modules/course/course.repository.ts';
+import type {
+  CourseRepository,
+  Course,
+} from '@/modules/course/course.repository.ts';
 
 // Entity
 import { CourseEntity } from '@/modules/course/course.entity.ts';
@@ -27,7 +30,6 @@ export class CourseTypeORMRepository implements CourseRepository {
     createdAt,
     updatedAt,
   }: CourseEntity): APIResponse<Course> {
-
     return {
       id: String(id),
       title: title,
@@ -41,12 +43,20 @@ export class CourseTypeORMRepository implements CourseRepository {
   }
 
   async findAllPublished(): Promise<APIResponse<Course>[]> {
-    const publishedCourses = await this.repository.find({ where: { status: COURSE_STATUS.PUBLISHED } })
+    const publishedCourses = await this.repository.find({
+      where: { status: COURSE_STATUS.PUBLISHED },
+    });
 
     return publishedCourses.map(course => this.mapToResponse(course));
   }
 
-  async create({ title, description, isFree, price, status }: Course): Promise<APIResponse<Course> | null> {
+  async create({
+    title,
+    description,
+    isFree,
+    price,
+    status,
+  }: Course): Promise<APIResponse<Course> | null> {
     const entity = this.repository.create({
       title: title,
       description: description,
