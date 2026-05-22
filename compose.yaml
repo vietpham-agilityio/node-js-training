@@ -1,0 +1,41 @@
+services:
+  english-learning-server:
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      DB_PASSWORD_FILE: /run/secrets/db-password
+    ports:
+      - 3001:3001
+    secrets:
+      - db-password
+    depends_on:
+      english-learning-db:
+        condition: service_healthy
+
+  english-learning-db:
+    image: postgres:16-alpine
+    restart: always
+    volumes:
+      - english-learning-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    expose:
+      - 5432
+    secrets:
+      - db-password
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d english-learning-platform']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  english-learning-data:
+
+secrets:
+  db-password:
+    file: db/password.txt
