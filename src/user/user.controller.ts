@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 
 @Controller('users')
-export class UsersController {
+export class UserController {
   @Get()
   findAll(): string {
     return 'This is basic controller';
