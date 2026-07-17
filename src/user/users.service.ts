@@ -1,8 +1,8 @@
-import { Injectable, Param } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
-  fetchUserDetails(@Param('userId') userId: string): string {
+  fetchUserDetails(userId: string): string {
     return `Details for user with ID: ${userId}`;
   }
 }
