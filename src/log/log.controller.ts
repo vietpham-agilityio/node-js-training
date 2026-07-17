@@ -1,5 +1,6 @@
 import { Controller, Get, Req } from '@nestjs/common';
 import { LoggingService } from './log.service';
+import { type Request } from 'express';
 
 @Controller('log')
 export class LogController {

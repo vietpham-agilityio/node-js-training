@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Request } from 'express'
 
 @Injectable()
 export class LoggingService {
@@ -6,6 +7,6 @@ export class LoggingService {
         const metadata = request['customMetadata'];
         console.log(
             `Accessed route: ${metadata.route} at
-            ${metadata.timestamp} via ${metadata.userAgent}`);
+            ${metadata.timestamp} via ${metadata.userAgent}, ip: ${request.ip}`);
     }
 }
