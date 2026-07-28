@@ -11,12 +11,14 @@ export class InventoryService {
     { id: 1, name: 'Laptop', quantity: 100 },
     { id: 2, name: 'Mouse', quantity: 50 },
     { id: 3, name: 'Keyboard', quantity: 75 },
+    { id: 4, name: 'Monitor', quantity: 0 },
   ];
 
   handleOrderCreated(order: Order) {
     let success = false;
     let message = '';
-    const item = this.inventory.find((i) => i.id === order.id);
+
+    const item = this.inventory.find((i) => i.id === order.productId);
     if (item) {
       if (item.quantity < order.quantity) {
         message = 'Insufficient quantity in inventory';
@@ -29,6 +31,7 @@ export class InventoryService {
       message = `Product ${order.id} not found in
         inventory`;
     }
+
     const payload = {
       success,
       message,
