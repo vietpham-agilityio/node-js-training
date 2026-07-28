@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserService } from './users.service';
 import { CreateUserDTO } from './user.dto';
+import { UserEntity } from './user.entity';
 
 describe('UsersService', () => {
   const newUser: CreateUserDTO = {
@@ -11,10 +13,55 @@ describe('UsersService', () => {
     address: '1234, Lubumbashi, DRC',
   };
 
+  const seedUsers: UserEntity[] = [
+    {
+      id: 1,
+      firstName: 'Alice',
+      lastName: 'Anderson',
+      email: 'alice@example.com',
+      phoneNumber: '0939997738',
+      address: '1 Independence Ave, Kinshasa, DRC',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 2,
+      firstName: 'Bob',
+      lastName: 'Baker',
+      email: 'bob@example.com',
+      phoneNumber: '0911111111',
+      address: '2 Liberation Rd, Lubumbashi, DRC',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
+
   let service: UserService;
+  let users: UserEntity[];
+
   beforeEach(async () => {
+    users = seedUsers.map((user) => ({ ...user }));
+
+    const mockRepository = {
+      create: jest.fn((dto: CreateUserDTO) => ({ ...dto }) as UserEntity),
+      save: jest.fn((user: UserEntity) => {
+        const saved: UserEntity = {
+          ...user,
+          id: users.length + 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        users.push(saved);
+        return Promise.resolve(saved);
+      }),
+      find: jest.fn(() => Promise.resolve(users)),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UserService],
+      providers: [
+        UserService,
+        { provide: getRepositoryToken(UserEntity), useValue: mockRepository },
+      ],
     }).compile();
     service = module.get<UserService>(UserService);
   });

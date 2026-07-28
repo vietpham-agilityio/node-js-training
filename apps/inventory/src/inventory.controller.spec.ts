@@ -8,15 +8,18 @@ describe('InventoryController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [InventoryController],
-      providers: [InventoryService],
+      providers: [
+        InventoryService,
+        { provide: 'ORDER_SERVICE', useValue: { emit: jest.fn() } },
+      ],
     }).compile();
 
     inventoryController = app.get<InventoryController>(InventoryController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(inventoryController.getHello()).toBe('Hello World!');
+  describe('health', () => {
+    it('should return status UP', () => {
+      expect(inventoryController.checkHealth()).toEqual({ status: 'UP' });
     });
   });
 });

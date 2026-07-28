@@ -49,8 +49,9 @@ describe('LoggingMiddleware', () => {
 
     middleware.use(req, res, next);
 
-    const loggedMessage = consoleLogSpy.mock.calls[0][0];
-    const isoTimestampPattern = /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\]/;
+    const [loggedMessage] = consoleLogSpy.mock.calls[0] as [string];
+    const isoTimestampPattern =
+      /\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\]/;
     expect(loggedMessage).toMatch(isoTimestampPattern);
   });
 

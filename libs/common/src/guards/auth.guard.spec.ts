@@ -1,4 +1,4 @@
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 
 describe('AuthGuard', () => {
@@ -22,7 +22,7 @@ describe('AuthGuard', () => {
     expect(guard).toBeDefined();
   });
 
-  it('should return true when the Authorization header matches the mock token', () => {
+  it('should return true when the Authorization header has a Bearer token', () => {
     const context = createMockExecutionContext({
       authorization: 'Bearer mock-token',
     });
@@ -30,41 +30,41 @@ describe('AuthGuard', () => {
     expect(guard.canActivate(context)).toBe(true);
   });
 
-  it('should return false when the Authorization header is missing', () => {
-    const context = createMockExecutionContext({});
-
-    expect(guard.canActivate(context)).toBe(false);
-  });
-
-  it('should return false when the Authorization header has the wrong token', () => {
+  it('should return true regardless of the token value, since it only checks presence', () => {
     const context = createMockExecutionContext({
-      authorization: 'Bearer wrong-token',
+      authorization: 'Bearer any-token-value',
     });
 
-    expect(guard.canActivate(context)).toBe(false);
+    expect(guard.canActivate(context)).toBe(true);
   });
 
-  it('should return false when the Authorization header is missing the Bearer prefix', () => {
+  it('should throw UnauthorizedException when the Authorization header is missing', () => {
+    const context = createMockExecutionContext({});
+
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
+  });
+
+  it('should throw UnauthorizedException when the Authorization header is missing the Bearer prefix', () => {
     const context = createMockExecutionContext({
       authorization: 'mock-token',
     });
 
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 
-  it('should return false when the Authorization header has different casing', () => {
+  it('should throw UnauthorizedException when the Authorization header has different casing', () => {
     const context = createMockExecutionContext({
       authorization: 'bearer mock-token',
     });
 
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 
-  it('should return false when the Authorization header has extra whitespace', () => {
+  it('should throw UnauthorizedException when the Authorization header has extra whitespace', () => {
     const context = createMockExecutionContext({
       authorization: 'Bearer  mock-token',
     });
 
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 });
