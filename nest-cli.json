@@ -1,14 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/nest-js-training/src",
+  "sourceRoot": "apps/api-gateway/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/nest-js-training/tsconfig.app.json"
+    "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/nest-js-training",
+  "root": "apps/api-gateway",
   "projects": {
     "constants": {
       "type": "library",
@@ -46,15 +46,6 @@
         "tsConfigPath": "apps/inventory/tsconfig.app.json"
       }
     },
-    "nest-js-training": {
-      "type": "application",
-      "root": "apps/nest-js-training",
-      "entryFile": "main",
-      "sourceRoot": "apps/nest-js-training/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/nest-js-training/tsconfig.app.json"
-      }
-    },
     "order": {
       "type": "application",
       "root": "apps/order",
@@ -62,6 +53,24 @@
       "sourceRoot": "apps/order/src",
       "compilerOptions": {
         "tsConfigPath": "apps/order/tsconfig.app.json"
+      }
+    },
+    "user": {
+      "type": "application",
+      "root": "apps/user",
+      "entryFile": "main",
+      "sourceRoot": "apps/user/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/user/tsconfig.app.json"
+      }
+    },
+    "product": {
+      "type": "application",
+      "root": "apps/product",
+      "entryFile": "main",
+      "sourceRoot": "apps/product/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/product/tsconfig.app.json"
       }
     }
   }
