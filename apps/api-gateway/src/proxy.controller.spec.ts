@@ -11,6 +11,8 @@ const mockOrder: Order = {
   price: 409999,
   status: OrderStatus.PENDING,
   quantity: 2,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 describe('ProxyController', () => {
