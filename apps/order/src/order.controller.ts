@@ -17,27 +17,27 @@ import { ORDER_EVENTS, type OrderProcessedPayload } from '@app/constants';
 
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(private readonly orderService: OrderService) { }
 
   @EventPattern(ORDER_EVENTS.ORDER_PROCESSED)
   handleOrderCreated(data: OrderProcessedPayload) {
-    this.orderService.handleOrderProcessed(data);
+    return this.orderService.handleOrderProcessed(data);
   }
 
   @Post()
   createOrder(
     @Body(new ValidationPipe()) createOrderInput: CreateOrderDTO,
-  ): Order {
+  ): Promise<Order> {
     return this.orderService.createOrder(createOrderInput);
   }
 
   @Get()
-  findAll(): Order[] {
+  findAll(): Promise<Order[]> {
     return this.orderService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Order {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Order> {
     return this.orderService.findOne(id);
   }
 
@@ -45,12 +45,12 @@ export class OrderController {
   updateOrder(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) updateOrderInput: UpdateOrderDTO,
-  ): Order {
+  ): Promise<Order> {
     return this.orderService.updateOrder(id, updateOrderInput);
   }
 
   @Delete(':id')
-  removeOrder(@Param('id', ParseIntPipe) id: number): Order {
+  removeOrder(@Param('id', ParseIntPipe) id: number): Promise<Order> {
     return this.orderService.removeOrder(id);
   }
 }

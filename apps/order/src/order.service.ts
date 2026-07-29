@@ -1,72 +1,75 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { Order, OrderStatus } from './order.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Order } from './order.entity';
 import { CreateOrderDTO, UpdateOrderDTO } from './order.dto';
-import { ORDER_EVENTS, type OrderProcessedPayload } from '@app/constants';
+import {
+  ORDER_EVENTS,
+  OrderStatus,
+  type OrderProcessedPayload,
+} from '@app/constants';
 
 @Injectable()
 export class OrderService {
   constructor(
     @Inject('INVENTORY_SERVICE') private inventoryClient: ClientProxy,
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
   ) {}
 
-  private orders: Order[] = [];
-
-  createOrder(createOrderInput: CreateOrderDTO): Order {
-    const order = {
+  async createOrder(createOrderInput: CreateOrderDTO): Promise<Order> {
+    const order = this.orderRepository.create({
       ...createOrderInput,
       price: 409999,
-      id: Number(`${this.orders.length + 1}`),
       status: OrderStatus.PENDING,
-    };
+    });
 
-    this.orders.push(order);
-    this.inventoryClient.emit(ORDER_EVENTS.ORDER_CREATED, order);
+    const savedOrder = await this.orderRepository.save(order);
+    this.inventoryClient.emit(ORDER_EVENTS.ORDER_CREATED, savedOrder);
 
-    return order;
+    return savedOrder;
   }
 
-  handleOrderProcessed(data: OrderProcessedPayload) {
-    const order = this.orders.find((o) => o.id === data.orderId);
+  async handleOrderProcessed(data: OrderProcessedPayload): Promise<void> {
+    const order = await this.orderRepository.findOneBy({ id: data.orderId });
     if (order) {
       order.status = data.success
         ? OrderStatus.COMPLETED
         : OrderStatus.CANCELLED;
-      console.log('Order status updated:', order, this.orders);
+      await this.orderRepository.save(order);
+      console.log('Order status updated:', order);
     } else {
       console.log('Order not found');
     }
   }
 
-  findAll(): Order[] {
-    return this.orders;
+  async findAll(): Promise<Order[]> {
+    return this.orderRepository.find();
   }
 
-  findOne(id: number): Order {
-    const order = this.orders.find((o) => o.id === id);
+  async findOne(id: number): Promise<Order> {
+    const order = await this.orderRepository.findOne({ where: { id } });
     if (!order) {
       throw new NotFoundException(`Order with id ${id} not found`);
     }
     return order;
   }
 
-  updateOrder(id: number, updateOrderInput: UpdateOrderDTO): Order {
-    const order = this.findOne(id);
-    const updatedOrder = { ...order, ...updateOrderInput };
+  async updateOrder(
+    id: number,
+    updateOrderInput: UpdateOrderDTO,
+  ): Promise<Order> {
+    const order = await this.findOne(id);
+    const updatedOrder = this.orderRepository.merge(order, updateOrderInput);
 
-    const index = this.orders.findIndex((o) => o.id === id);
-    this.orders[index] = updatedOrder;
-
-    return updatedOrder;
+    return this.orderRepository.save(updatedOrder);
   }
 
-  removeOrder(id: number): Order {
-    const index = this.orders.findIndex((o) => o.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Order with id ${id} not found`);
-    }
+  async removeOrder(id: number): Promise<Order> {
+    const order = await this.findOne(id);
+    await this.orderRepository.delete(id);
 
-    const [removedOrder] = this.orders.splice(index, 1);
-    return removedOrder;
+    return order;
   }
 }
