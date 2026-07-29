@@ -1,8 +1,6 @@
 import { IsString, IsNotEmpty, IsInt, IsPositive, Min } from 'class-validator';
 
-import { PartialType } from '@nestjs/mapped-types';
-
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 export class CreateOrderDTO {
   @ApiProperty({
