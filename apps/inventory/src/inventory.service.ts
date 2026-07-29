@@ -1,29 +1,49 @@
 import { ORDER_EVENTS } from '@app/constants';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Order } from '@app/constants';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { InventoryItem } from './inventory-item.entity';
+
+const SEED_ITEMS = [
+  { name: 'Laptop', quantity: 100 },
+  { name: 'Mouse', quantity: 50 },
+  { name: 'Keyboard', quantity: 75 },
+  { name: 'Monitor', quantity: 0 },
+];
 
 @Injectable()
-export class InventoryService {
-  constructor(@Inject('ORDER_SERVICE') private orderClient: ClientProxy) {}
+export class InventoryService implements OnModuleInit {
+  constructor(
+    @Inject('ORDER_SERVICE') private orderClient: ClientProxy,
+    @InjectRepository(InventoryItem)
+    private readonly inventoryRepository: Repository<InventoryItem>,
+  ) {}
 
-  private inventory = [
-    { id: 1, name: 'Laptop', quantity: 100 },
-    { id: 2, name: 'Mouse', quantity: 50 },
-    { id: 3, name: 'Keyboard', quantity: 75 },
-    { id: 4, name: 'Monitor', quantity: 0 },
-  ];
+  async onModuleInit(): Promise<void> {
+    const count = await this.inventoryRepository.count();
+    if (count === 0) {
+      await this.inventoryRepository.save(
+        this.inventoryRepository.create(SEED_ITEMS),
+      );
+    }
+  }
 
-  handleOrderCreated(order: Order) {
+  async handleOrderCreated(order: Order) {
     let success = false;
     let message = '';
 
-    const item = this.inventory.find((i) => i.id === order.productId);
+    const item = await this.inventoryRepository.findOne({
+      where: { id: order.productId },
+    });
+
     if (item) {
       if (item.quantity < order.quantity) {
         message = 'Insufficient quantity in inventory';
       } else {
         item.quantity -= order.quantity;
+        await this.inventoryRepository.save(item);
         success = true;
         message = 'Order processed successfully';
       }
