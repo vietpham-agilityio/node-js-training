@@ -2,19 +2,20 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 import { ProxyController } from './proxy.controller';
+import { HealthController } from './health.controller';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import {
   ResponseLoggingInterceptor,
   HttpErrorFilter,
   LoggingMiddleware,
 } from '@app/common';
-import { ConsulService } from './consul.service';
+import { OrderProxyService } from './order-proxy.service';
 
 @Module({
   imports: [TerminusModule, HttpModule],
-  controllers: [ProxyController],
+  controllers: [ProxyController, HealthController],
   providers: [
-    ConsulService,
+    OrderProxyService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseLoggingInterceptor,
@@ -25,6 +26,7 @@ import { ConsulService } from './consul.service';
     },
   ],
 })
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggingMiddleware).forRoutes('*');

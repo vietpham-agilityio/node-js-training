@@ -1,20 +1,42 @@
-import { Controller, Post, Req, Res } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import type { Request, Response } from 'express';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { OrderProxyService } from './order-proxy.service';
+import type { CreateOrderDTO, UpdateOrderDTO } from 'apps/order/src/order.dto';
 
 @Controller('orders')
 export class ProxyController {
-  constructor(private httpService: HttpService) {}
-  @Post('/create')
-  async forwardToOrderService(@Req() req: Request, @Res() res: Response) {
-    const { data } = await firstValueFrom(
-      this.httpService.post<unknown>(
-        'http://localhost:3001/orders-create',
-        req.body,
-      ),
-    );
+  constructor(private readonly orderProxyService: OrderProxyService) {}
 
-    res.json(data);
+  @Post()
+  createOrder(@Body() body: unknown) {
+    return this.orderProxyService.createOrder(body as CreateOrderDTO);3
+  }
+
+  @Get()
+  findAll() {
+    return this.orderProxyService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.orderProxyService.findOne(id);
+  }
+
+  @Patch(':id')
+  updateOrder(@Param('id', ParseIntPipe) id: number, @Body() body: unknown) {
+    return this.orderProxyService.updateOrder(id, body as UpdateOrderDTO);
+  }
+
+  @Delete(':id')
+  removeOrder(@Param('id', ParseIntPipe) id: number) {
+    return this.orderProxyService.removeOrder(id);
   }
 }

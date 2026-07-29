@@ -15,7 +15,7 @@ import { Order } from './order.entity';
 import { EventPattern } from '@nestjs/microservices';
 import { ORDER_EVENTS, type OrderProcessedPayload } from '@app/constants';
 
-@Controller()
+@Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -24,24 +24,24 @@ export class OrderController {
     this.orderService.handleOrderProcessed(data);
   }
 
-  @Post('orders-create')
+  @Post()
   createOrder(
     @Body(new ValidationPipe()) createOrderInput: CreateOrderDTO,
   ): Order {
     return this.orderService.createOrder(createOrderInput);
   }
 
-  @Get('orders')
+  @Get()
   findAll(): Order[] {
     return this.orderService.findAll();
   }
 
-  @Get('orders/:id')
+  @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Order {
     return this.orderService.findOne(id);
   }
 
-  @Patch('orders/:id')
+  @Patch(':id')
   updateOrder(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) updateOrderInput: UpdateOrderDTO,
@@ -49,7 +49,7 @@ export class OrderController {
     return this.orderService.updateOrder(id, updateOrderInput);
   }
 
-  @Delete('orders/:id')
+  @Delete(':id')
   removeOrder(@Param('id', ParseIntPipe) id: number): Order {
     return this.orderService.removeOrder(id);
   }
