@@ -14,12 +14,14 @@ describe('UserController', () => {
     phoneNumber: '0897278983',
     email: 'user@gmail.com',
     address: '1234, Lubumbashi, DRC',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(async () => {
     const mockUserService = {
       findAll: jest.fn(),
-      findAllV2: jest.fn(),
+      findById: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       remove: jest.fn(),
