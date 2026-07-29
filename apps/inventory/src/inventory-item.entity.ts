@@ -1,7 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { InventoryItemShape } from '@app/constants';
 
 @Entity('inventory_items')
-export class InventoryItem {
+export class InventoryItem implements InventoryItemShape {
   @PrimaryGeneratedColumn()
   id!: number;
 

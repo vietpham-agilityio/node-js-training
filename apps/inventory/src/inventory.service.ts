@@ -1,5 +1,5 @@
 import { ORDER_EVENTS } from '@app/constants';
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Order } from '@app/constants';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -61,5 +61,18 @@ export class InventoryService implements OnModuleInit {
     console.log('Order processed with the payload:', payload);
 
     return this.orderClient.emit(ORDER_EVENTS.ORDER_PROCESSED, payload);
+  }
+
+  async updateStock(productId: number, quantity: number): Promise<InventoryItem> {
+    const item = await this.inventoryRepository.findOne({
+      where: { id: productId },
+    });
+
+    if (!item) {
+      throw new NotFoundException(`Product ${productId} not found in inventory`);
+    }
+
+    item.quantity = quantity;
+    return this.inventoryRepository.save(item);
   }
 }
