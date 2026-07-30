@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, VersioningType } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import request from 'supertest';
 import { ProductModule } from '../src/product.module';
-import { VersionManagementMiddleware } from '@app/common';
+import { VersionManagementMiddleware, decodeBase64Key } from '@app/common';
+import { USER_ROLE } from '@app/constants';
 import { Request, Response, NextFunction } from 'express';
 
 interface ApiResponse<T> {
@@ -21,6 +23,7 @@ interface ProductResponse {
 
 describe('ProductModule (e2e)', () => {
   let app: INestApplication;
+  let bearerToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -40,6 +43,16 @@ describe('ProductModule (e2e)', () => {
     );
 
     await app.init();
+
+    const jwtService = new JwtService({
+      privateKey: decodeBase64Key(process.env.JWT_PRIVATE_KEY_BASE64),
+      signOptions: { algorithm: 'RS256' },
+    });
+    bearerToken = await jwtService.signAsync({
+      sub: 1,
+      email: 'product-tester@example.com',
+      role: USER_ROLE.ADMIN,
+    });
   });
 
   afterAll(async () => {
@@ -57,7 +70,7 @@ describe('ProductModule (e2e)', () => {
 
       const res = await request(app.getHttpServer())
         .post('/v1/products')
-        .set('Authorization', 'Bearer mock-token')
+        .set('Authorization', `Bearer ${bearerToken}`)
         .send(newProduct)
         .expect(201);
 
@@ -74,7 +87,7 @@ describe('ProductModule (e2e)', () => {
     it('GET /v1/products - returns the created products', async () => {
       const res = await request(app.getHttpServer())
         .get('/v1/products')
-        .set('Authorization', 'Bearer mock-token')
+        .set('Authorization', `Bearer ${bearerToken}`)
         .expect(200);
 
       const body = res.body as ApiResponse<ProductResponse[]>;
@@ -86,7 +99,7 @@ describe('ProductModule (e2e)', () => {
     it('GET /v1/products/:id - returns 404 for unknown product', () => {
       return request(app.getHttpServer())
         .get('/v1/products/9999999')
-        .set('Authorization', 'Bearer mock-token')
+        .set('Authorization', `Bearer ${bearerToken}`)
         .expect(404);
     });
 
