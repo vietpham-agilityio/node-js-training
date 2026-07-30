@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { UserController } from './users.controller';
 import { UserService } from './users.service';
-import { UserEntity, USER_ROLE } from './user.entity';
+import { UserEntity } from './user.entity';
+import { USER_ROLE } from '@app/constants';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -35,6 +37,10 @@ describe('UserController', () => {
         {
           provide: UserService,
           useValue: mockUserService,
+        },
+        {
+          provide: JwtService,
+          useValue: { verifyAsync: jest.fn() },
         },
       ],
     }).compile();

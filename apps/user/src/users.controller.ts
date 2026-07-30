@@ -27,11 +27,29 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
+import { MessagePattern } from '@nestjs/microservices';
+import {
+  USER_MESSAGES,
+  type LoginPayload,
+  type CreateUserPayload,
+  type UserCredentialsShape,
+} from '@app/constants';
 
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @MessagePattern(USER_MESSAGES.VALIDATE_CREDENTIALS)
+  validateCredentials(data: LoginPayload) {
+    return this.userService.validateCredentials(data.email, data.password);
+  }
+
+  @MessagePattern(USER_MESSAGES.CREATE_USER)
+  async createUser(data: CreateUserPayload): Promise<UserCredentialsShape> {
+    const user = await this.userService.create(data);
+    return { id: user.id, email: user.email, role: user.role! };
+  }
 
   @ApiOperation({ summary: 'Get all users (v1)' })
   @ApiOkResponse({

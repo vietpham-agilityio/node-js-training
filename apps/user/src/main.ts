@@ -1,12 +1,22 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { UserModule } from './user.module';
 import { VersioningType } from '@nestjs/common';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { VersionManagementMiddleware } from '@app/common';
 import { NextFunction, Request, Response } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(UserModule);
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: {
+      port: 8004,
+      host: 'localhost',
+    },
+  });
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -27,6 +37,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
+  await app.startAllMicroservices();
   await app.listen(3003);
 }
 

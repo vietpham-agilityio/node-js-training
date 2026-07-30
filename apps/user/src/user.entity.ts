@@ -6,12 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
-export enum USER_ROLE {
-  ADMIN = 'admin',
-  USER = 'user',
-  MERCHANT = 'merchant',
-}
+import { USER_ROLE } from '@app/constants';
 
 @Entity('users')
 export class UserEntity {
@@ -38,11 +33,7 @@ export class UserEntity {
   @Column()
   phoneNumber!: string;
 
-  @ApiProperty({
-    description: 'Password of user account',
-    example: 'good_user@123',
-  })
-  @Column()
+  @Column({ select: false })
   password!: string;
 
   @ApiProperty({

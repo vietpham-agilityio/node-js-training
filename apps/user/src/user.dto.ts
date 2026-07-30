@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { USER_ROLE } from './user.entity';
+import { USER_ROLE } from '@app/constants';
 
 export class CreateUserDTO {
   @ApiProperty({

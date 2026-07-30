@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { UnauthorizedException } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDTO } from './user.dto';
-import { UserEntity, USER_ROLE } from './user.entity';
+import { UserEntity } from './user.entity';
+import { USER_ROLE } from '@app/constants';
 
 describe('UsersService', () => {
   const newUser: CreateUserDTO = {
@@ -22,7 +25,7 @@ describe('UsersService', () => {
       email: 'alice@example.com',
       phoneNumber: '0939997738',
       address: '1 Independence Ave, Kinshasa, DRC',
-      password: 'good_user@123',
+      password: bcrypt.hashSync('good_user@123', 10),
       role: USER_ROLE.USER,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -43,11 +46,17 @@ describe('UsersService', () => {
 
   let service: UserService;
   let users: UserEntity[];
+  let mockRepository: {
+    create: jest.Mock;
+    save: jest.Mock;
+    find: jest.Mock;
+    createQueryBuilder: jest.Mock;
+  };
 
   beforeEach(async () => {
     users = seedUsers.map((user) => ({ ...user }));
 
-    const mockRepository = {
+    mockRepository = {
       create: jest.fn((dto: CreateUserDTO) => ({ ...dto }) as UserEntity),
       save: jest.fn((user: UserEntity) => {
         const saved: UserEntity = {
@@ -60,6 +69,20 @@ describe('UsersService', () => {
         return Promise.resolve(saved);
       }),
       find: jest.fn(() => Promise.resolve(users)),
+      createQueryBuilder: jest.fn(() => {
+        let emailFilter: string | undefined;
+        const builder = {
+          addSelect: jest.fn(() => builder),
+          where: jest.fn((_clause: string, params: { email: string }) => {
+            emailFilter = params.email;
+            return builder;
+          }),
+          getOne: jest.fn(() =>
+            Promise.resolve(users.find((u) => u.email === emailFilter)),
+          ),
+        };
+        return builder;
+      }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -84,11 +107,49 @@ describe('UsersService', () => {
     expect(user.address).toBe(newUser.address);
   });
 
+  it('should hash the password before persisting it, and never return it', async () => {
+    const user = await service.create(newUser);
+    expect(user.password).toBeUndefined();
+
+    const persisted = mockRepository.save.mock.calls[0][0] as UserEntity;
+    expect(persisted.password).not.toBe(newUser.password);
+    await expect(
+      bcrypt.compare(newUser.password, persisted.password),
+    ).resolves.toBe(true);
+  });
+
   it('should return an array of users', async () => {
     const users = await service.findAll();
     expect(users.length).toBeGreaterThan(0);
     expect(users[0].firstName).toBeDefined();
     expect(users[0].phoneNumber).toBe('0939997738');
     expect(users[1].address).toBeDefined();
+  });
+
+  describe('validateCredentials', () => {
+    it('returns the sanitized user shape for correct credentials', async () => {
+      const result = await service.validateCredentials(
+        'alice@example.com',
+        'good_user@123',
+      );
+
+      expect(result).toEqual({
+        id: 1,
+        email: 'alice@example.com',
+        role: USER_ROLE.USER,
+      });
+    });
+
+    it('throws UnauthorizedException for an unknown email', async () => {
+      await expect(
+        service.validateCredentials('nobody@example.com', 'good_user@123'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('throws UnauthorizedException for a wrong password', async () => {
+      await expect(
+        service.validateCredentials('alice@example.com', 'wrong-password'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
   });
 });
