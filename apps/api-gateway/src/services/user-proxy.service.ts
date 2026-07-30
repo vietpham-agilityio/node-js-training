@@ -62,7 +62,7 @@ export class UserProxyService {
             ? (data as { message: string | string[] }).message
             : 'User service error';
 
-        return new HttpException(message, status);
+        return new HttpException({ message }, status);
       }
 
       return new HttpException(

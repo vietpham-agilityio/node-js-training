@@ -66,7 +66,7 @@ export class ProductProxyService {
             ? (data as { message: string | string[] }).message
             : 'Product service error';
 
-        return new HttpException(message, status);
+        return new HttpException({ message }, status);
       }
 
       return new HttpException(

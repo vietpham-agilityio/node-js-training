@@ -61,7 +61,7 @@ export class OrderProxyService {
           typeof data === 'object' && data !== null && 'message' in data
             ? (data as { message: string | string[] }).message
             : 'Order service error';
-        return new HttpException(message, status);
+        return new HttpException({ message }, status);
       }
       return new HttpException(
         'Order service unavailable',
