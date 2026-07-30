@@ -14,7 +14,7 @@ import {
   imports: [
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: 'user-db.sqlite',
+      database: './database/user-db.sqlite',
       entities: [UserEntity],
       synchronize: true,
     }),

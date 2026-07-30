@@ -9,7 +9,7 @@ import { Order } from './order.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: 'order-db.sqlite',
+      database: './database/order-db.sqlite',
       entities: [Order],
       synchronize: true,
     }),

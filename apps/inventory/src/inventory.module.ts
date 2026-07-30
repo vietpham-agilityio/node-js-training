@@ -9,7 +9,7 @@ import { InventoryItem } from './inventory-item.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: 'inventory-db.sqlite',
+      database: './database/inventory-db.sqlite',
       entities: [InventoryItem],
       synchronize: true,
     }),
@@ -29,4 +29,4 @@ import { InventoryItem } from './inventory-item.entity';
   controllers: [InventoryController],
   providers: [InventoryService],
 })
-export class InventoryModule {}
+export class InventoryModule { }
