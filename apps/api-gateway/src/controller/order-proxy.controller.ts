@@ -16,7 +16,7 @@ import {
   ApiCreatedResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { OrderProxyService } from './order-proxy.service';
+import { OrderProxyService } from '../services';
 import { CreateOrderDTO, UpdateOrderDTO } from 'apps/order/src/order.dto';
 import { Order } from 'apps/order/src/order.entity';
 

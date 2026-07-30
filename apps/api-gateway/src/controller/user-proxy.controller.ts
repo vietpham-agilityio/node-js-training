@@ -13,7 +13,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { UserProxyService } from './user-proxy.service';
+import { UserProxyService } from '../services';
 import { AuthGuard } from '@app/common';
 import {
   ApiTags,

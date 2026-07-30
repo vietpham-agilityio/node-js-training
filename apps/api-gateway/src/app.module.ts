@@ -1,22 +1,34 @@
+// Libs
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ProxyController } from './order-proxy.controller';
-import { HealthController } from './health.controller';
-import { InventoryProxyController } from './inventory-proxy.controller';
-import { UserProxyController } from './user-proxy.controller';
-import { ProductProxyController } from './product-proxy.controller';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+
+// Controller
+import {
+  ProxyController,
+  HealthController,
+  InventoryProxyController,
+  ProductProxyController,
+  UserProxyController
+} from './controller';
+
+// Extensions
 import {
   ResponseLoggingInterceptor,
   HttpErrorFilter,
   LoggingMiddleware,
 } from '@app/common';
-import { OrderProxyService } from './order-proxy.service';
-import { InventoryProxyService } from './inventory-proxy.service';
-import { UserProxyService } from './user-proxy.service';
-import { ProductProxyService } from './product-proxy.service';
+
+// Services
+import {
+  InventoryProxyService,
+  OrderProxyService,
+  ProductProxyService,
+  UserProxyService,
+} from './services';
+
 
 @Module({
   imports: [

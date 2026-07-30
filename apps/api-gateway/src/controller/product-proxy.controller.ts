@@ -23,7 +23,7 @@ import {
   ApiUnauthorizedResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { ProductProxyService } from './product-proxy.service';
+import { ProductProxyService } from '../services/product-proxy.service';
 import {
   CreateProductDTO,
   UpdateProductDTO,
@@ -39,7 +39,7 @@ import { AuthGuard } from '@app/common';
 @Controller('products')
 @UseGuards(AuthGuard)
 export class ProductProxyController {
-  constructor(private readonly productProxyService: ProductProxyService) {}
+  constructor(private readonly productProxyService: ProductProxyService) { }
 
   @ApiOperation({ summary: 'Create a new product' })
   @ApiBody({ type: CreateProductDTO })

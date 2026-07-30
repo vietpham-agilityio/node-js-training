@@ -8,7 +8,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@app/common';
-import { InventoryProxyService } from './inventory-proxy.service';
+import { InventoryProxyService } from '../services';
 import { IsInt, Min } from 'class-validator';
 import {
   ApiTags,

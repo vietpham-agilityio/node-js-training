@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrderStatus } from '@app/constants';
 import { Order } from 'apps/order/src/order.entity';
-import { ProxyController } from './order-proxy.controller';
-import { OrderProxyService } from './order-proxy.service';
+import { ProxyController } from '../controller';
+import { OrderProxyService } from '../services';
 
 const mockOrder: Order = {
   id: 1,

@@ -2,30 +2,30 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
-import { UserProxyService } from './user-proxy.service';
+import { ProductProxyService } from '../services';
 
-describe('UserProxyService', () => {
-  let service: UserProxyService;
+describe('ProductProxyService', () => {
+  let service: ProductProxyService;
   let httpService: jest.Mocked<
-    Pick<HttpService, 'get' | 'post' | 'put' | 'delete'>
+    Pick<HttpService, 'get' | 'post' | 'patch' | 'delete'>
   >;
 
   beforeEach(async () => {
     const mockHttpService = {
       get: jest.fn(),
       post: jest.fn(),
-      put: jest.fn(),
+      patch: jest.fn(),
       delete: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UserProxyService,
+        ProductProxyService,
         { provide: HttpService, useValue: mockHttpService },
       ],
     }).compile();
 
-    service = module.get<UserProxyService>(UserProxyService);
+    service = module.get<ProductProxyService>(ProductProxyService);
     httpService = module.get(HttpService);
   });
 
@@ -34,24 +34,24 @@ describe('UserProxyService', () => {
   });
 
   describe('create', () => {
-    it('forwards to user-create and unwraps the response data', async () => {
+    it('forwards to product-create and unwraps the response data', async () => {
       httpService.post.mockReturnValue(of({ data: { id: 1 } }) as never);
 
       const result = await service.create({
-        firstName: 'Jimmy',
-        lastName: 'Outaly',
-        email: 'jimmy@example.com',
-        phoneNumber: '0987654321',
+        name: 'Sony Camera',
+        description: 'Modern camera in future',
+        price: 49000000,
+        quantity: 100,
       });
 
       expect(result).toEqual({ id: 1 });
       expect(httpService.post).toHaveBeenCalledWith(
-        'http://localhost:3003/users',
+        'http://localhost:3004/products',
         {
-          firstName: 'Jimmy',
-          lastName: 'Outaly',
-          email: 'jimmy@example.com',
-          phoneNumber: '0987654321',
+          name: 'Sony Camera',
+          description: 'Modern camera in future',
+          price: 49000000,
+          quantity: 100,
         },
       );
     });
@@ -65,46 +65,46 @@ describe('UserProxyService', () => {
 
       expect(result).toEqual([{ id: 1 }]);
       expect(httpService.get).toHaveBeenCalledWith(
-        'http://localhost:3003/users',
+        'http://localhost:3004/products',
       );
     });
   });
 
   describe('findOne', () => {
-    it('requests the user by id', async () => {
+    it('requests the product by id', async () => {
       httpService.get.mockReturnValue(of({ data: { id: 5 } }) as never);
 
       const result = await service.findOne(5);
 
       expect(result).toEqual({ id: 5 });
       expect(httpService.get).toHaveBeenCalledWith(
-        'http://localhost:3003/users/5',
+        'http://localhost:3004/products/5',
       );
     });
   });
 
   describe('update', () => {
-    it('puts the user by id', async () => {
-      httpService.put.mockReturnValue(of({ data: { id: 5 } }) as never);
+    it('patches the product by id', async () => {
+      httpService.patch.mockReturnValue(of({ data: { id: 5 } }) as never);
 
-      const result = await service.update(5, { firstName: 'New' });
+      const result = await service.update(5, { quantity: 2 });
 
       expect(result).toEqual({ id: 5 });
-      expect(httpService.put).toHaveBeenCalledWith(
-        'http://localhost:3003/users/5',
-        { firstName: 'New' },
+      expect(httpService.patch).toHaveBeenCalledWith(
+        'http://localhost:3004/products/5',
+        { quantity: 2 },
       );
     });
   });
 
   describe('remove', () => {
-    it('deletes the user by id', async () => {
+    it('deletes the product by id', async () => {
       httpService.delete.mockReturnValue(of({ data: undefined }) as never);
 
       await service.remove(5);
 
       expect(httpService.delete).toHaveBeenCalledWith(
-        'http://localhost:3003/users/5',
+        'http://localhost:3004/products/5',
       );
     });
   });
@@ -124,7 +124,7 @@ describe('UserProxyService', () => {
       });
     });
 
-    it('maps unreachable user service to a 502', async () => {
+    it('maps unreachable product service to a 502', async () => {
       httpService.get.mockReturnValue(
         throwError(() => ({ isAxiosError: true })) as never,
       );
