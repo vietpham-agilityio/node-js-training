@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { ProductModule } from './product.module';
 import { VersioningType } from '@nestjs/common';
