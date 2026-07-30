@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { InventoryProxyController } from '../controller';
 import { InventoryProxyService } from '../services';
 
@@ -15,6 +16,7 @@ describe('InventoryProxyController', () => {
       controllers: [InventoryProxyController],
       providers: [
         { provide: InventoryProxyService, useValue: mockInventoryProxyService },
+        { provide: JwtService, useValue: { verifyAsync: jest.fn() } },
       ],
     }).compile();
 

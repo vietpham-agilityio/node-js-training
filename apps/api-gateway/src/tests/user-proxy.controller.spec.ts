@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { UserProxyController } from '../controller';
 import { UserProxyService } from '../services';
 
@@ -17,7 +18,10 @@ describe('UserProxyController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserProxyController],
-      providers: [{ provide: UserProxyService, useValue: mockUserProxyService }],
+      providers: [
+        { provide: UserProxyService, useValue: mockUserProxyService },
+        { provide: JwtService, useValue: { verifyAsync: jest.fn() } },
+      ],
     }).compile();
 
     controller = module.get<UserProxyController>(UserProxyController);

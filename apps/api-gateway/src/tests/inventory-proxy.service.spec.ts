@@ -66,5 +66,16 @@ describe('InventoryProxyService', () => {
         status: HttpStatus.BAD_GATEWAY,
       });
     });
+
+    it('maps a connection-refused error (empty message) into a 502 with a meaningful message', async () => {
+      inventoryClient.send.mockReturnValue(
+        throwError(() => ({ code: 'ECONNREFUSED', message: '' })) as never,
+      );
+
+      await expect(service.updateStock(1, 10)).rejects.toMatchObject({
+        status: HttpStatus.BAD_GATEWAY,
+        message: 'Inventory service unavailable (ECONNREFUSED)',
+      });
+    });
   });
 });
