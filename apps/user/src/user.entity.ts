@@ -7,6 +7,12 @@ import {
 } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+export enum USER_ROLE {
+  ADMIN = 'admin',
+  USER = 'user',
+  MERCHANT = 'merchant',
+}
+
 @Entity('users')
 export class UserEntity {
   @ApiProperty({ description: 'User id', example: 1 })
@@ -31,6 +37,25 @@ export class UserEntity {
   })
   @Column()
   phoneNumber!: string;
+
+  @ApiProperty({
+    description: 'Password of user account',
+    example: 'good_user@123',
+  })
+  @Column()
+  password!: string;
+
+  @ApiProperty({
+    description: 'User role in application',
+    enum: USER_ROLE,
+    example: USER_ROLE.USER,
+  })
+  @Column({
+    type: 'text',
+    enum: USER_ROLE,
+    default: USER_ROLE.USER
+  })
+  role?: USER_ROLE;
 
   @ApiPropertyOptional({
     description: 'User address (introduced in v2)',

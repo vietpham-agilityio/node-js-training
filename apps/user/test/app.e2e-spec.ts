@@ -58,6 +58,7 @@ describe('UserModule (e2e)', () => {
         email: 'kaito.kid@example.com',
         phoneNumber: '0897278983',
         address: '1234, Lubumbashi, DRC',
+        password: 'Good_user@123',
       };
 
       const res = await request(app.getHttpServer())

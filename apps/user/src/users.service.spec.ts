@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserService } from './users.service';
 import { CreateUserDTO } from './user.dto';
-import { UserEntity } from './user.entity';
+import { UserEntity, USER_ROLE } from './user.entity';
 
 describe('UsersService', () => {
   const newUser: CreateUserDTO = {
@@ -11,6 +11,7 @@ describe('UsersService', () => {
     phoneNumber: '0897278983',
     email: 'example@gmail.com',
     address: '1234, Lubumbashi, DRC',
+    password: 'good_user@123',
   };
 
   const seedUsers: UserEntity[] = [
@@ -21,6 +22,8 @@ describe('UsersService', () => {
       email: 'alice@example.com',
       phoneNumber: '0939997738',
       address: '1 Independence Ave, Kinshasa, DRC',
+      password: 'good_user@123',
+      role: USER_ROLE.USER,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -31,6 +34,8 @@ describe('UsersService', () => {
       email: 'bob@example.com',
       phoneNumber: '0911111111',
       address: '2 Liberation Rd, Lubumbashi, DRC',
+      password: 'good_user@123',
+      role: USER_ROLE.USER,
       createdAt: new Date(),
       updatedAt: new Date(),
     },

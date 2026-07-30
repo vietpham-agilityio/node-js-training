@@ -52,6 +52,7 @@ describe('UserProxyController', () => {
       lastName: 'Outaly',
       email: 'jimmy@example.com',
       phoneNumber: '0987654321',
+      password: 'good_user@123',
     };
     service.create.mockResolvedValue({ id: 1, ...body } as never);
 

@@ -42,6 +42,7 @@ describe('UserProxyService', () => {
         lastName: 'Outaly',
         email: 'jimmy@example.com',
         phoneNumber: '0987654321',
+        password: 'good_user@123',
       });
 
       expect(result).toEqual({ id: 1 });
@@ -52,6 +53,7 @@ describe('UserProxyService', () => {
           lastName: 'Outaly',
           email: 'jimmy@example.com',
           phoneNumber: '0987654321',
+          password: 'good_user@123',
         },
       );
     });

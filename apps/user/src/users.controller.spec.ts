@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './users.controller';
 import { UserService } from './users.service';
-import { UserEntity } from './user.entity';
+import { UserEntity, USER_ROLE } from './user.entity';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -14,6 +14,8 @@ describe('UserController', () => {
     phoneNumber: '0897278983',
     email: 'user@gmail.com',
     address: '1234, Lubumbashi, DRC',
+    password: 'good_user@123',
+    role: USER_ROLE.USER,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -77,6 +79,7 @@ describe('UserController', () => {
         phoneNumber: '0897278983',
         email: 'user@gmail.com',
         address: '1234, Lubumbashi, DRC',
+        password: 'good_user@123',
       };
       service.create.mockResolvedValue(mockUser);
 
