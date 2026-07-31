@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
-import { UserProxyService } from '../services';
+import { UserProxyService } from '..';
 
 describe('UserProxyService', () => {
   let service: UserProxyService;

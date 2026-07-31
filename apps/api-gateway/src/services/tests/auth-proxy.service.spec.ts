@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ClientProxy } from '@nestjs/microservices';
 import { HttpStatus } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
-import { AuthProxyService } from '../services';
+import { AuthProxyService } from '../';
 
 describe('AuthProxyService', () => {
   let service: AuthProxyService;

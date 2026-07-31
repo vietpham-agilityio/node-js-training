@@ -2,10 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
-import { ProductProxyService } from '../services';
+import { OrderProxyService } from '../';
 
-describe('ProductProxyService', () => {
-  let service: ProductProxyService;
+describe('OrderProxyService', () => {
+  let service: OrderProxyService;
   let httpService: jest.Mocked<
     Pick<HttpService, 'get' | 'post' | 'patch' | 'delete'>
   >;
@@ -20,12 +20,12 @@ describe('ProductProxyService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ProductProxyService,
+        OrderProxyService,
         { provide: HttpService, useValue: mockHttpService },
       ],
     }).compile();
 
-    service = module.get<ProductProxyService>(ProductProxyService);
+    service = module.get<OrderProxyService>(OrderProxyService);
     httpService = module.get(HttpService);
   });
 
@@ -33,26 +33,20 @@ describe('ProductProxyService', () => {
     jest.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('forwards to product-create and unwraps the response data', async () => {
+  describe('createOrder', () => {
+    it('forwards to order-create and unwraps the response data', async () => {
       httpService.post.mockReturnValue(of({ data: { id: 1 } }) as never);
 
-      const result = await service.create({
-        name: 'Sony Camera',
-        description: 'Modern camera in future',
-        price: 49000000,
-        quantity: 100,
+      const result = await service.createOrder({
+        name: 'x',
+        productId: 12,
+        quantity: 2,
       });
 
       expect(result).toEqual({ id: 1 });
       expect(httpService.post).toHaveBeenCalledWith(
-        'http://localhost:3004/products',
-        {
-          name: 'Sony Camera',
-          description: 'Modern camera in future',
-          price: 49000000,
-          quantity: 100,
-        },
+        'http://localhost:3001/orders',
+        { name: 'x', productId: 12, quantity: 2 },
       );
     });
   });
@@ -65,46 +59,47 @@ describe('ProductProxyService', () => {
 
       expect(result).toEqual([{ id: 1 }]);
       expect(httpService.get).toHaveBeenCalledWith(
-        'http://localhost:3004/products',
+        'http://localhost:3001/orders',
       );
     });
   });
 
   describe('findOne', () => {
-    it('requests the product by id', async () => {
+    it('requests the order by id', async () => {
       httpService.get.mockReturnValue(of({ data: { id: 5 } }) as never);
 
       const result = await service.findOne(5);
 
       expect(result).toEqual({ id: 5 });
       expect(httpService.get).toHaveBeenCalledWith(
-        'http://localhost:3004/products/5',
+        'http://localhost:3001/orders/5',
       );
     });
   });
 
-  describe('update', () => {
-    it('patches the product by id', async () => {
+  describe('updateOrder', () => {
+    it('patches the order by id', async () => {
       httpService.patch.mockReturnValue(of({ data: { id: 5 } }) as never);
 
-      const result = await service.update(5, { quantity: 2 });
+      const result = await service.updateOrder(5, { quantity: 2 });
 
       expect(result).toEqual({ id: 5 });
       expect(httpService.patch).toHaveBeenCalledWith(
-        'http://localhost:3004/products/5',
+        'http://localhost:3001/orders/5',
         { quantity: 2 },
       );
     });
   });
 
-  describe('remove', () => {
-    it('deletes the product by id', async () => {
-      httpService.delete.mockReturnValue(of({ data: undefined }) as never);
+  describe('removeOrder', () => {
+    it('deletes the order by id', async () => {
+      httpService.delete.mockReturnValue(of({ data: { id: 5 } }) as never);
 
-      await service.remove(5);
+      const result = await service.removeOrder(5);
 
+      expect(result).toEqual({ id: 5 });
       expect(httpService.delete).toHaveBeenCalledWith(
-        'http://localhost:3004/products/5',
+        'http://localhost:3001/orders/5',
       );
     });
   });
@@ -124,7 +119,7 @@ describe('ProductProxyService', () => {
       });
     });
 
-    it('maps unreachable product service to a 502', async () => {
+    it('maps unreachable order service to a 502', async () => {
       httpService.get.mockReturnValue(
         throwError(() => ({ isAxiosError: true })) as never,
       );

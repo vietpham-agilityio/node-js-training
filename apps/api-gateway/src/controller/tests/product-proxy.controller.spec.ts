@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { ProductProxyController } from '../controller';
-import { ProductProxyService } from '../services';
+import { ProductProxyController } from '..';
+import { ProductProxyService } from '../../services';
 
 describe('ProductProxyController', () => {
   let controller: ProductProxyController;

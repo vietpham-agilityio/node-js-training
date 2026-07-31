@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ClientProxy } from '@nestjs/microservices';
 import { HttpStatus } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
-import { InventoryProxyService } from '../services';
+import { InventoryProxyService } from '../';
 
 describe('InventoryProxyService', () => {
   let service: InventoryProxyService;

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom } from 'rxjs';
-import { extractRpcErrorMessage } from '@app/common';
+import { extractErrorMessage } from '@app/common';
 import {
   AUTH_MESSAGES,
   type LoginResponse,
@@ -44,13 +44,13 @@ export class AuthProxyService {
 
     if (status === HttpStatus.UNAUTHORIZED) {
       return new HttpException(
-        extractRpcErrorMessage(error, 'Invalid credentials'),
+        extractErrorMessage(error, 'Invalid credentials'),
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     return new HttpException(
-      extractRpcErrorMessage(error, 'Auth service unavailable'),
+      extractErrorMessage(error, 'Auth service unavailable'),
       HttpStatus.BAD_GATEWAY,
     );
   }

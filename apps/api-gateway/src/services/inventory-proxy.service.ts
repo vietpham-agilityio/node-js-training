@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom } from 'rxjs';
-import { extractRpcErrorMessage } from '@app/common';
+import { extractErrorMessage } from '@app/common';
 import { INVENTORY_MESSAGES, type InventoryItemShape } from '@app/constants';
 
 @Injectable()
@@ -36,13 +36,13 @@ export class InventoryProxyService {
 
     if (status === HttpStatus.NOT_FOUND) {
       return new HttpException(
-        extractRpcErrorMessage(error, 'Not found'),
+        extractErrorMessage(error, 'Not found'),
         HttpStatus.NOT_FOUND,
       );
     }
 
     return new HttpException(
-      extractRpcErrorMessage(error, 'Inventory service unavailable'),
+      extractErrorMessage(error, 'Inventory service unavailable'),
       HttpStatus.BAD_GATEWAY,
     );
   }

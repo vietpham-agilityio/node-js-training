@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthProxyController } from '../controller';
-import { AuthProxyService } from '../services';
+import { AuthProxyController } from '..';
+import { AuthProxyService } from '../../services';
 
 describe('AuthProxyController', () => {
   let controller: AuthProxyController;
