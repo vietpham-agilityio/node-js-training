@@ -3,25 +3,35 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
+  ApiBearerAuth,
   ApiBody,
   ApiOkResponse,
   ApiCreatedResponse,
+  ApiUnauthorizedResponse,
   ApiParam,
 } from '@nestjs/swagger';
 import { OrderProxyService } from '../services';
 import { CreateOrderDTO, UpdateOrderDTO } from 'apps/order/src/order.dto';
 import { Order } from 'apps/order/src/order.entity';
+import { AuthGuard } from '@app/common';
 
 @ApiTags('Orders')
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({
+  description: 'Missing or invalid authentication token',
+})
 @Controller('orders')
+@UseGuards(AuthGuard)
 export class ProxyController {
   constructor(private readonly orderProxyService: OrderProxyService) {}
 
@@ -32,8 +42,14 @@ export class ProxyController {
     type: Order,
   })
   @Post()
-  createOrder(@Body() body: unknown) {
-    return this.orderProxyService.createOrder(body as CreateOrderDTO);
+  createOrder(
+    @Body() body: unknown,
+    @Headers('authorization') authorization?: string,
+  ) {
+    return this.orderProxyService.createOrder(
+      body as CreateOrderDTO,
+      authorization,
+    );
   }
 
   @ApiOperation({ summary: 'Get all orders' })
@@ -42,16 +58,19 @@ export class ProxyController {
     type: [Order],
   })
   @Get()
-  findAll() {
-    return this.orderProxyService.findAll();
+  findAll(@Headers('authorization') authorization?: string) {
+    return this.orderProxyService.findAll(authorization);
   }
 
   @ApiOperation({ summary: 'Get an order by id' })
   @ApiParam({ name: 'id', description: 'ID of the order to fetch', example: 1 })
   @ApiOkResponse({ description: 'Order returned successfully', type: Order })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.orderProxyService.findOne(id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Headers('authorization') authorization?: string,
+  ) {
+    return this.orderProxyService.findOne(id, authorization);
   }
 
   @ApiOperation({ summary: 'Update an existing order' })
@@ -59,15 +78,26 @@ export class ProxyController {
   @ApiBody({ type: UpdateOrderDTO })
   @ApiOkResponse({ description: 'Order updated successfully', type: Order })
   @Patch(':id')
-  updateOrder(@Param('id', ParseIntPipe) id: number, @Body() body: unknown) {
-    return this.orderProxyService.updateOrder(id, body as UpdateOrderDTO);
+  updateOrder(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: unknown,
+    @Headers('authorization') authorization?: string,
+  ) {
+    return this.orderProxyService.updateOrder(
+      id,
+      body as UpdateOrderDTO,
+      authorization,
+    );
   }
 
   @ApiOperation({ summary: 'Delete an order' })
   @ApiParam({ name: 'id', description: 'ID of the order to delete', example: 1 })
   @ApiOkResponse({ description: 'Order deleted successfully', type: Order })
   @Delete(':id')
-  removeOrder(@Param('id', ParseIntPipe) id: number) {
-    return this.orderProxyService.removeOrder(id);
+  removeOrder(
+    @Param('id', ParseIntPipe) id: number,
+    @Headers('authorization') authorization?: string,
+  ) {
+    return this.orderProxyService.removeOrder(id, authorization);
   }
 }

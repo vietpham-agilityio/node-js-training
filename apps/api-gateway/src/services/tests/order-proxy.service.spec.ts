@@ -47,6 +47,7 @@ describe('OrderProxyService', () => {
       expect(httpService.post).toHaveBeenCalledWith(
         'http://localhost:3001/orders',
         { name: 'x', productId: 12, quantity: 2 },
+        {},
       );
     });
   });
@@ -60,6 +61,18 @@ describe('OrderProxyService', () => {
       expect(result).toEqual([{ id: 1 }]);
       expect(httpService.get).toHaveBeenCalledWith(
         'http://localhost:3001/orders',
+        {},
+      );
+    });
+
+    it('forwards the incoming Authorization header', async () => {
+      httpService.get.mockReturnValue(of({ data: [{ id: 1 }] }) as never);
+
+      await service.findAll('Bearer abc.def.ghi');
+
+      expect(httpService.get).toHaveBeenCalledWith(
+        'http://localhost:3001/orders',
+        { headers: { Authorization: 'Bearer abc.def.ghi' } },
       );
     });
   });
@@ -73,6 +86,7 @@ describe('OrderProxyService', () => {
       expect(result).toEqual({ id: 5 });
       expect(httpService.get).toHaveBeenCalledWith(
         'http://localhost:3001/orders/5',
+        {},
       );
     });
   });
@@ -87,6 +101,7 @@ describe('OrderProxyService', () => {
       expect(httpService.patch).toHaveBeenCalledWith(
         'http://localhost:3001/orders/5',
         { quantity: 2 },
+        {},
       );
     });
   });
@@ -100,6 +115,7 @@ describe('OrderProxyService', () => {
       expect(result).toEqual({ id: 5 });
       expect(httpService.delete).toHaveBeenCalledWith(
         'http://localhost:3001/orders/5',
+        {},
       );
     });
   });

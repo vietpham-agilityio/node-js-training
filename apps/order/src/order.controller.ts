@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
@@ -14,6 +15,7 @@ import { CreateOrderDTO, UpdateOrderDTO } from './order.dto';
 import { Order } from './order.entity';
 import { EventPattern } from '@nestjs/microservices';
 import { ORDER_EVENTS, type OrderProcessedPayload } from '@app/constants';
+import { AuthGuard } from '@app/common';
 
 @Controller('orders')
 export class OrderController {
@@ -25,6 +27,7 @@ export class OrderController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   createOrder(
     @Body(new ValidationPipe()) createOrderInput: CreateOrderDTO,
   ): Promise<Order> {
@@ -32,16 +35,19 @@ export class OrderController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   findAll(): Promise<Order[]> {
     return this.orderService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Order> {
     return this.orderService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   updateOrder(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) updateOrderInput: UpdateOrderDTO,
@@ -50,6 +56,7 @@ export class OrderController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   removeOrder(@Param('id', ParseIntPipe) id: number): Promise<Order> {
     return this.orderService.removeOrder(id);
   }

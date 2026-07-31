@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { Order } from './order.entity';
@@ -18,6 +19,7 @@ describe('OrderController', () => {
         OrderService,
         { provide: 'INVENTORY_SERVICE', useValue: { emit: jest.fn() } },
         { provide: getRepositoryToken(Order), useValue: mockOrderRepository },
+        { provide: JwtService, useValue: { verifyAsync: jest.fn() } },
       ],
     }).compile();
 

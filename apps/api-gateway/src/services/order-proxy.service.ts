@@ -9,30 +9,59 @@ import { Order } from 'apps/order/src/order.entity';
 export class OrderProxyService {
   constructor(private readonly httpService: HttpService) { }
 
-  createOrder(body: CreateOrderDTO): Promise<Order> {
+  createOrder(body: CreateOrderDTO, authorization?: string): Promise<Order> {
     return this.forward(
-      this.httpService.post(`${ORDER_BASE_URL}${API_ENDPOINT.ORDER}`, body),
+      this.httpService.post(
+        `${ORDER_BASE_URL}${API_ENDPOINT.ORDER}`,
+        body,
+        this.withAuth(authorization),
+      ),
     );
   }
 
-  findAll(): Promise<Order[]> {
-    return this.forward(this.httpService.get(`${ORDER_BASE_URL}${API_ENDPOINT.ORDER}`));
-  }
-
-  findOne(id: number): Promise<Order> {
-    return this.forward(this.httpService.get(`${ORDER_BASE_URL}${API_ENDPOINT.ORDER}/${id}`));
-  }
-
-  updateOrder(id: number, body: UpdateOrderDTO): Promise<Order> {
+  findAll(authorization?: string): Promise<Order[]> {
     return this.forward(
-      this.httpService.patch(`${ORDER_BASE_URL}${API_ENDPOINT.ORDER}/${id}`, body),
+      this.httpService.get(
+        `${ORDER_BASE_URL}${API_ENDPOINT.ORDER}`,
+        this.withAuth(authorization),
+      ),
     );
   }
 
-  removeOrder(id: number): Promise<Order> {
+  findOne(id: number, authorization?: string): Promise<Order> {
     return this.forward(
-      this.httpService.delete(`${ORDER_BASE_URL}${API_ENDPOINT.ORDER}/${id}`),
+      this.httpService.get(
+        `${ORDER_BASE_URL}${API_ENDPOINT.ORDER}/${id}`,
+        this.withAuth(authorization),
+      ),
     );
+  }
+
+  updateOrder(
+    id: number,
+    body: UpdateOrderDTO,
+    authorization?: string,
+  ): Promise<Order> {
+    return this.forward(
+      this.httpService.patch(
+        `${ORDER_BASE_URL}${API_ENDPOINT.ORDER}/${id}`,
+        body,
+        this.withAuth(authorization),
+      ),
+    );
+  }
+
+  removeOrder(id: number, authorization?: string): Promise<Order> {
+    return this.forward(
+      this.httpService.delete(
+        `${ORDER_BASE_URL}${API_ENDPOINT.ORDER}/${id}`,
+        this.withAuth(authorization),
+      ),
+    );
+  }
+
+  private withAuth(authorization?: string): { headers?: Record<string, string> } {
+    return authorization ? { headers: { Authorization: authorization } } : {};
   }
 
   private forward<T>(obs: Observable<{ data: T }>): Promise<T> {
@@ -63,11 +92,13 @@ export class OrderProxyService {
             : 'Order service error';
         return new HttpException({ message }, status);
       }
+      
       return new HttpException(
         'Order service unavailable',
         HttpStatus.BAD_GATEWAY,
       );
     }
+
     return new HttpException(
       'Unexpected error calling order service',
       HttpStatus.INTERNAL_SERVER_ERROR,

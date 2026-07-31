@@ -3,7 +3,9 @@ import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
 import { Order } from './order.entity';
+import { decodeBase64Key } from '@app/common';
 
 @Module({
   imports: [
@@ -23,6 +25,13 @@ import { Order } from './order.entity';
         },
       },
     ]),
+    JwtModule.registerAsync({
+      global: true,
+      useFactory: () => ({
+        publicKey: decodeBase64Key(process.env.JWT_PUBLIC_KEY_BASE64),
+        verifyOptions: { algorithms: ['RS256'] },
+      }),
+    }),
   ],
   controllers: [OrderController],
   providers: [OrderService],

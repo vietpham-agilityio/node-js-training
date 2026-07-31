@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { OrderStatus } from '@app/constants';
 import { Order } from 'apps/order/src/order.entity';
 import { ProxyController } from '..';
@@ -32,6 +33,7 @@ describe('ProxyController', () => {
       controllers: [ProxyController],
       providers: [
         { provide: OrderProxyService, useValue: mockOrderProxyService },
+        { provide: JwtService, useValue: { verifyAsync: jest.fn() } },
       ],
     }).compile();
 
@@ -53,11 +55,14 @@ describe('ProxyController', () => {
     });
 
     expect(result).toEqual(mockOrder);
-    expect(service.createOrder).toHaveBeenCalledWith({
-      name: 'Order Camera',
-      productId: 12,
-      quantity: 2,
-    });
+    expect(service.createOrder).toHaveBeenCalledWith(
+      {
+        name: 'Order Camera',
+        productId: 12,
+        quantity: 2,
+      },
+      undefined,
+    );
   });
 
   it('findAll delegates to the proxy service', async () => {
@@ -66,7 +71,15 @@ describe('ProxyController', () => {
     const result = await controller.findAll();
 
     expect(result).toEqual([mockOrder]);
-    expect(service.findAll).toHaveBeenCalledTimes(1);
+    expect(service.findAll).toHaveBeenCalledWith(undefined);
+  });
+
+  it('findAll forwards the incoming Authorization header', async () => {
+    service.findAll.mockResolvedValue([mockOrder]);
+
+    await controller.findAll('Bearer abc.def.ghi');
+
+    expect(service.findAll).toHaveBeenCalledWith('Bearer abc.def.ghi');
   });
 
   it('findOne delegates with the parsed numeric id', async () => {
@@ -75,7 +88,7 @@ describe('ProxyController', () => {
     const result = await controller.findOne(5);
 
     expect(result).toEqual(mockOrder);
-    expect(service.findOne).toHaveBeenCalledWith(5);
+    expect(service.findOne).toHaveBeenCalledWith(5, undefined);
   });
 
   it('updateOrder delegates with id and body', async () => {
@@ -84,7 +97,7 @@ describe('ProxyController', () => {
     const result = await controller.updateOrder(5, { quantity: 2 });
 
     expect(result).toEqual(mockOrder);
-    expect(service.updateOrder).toHaveBeenCalledWith(5, { quantity: 2 });
+    expect(service.updateOrder).toHaveBeenCalledWith(5, { quantity: 2 }, undefined);
   });
 
   it('removeOrder delegates with the parsed numeric id', async () => {
@@ -93,6 +106,6 @@ describe('ProxyController', () => {
     const result = await controller.removeOrder(5);
 
     expect(result).toEqual(mockOrder);
-    expect(service.removeOrder).toHaveBeenCalledWith(5);
+    expect(service.removeOrder).toHaveBeenCalledWith(5, undefined);
   });
 });
