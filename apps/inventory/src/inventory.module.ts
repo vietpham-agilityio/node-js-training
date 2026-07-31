@@ -9,7 +9,10 @@ import { InventoryItem } from './inventory-item.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: './database/inventory-db.sqlite',
+      database:
+        process.env.NODE_ENV === 'test'
+          ? ':memory:'
+          : './database/inventory-db.sqlite',
       entities: [InventoryItem],
       synchronize: true,
     }),

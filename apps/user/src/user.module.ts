@@ -16,7 +16,8 @@ import {
   imports: [
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: './database/user-db.sqlite',
+      database:
+        process.env.NODE_ENV === 'test' ? ':memory:' : './database/user-db.sqlite',
       entities: [UserEntity],
       synchronize: true,
     }),

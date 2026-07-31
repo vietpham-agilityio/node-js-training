@@ -11,7 +11,8 @@ import { decodeBase64Key } from '@app/common';
   imports: [
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: './database/order-db.sqlite',
+      database:
+        process.env.NODE_ENV === 'test' ? ':memory:' : './database/order-db.sqlite',
       entities: [Order],
       synchronize: true,
     }),

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { UnauthorizedException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDTO } from './user.dto';
 import { UserEntity } from './user.entity';
@@ -50,6 +50,7 @@ describe('UsersService', () => {
     create: jest.Mock;
     save: jest.Mock;
     find: jest.Mock;
+    findOneBy: jest.Mock;
     createQueryBuilder: jest.Mock;
   };
 
@@ -69,6 +70,9 @@ describe('UsersService', () => {
         return Promise.resolve(saved);
       }),
       find: jest.fn(() => Promise.resolve(users)),
+      findOneBy: jest.fn(({ email }: { email: string }) =>
+        Promise.resolve(users.find((u) => u.email === email)),
+      ),
       createQueryBuilder: jest.fn(() => {
         let emailFilter: string | undefined;
         const builder = {
@@ -105,6 +109,14 @@ describe('UsersService', () => {
     expect(user.lastName).toBe(newUser.lastName);
     expect(user.phoneNumber).toBe(newUser.phoneNumber);
     expect(user.address).toBe(newUser.address);
+  });
+
+  it('rejects registering a second account with an already-used email', async () => {
+    await expect(
+      service.create({ ...newUser, email: 'alice@example.com' }),
+    ).rejects.toThrow(ConflictException);
+
+    expect(mockRepository.save).not.toHaveBeenCalled();
   });
 
   it('should hash the password before persisting it, and never return it', async () => {
