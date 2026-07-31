@@ -1,4 +1,5 @@
 export * from './filters/http-error.filter';
+export * from './filters/rpc-error.filter';
 export * from './interceptors/response-log.interceptor';
 export * from './guards/auth.guard';
 export * from './guards/roles.guard';
