@@ -9,30 +9,59 @@ import { UserEntity } from 'apps/user/src/user.entity';
 export class UserProxyService {
   constructor(private readonly httpService: HttpService) { }
 
-  create(body: CreateUserDTO): Promise<UserEntity> {
+  create(body: CreateUserDTO, authorization?: string): Promise<UserEntity> {
     return this.forward(
-      this.httpService.post(`${USER_BASE_URL}${API_ENDPOINT.USER}`, body),
+      this.httpService.post(
+        `${USER_BASE_URL}${API_ENDPOINT.USER}`,
+        body,
+        this.withAuth(authorization),
+      ),
     );
   }
 
-  findAll(): Promise<UserEntity[]> {
-    return this.forward(this.httpService.get(`${USER_BASE_URL}${API_ENDPOINT.USER}`));
-  }
-
-  findOne(id: number): Promise<UserEntity> {
-    return this.forward(this.httpService.get(`${USER_BASE_URL}${API_ENDPOINT.USER}/${id}`));
-  }
-
-  update(userId: number, body: UpdateUserDTO): Promise<UserEntity> {
+  findAll(authorization?: string): Promise<UserEntity[]> {
     return this.forward(
-      this.httpService.put(`${USER_BASE_URL}${API_ENDPOINT.USER}/${userId}`, body),
+      this.httpService.get(
+        `${USER_BASE_URL}${API_ENDPOINT.USER}`,
+        this.withAuth(authorization),
+      ),
     );
   }
 
-  remove(userId: number): Promise<void> {
+  findOne(id: number, authorization?: string): Promise<UserEntity> {
     return this.forward(
-      this.httpService.delete(`${USER_BASE_URL}${API_ENDPOINT.USER}/${userId}`),
+      this.httpService.get(
+        `${USER_BASE_URL}${API_ENDPOINT.USER}/${id}`,
+        this.withAuth(authorization),
+      ),
     );
+  }
+
+  update(
+    userId: number,
+    body: UpdateUserDTO,
+    authorization?: string,
+  ): Promise<UserEntity> {
+    return this.forward(
+      this.httpService.put(
+        `${USER_BASE_URL}${API_ENDPOINT.USER}/${userId}`,
+        body,
+        this.withAuth(authorization),
+      ),
+    );
+  }
+
+  remove(userId: number, authorization?: string): Promise<void> {
+    return this.forward(
+      this.httpService.delete(
+        `${USER_BASE_URL}${API_ENDPOINT.USER}/${userId}`,
+        this.withAuth(authorization),
+      ),
+    );
+  }
+
+  private withAuth(authorization?: string): { headers?: Record<string, string> } {
+    return authorization ? { headers: { Authorization: authorization } } : {};
   }
 
   private forward<T>(obs: Observable<{ data: T }>): Promise<T> {

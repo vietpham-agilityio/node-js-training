@@ -38,7 +38,15 @@ describe('UserProxyController', () => {
     const result = await controller.findAll();
 
     expect(result).toEqual([{ id: 1 }]);
-    expect(service.findAll).toHaveBeenCalled();
+    expect(service.findAll).toHaveBeenCalledWith(undefined);
+  });
+
+  it('findAll forwards the incoming Authorization header', async () => {
+    service.findAll.mockResolvedValue([{ id: 1 } as never]);
+
+    await controller.findAll('Bearer abc.def.ghi');
+
+    expect(service.findAll).toHaveBeenCalledWith('Bearer abc.def.ghi');
   });
 
   it('findById delegates to the proxy service with the parsed id', async () => {
@@ -47,7 +55,7 @@ describe('UserProxyController', () => {
     const result = await controller.findById(5);
 
     expect(result).toEqual({ id: 5 });
-    expect(service.findOne).toHaveBeenCalledWith(5);
+    expect(service.findOne).toHaveBeenCalledWith(5, undefined);
   });
 
   it('create delegates to the proxy service with the body', async () => {
@@ -63,7 +71,7 @@ describe('UserProxyController', () => {
     const result = await controller.create(body);
 
     expect(result).toEqual({ id: 1, ...body });
-    expect(service.create).toHaveBeenCalledWith(body);
+    expect(service.create).toHaveBeenCalledWith(body, undefined);
   });
 
   it('update delegates to the proxy service with the parsed id and body', async () => {
@@ -72,7 +80,7 @@ describe('UserProxyController', () => {
     const result = await controller.update(5, { firstName: 'New' });
 
     expect(result).toEqual({ id: 5, firstName: 'New' });
-    expect(service.update).toHaveBeenCalledWith(5, { firstName: 'New' });
+    expect(service.update).toHaveBeenCalledWith(5, { firstName: 'New' }, undefined);
   });
 
   it('remove delegates to the proxy service with the parsed id', async () => {
@@ -80,6 +88,6 @@ describe('UserProxyController', () => {
 
     await controller.remove(5);
 
-    expect(service.remove).toHaveBeenCalledWith(5);
+    expect(service.remove).toHaveBeenCalledWith(5, undefined);
   });
 });

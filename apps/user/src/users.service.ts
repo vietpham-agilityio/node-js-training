@@ -14,14 +14,16 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
   async create(user: CreateUserDTO): Promise<UserEntity> {
     const hashedPassword = await bcrypt.hash(user.password, PASSWORD_SALT_ROUNDS);
+  
     const newUser = this.userRepository.create({
       ...user,
       password: hashedPassword,
     });
+
     const saved = await this.userRepository.save(newUser);
     return this.stripPassword(saved);
   }
@@ -50,6 +52,7 @@ export class UserService {
       rest,
       password ? { password: await bcrypt.hash(password, PASSWORD_SALT_ROUNDS) } : {},
     );
+    
     const saved = await this.userRepository.save(updated);
     return this.stripPassword(saved);
   }

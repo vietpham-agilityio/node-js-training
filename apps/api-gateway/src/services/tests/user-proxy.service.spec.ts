@@ -55,6 +55,7 @@ describe('UserProxyService', () => {
           phoneNumber: '0987654321',
           password: 'good_user@123',
         },
+        {},
       );
     });
   });
@@ -68,6 +69,18 @@ describe('UserProxyService', () => {
       expect(result).toEqual([{ id: 1 }]);
       expect(httpService.get).toHaveBeenCalledWith(
         'http://localhost:3003/users',
+        {},
+      );
+    });
+
+    it('forwards the incoming Authorization header', async () => {
+      httpService.get.mockReturnValue(of({ data: [{ id: 1 }] }) as never);
+
+      await service.findAll('Bearer abc.def.ghi');
+
+      expect(httpService.get).toHaveBeenCalledWith(
+        'http://localhost:3003/users',
+        { headers: { Authorization: 'Bearer abc.def.ghi' } },
       );
     });
   });
@@ -81,6 +94,7 @@ describe('UserProxyService', () => {
       expect(result).toEqual({ id: 5 });
       expect(httpService.get).toHaveBeenCalledWith(
         'http://localhost:3003/users/5',
+        {},
       );
     });
   });
@@ -95,6 +109,7 @@ describe('UserProxyService', () => {
       expect(httpService.put).toHaveBeenCalledWith(
         'http://localhost:3003/users/5',
         { firstName: 'New' },
+        {},
       );
     });
   });
@@ -107,6 +122,7 @@ describe('UserProxyService', () => {
 
       expect(httpService.delete).toHaveBeenCalledWith(
         'http://localhost:3003/users/5',
+        {},
       );
     });
   });

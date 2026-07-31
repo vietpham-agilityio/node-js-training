@@ -6,7 +6,11 @@ import {
   ApiOkResponse,
   ApiCreatedResponse,
 } from '@nestjs/swagger';
+
+// Services
 import { AuthProxyService } from '../services';
+
+// DTO
 import { LoginDTO, RegisterDTO } from 'apps/auth/src/auth.dto';
 
 @ApiTags('Auth')
