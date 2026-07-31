@@ -9,13 +9,14 @@ import {
   ValidationPipe,
   ParseIntPipe,
   UseGuards,
+  UseFilters,
   Version,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
-import { AuthGuard } from '@app/common';
+import { AuthGuard, RpcErrorFilter } from '@app/common';
 import {
   ApiTags,
   ApiOperation,
@@ -40,11 +41,13 @@ import {
 export class UserController {
   constructor(private userService: UserService) { }
 
+  @UseFilters(new RpcErrorFilter())
   @MessagePattern(USER_MESSAGES.VALIDATE_CREDENTIALS)
   validateCredentials(data: LoginPayload) {
     return this.userService.validateCredentials(data.email, data.password);
   }
 
+  @UseFilters(new RpcErrorFilter())
   @MessagePattern(USER_MESSAGES.CREATE_USER)
   async createUser(data: CreateUserPayload): Promise<UserCredentialsShape> {
     const user = await this.userService.create(data);

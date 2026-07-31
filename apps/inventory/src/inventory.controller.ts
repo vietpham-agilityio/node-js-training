@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseFilters } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
+import { RpcErrorFilter } from '@app/common';
 import {
   type Order,
   ORDER_EVENTS,
@@ -17,6 +18,7 @@ export class InventoryController {
     this.inventoryService.handleOrderCreated(data);
   }
 
+  @UseFilters(new RpcErrorFilter())
   @MessagePattern(INVENTORY_MESSAGES.UPDATE_STOCK)
   handleUpdateStock(data: UpdateStockPayload) {
     return this.inventoryService.updateStock(data.productId, data.quantity);

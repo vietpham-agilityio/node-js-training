@@ -1,5 +1,6 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
+import { RpcErrorFilter } from '@app/common';
 import {
   AUTH_MESSAGES,
   type LoginPayload,
@@ -8,6 +9,7 @@ import {
 import { AuthService } from './auth.service';
 
 @Controller()
+@UseFilters(new RpcErrorFilter())
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

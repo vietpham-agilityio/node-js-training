@@ -12,7 +12,7 @@ import {
 export class AuthProxyService {
   constructor(
     @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
-  ) {}
+  ) { }
 
   login(email: string, password: string): Promise<LoginResponse> {
     return firstValueFrom(
