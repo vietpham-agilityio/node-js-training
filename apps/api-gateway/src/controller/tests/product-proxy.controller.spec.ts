@@ -38,7 +38,15 @@ describe('ProductProxyController', () => {
     const result = await controller.findAll();
 
     expect(result).toEqual([{ id: 1 }]);
-    expect(service.findAll).toHaveBeenCalled();
+    expect(service.findAll).toHaveBeenCalledWith(undefined);
+  });
+
+  it('findAll forwards the incoming Authorization header', async () => {
+    service.findAll.mockResolvedValue([{ id: 1 } as never]);
+
+    await controller.findAll('Bearer abc.def.ghi');
+
+    expect(service.findAll).toHaveBeenCalledWith('Bearer abc.def.ghi');
   });
 
   it('findOne delegates to the proxy service with the parsed id', async () => {
@@ -47,7 +55,7 @@ describe('ProductProxyController', () => {
     const result = await controller.findOne(5);
 
     expect(result).toEqual({ id: 5 });
-    expect(service.findOne).toHaveBeenCalledWith(5);
+    expect(service.findOne).toHaveBeenCalledWith(5, undefined);
   });
 
   it('create delegates to the proxy service with the dto', async () => {
@@ -62,7 +70,7 @@ describe('ProductProxyController', () => {
     const result = await controller.create(dto);
 
     expect(result).toEqual({ id: 1, ...dto });
-    expect(service.create).toHaveBeenCalledWith(dto);
+    expect(service.create).toHaveBeenCalledWith(dto, undefined);
   });
 
   it('update delegates to the proxy service with the parsed id and dto', async () => {
@@ -71,7 +79,7 @@ describe('ProductProxyController', () => {
     const result = await controller.update(5, { quantity: 2 });
 
     expect(result).toEqual({ id: 5, quantity: 2 });
-    expect(service.update).toHaveBeenCalledWith(5, { quantity: 2 });
+    expect(service.update).toHaveBeenCalledWith(5, { quantity: 2 }, undefined);
   });
 
   it('remove delegates to the proxy service with the parsed id', async () => {
@@ -79,6 +87,6 @@ describe('ProductProxyController', () => {
 
     await controller.remove(5);
 
-    expect(service.remove).toHaveBeenCalledWith(5);
+    expect(service.remove).toHaveBeenCalledWith(5, undefined);
   });
 });

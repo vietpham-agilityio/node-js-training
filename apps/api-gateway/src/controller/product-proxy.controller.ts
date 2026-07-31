@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseGuards,
   ValidationPipe,
+  Headers,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -48,8 +49,11 @@ export class ProductProxyController {
     type: ProductEntity,
   })
   @Post()
-  create(@Body(new ValidationPipe()) dto: CreateProductDTO) {
-    return this.productProxyService.create(dto);
+  create(
+    @Body(new ValidationPipe()) dto: CreateProductDTO,
+    @Headers('authorization') authorization?: string,
+  ) {
+    return this.productProxyService.create(dto, authorization);
   }
 
   @ApiOperation({ summary: 'Get all products' })
@@ -58,8 +62,8 @@ export class ProductProxyController {
     type: [ProductEntity],
   })
   @Get()
-  findAll() {
-    return this.productProxyService.findAll();
+  findAll(@Headers('authorization') authorization?: string) {
+    return this.productProxyService.findAll(authorization);
   }
 
   @ApiOperation({ summary: 'Get a product by id' })
@@ -73,8 +77,11 @@ export class ProductProxyController {
     type: ProductEntity,
   })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productProxyService.findOne(id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Headers('authorization') authorization?: string,
+  ) {
+    return this.productProxyService.findOne(id, authorization);
   }
 
   @ApiOperation({ summary: 'Update a product by id' })
@@ -92,8 +99,9 @@ export class ProductProxyController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) dto: UpdateProductDTO,
+    @Headers('authorization') authorization?: string,
   ) {
-    return this.productProxyService.update(id, dto);
+    return this.productProxyService.update(id, dto, authorization);
   }
 
   @ApiOperation({ summary: 'Delete a product by id' })
@@ -105,7 +113,10 @@ export class ProductProxyController {
   @ApiNoContentResponse({ description: 'Product deleted successfully' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productProxyService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Headers('authorization') authorization?: string,
+  ) {
+    return this.productProxyService.remove(id, authorization);
   }
 }

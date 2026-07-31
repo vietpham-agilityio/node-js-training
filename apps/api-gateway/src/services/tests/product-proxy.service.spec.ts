@@ -53,6 +53,7 @@ describe('ProductProxyService', () => {
           price: 49000000,
           quantity: 100,
         },
+        {},
       );
     });
   });
@@ -66,6 +67,18 @@ describe('ProductProxyService', () => {
       expect(result).toEqual([{ id: 1 }]);
       expect(httpService.get).toHaveBeenCalledWith(
         'http://localhost:3004/products',
+        {},
+      );
+    });
+
+    it('forwards the incoming Authorization header', async () => {
+      httpService.get.mockReturnValue(of({ data: [{ id: 1 }] }) as never);
+
+      await service.findAll('Bearer abc.def.ghi');
+
+      expect(httpService.get).toHaveBeenCalledWith(
+        'http://localhost:3004/products',
+        { headers: { Authorization: 'Bearer abc.def.ghi' } },
       );
     });
   });
@@ -79,6 +92,7 @@ describe('ProductProxyService', () => {
       expect(result).toEqual({ id: 5 });
       expect(httpService.get).toHaveBeenCalledWith(
         'http://localhost:3004/products/5',
+        {},
       );
     });
   });
@@ -93,6 +107,7 @@ describe('ProductProxyService', () => {
       expect(httpService.patch).toHaveBeenCalledWith(
         'http://localhost:3004/products/5',
         { quantity: 2 },
+        {},
       );
     });
   });
@@ -105,6 +120,7 @@ describe('ProductProxyService', () => {
 
       expect(httpService.delete).toHaveBeenCalledWith(
         'http://localhost:3004/products/5',
+        {},
       );
     });
   });
