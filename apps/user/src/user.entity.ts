@@ -23,7 +23,7 @@ export class UserEntity {
   lastName!: string;
 
   @ApiProperty({ description: 'Email of user', example: 'example@email.com' })
-  @Column()
+  @Column({ unique: true })
   email!: string;
 
   @ApiProperty({

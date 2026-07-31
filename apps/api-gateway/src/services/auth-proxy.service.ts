@@ -42,10 +42,15 @@ export class AuthProxyService {
         ? (error as { status?: number }).status
         : undefined;
 
-    if (status === HttpStatus.UNAUTHORIZED) {
+    if (typeof status === 'number') {
       return new HttpException(
-        extractErrorMessage(error, 'Invalid credentials'),
-        HttpStatus.UNAUTHORIZED,
+        extractErrorMessage(
+          error,
+          status === HttpStatus.UNAUTHORIZED
+            ? 'Invalid credentials'
+            : 'Auth service error',
+        ),
+        status,
       );
     }
 

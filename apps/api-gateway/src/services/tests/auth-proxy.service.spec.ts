@@ -104,5 +104,27 @@ describe('AuthProxyService', () => {
       expect(result).toEqual({ accessToken: 'signed-token' });
       expect(authClient.send).toHaveBeenCalledWith('auth_register', payload);
     });
+
+    it('maps a conflict error (e.g. duplicate email) into a 409 HttpException', async () => {
+      authClient.send.mockReturnValue(
+        throwError(() => ({
+          status: HttpStatus.CONFLICT,
+          message: 'Email jimmy@example.com is already registered',
+        })) as never,
+      );
+
+      await expect(
+        service.register({
+          firstName: 'Jimmy',
+          lastName: 'Outaly',
+          email: 'jimmy@example.com',
+          phoneNumber: '0987654321',
+          password: 'Good_user@123',
+        }),
+      ).rejects.toMatchObject({
+        message: 'Email jimmy@example.com is already registered',
+        status: HttpStatus.CONFLICT,
+      });
+    });
   });
 });
