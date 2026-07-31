@@ -1,4 +1,4 @@
-export function extractRpcErrorMessage(
+export function extractErrorMessage(
   error: unknown,
   fallback: string,
 ): string | string[] {

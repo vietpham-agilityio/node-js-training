@@ -1,4 +1,4 @@
-import { VersionManagementMiddleware } from './versioning.middleware';
+import { VersionManagementMiddleware } from '../versioning.middleware';
 import { Request, Response, NextFunction } from 'express';
 
 describe('VersionManagementMiddleware', () => {

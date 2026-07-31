@@ -1,6 +1,6 @@
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RolesGuard } from './roles.guard';
+import { RolesGuard } from '../roles.guard';
 import { USER_ROLE, type AuthTokenPayload } from '@app/constants';
 
 describe('RolesGuard', () => {

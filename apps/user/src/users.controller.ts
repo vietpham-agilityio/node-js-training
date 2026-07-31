@@ -38,7 +38,7 @@ import {
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   @MessagePattern(USER_MESSAGES.VALIDATE_CREDENTIALS)
   validateCredentials(data: LoginPayload) {
@@ -51,6 +51,7 @@ export class UserController {
     return { id: user.id, email: user.email, role: user.role! };
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all users (v1)' })
   @ApiOkResponse({
     description: 'List of users returned successfully',
@@ -58,11 +59,14 @@ export class UserController {
   })
   @Version('1')
   @Get()
+  @UseGuards(AuthGuard)
   findAll(): Promise<UserEntity[]> {
     return this.userService.findAll();
   }
 
+  @ApiBearerAuth()
   @Get(':id')
+  @UseGuards(AuthGuard)
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findById(id);
   }

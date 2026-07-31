@@ -1,4 +1,4 @@
-import { LoggingMiddleware } from './logging.middleware';
+import { LoggingMiddleware } from '../logging.middleware';
 import { Request, Response, NextFunction } from 'express';
 
 describe('LoggingMiddleware', () => {

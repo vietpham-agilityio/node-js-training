@@ -1,4 +1,5 @@
 import { USER_ROLE } from './user';
+import type { Request } from 'express';
 
 export interface LoginPayload {
   email: string;
@@ -22,4 +23,8 @@ export interface AuthTokenPayload {
   sub: number;
   email: string;
   role: USER_ROLE;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user?: AuthTokenPayload;
 }
