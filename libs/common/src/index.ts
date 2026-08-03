@@ -8,3 +8,6 @@ export * from './middleware/logging.middleware';
 export * from './middleware/versioning.middleware';
 export * from './utils/jwt-key.util';
 export * from './utils/extract-error-message';
+export * from './services/proxy.service';
+export * from './services/tcp-proxy.service';
+export * from './services/http-proxy.service';
