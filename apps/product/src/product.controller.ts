@@ -16,15 +16,17 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { CreateProductDTO, UpdateProductDTO } from './product.dto';
 import { ProductEntity } from './product.entity';
-import { AuthGuard } from '@app/common';
+import { AuthGuard, RolesGuard, Roles } from '@app/common';
+import { USER_ROLE } from '@app/constants';
 
 @ApiTags('Products')
 @Controller('products')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @Post()
+  @Roles(USER_ROLE.ADMIN)
   @ApiOperation({ summary: 'Create a new product' })
   @ApiResponse({ status: 201, type: ProductEntity })
   create(@Body(new ValidationPipe()) dto: CreateProductDTO) {
@@ -46,6 +48,7 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @Roles(USER_ROLE.ADMIN)
   @ApiOperation({ summary: 'Update a product by id' })
   @ApiResponse({ status: 200, type: ProductEntity })
   update(
@@ -56,6 +59,7 @@ export class ProductController {
   }
 
   @Delete(':id')
+  @Roles(USER_ROLE.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a product by id' })
   @ApiResponse({ status: 204 })

@@ -15,7 +15,8 @@ import {
   Headers,
 } from '@nestjs/common';
 import { UserProxyService } from '../services';
-import { AuthGuard } from '@app/common';
+import { AuthGuard, RolesGuard, Roles } from '@app/common';
+import { USER_ROLE } from '@app/constants';
 import {
   ApiTags,
   ApiOperation,
@@ -33,7 +34,7 @@ import { UserEntity } from 'apps/user/src/user.entity';
 @ApiTags('Users')
 @Controller('users')
 export class UserProxyController {
-  constructor(private readonly userProxyService: UserProxyService) {}
+  constructor(private readonly userProxyService: UserProxyService) { }
 
   @ApiOperation({ summary: 'Get all users (v1)' })
   @ApiBearerAuth()
@@ -46,7 +47,8 @@ export class UserProxyController {
   })
   @Version('1')
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(USER_ROLE.ADMIN)
   findAll(@Headers('authorization') authorization?: string): Promise<UserEntity[]> {
     return this.userProxyService.findAll(authorization);
   }
@@ -59,7 +61,6 @@ export class UserProxyController {
     description: 'Missing or invalid authentication token',
   })
   @Get(':id')
-  @UseGuards(AuthGuard)
   findById(
     @Param('id', ParseIntPipe) id: number,
     @Headers('authorization') authorization?: string,
@@ -108,6 +109,8 @@ export class UserProxyController {
     return this.userProxyService.update(userId, updateUserBody, authorization);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(USER_ROLE.ADMIN)
   @ApiOperation({ summary: 'Delete a user' })
   @ApiBearerAuth()
   @ApiParam({

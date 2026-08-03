@@ -30,7 +30,8 @@ import {
   UpdateProductDTO,
 } from 'apps/product/src/product.dto';
 import { ProductEntity } from 'apps/product/src/product.entity';
-import { AuthGuard } from '@app/common';
+import { AuthGuard, RolesGuard, Roles } from '@app/common';
+import { USER_ROLE } from '@app/constants';
 
 @ApiTags('Products')
 @ApiBearerAuth()
@@ -38,10 +39,11 @@ import { AuthGuard } from '@app/common';
   description: 'Missing or invalid authentication token',
 })
 @Controller('products')
-@UseGuards(AuthGuard)
 export class ProductProxyController {
   constructor(private readonly productProxyService: ProductProxyService) { }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(USER_ROLE.ADMIN)
   @ApiOperation({ summary: 'Create a new product' })
   @ApiBody({ type: CreateProductDTO })
   @ApiCreatedResponse({
@@ -84,6 +86,8 @@ export class ProductProxyController {
     return this.productProxyService.findOne(id, authorization);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(USER_ROLE.ADMIN)
   @ApiOperation({ summary: 'Update a product by id' })
   @ApiParam({
     name: 'id',
@@ -104,6 +108,8 @@ export class ProductProxyController {
     return this.productProxyService.update(id, dto, authorization);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(USER_ROLE.ADMIN)
   @ApiOperation({ summary: 'Delete a product by id' })
   @ApiParam({
     name: 'id',

@@ -16,7 +16,8 @@ import {
 } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
-import { AuthGuard, RpcErrorFilter } from '@app/common';
+import { AuthGuard, RolesGuard, Roles, RpcErrorFilter } from '@app/common';
+import { USER_ROLE } from '@app/constants';
 import {
   ApiTags,
   ApiOperation,
@@ -62,7 +63,8 @@ export class UserController {
   })
   @Version('1')
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(USER_ROLE.ADMIN)
   findAll(): Promise<UserEntity[]> {
     return this.userService.findAll();
   }
@@ -111,6 +113,7 @@ export class UserController {
     return this.userService.update(userId, updateUserBody);
   }
 
+
   @ApiOperation({ summary: 'Delete a user' })
   @ApiBearerAuth()
   @ApiParam({
@@ -124,7 +127,8 @@ export class UserController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':userId')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(USER_ROLE.ADMIN)
   async remove(@Param('userId', ParseIntPipe) userId: number): Promise<void> {
     return this.userService.remove(userId);
   }

@@ -7,7 +7,8 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { AuthGuard } from '@app/common';
+import { AuthGuard, RolesGuard, Roles } from '@app/common';
+import { USER_ROLE } from '@app/constants';
 import { InventoryProxyService } from '../services';
 import { IsInt, Min } from 'class-validator';
 import {
@@ -45,8 +46,10 @@ export class InventoryItemResponseDTO {
 @ApiTags('Inventory')
 @Controller('inventory')
 export class InventoryProxyController {
-  constructor(private readonly inventoryProxyService: InventoryProxyService) {}
+  constructor(private readonly inventoryProxyService: InventoryProxyService) { }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(USER_ROLE.MERCHANT)
   @ApiOperation({ summary: 'Update stock quantity for a product' })
   @ApiBearerAuth()
   @ApiParam({
@@ -63,7 +66,6 @@ export class InventoryProxyController {
     description: 'Missing or invalid authentication token',
   })
   @Patch(':productId/stock')
-  @UseGuards(AuthGuard)
   updateStock(
     @Param('productId', ParseIntPipe) productId: number,
     @Body(new ValidationPipe()) body: UpdateStockDTO,
