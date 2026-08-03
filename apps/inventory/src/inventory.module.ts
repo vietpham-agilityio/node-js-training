@@ -22,6 +22,7 @@ import { InventoryItem } from './inventory-item.entity';
         name: 'ORDER_SERVICE',
         transport: Transport.TCP,
         options: {
+          host: process.env.ORDER_SERVICE_HOST,
           port: 8001,
           retryAttempts: 3,
           retryDelay: 3000,

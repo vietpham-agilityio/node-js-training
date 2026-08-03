@@ -22,6 +22,7 @@ import { decodeBase64Key } from '@app/common';
         name: 'INVENTORY_SERVICE',
         transport: Transport.TCP,
         options: {
+          host: process.env.INVENTORY_SERVICE_HOST,
           port: 8002,
         },
       },

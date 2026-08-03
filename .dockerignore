@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+coverage
+.nyc_output
+database
+*.sqlite
+.git
+.gitignore
+.vscode
+.idea
+.env
+.env.*
+!.env.example
+CLAUDE.md
+docs
+*.log

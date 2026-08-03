@@ -20,8 +20,8 @@ import { AuthService } from './auth.service';
         name: 'USER_SERVICE',
         transport: Transport.TCP,
         options: {
+          host: process.env.USER_SERVICE_HOST,
           port: 8004,
-          host: 'localhost',
         },
       },
     ]),

@@ -1,0 +1,90 @@
+services:
+  order:
+    build:
+      context: .
+      args:
+        APP: order
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      INVENTORY_SERVICE_HOST: inventory
+    ports:
+      - '3001:3001'
+    volumes:
+      - order-db:/app/database
+
+  inventory:
+    build:
+      context: .
+      args:
+        APP: inventory
+    environment:
+      ORDER_SERVICE_HOST: order
+    volumes:
+      - inventory-db:/app/database
+
+  auth:
+    build:
+      context: .
+      args:
+        APP: auth
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      USER_SERVICE_HOST: user
+    depends_on:
+      - user
+
+  user:
+    build:
+      context: .
+      args:
+        APP: user
+    env_file: .env
+    environment:
+      NODE_ENV: production
+    ports:
+      - '3003:3003'
+    volumes:
+      - user-db:/app/database
+
+  product:
+    build:
+      context: .
+      args:
+        APP: product
+    env_file: .env
+    environment:
+      NODE_ENV: production
+    ports:
+      - '3004:3004'
+    volumes:
+      - product-db:/app/database
+
+  api-gateway:
+    build:
+      context: .
+      args:
+        APP: api-gateway
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      INVENTORY_SERVICE_HOST: inventory
+      AUTH_SERVICE_HOST: auth
+      ORDER_SERVICE_BASE_URL: http://order:3001
+      USER_SERVICE_BASE_URL: http://user:3003
+      PRODUCT_SERVICE_BASE_URL: http://product:3004
+    ports:
+      - '3002:3002'
+    depends_on:
+      - order
+      - inventory
+      - auth
+      - user
+      - product
+
+volumes:
+  order-db:
+  inventory-db:
+  user-db:
+  product-db:

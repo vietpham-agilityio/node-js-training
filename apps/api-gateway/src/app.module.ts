@@ -50,6 +50,7 @@ import {
         name: 'INVENTORY_SERVICE',
         transport: Transport.TCP,
         options: {
+          host: process.env.INVENTORY_SERVICE_HOST,
           port: 8002,
         },
       },
@@ -57,6 +58,7 @@ import {
         name: 'AUTH_SERVICE',
         transport: Transport.TCP,
         options: {
+          host: process.env.AUTH_SERVICE_HOST,
           port: 8003,
         },
       },
