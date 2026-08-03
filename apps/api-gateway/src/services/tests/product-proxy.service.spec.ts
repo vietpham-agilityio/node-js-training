@@ -150,6 +150,46 @@ describe('ProductProxyService', () => {
       });
     });
 
+    it('falls back to a generic message when the downstream response has no message field', async () => {
+      httpService.get.mockReturnValue(
+        throwError(() => ({
+          isAxiosError: true,
+          response: { status: HttpStatus.INTERNAL_SERVER_ERROR, data: {} },
+        })) as never,
+      );
+
+      await expect(service.findAll()).rejects.toMatchObject({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Product service error',
+      });
+    });
+
+    it('preserves an array of downstream validation messages', async () => {
+      httpService.post.mockReturnValue(
+        throwError(() => ({
+          isAxiosError: true,
+          response: {
+            status: HttpStatus.BAD_REQUEST,
+            data: { message: ['price must be positive'] },
+          },
+        })) as never,
+      );
+
+      const error = (await service
+        .create({
+          name: 'Sony Camera',
+          description: 'Modern camera in future',
+          price: -1,
+          quantity: 100,
+        })
+        .catch((e) => e)) as HttpException;
+
+      expect(error.getStatus()).toBe(HttpStatus.BAD_REQUEST);
+      expect(error.getResponse()).toEqual({
+        message: ['price must be positive'],
+      });
+    });
+
     it('maps unexpected errors to a 500', async () => {
       httpService.get.mockReturnValue(
         throwError(() => new Error('boom')) as never,

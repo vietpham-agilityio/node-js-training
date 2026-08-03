@@ -1,14 +1,22 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom } from 'rxjs';
-import { extractErrorMessage } from '@app/common';
+
+// Common
+import { TCPProxyService } from '@app/common';
+
+// Constants
 import { INVENTORY_MESSAGES, type InventoryItemShape } from '@app/constants';
 
 @Injectable()
-export class InventoryProxyService {
+export class InventoryProxyService extends TCPProxyService {
+  protected readonly unavailableMessage = 'Inventory service unavailable';
+
   constructor(
     @Inject('INVENTORY_SERVICE') private readonly inventoryClient: ClientProxy,
-  ) {}
+  ) {
+    super();
+  }
 
   updateStock(
     productId: number,
@@ -28,22 +36,11 @@ export class InventoryProxyService {
     );
   }
 
-  private toHttpException(error: unknown): HttpException {
-    const status =
-      typeof error === 'object' && error !== null && 'status' in error
-        ? (error as { status?: number }).status
-        : undefined;
+  protected acceptStatus(status: number): boolean {
+    return status === HttpStatus.NOT_FOUND;
+  }
 
-    if (status === HttpStatus.NOT_FOUND) {
-      return new HttpException(
-        extractErrorMessage(error, 'Not found'),
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    return new HttpException(
-      extractErrorMessage(error, 'Inventory service unavailable'),
-      HttpStatus.BAD_GATEWAY,
-    );
+  protected statusFallbackMessage(): string {
+    return 'Item Not found';
   }
 }

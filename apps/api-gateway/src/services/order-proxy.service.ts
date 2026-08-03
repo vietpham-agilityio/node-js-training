@@ -1,13 +1,24 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom, map, Observable } from 'rxjs';
+
+// Common
+import { HttpProxyService } from '@app/common';
+
+// Constants
 import { ORDER_BASE_URL, API_ENDPOINT } from '@app/constants/shared/router/route';
 import { CreateOrderDTO, UpdateOrderDTO } from 'apps/order/src/order.dto';
+
+// Entities
 import { Order } from 'apps/order/src/order.entity';
 
 @Injectable()
-export class OrderProxyService {
-  constructor(private readonly httpService: HttpService) { }
+export class OrderProxyService extends HttpProxyService {
+  protected readonly serviceName = 'Order';
+
+  constructor(private readonly httpService: HttpService) {
+    super();
+  }
 
   createOrder(body: CreateOrderDTO, authorization?: string): Promise<Order> {
     return this.forward(
@@ -72,36 +83,6 @@ export class OrderProxyService {
           throw this.toHttpException(err);
         }),
       ),
-    );
-  }
-
-  private toHttpException(error: unknown): HttpException {
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      (error as { isAxiosError?: boolean }).isAxiosError
-    ) {
-      const { response } = error as {
-        response?: { status: number; data: unknown };
-      };
-      if (response) {
-        const { status, data } = response;
-        const message =
-          typeof data === 'object' && data !== null && 'message' in data
-            ? (data as { message: string | string[] }).message
-            : 'Order service error';
-        return new HttpException({ message }, status);
-      }
-      
-      return new HttpException(
-        'Order service unavailable',
-        HttpStatus.BAD_GATEWAY,
-      );
-    }
-
-    return new HttpException(
-      'Unexpected error calling order service',
-      HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
 }

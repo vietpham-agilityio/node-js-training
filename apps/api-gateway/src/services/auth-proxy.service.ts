@@ -1,7 +1,7 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, firstValueFrom } from 'rxjs';
-import { extractErrorMessage } from '@app/common';
+import { TCPProxyService } from '@app/common';
 import {
   AUTH_MESSAGES,
   type LoginResponse,
@@ -9,10 +9,14 @@ import {
 } from '@app/constants';
 
 @Injectable()
-export class AuthProxyService {
+export class AuthProxyService extends TCPProxyService {
+  protected readonly unavailableMessage = 'Auth service unavailable';
+
   constructor(
     @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
-  ) { }
+  ) {
+    super();
+  }
 
   login(email: string, password: string): Promise<LoginResponse> {
     return firstValueFrom(
@@ -36,27 +40,9 @@ export class AuthProxyService {
     );
   }
 
-  private toHttpException(error: unknown): HttpException {
-    const status =
-      typeof error === 'object' && error !== null && 'status' in error
-        ? (error as { status?: number }).status
-        : undefined;
-
-    if (typeof status === 'number') {
-      return new HttpException(
-        extractErrorMessage(
-          error,
-          status === HttpStatus.UNAUTHORIZED
-            ? 'Invalid credentials'
-            : 'Auth service error',
-        ),
-        status,
-      );
-    }
-
-    return new HttpException(
-      extractErrorMessage(error, 'Auth service unavailable'),
-      HttpStatus.BAD_GATEWAY,
-    );
+  protected statusFallbackMessage(status: number): string {
+    return status === HttpStatus.UNAUTHORIZED
+      ? 'Invalid credentials'
+      : 'Auth service error';
   }
 }

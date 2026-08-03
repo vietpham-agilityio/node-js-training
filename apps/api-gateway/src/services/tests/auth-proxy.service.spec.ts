@@ -83,6 +83,19 @@ describe('AuthProxyService', () => {
         message: 'Auth service unavailable (ECONNREFUSED)',
       });
     });
+
+    it('maps a non-401 status error into a generic auth-service-error message', async () => {
+      authClient.send.mockReturnValue(
+        throwError(() => ({ status: HttpStatus.INTERNAL_SERVER_ERROR })) as never,
+      );
+
+      await expect(
+        service.login('user@example.com', 'Good_user@123'),
+      ).rejects.toMatchObject({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Auth service error',
+      });
+    });
   });
 
   describe('register', () => {

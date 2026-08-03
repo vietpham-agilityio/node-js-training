@@ -1,13 +1,24 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom, map, Observable } from 'rxjs';
+
+// Common
+import { HttpProxyService } from '@app/common';
+
+// Constants
 import { USER_BASE_URL, API_ENDPOINT } from '@app/constants/shared/router/route';
 import { CreateUserDTO, UpdateUserDTO } from 'apps/user/src/user.dto';
+
+// Entities
 import { UserEntity } from 'apps/user/src/user.entity';
 
 @Injectable()
-export class UserProxyService {
-  constructor(private readonly httpService: HttpService) { }
+export class UserProxyService extends HttpProxyService {
+  protected readonly serviceName = 'User';
+
+  constructor(private readonly httpService: HttpService) {
+    super();
+  }
 
   create(body: CreateUserDTO, authorization?: string): Promise<UserEntity> {
     return this.forward(
@@ -72,37 +83,6 @@ export class UserProxyService {
           throw this.toHttpException(err);
         }),
       ),
-    );
-  }
-
-  private toHttpException(error: unknown): HttpException {
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      (error as { isAxiosError?: boolean }).isAxiosError
-    ) {
-      const { response } = error as {
-        response?: { status: number; data: unknown };
-      };
-      if (response) {
-        const { status, data } = response;
-        const message =
-          typeof data === 'object' && data !== null && 'message' in data
-            ? (data as { message: string | string[] }).message
-            : 'User service error';
-
-        return new HttpException({ message }, status);
-      }
-
-      return new HttpException(
-        'User service unavailable',
-        HttpStatus.BAD_GATEWAY,
-      );
-    }
-
-    return new HttpException(
-      'Unexpected error calling user service',
-      HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
 }

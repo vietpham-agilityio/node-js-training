@@ -23,9 +23,4 @@ export class InventoryController {
   handleUpdateStock(data: UpdateStockPayload) {
     return this.inventoryService.updateStock(data.productId, data.quantity);
   }
-
-  @Get('health')
-  checkHealth() {
-    return { status: 'UP' };
-  }
 }

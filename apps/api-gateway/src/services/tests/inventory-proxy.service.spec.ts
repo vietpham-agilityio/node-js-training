@@ -77,5 +77,19 @@ describe('InventoryProxyService', () => {
         message: 'Inventory service unavailable (ECONNREFUSED)',
       });
     });
+
+    it('does not trust a non-404 status from the inventory service and maps it to a 502', async () => {
+      inventoryClient.send.mockReturnValue(
+        throwError(() => ({
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'inventory db exploded',
+        })) as never,
+      );
+
+      await expect(service.updateStock(1, 10)).rejects.toMatchObject({
+        status: HttpStatus.BAD_GATEWAY,
+        message: 'inventory db exploded',
+      });
+    });
   });
 });

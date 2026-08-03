@@ -152,6 +152,47 @@ describe('UserProxyService', () => {
       });
     });
 
+    it('falls back to a generic message when the downstream response has no message field', async () => {
+      httpService.get.mockReturnValue(
+        throwError(() => ({
+          isAxiosError: true,
+          response: { status: HttpStatus.INTERNAL_SERVER_ERROR, data: {} },
+        })) as never,
+      );
+
+      await expect(service.findAll()).rejects.toMatchObject({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'User service error',
+      });
+    });
+
+    it('preserves an array of downstream validation messages', async () => {
+      httpService.post.mockReturnValue(
+        throwError(() => ({
+          isAxiosError: true,
+          response: {
+            status: HttpStatus.BAD_REQUEST,
+            data: { message: ['email must be a valid email'] },
+          },
+        })) as never,
+      );
+
+      const error = (await service
+        .create({
+          firstName: 'Jimmy',
+          lastName: 'Outaly',
+          email: 'not-an-email',
+          phoneNumber: '0987654321',
+          password: 'good_user@123',
+        })
+        .catch((e) => e)) as HttpException;
+
+      expect(error.getStatus()).toBe(HttpStatus.BAD_REQUEST);
+      expect(error.getResponse()).toEqual({
+        message: ['email must be a valid email'],
+      });
+    });
+
     it('maps unexpected errors to a 500', async () => {
       httpService.get.mockReturnValue(
         throwError(() => new Error('boom')) as never,
