@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
@@ -6,7 +6,7 @@ import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { ProductEntity } from './product.entity';
 import {
-  LoggingMiddleware,
+  AppLoggerModule,
   ResponseLoggingInterceptor,
   HttpErrorFilter,
   decodeBase64Key,
@@ -14,6 +14,7 @@ import {
 
 @Module({
   imports: [
+    AppLoggerModule,
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
       database:
@@ -45,8 +46,4 @@ import {
     },
   ],
 })
-export class ProductModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggingMiddleware).forRoutes('*');
-  }
-}
+export class ProductModule {}

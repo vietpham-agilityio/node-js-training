@@ -1,5 +1,5 @@
 // Libs
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
@@ -20,7 +20,7 @@ import {
 import {
   ResponseLoggingInterceptor,
   HttpErrorFilter,
-  LoggingMiddleware,
+  AppLoggerModule,
   decodeBase64Key,
 } from '@app/common';
 
@@ -36,6 +36,7 @@ import {
 
 @Module({
   imports: [
+    AppLoggerModule,
     TerminusModule,
     HttpModule,
     JwtModule.registerAsync({
@@ -88,9 +89,4 @@ import {
     },
   ],
 })
-
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggingMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

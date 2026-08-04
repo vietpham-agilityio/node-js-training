@@ -4,9 +4,11 @@ import { InventoryService } from './inventory.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InventoryItem } from './inventory-item.entity';
+import { AppLoggerModule } from '@app/common';
 
 @Module({
   imports: [
+    AppLoggerModule,
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
       database:

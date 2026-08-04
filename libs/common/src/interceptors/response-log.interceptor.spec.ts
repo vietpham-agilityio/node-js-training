@@ -10,14 +10,9 @@ interface ResponseEnvelope<T = unknown> {
 
 describe('ResponseLoggingInterceptor', () => {
   let interceptor: ResponseLoggingInterceptor;
-  let consoleLogSpy: jest.SpyInstance;
 
-  const createMockExecutionContext = (url = '/users'): ExecutionContext => {
-    return {
-      switchToHttp: () => ({
-        getRequest: () => ({ url }),
-      }),
-    } as unknown as ExecutionContext;
+  const createMockExecutionContext = (): ExecutionContext => {
+    return {} as unknown as ExecutionContext;
   };
 
   const createMockCallHandler = (returnValue: any): CallHandler => ({
@@ -26,12 +21,6 @@ describe('ResponseLoggingInterceptor', () => {
 
   beforeEach(() => {
     interceptor = new ResponseLoggingInterceptor();
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
-  });
-
-  afterEach(() => {
-    consoleLogSpy.mockRestore();
-    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -109,22 +98,6 @@ describe('ResponseLoggingInterceptor', () => {
 
     expect(() => new Date(result.timestamp).toISOString()).not.toThrow();
     expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp);
-  });
-
-  it('should log the request URL and execution time', async () => {
-    const context = createMockExecutionContext('/v1/users');
-    const handler = createMockCallHandler({ ok: true });
-
-    const result$ = interceptor.intercept(
-      context,
-      handler,
-    ) as Observable<ResponseEnvelope>;
-    await lastValueFrom(result$);
-
-    expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringMatching(/^Request to \/v1\/users took \d+ms$/),
-    );
   });
 
   it('should preserve the original data structure inside the data field', async () => {

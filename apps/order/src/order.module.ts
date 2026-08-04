@@ -5,10 +5,11 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { Order } from './order.entity';
-import { decodeBase64Key } from '@app/common';
+import { decodeBase64Key, AppLoggerModule } from '@app/common';
 
 @Module({
   imports: [
+    AppLoggerModule,
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
       database:

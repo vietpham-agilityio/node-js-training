@@ -2,9 +2,11 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { OrderModule } from './order.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(OrderModule);
+  const app = await NestFactory.create(OrderModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
