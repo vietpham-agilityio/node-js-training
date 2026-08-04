@@ -2,6 +2,7 @@ services:
   order:
     build:
       context: .
+      target: production
       args:
         APP: order
     env_file: .env
@@ -16,6 +17,7 @@ services:
   inventory:
     build:
       context: .
+      target: production
       args:
         APP: inventory
     environment:
@@ -26,6 +28,7 @@ services:
   auth:
     build:
       context: .
+      target: production
       args:
         APP: auth
     env_file: .env
@@ -38,6 +41,7 @@ services:
   user:
     build:
       context: .
+      target: production
       args:
         APP: user
     env_file: .env
@@ -51,6 +55,7 @@ services:
   product:
     build:
       context: .
+      target: production
       args:
         APP: product
     env_file: .env
@@ -64,6 +69,7 @@ services:
   api-gateway:
     build:
       context: .
+      target: production
       args:
         APP: api-gateway
     env_file: .env
