@@ -13,7 +13,9 @@ import {
   HttpCode,
   HttpStatus,
   Headers,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { UserProxyService } from '../services';
 import { AuthGuard, RolesGuard, Roles } from '@app/common';
 import { USER_ROLE } from '@app/constants';
@@ -49,8 +51,11 @@ export class UserProxyController {
   @Get()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(USER_ROLE.ADMIN)
-  findAll(@Headers('authorization') authorization?: string): Promise<UserEntity[]> {
-    return this.userProxyService.findAll(authorization);
+  findAll(
+    @Headers('authorization') authorization?: string,
+    @Res({ passthrough: true }) response?: Response,
+  ): Promise<UserEntity[]> {
+    return this.userProxyService.findAll(authorization, response);
   }
 
   @ApiOperation({ summary: 'Get a user by id' })
@@ -64,8 +69,9 @@ export class UserProxyController {
   findById(
     @Param('id', ParseIntPipe) id: number,
     @Headers('authorization') authorization?: string,
+    @Res({ passthrough: true }) response?: Response,
   ): Promise<UserEntity> {
-    return this.userProxyService.findOne(id, authorization);
+    return this.userProxyService.findOne(id, authorization, response);
   }
 
   @ApiOperation({ summary: 'Create a new user' })

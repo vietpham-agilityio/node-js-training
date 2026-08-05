@@ -83,6 +83,17 @@ describe('UserProxyService', () => {
         { headers: { Authorization: 'Bearer abc.def.ghi' } },
       );
     });
+
+    it("surfaces the downstream X-Cache header on the gateway's response", async () => {
+      httpService.get.mockReturnValue(
+        of({ data: [{ id: 1 }], headers: { 'x-cache': 'HIT' } }) as never,
+      );
+      const setHeader = jest.fn();
+
+      await service.findAll(undefined, { setHeader } as never);
+
+      expect(setHeader).toHaveBeenCalledWith('X-Cache', 'HIT');
+    });
   });
 
   describe('findOne', () => {

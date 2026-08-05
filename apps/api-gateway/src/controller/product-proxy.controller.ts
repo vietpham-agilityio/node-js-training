@@ -12,7 +12,9 @@ import {
   UseGuards,
   ValidationPipe,
   Headers,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -64,8 +66,11 @@ export class ProductProxyController {
     type: [ProductEntity],
   })
   @Get()
-  findAll(@Headers('authorization') authorization?: string) {
-    return this.productProxyService.findAll(authorization);
+  findAll(
+    @Headers('authorization') authorization?: string,
+    @Res({ passthrough: true }) response?: Response,
+  ) {
+    return this.productProxyService.findAll(authorization, response);
   }
 
   @ApiOperation({ summary: 'Get a product by id' })
@@ -82,8 +87,9 @@ export class ProductProxyController {
   findOne(
     @Param('id', ParseIntPipe) id: number,
     @Headers('authorization') authorization?: string,
+    @Res({ passthrough: true }) response?: Response,
   ) {
-    return this.productProxyService.findOne(id, authorization);
+    return this.productProxyService.findOne(id, authorization, response);
   }
 
   @UseGuards(AuthGuard, RolesGuard)

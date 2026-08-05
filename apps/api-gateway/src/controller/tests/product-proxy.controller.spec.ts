@@ -38,7 +38,7 @@ describe('ProductProxyController', () => {
     const result = await controller.findAll();
 
     expect(result).toEqual([{ id: 1 }]);
-    expect(service.findAll).toHaveBeenCalledWith(undefined);
+    expect(service.findAll).toHaveBeenCalledWith(undefined, undefined);
   });
 
   it('findAll forwards the incoming Authorization header', async () => {
@@ -46,7 +46,7 @@ describe('ProductProxyController', () => {
 
     await controller.findAll('Bearer abc.def.ghi');
 
-    expect(service.findAll).toHaveBeenCalledWith('Bearer abc.def.ghi');
+    expect(service.findAll).toHaveBeenCalledWith('Bearer abc.def.ghi', undefined);
   });
 
   it('findOne delegates to the proxy service with the parsed id', async () => {
@@ -55,7 +55,7 @@ describe('ProductProxyController', () => {
     const result = await controller.findOne(5);
 
     expect(result).toEqual({ id: 5 });
-    expect(service.findOne).toHaveBeenCalledWith(5, undefined);
+    expect(service.findOne).toHaveBeenCalledWith(5, undefined, undefined);
   });
 
   it('create delegates to the proxy service with the dto', async () => {
