@@ -93,8 +93,12 @@ services:
       ORDER_SERVICE_BASE_URL: http://order:3001
       USER_SERVICE_BASE_URL: http://user:3003
       PRODUCT_SERVICE_BASE_URL: http://product:3004
+      TLS_KEY_PATH: /app/certs/localhost-key.pem
+      TLS_CERT_PATH: /app/certs/localhost-cert.pem
     ports:
       - '3002:3002'
+    volumes:
+      - ./certs:/app/certs:ro
     depends_on:
       - order
       - inventory

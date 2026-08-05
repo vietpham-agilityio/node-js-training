@@ -3,13 +3,25 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { VersionManagementMiddleware } from '@app/common';
+import {
+  VersionManagementMiddleware,
+  applySecurityHeaders,
+  loadHttpsOptions,
+} from '@app/common';
 import { NextFunction, Request, Response } from 'express';
 import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const httpsOptions = loadHttpsOptions();
+
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+    httpsOptions,
+  });
+
   app.useLogger(app.get(Logger));
+
+  applySecurityHeaders(app, { httpsEnabled: Boolean(httpsOptions) });
 
   app.enableVersioning({
     type: VersioningType.URI,
