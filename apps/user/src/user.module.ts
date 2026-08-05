@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
@@ -30,6 +31,9 @@ import {
         verifyOptions: { algorithms: ['RS256'] },
       }),
     }),
+    CacheModule.register({
+      ttl: 5,
+    })
   ],
   controllers: [UserController],
   providers: [
@@ -39,9 +43,13 @@ import {
       useClass: ResponseLoggingInterceptor,
     },
     {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+    {
       provide: APP_FILTER,
       useClass: HttpErrorFilter,
     },
   ],
 })
-export class UserModule {}
+export class UserModule { }
