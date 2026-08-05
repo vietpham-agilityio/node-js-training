@@ -1,19 +1,34 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+
+// Cache
+import type { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+
+// ORM
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductEntity } from './product.entity';
 import { Repository } from 'typeorm';
+
+// Entities
+import { ProductEntity } from './product.entity';
 import { CreateProductDTO, UpdateProductDTO } from './product.dto';
+
+export const PRODUCT_LIST_CACHE_KEY = 'products:all';
+export const productCacheKey = (id: number | string) => `products:${id}`;
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
   ) {}
 
   async create(dto: CreateProductDTO): Promise<ProductEntity> {
     const product = this.productRepository.create(dto);
-    return this.productRepository.save(product);
+    const saved = await this.productRepository.save(product);
+    await this.cache.del(PRODUCT_LIST_CACHE_KEY);
+
+    return saved;
   }
 
   async findAll(): Promise<ProductEntity[]> {
@@ -33,8 +48,10 @@ export class ProductService {
   async update(id: number, dto: UpdateProductDTO): Promise<ProductEntity> {
     const product = await this.findOne(id);
     Object.assign(product, dto);
+    const saved = await this.productRepository.save(product);
+    await this.invalidate(id);
 
-    return this.productRepository.save(product);
+    return saved;
   }
 
   async remove(id: number): Promise<void> {
@@ -42,5 +59,10 @@ export class ProductService {
     if (result.affected === 0) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
+    await this.invalidate(id);
+  }
+
+  private async invalidate(id: number): Promise<void> {
+    await this.cache.mdel([PRODUCT_LIST_CACHE_KEY, productCacheKey(id)]);
   }
 }

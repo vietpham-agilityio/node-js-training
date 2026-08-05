@@ -1,24 +1,40 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+
+// Caches
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
+
+// ORM
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+// Encrypt
 import * as bcrypt from 'bcrypt';
 
+// Entities
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
-import { Repository } from 'typeorm';
+
+// Constants
 import { UserCredentialsShape } from '@app/constants';
 
 const PASSWORD_SALT_ROUNDS = 10;
+
+export const USER_LIST_CACHE_KEY = 'users:all';
+export const userCacheKey = (id: number | string) => `users:${id}`;
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
   ) { }
 
   async create(user: CreateUserDTO): Promise<UserEntity> {
@@ -36,6 +52,9 @@ export class UserService {
     });
 
     const saved = await this.userRepository.save(newUser);
+
+    await this.cache.del(USER_LIST_CACHE_KEY);
+
     return this.stripPassword(saved);
   }
 
@@ -65,6 +84,9 @@ export class UserService {
     );
     
     const saved = await this.userRepository.save(updated);
+    
+    await this.invalidate(userId);
+
     return this.stripPassword(saved);
   }
 
@@ -74,6 +96,12 @@ export class UserService {
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
+
+    await this.invalidate(userId);
+  }
+
+  private async invalidate(userId: number): Promise<void> {
+    await this.cache.mdel([USER_LIST_CACHE_KEY, userCacheKey(userId)]);
   }
 
   async validateCredentials(

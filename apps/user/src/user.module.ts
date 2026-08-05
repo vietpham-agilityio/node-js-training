@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
@@ -8,6 +7,7 @@ import { UserService } from './users.service';
 import { UserEntity } from './user.entity';
 import {
   AppLoggerModule,
+  AppCacheModule,
   ResponseLoggingInterceptor,
   HttpErrorFilter,
   decodeBase64Key,
@@ -16,6 +16,7 @@ import {
 @Module({
   imports: [
     AppLoggerModule,
+    AppCacheModule,
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
       database:
@@ -31,9 +32,6 @@ import {
         verifyOptions: { algorithms: ['RS256'] },
       }),
     }),
-    CacheModule.register({
-      ttl: 5,
-    })
   ],
   controllers: [UserController],
   providers: [
@@ -41,10 +39,6 @@ import {
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseLoggingInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
     },
     {
       provide: APP_FILTER,

@@ -10,13 +10,29 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
+
+// Cache
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+
+// Docs
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ProductService } from './product.service';
+
+// Module
+import {
+  ProductService,
+  PRODUCT_LIST_CACHE_KEY,
+  productCacheKey,
+} from './product.service';
 import { CreateProductDTO, UpdateProductDTO } from './product.dto';
 import { ProductEntity } from './product.entity';
+
+// Extension
 import { AuthGuard, RolesGuard, Roles } from '@app/common';
+
+// Constant
 import { USER_ROLE } from '@app/constants';
 
 @ApiTags('Products')
@@ -34,6 +50,8 @@ export class ProductController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey(PRODUCT_LIST_CACHE_KEY)
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({ status: 200, type: [ProductEntity] })
   findAll() {
@@ -41,6 +59,8 @@ export class ProductController {
   }
 
   @Get(':id')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey((ctx) => productCacheKey(ctx.switchToHttp().getRequest().params.id))
   @ApiOperation({ summary: 'Get a product by id' })
   @ApiResponse({ status: 200, type: ProductEntity })
   findOne(@Param('id', ParseIntPipe) id: number) {

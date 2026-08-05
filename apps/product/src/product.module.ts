@@ -7,6 +7,7 @@ import { ProductService } from './product.service';
 import { ProductEntity } from './product.entity';
 import {
   AppLoggerModule,
+  AppCacheModule,
   ResponseLoggingInterceptor,
   HttpErrorFilter,
   decodeBase64Key,
@@ -15,6 +16,7 @@ import {
 @Module({
   imports: [
     AppLoggerModule,
+    AppCacheModule,
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
       database:

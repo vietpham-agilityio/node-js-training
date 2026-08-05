@@ -6,6 +6,7 @@ export * from './guards/roles.guard';
 export * from './decorators/roles';
 export * from './middleware/versioning.middleware';
 export * from './logger/pino-logger.module';
+export * from './cache/app-cache.module';
 export * from './utils/jwt-key.util';
 export * from './utils/extract-error-message';
 export * from './services/proxy.service';

@@ -10,14 +10,32 @@ import {
   ParseIntPipe,
   UseGuards,
   UseFilters,
+  UseInterceptors,
   Version,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { UserService } from './users.service';
-import { CreateUserDTO, UpdateUserDTO } from './user.dto';
+import { MessagePattern } from '@nestjs/microservices';
+
+// Extension 
 import { AuthGuard, RolesGuard, Roles, RpcErrorFilter } from '@app/common';
+
+// Cache
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+
+// Modules
+import {
+  UserService,
+  USER_LIST_CACHE_KEY,
+  userCacheKey,
+} from './users.service';
+import { CreateUserDTO, UpdateUserDTO } from './user.dto';
+import { UserEntity } from './user.entity';
+
+// Constant
 import { USER_ROLE } from '@app/constants';
+
+// Docs
 import {
   ApiTags,
   ApiOperation,
@@ -28,8 +46,8 @@ import {
   ApiUnauthorizedResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { UserEntity } from './user.entity';
-import { MessagePattern } from '@nestjs/microservices';
+
+// Constant
 import {
   USER_MESSAGES,
   type LoginPayload,
@@ -65,6 +83,8 @@ export class UserController {
   @Get()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(USER_ROLE.ADMIN)
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey(USER_LIST_CACHE_KEY)
   findAll(): Promise<UserEntity[]> {
     return this.userService.findAll();
   }
@@ -72,6 +92,8 @@ export class UserController {
   @ApiBearerAuth()
   @Get(':id')
   @UseGuards(AuthGuard)
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey((context) => userCacheKey(context.switchToHttp().getRequest().params.id))
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findById(id);
   }

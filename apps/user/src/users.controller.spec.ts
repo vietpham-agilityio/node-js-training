@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { UserController } from './users.controller';
 import { UserService } from './users.service';
 import { UserEntity } from './user.entity';
@@ -41,6 +42,10 @@ describe('UserController', () => {
         {
           provide: JwtService,
           useValue: { verifyAsync: jest.fn() },
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn(), mdel: jest.fn() },
         },
       ],
     }).compile();

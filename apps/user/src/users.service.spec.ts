@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import * as bcrypt from 'bcrypt';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { UserService } from './users.service';
@@ -93,6 +94,10 @@ describe('UsersService', () => {
       providers: [
         UserService,
         { provide: getRepositoryToken(UserEntity), useValue: mockRepository },
+        {
+          provide: CACHE_MANAGER,
+          useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn(), mdel: jest.fn() },
+        },
       ],
     }).compile();
     service = module.get<UserService>(UserService);
