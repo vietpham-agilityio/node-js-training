@@ -38,6 +38,13 @@ services:
     depends_on:
       - user
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+
   user:
     build:
       context: .
@@ -47,10 +54,13 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
+      REDIS_URL: redis://redis:6379
     ports:
       - '3003:3003'
     volumes:
       - user-db:/app/database
+    depends_on:
+      - redis
 
   product:
     build:
@@ -61,10 +71,13 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
+      REDIS_URL: redis://redis:6379
     ports:
       - '3004:3004'
     volumes:
       - product-db:/app/database
+    depends_on:
+      - redis
 
   api-gateway:
     build:
@@ -94,3 +107,4 @@ volumes:
   inventory-db:
   user-db:
   product-db:
+  redis-data:
