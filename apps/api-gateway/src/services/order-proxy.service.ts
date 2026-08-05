@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { catchError, firstValueFrom, map, Observable } from 'rxjs';
 
 // Common
 import { HttpProxyService } from '@app/common';
@@ -67,21 +66,6 @@ export class OrderProxyService extends HttpProxyService {
       this.httpService.delete(
         `${ORDER_BASE_URL}${API_ENDPOINT.ORDER}/${id}`,
         this.withAuth(authorization),
-      ),
-    );
-  }
-
-  private withAuth(authorization?: string): { headers?: Record<string, string> } {
-    return authorization ? { headers: { Authorization: authorization } } : {};
-  }
-
-  private forward<T>(obs: Observable<{ data: T }>): Promise<T> {
-    return firstValueFrom(
-      obs.pipe(
-        map((res) => res.data),
-        catchError((err: unknown) => {
-          throw this.toHttpException(err);
-        }),
       ),
     );
   }

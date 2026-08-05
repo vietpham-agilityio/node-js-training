@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
 
-export const DEFAULT_CACHE_TTL_MS = 600;
+export const DEFAULT_CACHE_TTL_MS = 600_000;
 
 @Module({
   imports: [

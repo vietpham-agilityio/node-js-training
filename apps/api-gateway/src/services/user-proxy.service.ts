@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { catchError, firstValueFrom, map, Observable } from 'rxjs';
+import type { Response } from 'express';
 
 // Common
 import { HttpProxyService } from '@app/common';
@@ -30,21 +30,27 @@ export class UserProxyService extends HttpProxyService {
     );
   }
 
-  findAll(authorization?: string): Promise<UserEntity[]> {
+  findAll(authorization?: string, httpResponse?: Response): Promise<UserEntity[]> {
     return this.forward(
       this.httpService.get(
         `${USER_BASE_URL}${API_ENDPOINT.USER}`,
         this.withAuth(authorization),
       ),
+      httpResponse,
     );
   }
 
-  findOne(id: number, authorization?: string): Promise<UserEntity> {
+  findOne(
+    id: number,
+    authorization?: string,
+    httpResponse?: Response,
+  ): Promise<UserEntity> {
     return this.forward(
       this.httpService.get(
         `${USER_BASE_URL}${API_ENDPOINT.USER}/${id}`,
         this.withAuth(authorization),
       ),
+      httpResponse,
     );
   }
 
@@ -67,21 +73,6 @@ export class UserProxyService extends HttpProxyService {
       this.httpService.delete(
         `${USER_BASE_URL}${API_ENDPOINT.USER}/${userId}`,
         this.withAuth(authorization),
-      ),
-    );
-  }
-
-  private withAuth(authorization?: string): { headers?: Record<string, string> } {
-    return authorization ? { headers: { Authorization: authorization } } : {};
-  }
-
-  private forward<T>(obs: Observable<{ data: T }>): Promise<T> {
-    return firstValueFrom(
-      obs.pipe(
-        map((res) => res.data),
-        catchError((err: unknown) => {
-          throw this.toHttpException(err);
-        }),
       ),
     );
   }
