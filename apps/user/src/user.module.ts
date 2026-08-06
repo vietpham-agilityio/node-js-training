@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { UserController } from './users.controller';
-import { UserService } from './users.service';
-import { UserEntity } from './user.entity';
+
+// ORM
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+// Libs
 import {
   AppLoggerModule,
   AppCacheModule,
@@ -12,6 +13,11 @@ import {
   HttpErrorFilter,
   decodeBase64Key,
 } from '@app/common';
+
+// Module
+import { UserController } from './users.controller';
+import { UserService } from './users.service';
+import { UserEntity } from './user.entity';
 
 @Module({
   imports: [

@@ -6,23 +6,23 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-// Caches
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
-
 // ORM
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+// Cache
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
+
 // Encrypt
 import * as bcrypt from 'bcrypt';
 
-// Entities
+// Libs
+import { UserCredentialsShape } from '@app/constants';
+
+// Module
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 import { UserEntity } from './user.entity';
-
-// Constants
-import { UserCredentialsShape } from '@app/constants';
 
 const PASSWORD_SALT_ROUNDS = 10;
 

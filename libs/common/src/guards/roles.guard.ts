@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-// Constants
+// Libs
 import type { USER_ROLE, AuthenticatedRequest } from '@app/constants';
 
-// Decorators
+// Module
 import { ROLES_KEY } from '@app/common/decorators/roles';
 
 @Injectable()

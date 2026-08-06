@@ -1,12 +1,20 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
-import { UserModule } from './user.module';
 import { VersioningType } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { VersionManagementMiddleware, applySecurityHeaders } from '@app/common';
-import { NextFunction, Request, Response } from 'express';
 import { Logger } from 'nestjs-pino';
+
+// Docs
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
+// Extensions
+import { NextFunction, Request, Response } from 'express';
+
+// Libs
+import { VersionManagementMiddleware, applySecurityHeaders } from '@app/common';
+
+// Module
+import { UserModule } from './user.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(UserModule, { bufferLogs: true });

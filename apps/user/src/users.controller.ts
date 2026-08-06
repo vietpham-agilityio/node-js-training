@@ -17,24 +17,6 @@ import {
 } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
-// Extension 
-import { AuthGuard, RolesGuard, Roles, RpcErrorFilter } from '@app/common';
-
-// Cache
-import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
-
-// Modules
-import {
-  UserService,
-  USER_LIST_CACHE_KEY,
-  userCacheKey,
-} from './users.service';
-import { CreateUserDTO, UpdateUserDTO } from './user.dto';
-import { UserEntity } from './user.entity';
-
-// Constant
-import { USER_ROLE } from '@app/constants';
-
 // Docs
 import {
   ApiTags,
@@ -47,13 +29,27 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 
-// Constant
+// Cache
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+
+// Libs
+import { AuthGuard, RolesGuard, Roles, RpcErrorFilter } from '@app/common';
+import { USER_ROLE } from '@app/constants';
 import {
   USER_MESSAGES,
   type LoginPayload,
   type CreateUserPayload,
   type UserCredentialsShape,
 } from '@app/constants';
+
+// Module
+import {
+  UserService,
+  USER_LIST_CACHE_KEY,
+  userCacheKey,
+} from './users.service';
+import { CreateUserDTO, UpdateUserDTO } from './user.dto';
+import { UserEntity } from './user.entity';
 
 @ApiTags('Users')
 @Controller('users')

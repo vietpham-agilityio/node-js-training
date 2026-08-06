@@ -1,5 +1,8 @@
-import { USER_ROLE } from './user';
+// Extensions
 import type { Request } from 'express';
+
+// Module
+import { USER_ROLE } from './user';
 
 export interface LoginPayload {
   email: string;

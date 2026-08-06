@@ -9,7 +9,10 @@ import {
   IsStrongPassword,
 } from 'class-validator';
 
+// Docs
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+
+// Libs
 import { USER_ROLE } from '@app/constants';
 
 export class CreateUserDTO {

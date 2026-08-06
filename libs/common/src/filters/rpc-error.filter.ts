@@ -14,7 +14,7 @@ interface RpcErrorPayload {
 
 @Catch()
 export class RpcErrorFilter implements ExceptionFilter<unknown> {
-  catch(exception: unknown, p0: never): Observable<never> {
+  catch(exception: unknown): Observable<never> {
     return throwError(() => this.toPayload(exception));
   }
 

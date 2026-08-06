@@ -1,3 +1,7 @@
+// Docs
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+// ORM
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,7 +9,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+// Libs
 import { USER_ROLE } from '@app/constants';
 
 @Entity('users')

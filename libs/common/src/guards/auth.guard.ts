@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-// Constants
+// Libs
 import type { AuthTokenPayload, AuthenticatedRequest } from '@app/constants';
 
 @Injectable()

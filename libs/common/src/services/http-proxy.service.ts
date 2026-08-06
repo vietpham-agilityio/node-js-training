@@ -1,5 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { catchError, firstValueFrom, map, Observable, tap } from 'rxjs';
+
+// Module
 import { KnownProxyError, ProxyService } from './proxy.service';
 
 interface AxiosLikeError {

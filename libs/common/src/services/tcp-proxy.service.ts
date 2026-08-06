@@ -1,4 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+
+// Module
 import { extractErrorMessage } from '../utils/extract-error-message';
 import { KnownProxyError, ProxyService } from './proxy.service';
 

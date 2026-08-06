@@ -1,4 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
+
+// Extensions
 import { NextFunction, Request, Response } from 'express';
 
 const SUPPORTED_VERSIONS = ['v1', 'v2'];
