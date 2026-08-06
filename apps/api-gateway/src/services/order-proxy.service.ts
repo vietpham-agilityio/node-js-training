@@ -3,7 +3,10 @@ import { HttpService } from '@nestjs/axios';
 
 // Libs
 import { HttpProxyService } from '@app/common';
-import { ORDER_BASE_URL, API_ENDPOINT } from '@app/constants/shared/router/route';
+import {
+  ORDER_BASE_URL,
+  API_ENDPOINT,
+} from '@app/constants/shared/router/route';
 
 // Module
 import { CreateOrderDTO, UpdateOrderDTO } from 'apps/order/src/order.dto';

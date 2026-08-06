@@ -6,7 +6,10 @@ import type { Response } from 'express';
 
 // Libs
 import { HttpProxyService } from '@app/common';
-import { USER_BASE_URL, API_ENDPOINT } from '@app/constants/shared/router/route';
+import {
+  USER_BASE_URL,
+  API_ENDPOINT,
+} from '@app/constants/shared/router/route';
 
 // Module
 import { CreateUserDTO, UpdateUserDTO } from 'apps/user/src/user.dto';
@@ -30,7 +33,10 @@ export class UserProxyService extends HttpProxyService {
     );
   }
 
-  findAll(authorization?: string, httpResponse?: Response): Promise<UserEntity[]> {
+  findAll(
+    authorization?: string,
+    httpResponse?: Response,
+  ): Promise<UserEntity[]> {
     return this.forward(
       this.httpService.get(
         `${USER_BASE_URL}${API_ENDPOINT.USER}`,

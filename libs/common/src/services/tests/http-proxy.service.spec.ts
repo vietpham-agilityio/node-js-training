@@ -15,7 +15,10 @@ describe('HttpProxyService', () => {
 
     const result = service.call({
       isAxiosError: true,
-      response: { status: HttpStatus.NOT_FOUND, data: { message: 'not found' } },
+      response: {
+        status: HttpStatus.NOT_FOUND,
+        data: { message: 'not found' },
+      },
     });
 
     expect(result.getStatus()).toBe(HttpStatus.NOT_FOUND);
@@ -29,7 +32,9 @@ describe('HttpProxyService', () => {
       isAxiosError: true,
       response: {
         status: HttpStatus.BAD_REQUEST,
-        data: { message: ['name should not be empty', 'price must be positive'] },
+        data: {
+          message: ['name should not be empty', 'price must be positive'],
+        },
       },
     });
 

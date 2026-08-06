@@ -111,9 +111,7 @@ describe('InventoryController', () => {
         quantity: 25,
       });
 
-      expect(result).toEqual(
-        expect.objectContaining({ id: 1, quantity: 25 }),
-      );
+      expect(result).toEqual(expect.objectContaining({ id: 1, quantity: 25 }));
       expect(mockInventoryRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({ id: 1, quantity: 25 }),
       );

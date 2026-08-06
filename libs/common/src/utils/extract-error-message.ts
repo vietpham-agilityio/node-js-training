@@ -6,7 +6,10 @@ export function extractErrorMessage(
     return fallback;
   }
 
-  const { message, code } = error as { message?: string | string[]; code?: string };
+  const { message, code } = error as {
+    message?: string | string[];
+    code?: string;
+  };
 
   if (Array.isArray(message) && message.length > 0) {
     return message;

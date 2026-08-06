@@ -6,6 +6,14 @@ import { OrderModule } from './../src/order.module';
 import { decodeBase64Key } from '@app/common';
 import { USER_ROLE } from '@app/constants';
 
+interface OrderResponse {
+  id: number;
+  name: string;
+  productId: number;
+  quantity: number;
+  status: string;
+}
+
 describe('OrderController (e2e)', () => {
   let app: INestApplication;
   let bearerToken: string;
@@ -42,13 +50,15 @@ describe('OrderController (e2e)', () => {
       .send({ name: 'Order Camera', productId: 12, quantity: 2 })
       .expect(201);
 
-    expect(res.body).toMatchObject({
+    const body = res.body as OrderResponse;
+
+    expect(body).toMatchObject({
       name: 'Order Camera',
       productId: 12,
       quantity: 2,
       status: 'Pending',
     });
-    expect(res.body.id).toBeDefined();
+    expect(body.id).toBeDefined();
   });
 
   it('POST /orders rejects requests without a bearer token', () => {
@@ -70,8 +80,10 @@ describe('OrderController (e2e)', () => {
       .set('Authorization', `Bearer ${bearerToken}`)
       .expect(200);
 
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBeGreaterThan(0);
+    const body = res.body as OrderResponse[];
+
+    expect(Array.isArray(body)).toBe(true);
+    expect(body.length).toBeGreaterThan(0);
   });
 
   it('GET /orders/:id returns 404 for an unknown order', () => {
@@ -86,14 +98,16 @@ describe('OrderController (e2e)', () => {
       .post('/orders')
       .set('Authorization', `Bearer ${bearerToken}`)
       .send({ name: 'Order Keyboard', productId: 3, quantity: 1 });
+    const createdBody = created.body as OrderResponse;
 
     const res = await request(app.getHttpServer())
-      .patch(`/orders/${created.body.id}`)
+      .patch(`/orders/${createdBody.id}`)
       .set('Authorization', `Bearer ${bearerToken}`)
       .send({ quantity: 5 })
       .expect(200);
+    const body = res.body as OrderResponse;
 
-    expect(res.body.quantity).toBe(5);
+    expect(body.quantity).toBe(5);
   });
 
   it('DELETE /orders/:id removes an order', async () => {
@@ -101,14 +115,15 @@ describe('OrderController (e2e)', () => {
       .post('/orders')
       .set('Authorization', `Bearer ${bearerToken}`)
       .send({ name: 'Order Monitor', productId: 4, quantity: 1 });
+    const createdBody = created.body as OrderResponse;
 
     await request(app.getHttpServer())
-      .delete(`/orders/${created.body.id}`)
+      .delete(`/orders/${createdBody.id}`)
       .set('Authorization', `Bearer ${bearerToken}`)
       .expect(200);
 
     await request(app.getHttpServer())
-      .get(`/orders/${created.body.id}`)
+      .get(`/orders/${createdBody.id}`)
       .set('Authorization', `Bearer ${bearerToken}`)
       .expect(404);
   });

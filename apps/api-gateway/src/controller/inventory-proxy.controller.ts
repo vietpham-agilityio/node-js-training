@@ -52,7 +52,7 @@ export class InventoryItemResponseDTO {
 @ApiTags('Inventory')
 @Controller('inventory')
 export class InventoryProxyController {
-  constructor(private readonly inventoryProxyService: InventoryProxyService) { }
+  constructor(private readonly inventoryProxyService: InventoryProxyService) {}
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(USER_ROLE.MERCHANT)

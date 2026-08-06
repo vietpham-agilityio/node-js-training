@@ -20,9 +20,7 @@ describe('InventoryProxyController', () => {
       ],
     }).compile();
 
-    controller = module.get<InventoryProxyController>(
-      InventoryProxyController,
-    );
+    controller = module.get<InventoryProxyController>(InventoryProxyController);
     service = module.get(InventoryProxyService);
   });
 

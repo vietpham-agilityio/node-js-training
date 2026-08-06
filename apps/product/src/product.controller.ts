@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
+import { Request } from 'express';
 
 // Docs
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -37,7 +38,7 @@ import { ProductEntity } from './product.entity';
 @Controller('products')
 @UseGuards(AuthGuard, RolesGuard)
 export class ProductController {
-  constructor(private readonly productService: ProductService) { }
+  constructor(private readonly productService: ProductService) {}
 
   @Post()
   @Roles(USER_ROLE.ADMIN)
@@ -58,7 +59,11 @@ export class ProductController {
 
   @Get(':id')
   @UseInterceptors(CacheInterceptor)
-  @CacheKey((ctx) => productCacheKey(ctx.switchToHttp().getRequest().params.id))
+  @CacheKey((ctx) =>
+    productCacheKey(
+      ctx.switchToHttp().getRequest<Request>().params.id as string,
+    ),
+  )
   @ApiOperation({ summary: 'Get a product by id' })
   @ApiResponse({ status: 200, type: ProductEntity })
   findOne(@Param('id', ParseIntPipe) id: number) {

@@ -49,7 +49,7 @@ export class UserEntity {
   @Column({
     type: 'text',
     enum: USER_ROLE,
-    default: USER_ROLE.USER
+    default: USER_ROLE.USER,
   })
   role?: USER_ROLE;
 

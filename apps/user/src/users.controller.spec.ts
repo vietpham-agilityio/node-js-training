@@ -45,7 +45,12 @@ describe('UserController', () => {
         },
         {
           provide: CACHE_MANAGER,
-          useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn(), mdel: jest.fn() },
+          useValue: {
+            get: jest.fn(),
+            set: jest.fn(),
+            del: jest.fn(),
+            mdel: jest.fn(),
+          },
         },
       ],
     }).compile();

@@ -21,12 +21,17 @@ describe('OrderService', () => {
   beforeEach(async () => {
     inventoryClient = { emit: jest.fn() };
     mockRepository = {
-      create: jest.fn((input) => input),
-      save: jest.fn((order) => Promise.resolve({ id: 1, ...order })),
+      create: jest.fn((input: Partial<Order>) => input),
+      save: jest.fn((order: Partial<Order>) =>
+        Promise.resolve({ id: 1, ...order }),
+      ),
       find: jest.fn(),
       findOne: jest.fn(),
       findOneBy: jest.fn(),
-      merge: jest.fn((order, input) => ({ ...order, ...input })),
+      merge: jest.fn((order: Partial<Order>, input: Partial<Order>) => ({
+        ...order,
+        ...input,
+      })),
       delete: jest.fn(),
     };
 
@@ -158,9 +163,9 @@ describe('OrderService', () => {
     it('throws NotFoundException when the order does not exist', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.updateOrder(999, { quantity: 5 }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.updateOrder(999, { quantity: 5 })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -178,9 +183,7 @@ describe('OrderService', () => {
     it('throws NotFoundException when the order does not exist', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.removeOrder(999)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.removeOrder(999)).rejects.toThrow(NotFoundException);
     });
   });
 });

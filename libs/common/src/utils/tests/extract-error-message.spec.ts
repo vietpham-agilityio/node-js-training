@@ -8,9 +8,10 @@ describe('extractErrorMessage', () => {
   });
 
   it('returns the message when it is a non-empty array', () => {
-    expect(
-      extractErrorMessage({ message: ['a', 'b'] }, 'fallback'),
-    ).toEqual(['a', 'b']);
+    expect(extractErrorMessage({ message: ['a', 'b'] }, 'fallback')).toEqual([
+      'a',
+      'b',
+    ]);
   });
 
   it('falls back with the error code appended when message is an empty string', () => {

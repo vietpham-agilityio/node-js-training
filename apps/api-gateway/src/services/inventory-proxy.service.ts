@@ -35,7 +35,8 @@ export class InventoryProxyService extends TCPProxyService {
   }
 
   protected acceptStatus(status: number): boolean {
-    return status === HttpStatus.NOT_FOUND;
+    const notFound: number = HttpStatus.NOT_FOUND;
+    return status === notFound;
   }
 
   protected statusFallbackMessage(): string {

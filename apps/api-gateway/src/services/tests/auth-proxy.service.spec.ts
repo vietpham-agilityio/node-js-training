@@ -30,9 +30,7 @@ describe('AuthProxyService', () => {
 
   describe('login', () => {
     it('sends the login message and returns the access token', async () => {
-      authClient.send.mockReturnValue(
-        of({ accessToken: 'signed-token' }) as never,
-      );
+      authClient.send.mockReturnValue(of({ accessToken: 'signed-token' }));
 
       const result = await service.login('user@example.com', 'Good_user@123');
 
@@ -48,7 +46,7 @@ describe('AuthProxyService', () => {
         throwError(() => ({
           status: HttpStatus.UNAUTHORIZED,
           message: 'Invalid email or password',
-        })) as never,
+        })),
       );
 
       await expect(
@@ -60,9 +58,7 @@ describe('AuthProxyService', () => {
     });
 
     it('maps an unrecognized error into a 502', async () => {
-      authClient.send.mockReturnValue(
-        throwError(() => new Error('boom')) as never,
-      );
+      authClient.send.mockReturnValue(throwError(() => new Error('boom')));
 
       await expect(
         service.login('user@example.com', 'Good_user@123'),
@@ -73,7 +69,7 @@ describe('AuthProxyService', () => {
 
     it('maps a connection-refused error (empty message) into a 502 with a meaningful message', async () => {
       authClient.send.mockReturnValue(
-        throwError(() => ({ code: 'ECONNREFUSED', message: '' })) as never,
+        throwError(() => ({ code: 'ECONNREFUSED', message: '' })),
       );
 
       await expect(
@@ -86,7 +82,9 @@ describe('AuthProxyService', () => {
 
     it('maps a non-401 status error into a generic auth-service-error message', async () => {
       authClient.send.mockReturnValue(
-        throwError(() => ({ status: HttpStatus.INTERNAL_SERVER_ERROR })) as never,
+        throwError(() => ({
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+        })),
       );
 
       await expect(
@@ -100,9 +98,7 @@ describe('AuthProxyService', () => {
 
   describe('register', () => {
     it('sends the register message and returns the access token', async () => {
-      authClient.send.mockReturnValue(
-        of({ accessToken: 'signed-token' }) as never,
-      );
+      authClient.send.mockReturnValue(of({ accessToken: 'signed-token' }));
 
       const payload = {
         firstName: 'Jimmy',
@@ -123,7 +119,7 @@ describe('AuthProxyService', () => {
         throwError(() => ({
           status: HttpStatus.CONFLICT,
           message: 'Email jimmy@example.com is already registered',
-        })) as never,
+        })),
       );
 
       await expect(

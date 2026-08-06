@@ -14,7 +14,9 @@ describe('AuthProxyController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthProxyController],
-      providers: [{ provide: AuthProxyService, useValue: mockAuthProxyService }],
+      providers: [
+        { provide: AuthProxyService, useValue: mockAuthProxyService },
+      ],
     }).compile();
 
     controller = module.get<AuthProxyController>(AuthProxyController);

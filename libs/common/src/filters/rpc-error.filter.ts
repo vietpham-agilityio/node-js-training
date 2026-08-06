@@ -23,7 +23,10 @@ export class RpcErrorFilter implements ExceptionFilter<unknown> {
       const error = exception.getError();
       return this.isRpcErrorPayload(error)
         ? error
-        : { status: HttpStatus.INTERNAL_SERVER_ERROR, message: String(error) };
+        : {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: typeof error === 'string' ? error : JSON.stringify(error),
+          };
     }
 
     if (exception instanceof HttpException) {

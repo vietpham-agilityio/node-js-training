@@ -41,4 +41,4 @@ import { InventoryItem } from './inventory-item.entity';
   controllers: [InventoryController],
   providers: [InventoryService],
 })
-export class InventoryModule { }
+export class InventoryModule {}

@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 // ORM
@@ -69,13 +74,18 @@ export class InventoryService implements OnModuleInit {
     return this.orderClient.emit(ORDER_EVENTS.ORDER_PROCESSED, payload);
   }
 
-  async updateStock(productId: number, quantity: number): Promise<InventoryItem> {
+  async updateStock(
+    productId: number,
+    quantity: number,
+  ): Promise<InventoryItem> {
     const item = await this.inventoryRepository.findOne({
       where: { id: productId },
     });
 
     if (!item) {
-      throw new NotFoundException(`Product ${productId} not found in inventory`);
+      throw new NotFoundException(
+        `Product ${productId} not found in inventory`,
+      );
     }
 
     item.quantity = quantity;

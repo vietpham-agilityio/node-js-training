@@ -68,18 +68,14 @@ describe('loadHttpsOptions', () => {
       process.env.TLS_KEY_PATH = write('k1.pem', 'not a key');
       process.env.TLS_CERT_PATH = write('c1.pem', 'definitely not a cert');
 
-      expect(() => loadHttpsOptions()).toThrow(
-        /is not an X.509 certificate/,
-      );
+      expect(() => loadHttpsOptions()).toThrow(/is not an X.509 certificate/);
     });
 
     it('should reject an empty cert file', () => {
       process.env.TLS_KEY_PATH = write('k2.pem', 'not a key');
       process.env.TLS_CERT_PATH = write('c2.pem', '');
 
-      expect(() => loadHttpsOptions()).toThrow(
-        /is not an X.509 certificate/,
-      );
+      expect(() => loadHttpsOptions()).toThrow(/is not an X.509 certificate/);
     });
 
     // The swapped-paths case: a private key in TLS_CERT_PATH is well-formed PEM
@@ -93,9 +89,7 @@ describe('loadHttpsOptions', () => {
       process.env.TLS_KEY_PATH = write('k3.pem', privateKey);
       process.env.TLS_CERT_PATH = write('c3.pem', privateKey);
 
-      expect(() => loadHttpsOptions()).toThrow(
-        /is not an X.509 certificate/,
-      );
+      expect(() => loadHttpsOptions()).toThrow(/is not an X.509 certificate/);
     });
   });
 });

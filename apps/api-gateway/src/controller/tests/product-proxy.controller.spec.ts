@@ -46,7 +46,10 @@ describe('ProductProxyController', () => {
 
     await controller.findAll('Bearer abc.def.ghi');
 
-    expect(service.findAll).toHaveBeenCalledWith('Bearer abc.def.ghi', undefined);
+    expect(service.findAll).toHaveBeenCalledWith(
+      'Bearer abc.def.ghi',
+      undefined,
+    );
   });
 
   it('findOne delegates to the proxy service with the parsed id', async () => {

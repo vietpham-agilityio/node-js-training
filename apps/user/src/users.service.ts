@@ -35,7 +35,7 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
-  ) { }
+  ) {}
 
   async create(user: CreateUserDTO): Promise<UserEntity> {
     const existing = await this.userRepository.findOneBy({ email: user.email });
@@ -44,7 +44,10 @@ export class UserService {
       throw new ConflictException(`Email ${user.email} is already registered`);
     }
 
-    const hashedPassword = await bcrypt.hash(user.password, PASSWORD_SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(
+      user.password,
+      PASSWORD_SALT_ROUNDS,
+    );
 
     const newUser = this.userRepository.create({
       ...user,
@@ -80,11 +83,13 @@ export class UserService {
     const updated = this.userRepository.merge(
       existing,
       rest,
-      password ? { password: await bcrypt.hash(password, PASSWORD_SALT_ROUNDS) } : {},
+      password
+        ? { password: await bcrypt.hash(password, PASSWORD_SALT_ROUNDS) }
+        : {},
     );
-    
+
     const saved = await this.userRepository.save(updated);
-    
+
     await this.invalidate(userId);
 
     return this.stripPassword(saved);
@@ -114,7 +119,9 @@ export class UserService {
       .where('user.email = :email', { email })
       .getOne();
 
-    const isMatch = user ? await bcrypt.compare(password, user.password) : false;
+    const isMatch = user
+      ? await bcrypt.compare(password, user.password)
+      : false;
 
     if (!user || !isMatch) {
       throw new UnauthorizedException('Invalid email or password');

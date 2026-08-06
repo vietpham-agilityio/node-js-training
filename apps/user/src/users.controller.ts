@@ -16,6 +16,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
+import { Request } from 'express';
 
 // Docs
 import {
@@ -54,7 +55,7 @@ import { UserEntity } from './user.entity';
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   @UseFilters(new RpcErrorFilter())
   @MessagePattern(USER_MESSAGES.VALIDATE_CREDENTIALS)
@@ -89,7 +90,11 @@ export class UserController {
   @Get(':id')
   @UseGuards(AuthGuard)
   @UseInterceptors(CacheInterceptor)
-  @CacheKey((context) => userCacheKey(context.switchToHttp().getRequest().params.id))
+  @CacheKey((context) =>
+    userCacheKey(
+      context.switchToHttp().getRequest<Request>().params.id as string,
+    ),
+  )
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findById(id);
   }
@@ -130,7 +135,6 @@ export class UserController {
   ): Promise<UserEntity> {
     return this.userService.update(userId, updateUserBody);
   }
-
 
   @ApiOperation({ summary: 'Delete a user' })
   @ApiBearerAuth()

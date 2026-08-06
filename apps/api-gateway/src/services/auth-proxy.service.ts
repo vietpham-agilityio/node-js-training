@@ -43,7 +43,8 @@ export class AuthProxyService extends TCPProxyService {
   }
 
   protected statusFallbackMessage(status: number): string {
-    return status === HttpStatus.UNAUTHORIZED
+    const unauthorized: number = HttpStatus.UNAUTHORIZED;
+    return status === unauthorized
       ? 'Invalid credentials'
       : 'Auth service error';
   }

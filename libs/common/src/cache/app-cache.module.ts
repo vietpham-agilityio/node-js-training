@@ -21,5 +21,4 @@ export const DEFAULT_CACHE_TTL_MS = 600_000;
   ],
   exports: [CacheModule],
 })
-
 export class AppCacheModule {}

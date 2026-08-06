@@ -19,7 +19,9 @@ import { Order } from './order.entity';
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
       database:
-        process.env.NODE_ENV === 'test' ? ':memory:' : './database/order-db.sqlite',
+        process.env.NODE_ENV === 'test'
+          ? ':memory:'
+          : './database/order-db.sqlite',
       entities: [Order],
       synchronize: true,
     }),

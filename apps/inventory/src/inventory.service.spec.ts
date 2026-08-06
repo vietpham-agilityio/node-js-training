@@ -29,7 +29,7 @@ describe('InventoryService', () => {
     orderClient = { emit: jest.fn() };
     mockRepository = {
       count: jest.fn().mockResolvedValue(1),
-      create: jest.fn((items) => items),
+      create: jest.fn((items: Partial<InventoryItem>) => items),
       findOne: jest.fn(),
       save: jest.fn((item: InventoryItem) => Promise.resolve(item)),
     };

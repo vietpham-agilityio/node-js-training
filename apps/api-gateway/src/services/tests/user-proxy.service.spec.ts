@@ -144,7 +144,7 @@ describe('UserProxyService', () => {
         throwError(() => ({
           isAxiosError: true,
           response: { status: 404, data: { message: 'not found' } },
-        })) as never,
+        })),
       );
 
       await expect(service.findOne(999)).rejects.toMatchObject({
@@ -155,7 +155,7 @@ describe('UserProxyService', () => {
 
     it('maps unreachable user service to a 502', async () => {
       httpService.get.mockReturnValue(
-        throwError(() => ({ isAxiosError: true })) as never,
+        throwError(() => ({ isAxiosError: true })),
       );
 
       await expect(service.findAll()).rejects.toMatchObject({
@@ -168,7 +168,7 @@ describe('UserProxyService', () => {
         throwError(() => ({
           isAxiosError: true,
           response: { status: HttpStatus.INTERNAL_SERVER_ERROR, data: {} },
-        })) as never,
+        })),
       );
 
       await expect(service.findAll()).rejects.toMatchObject({
@@ -185,7 +185,7 @@ describe('UserProxyService', () => {
             status: HttpStatus.BAD_REQUEST,
             data: { message: ['email must be a valid email'] },
           },
-        })) as never,
+        })),
       );
 
       const error = (await service
@@ -196,7 +196,7 @@ describe('UserProxyService', () => {
           phoneNumber: '0987654321',
           password: 'good_user@123',
         })
-        .catch((e) => e)) as HttpException;
+        .catch((e: unknown) => e)) as HttpException;
 
       expect(error.getStatus()).toBe(HttpStatus.BAD_REQUEST);
       expect(error.getResponse()).toEqual({
@@ -205,11 +205,11 @@ describe('UserProxyService', () => {
     });
 
     it('maps unexpected errors to a 500', async () => {
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('boom')) as never,
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('boom')));
 
-      const error = (await service.findAll().catch((e) => e)) as HttpException;
+      const error = (await service
+        .findAll()
+        .catch((e: unknown) => e)) as HttpException;
 
       expect(error).toBeInstanceOf(HttpException);
       expect(error.getStatus()).toBe(HttpStatus.INTERNAL_SERVER_ERROR);

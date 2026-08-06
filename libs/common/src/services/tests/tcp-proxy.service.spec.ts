@@ -47,7 +47,8 @@ describe('TCPProxyService', () => {
   });
 
   it('rejects a status the subclass does not accept and falls back to 502', () => {
-    const service = new TestTcpProxyService((status) => status === HttpStatus.NOT_FOUND);
+    const notFound: number = HttpStatus.NOT_FOUND;
+    const service = new TestTcpProxyService((status) => status === notFound);
 
     const result = service.call({
       status: HttpStatus.INTERNAL_SERVER_ERROR,

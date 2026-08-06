@@ -49,5 +49,4 @@ import { ProductEntity } from './product.entity';
     },
   ],
 })
-
 export class ProductModule {}

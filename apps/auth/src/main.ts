@@ -18,7 +18,7 @@ async function bootstrap() {
       bufferLogs: true,
     },
   );
-  
+
   app.useLogger(app.get(Logger));
 
   await app.listen();

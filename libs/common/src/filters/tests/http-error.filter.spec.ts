@@ -1,11 +1,30 @@
-import { ArgumentsHost, ConflictException, HttpStatus, NotFoundException } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  ConflictException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
 import { HttpErrorFilter } from '../http-error.filter';
+
+interface ErrorResponseBody {
+  statusCode: number;
+  message: string | string[];
+  timestamp: string;
+  path: string;
+}
+
+// expect.any(String) is typed `any` by @types/jest; assigning it to a
+// `string`-typed const here (rather than inline in each object literal)
+// keeps it out of the no-unsafe-assignment/no-unnecessary-type-assertion
+// tug-of-war that fires when it's used directly as an ErrorResponseBody
+// property value.
+const ANY_ISO_STRING = expect.any(String) as unknown as string;
 
 describe('HttpErrorFilter', () => {
   const filter = new HttpErrorFilter();
 
   const createMockHost = (url: string) => {
-    const json = jest.fn();
+    const json = jest.fn<void, [ErrorResponseBody]>();
     const status = jest.fn().mockReturnValue({ json });
     const response = { status };
     const request = { url };
@@ -29,7 +48,7 @@ describe('HttpErrorFilter', () => {
     expect(json).toHaveBeenCalledWith({
       statusCode: HttpStatus.NOT_FOUND,
       message: 'User with ID 1 not found',
-      timestamp: expect.any(String),
+      timestamp: ANY_ISO_STRING,
       path: '/users/1',
     });
   });
@@ -46,13 +65,13 @@ describe('HttpErrorFilter', () => {
     expect(json).toHaveBeenCalledWith({
       statusCode: HttpStatus.CONFLICT,
       message: 'Email vion@gmail.com is already registered',
-      timestamp: expect.any(String),
+      timestamp: ANY_ISO_STRING,
       path: '/users',
     });
   });
 
   it('extracts the message array from a ValidationPipe-style response body', () => {
-    const { host, status, json } = createMockHost('/products');
+    const { host, json } = createMockHost('/products');
 
     filter.catch(
       new (class extends NotFoundException {
@@ -70,7 +89,7 @@ describe('HttpErrorFilter', () => {
     expect(json).toHaveBeenCalledWith({
       statusCode: HttpStatus.NOT_FOUND,
       message: ['name should not be empty', 'price must be a number'],
-      timestamp: expect.any(String),
+      timestamp: ANY_ISO_STRING,
       path: '/products',
     });
   });
@@ -91,7 +110,7 @@ describe('HttpErrorFilter', () => {
     expect(json).toHaveBeenCalledWith({
       statusCode: HttpStatus.NOT_FOUND,
       message: 'Internal server error',
-      timestamp: expect.any(String),
+      timestamp: ANY_ISO_STRING,
       path: '/orders',
     });
   });

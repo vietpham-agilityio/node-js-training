@@ -80,7 +80,11 @@ export class ProxyController {
   }
 
   @ApiOperation({ summary: 'Update an existing order' })
-  @ApiParam({ name: 'id', description: 'ID of the order to update', example: 1 })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the order to update',
+    example: 1,
+  })
   @ApiBody({ type: UpdateOrderDTO })
   @ApiOkResponse({ description: 'Order updated successfully', type: Order })
   @Patch(':id')
@@ -97,7 +101,11 @@ export class ProxyController {
   }
 
   @ApiOperation({ summary: 'Delete an order' })
-  @ApiParam({ name: 'id', description: 'ID of the order to delete', example: 1 })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the order to delete',
+    example: 1,
+  })
   @ApiOkResponse({ description: 'Order deleted successfully', type: Order })
   @Delete(':id')
   removeOrder(

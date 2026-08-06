@@ -31,7 +31,7 @@ describe('InventoryProxyService', () => {
   describe('updateStock', () => {
     it('sends the update-stock message and returns the response', async () => {
       inventoryClient.send.mockReturnValue(
-        of({ id: 1, name: 'Laptop', quantity: 25 }) as never,
+        of({ id: 1, name: 'Laptop', quantity: 25 }),
       );
 
       const result = await service.updateStock(1, 25);
@@ -48,7 +48,7 @@ describe('InventoryProxyService', () => {
         throwError(() => ({
           status: HttpStatus.NOT_FOUND,
           message: 'Product 999 not found in inventory',
-        })) as never,
+        })),
       );
 
       await expect(service.updateStock(999, 10)).rejects.toMatchObject({
@@ -58,9 +58,7 @@ describe('InventoryProxyService', () => {
     });
 
     it('maps an unrecognized error into a 502', async () => {
-      inventoryClient.send.mockReturnValue(
-        throwError(() => new Error('boom')) as never,
-      );
+      inventoryClient.send.mockReturnValue(throwError(() => new Error('boom')));
 
       await expect(service.updateStock(1, 10)).rejects.toMatchObject({
         status: HttpStatus.BAD_GATEWAY,
@@ -69,7 +67,7 @@ describe('InventoryProxyService', () => {
 
     it('maps a connection-refused error (empty message) into a 502 with a meaningful message', async () => {
       inventoryClient.send.mockReturnValue(
-        throwError(() => ({ code: 'ECONNREFUSED', message: '' })) as never,
+        throwError(() => ({ code: 'ECONNREFUSED', message: '' })),
       );
 
       await expect(service.updateStock(1, 10)).rejects.toMatchObject({
@@ -83,7 +81,7 @@ describe('InventoryProxyService', () => {
         throwError(() => ({
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           message: 'inventory db exploded',
-        })) as never,
+        })),
       );
 
       await expect(service.updateStock(1, 10)).rejects.toMatchObject({

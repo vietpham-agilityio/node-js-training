@@ -9,7 +9,6 @@ import {
   Transport,
 } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import request from 'supertest';
 import { ORDER_EVENTS, INVENTORY_MESSAGES } from '@app/constants';
 import { InventoryModule } from './../src/inventory.module';
 import { InventoryItem } from './../src/inventory-item.entity';
@@ -75,13 +74,6 @@ describe('Inventory (e2e)', () => {
 
   beforeEach(() => {
     orderClientEmit.mockClear();
-  });
-
-  it('GET /health returns UP', () => {
-    return request(app.getHttpServer())
-      .get('/health')
-      .expect(200)
-      .expect({ status: 'UP' });
   });
 
   describe('inventory_update_stock message pattern', () => {

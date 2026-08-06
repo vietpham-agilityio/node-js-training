@@ -1,4 +1,8 @@
-import { ConflictException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { RpcErrorFilter } from '../rpc-error.filter';
@@ -7,7 +11,7 @@ describe('RpcErrorFilter', () => {
   const filter = new RpcErrorFilter();
 
   async function catchAndReject(exception: unknown) {
-    return firstValueFrom(filter.catch(exception, {} as never)).catch(
+    return firstValueFrom(filter.catch(exception, {})).catch(
       (err: unknown) => err,
     );
   }

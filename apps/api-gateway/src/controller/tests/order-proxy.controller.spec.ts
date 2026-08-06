@@ -97,7 +97,11 @@ describe('ProxyController', () => {
     const result = await controller.updateOrder(5, { quantity: 2 });
 
     expect(result).toEqual(mockOrder);
-    expect(service.updateOrder).toHaveBeenCalledWith(5, { quantity: 2 }, undefined);
+    expect(service.updateOrder).toHaveBeenCalledWith(
+      5,
+      { quantity: 2 },
+      undefined,
+    );
   });
 
   it('removeOrder delegates with the parsed numeric id', async () => {

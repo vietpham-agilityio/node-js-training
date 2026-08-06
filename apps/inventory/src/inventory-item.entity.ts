@@ -15,4 +15,3 @@ export class InventoryItem implements InventoryItemShape {
   @Column({ type: 'int', default: 0 })
   quantity!: number;
 }
-

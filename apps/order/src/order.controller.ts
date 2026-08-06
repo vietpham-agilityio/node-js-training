@@ -23,7 +23,7 @@ import { Order } from './order.entity';
 
 @Controller('orders')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) { }
+  constructor(private readonly orderService: OrderService) {}
 
   @EventPattern(ORDER_EVENTS.ORDER_PROCESSED)
   handleOrderCreated(data: OrderProcessedPayload) {

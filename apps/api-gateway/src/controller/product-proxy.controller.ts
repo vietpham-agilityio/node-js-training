@@ -50,7 +50,7 @@ import { ProductEntity } from 'apps/product/src/product.entity';
 })
 @Controller('products')
 export class ProductProxyController {
-  constructor(private readonly productProxyService: ProductProxyService) { }
+  constructor(private readonly productProxyService: ProductProxyService) {}
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(USER_ROLE.ADMIN)

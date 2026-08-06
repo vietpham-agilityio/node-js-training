@@ -13,11 +13,10 @@ import { LoggerModule } from 'nestjs-pino';
         transport:
           process.env.NODE_ENV === 'production'
             ? undefined
-            : { target: 'pino-pretty', options: { singleLine: true }},
+            : { target: 'pino-pretty', options: { singleLine: true } },
       },
     }),
   ],
   exports: [LoggerModule],
 })
-
 export class AppLoggerModule {}

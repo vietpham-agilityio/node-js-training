@@ -59,13 +59,13 @@ export abstract class HttpProxyService extends ProxyService {
 
   protected extractKnownError(error: unknown): KnownProxyError | undefined {
     const response = this.asAxiosError(error)?.response;
-   
+
     if (!response) {
       return undefined;
     }
 
     const { status, data } = response;
-    
+
     const message =
       typeof data === 'object' && data !== null && 'message' in data
         ? (data as { message: string | string[] }).message
@@ -92,7 +92,7 @@ export abstract class HttpProxyService extends ProxyService {
     return typeof error === 'object' &&
       error !== null &&
       (error as AxiosLikeError).isAxiosError
-      ? (error as AxiosLikeError)
+      ? error
       : undefined;
   }
 }

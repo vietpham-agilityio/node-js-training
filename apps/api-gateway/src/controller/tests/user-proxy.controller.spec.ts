@@ -46,7 +46,10 @@ describe('UserProxyController', () => {
 
     await controller.findAll('Bearer abc.def.ghi');
 
-    expect(service.findAll).toHaveBeenCalledWith('Bearer abc.def.ghi', undefined);
+    expect(service.findAll).toHaveBeenCalledWith(
+      'Bearer abc.def.ghi',
+      undefined,
+    );
   });
 
   it('findById delegates to the proxy service with the parsed id', async () => {
@@ -80,7 +83,11 @@ describe('UserProxyController', () => {
     const result = await controller.update(5, { firstName: 'New' });
 
     expect(result).toEqual({ id: 5, firstName: 'New' });
-    expect(service.update).toHaveBeenCalledWith(5, { firstName: 'New' }, undefined);
+    expect(service.update).toHaveBeenCalledWith(
+      5,
+      { firstName: 'New' },
+      undefined,
+    );
   });
 
   it('remove delegates to the proxy service with the parsed id', async () => {

@@ -25,7 +25,9 @@ import { UserEntity } from './user.entity';
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
       database:
-        process.env.NODE_ENV === 'test' ? ':memory:' : './database/user-db.sqlite',
+        process.env.NODE_ENV === 'test'
+          ? ':memory:'
+          : './database/user-db.sqlite',
       entities: [UserEntity],
       synchronize: true,
     }),
@@ -47,4 +49,4 @@ import { UserEntity } from './user.entity';
     },
   ],
 })
-export class UserModule { }
+export class UserModule {}

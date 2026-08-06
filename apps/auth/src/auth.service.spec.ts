@@ -34,17 +34,20 @@ describe('AuthService', () => {
   describe('login', () => {
     it('validates credentials via TCP and signs a token with sub/email/role', async () => {
       userClient.send.mockReturnValue(
-        of({ id: 1, email: 'user@example.com', role: USER_ROLE.USER }) as never,
+        of({ id: 1, email: 'user@example.com', role: USER_ROLE.USER }),
       );
-      jwtService.signAsync.mockResolvedValue('signed-token' as never);
+      jwtService.signAsync.mockResolvedValue('signed-token');
 
       const result = await service.login('user@example.com', 'Good_user@123');
 
       expect(result).toEqual({ accessToken: 'signed-token' });
-      expect(userClient.send).toHaveBeenCalledWith('user_validate_credentials', {
-        email: 'user@example.com',
-        password: 'Good_user@123',
-      });
+      expect(userClient.send).toHaveBeenCalledWith(
+        'user_validate_credentials',
+        {
+          email: 'user@example.com',
+          password: 'Good_user@123',
+        },
+      );
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         sub: 1,
         email: 'user@example.com',
@@ -56,9 +59,13 @@ describe('AuthService', () => {
   describe('register', () => {
     it('creates the user via TCP forcing role to USER, then signs a token', async () => {
       userClient.send.mockReturnValue(
-        of({ id: 2, email: 'jimmy@example.com', role: USER_ROLE.USER }) as never,
+        of({
+          id: 2,
+          email: 'jimmy@example.com',
+          role: USER_ROLE.USER,
+        }),
       );
-      jwtService.signAsync.mockResolvedValue('signed-token' as never);
+      jwtService.signAsync.mockResolvedValue('signed-token');
 
       const payload = {
         firstName: 'Jimmy',

@@ -8,6 +8,12 @@ import { CreateUserDTO } from './user.dto';
 import { UserEntity } from './user.entity';
 import { USER_ROLE } from '@app/constants';
 
+interface QueryBuilderMock {
+  addSelect: jest.Mock<QueryBuilderMock, []>;
+  where: jest.Mock<QueryBuilderMock, [string, { email: string }]>;
+  getOne: jest.Mock<Promise<UserEntity | undefined>, []>;
+}
+
 describe('UsersService', () => {
   const newUser: CreateUserDTO = {
     firstName: 'Kitoko',
@@ -48,11 +54,11 @@ describe('UsersService', () => {
   let service: UserService;
   let users: UserEntity[];
   let mockRepository: {
-    create: jest.Mock;
-    save: jest.Mock;
-    find: jest.Mock;
-    findOneBy: jest.Mock;
-    createQueryBuilder: jest.Mock;
+    create: jest.Mock<UserEntity, [CreateUserDTO]>;
+    save: jest.Mock<Promise<UserEntity>, [UserEntity]>;
+    find: jest.Mock<Promise<UserEntity[]>, []>;
+    findOneBy: jest.Mock<Promise<UserEntity | undefined>, [{ email: string }]>;
+    createQueryBuilder: jest.Mock<QueryBuilderMock, []>;
   };
 
   beforeEach(async () => {
@@ -76,7 +82,7 @@ describe('UsersService', () => {
       ),
       createQueryBuilder: jest.fn(() => {
         let emailFilter: string | undefined;
-        const builder = {
+        const builder: QueryBuilderMock = {
           addSelect: jest.fn(() => builder),
           where: jest.fn((_clause: string, params: { email: string }) => {
             emailFilter = params.email;
@@ -96,7 +102,12 @@ describe('UsersService', () => {
         { provide: getRepositoryToken(UserEntity), useValue: mockRepository },
         {
           provide: CACHE_MANAGER,
-          useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn(), mdel: jest.fn() },
+          useValue: {
+            get: jest.fn(),
+            set: jest.fn(),
+            del: jest.fn(),
+            mdel: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -128,7 +139,7 @@ describe('UsersService', () => {
     const user = await service.create(newUser);
     expect(user.password).toBeUndefined();
 
-    const persisted = mockRepository.save.mock.calls[0][0] as UserEntity;
+    const persisted = mockRepository.save.mock.calls[0][0];
     expect(persisted.password).not.toBe(newUser.password);
     await expect(
       bcrypt.compare(newUser.password, persisted.password),

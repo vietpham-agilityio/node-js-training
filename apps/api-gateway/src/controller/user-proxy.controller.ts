@@ -44,7 +44,7 @@ import { UserEntity } from 'apps/user/src/user.entity';
 @ApiTags('Users')
 @Controller('users')
 export class UserProxyController {
-  constructor(private readonly userProxyService: UserProxyService) { }
+  constructor(private readonly userProxyService: UserProxyService) {}
 
   @ApiOperation({ summary: 'Get all users (v1)' })
   @ApiBearerAuth()
@@ -69,7 +69,10 @@ export class UserProxyController {
   @ApiOperation({ summary: 'Get a user by id' })
   @ApiBearerAuth()
   @ApiParam({ name: 'id', description: 'ID of the user to fetch', example: 1 })
-  @ApiOkResponse({ description: 'User returned successfully', type: UserEntity })
+  @ApiOkResponse({
+    description: 'User returned successfully',
+    type: UserEntity,
+  })
   @ApiUnauthorizedResponse({
     description: 'Missing or invalid authentication token',
   })
