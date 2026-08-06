@@ -1,5 +1,6 @@
 import { IsString, IsNotEmpty, IsInt, IsPositive, Min } from 'class-validator';
 
+// Docs
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 export class CreateOrderDTO {

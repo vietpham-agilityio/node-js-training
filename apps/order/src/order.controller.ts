@@ -10,12 +10,16 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { EventPattern } from '@nestjs/microservices';
+
+// Libs
+import { ORDER_EVENTS, type OrderProcessedPayload } from '@app/constants';
+import { AuthGuard } from '@app/common';
+
+// Module
 import { OrderService } from './order.service';
 import { CreateOrderDTO, UpdateOrderDTO } from './order.dto';
 import { Order } from './order.entity';
-import { EventPattern } from '@nestjs/microservices';
-import { ORDER_EVENTS, type OrderProcessedPayload } from '@app/constants';
-import { AuthGuard } from '@app/common';
 
 @Controller('orders')
 export class OrderController {

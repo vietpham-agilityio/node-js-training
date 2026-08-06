@@ -1,14 +1,20 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+
+// ORM
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Order } from './order.entity';
-import { CreateOrderDTO, UpdateOrderDTO } from './order.dto';
+
+// Libs
 import {
   ORDER_EVENTS,
   OrderStatus,
   type OrderProcessedPayload,
 } from '@app/constants';
+
+// Module
+import { Order } from './order.entity';
+import { CreateOrderDTO, UpdateOrderDTO } from './order.dto';
 
 @Injectable()
 export class OrderService {

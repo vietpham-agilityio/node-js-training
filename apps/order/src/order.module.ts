@@ -1,11 +1,17 @@
 import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { JwtModule } from '@nestjs/jwt';
+
+// ORM
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+// Libs
+import { decodeBase64Key, AppLoggerModule } from '@app/common';
+
+// Module
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
 import { Order } from './order.entity';
-import { decodeBase64Key, AppLoggerModule } from '@app/common';
 
 @Module({
   imports: [

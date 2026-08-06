@@ -14,11 +14,15 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
+// Docs
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+
 // Cache
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 
-// Docs
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+// Libs
+import { AuthGuard, RolesGuard, Roles } from '@app/common';
+import { USER_ROLE } from '@app/constants';
 
 // Module
 import {
@@ -28,12 +32,6 @@ import {
 } from './product.service';
 import { CreateProductDTO, UpdateProductDTO } from './product.dto';
 import { ProductEntity } from './product.entity';
-
-// Extension
-import { AuthGuard, RolesGuard, Roles } from '@app/common';
-
-// Constant
-import { USER_ROLE } from '@app/constants';
 
 @ApiTags('Products')
 @Controller('products')

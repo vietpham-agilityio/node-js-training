@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { ProductController } from './product.controller';
-import { ProductService } from './product.service';
-import { ProductEntity } from './product.entity';
+import { JwtModule } from '@nestjs/jwt';
+
+// ORM
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+// Libs
 import {
   AppLoggerModule,
   AppCacheModule,
@@ -12,6 +13,11 @@ import {
   HttpErrorFilter,
   decodeBase64Key,
 } from '@app/common';
+
+// Module
+import { ProductController } from './product.controller';
+import { ProductService } from './product.service';
+import { ProductEntity } from './product.entity';
 
 @Module({
   imports: [
@@ -48,4 +54,5 @@ import {
     },
   ],
 })
+
 export class ProductModule {}

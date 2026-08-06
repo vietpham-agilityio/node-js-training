@@ -1,3 +1,7 @@
+// Docs
+import { ApiProperty } from '@nestjs/swagger';
+
+// ORM
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,7 +9,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('products')
 export class ProductEntity {

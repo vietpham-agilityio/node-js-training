@@ -1,9 +1,13 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
-import { OrderModule } from './order.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { applySecurityHeaders } from '@app/common';
 import { Logger } from 'nestjs-pino';
+
+// Libs
+import { applySecurityHeaders } from '@app/common';
+
+// Module
+import { OrderModule } from './order.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(OrderModule, { bufferLogs: true });

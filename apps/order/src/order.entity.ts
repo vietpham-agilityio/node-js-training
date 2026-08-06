@@ -1,3 +1,7 @@
+// Docs
+import { ApiProperty } from '@nestjs/swagger';
+
+// ORM
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,7 +9,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
+
+// Libs
 import { OrderStatus, Order as OrderShape } from '@app/constants';
 
 @Entity('orders')

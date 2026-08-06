@@ -7,6 +7,7 @@ import {
   Min,
 } from 'class-validator';
 
+// Docs
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 export class CreateProductDTO {

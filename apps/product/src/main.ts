@@ -1,11 +1,19 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
-import { ProductModule } from './product.module';
 import { VersioningType } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { VersionManagementMiddleware, applySecurityHeaders } from '@app/common';
-import { NextFunction, Request, Response } from 'express';
 import { Logger } from 'nestjs-pino';
+
+// Docs
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
+// Extensions
+import { NextFunction, Request, Response } from 'express';
+
+// Libs
+import { VersionManagementMiddleware, applySecurityHeaders } from '@app/common';
+
+// Module
+import { ProductModule } from './product.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(ProductModule, { bufferLogs: true });
@@ -19,6 +27,7 @@ async function bootstrap() {
   });
 
   const versionMiddleware = new VersionManagementMiddleware();
+
   app.use((req: Request, res: Response, next: NextFunction) =>
     versionMiddleware.use(req, res, next),
   );
