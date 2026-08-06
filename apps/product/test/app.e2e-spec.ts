@@ -7,12 +7,6 @@ import { VersionManagementMiddleware, decodeBase64Key } from '@app/common';
 import { USER_ROLE } from '@app/constants';
 import { Request, Response, NextFunction } from 'express';
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-}
-
 interface ProductResponse {
   id: number;
   name: string;
@@ -74,14 +68,14 @@ describe('ProductModule (e2e)', () => {
         .send(newProduct)
         .expect(201);
 
-      const body = res.body as ApiResponse<ProductResponse>;
+      const body = res.body as ProductResponse;
 
-      expect(body.data).toMatchObject({
+      expect(body).toMatchObject({
         name: 'Sony Camera',
         description: 'Modern camera in future',
         quantity: 10,
       });
-      expect(body.data.id).toBeDefined();
+      expect(body.id).toBeDefined();
     });
 
     it('GET /v1/products - returns the created products', async () => {
@@ -90,10 +84,10 @@ describe('ProductModule (e2e)', () => {
         .set('Authorization', `Bearer ${bearerToken}`)
         .expect(200);
 
-      const body = res.body as ApiResponse<ProductResponse[]>;
+      const body = res.body as ProductResponse[];
 
-      expect(Array.isArray(body.data)).toBe(true);
-      expect(body.data.length).toBeGreaterThan(0);
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBeGreaterThan(0);
     });
 
     it('GET /v1/products/:id - returns 404 for unknown product', () => {

@@ -7,12 +7,6 @@ import { VersionManagementMiddleware, decodeBase64Key } from '@app/common';
 import { USER_ROLE } from '@app/constants';
 import { Request, Response, NextFunction } from 'express';
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-}
-
 interface UserResponse {
   id: number;
   firstName: string;
@@ -80,15 +74,15 @@ describe('UserModule (e2e)', () => {
         .send(newUser)
         .expect(201);
 
-      const body = res.body as ApiResponse<UserResponse>;
+      const body = res.body as UserResponse;
 
-      expect(body.data).toMatchObject({
+      expect(body).toMatchObject({
         firstName: 'Kaito',
         lastName: 'Kid',
         phoneNumber: '0897278983',
         address: '1234, Lubumbashi, DRC',
       });
-      expect(body.data.id).toBeDefined();
+      expect(body.id).toBeDefined();
     });
 
     it('GET /v1/users - returns the created users', async () => {
@@ -97,10 +91,10 @@ describe('UserModule (e2e)', () => {
         .set('Authorization', `Bearer ${bearerToken}`)
         .expect(200);
 
-      const body = res.body as ApiResponse<UserResponse[]>;
+      const body = res.body as UserResponse[];
 
-      expect(Array.isArray(body.data)).toBe(true);
-      expect(body.data.length).toBeGreaterThan(0);
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBeGreaterThan(0);
     });
 
     it('GET /v1/users/:id - returns 404 for unknown user', () => {

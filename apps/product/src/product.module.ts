@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 
 // ORM
@@ -9,7 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   AppLoggerModule,
   AppCacheModule,
-  ResponseLoggingInterceptor,
   HttpErrorFilter,
   decodeBase64Key,
 } from '@app/common';
@@ -44,10 +43,6 @@ import { ProductEntity } from './product.entity';
   controllers: [ProductController],
   providers: [
     ProductService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ResponseLoggingInterceptor,
-    },
     {
       provide: APP_FILTER,
       useClass: HttpErrorFilter,
