@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'feat/*'
+  pull_request:
+    branches:
+      - 'feat/*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: '10.3.0'
+  NODE_VERSION: '22'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ESLint
+        run: pnpm exec eslint "{src,apps,libs,test}/**/*.ts"
+
+  build:
+    name: Build (verify packaging)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build every app (nest-cli.json projects)
+        run: pnpm exec nest build --all
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate ephemeral RS256 keypair for JWT-signing tests
+        run: node -e "const c=require('crypto');const{publicKey,privateKey}=c.generateKeyPairSync('rsa',{modulusLength:2048,publicKeyEncoding:{type:'spki',format:'pem'},privateKeyEncoding:{type:'pkcs8',format:'pem'}});console.log('JWT_PRIVATE_KEY_BASE64='+Buffer.from(privateKey).toString('base64'));console.log('JWT_PUBLIC_KEY_BASE64='+Buffer.from(publicKey).toString('base64'));" >> "$GITHUB_ENV"
+
+      - name: Unit tests
+        run: pnpm run test:unit
+
+      - name: Order e2e tests
+        run: pnpm run test:e2e:order
+
+      - name: User e2e tests
+        run: pnpm run test:e2e:user
+
+      - name: Product e2e tests
+        run: pnpm run test:e2e:product
+
+      - name: Inventory e2e tests
+        run: pnpm run test:e2e:inventory
