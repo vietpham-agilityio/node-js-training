@@ -1,9 +1,15 @@
-import { ORDER_EVENTS } from '@app/constants';
 import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { Order } from '@app/constants';
+
+// ORM
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+// Libs
+import { ORDER_EVENTS } from '@app/constants';
+import { Order } from '@app/constants';
+
+// Module
 import { InventoryItem } from './inventory-item.entity';
 
 const SEED_ITEMS = [

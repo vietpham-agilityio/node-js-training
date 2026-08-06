@@ -1,4 +1,7 @@
+// ORM
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+// Libs
 import { InventoryItemShape } from '@app/constants';
 
 @Entity('inventory_items')

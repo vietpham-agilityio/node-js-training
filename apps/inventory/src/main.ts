@@ -1,7 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { InventoryModule } from './inventory.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { Logger } from 'nestjs-pino';
+
+// Module
+import { InventoryModule } from './inventory.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(

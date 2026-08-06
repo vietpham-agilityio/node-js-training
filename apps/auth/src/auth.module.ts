@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+
+// Libs
 import { decodeBase64Key, AppLoggerModule } from '@app/common';
+
+// Module
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 

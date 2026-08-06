@@ -1,11 +1,15 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
+
+// Libs
 import { RpcErrorFilter } from '@app/common';
 import {
   AUTH_MESSAGES,
   type LoginPayload,
   type RegisterPayload,
 } from '@app/constants';
+
+// Module
 import { AuthService } from './auth.service';
 
 @Controller()

@@ -1,10 +1,16 @@
 import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+
+// ORM
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+// Libs
+import { AppLoggerModule } from '@app/common';
+
+// Module
 import { InventoryController } from './inventory.controller';
 import { InventoryService } from './inventory.service';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { InventoryItem } from './inventory-item.entity';
-import { AppLoggerModule } from '@app/common';
 
 @Module({
   imports: [

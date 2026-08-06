@@ -7,6 +7,8 @@ import {
   MinLength,
   IsStrongPassword,
 } from 'class-validator';
+
+// Docs
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class LoginDTO {

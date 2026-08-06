@@ -1,6 +1,7 @@
-import { Controller, Get, UseFilters } from '@nestjs/common';
-import { InventoryService } from './inventory.service';
+import { Controller, UseFilters } from '@nestjs/common';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
+
+// Libs
 import { RpcErrorFilter } from '@app/common';
 import {
   type Order,
@@ -8,6 +9,9 @@ import {
   INVENTORY_MESSAGES,
   type UpdateStockPayload,
 } from '@app/constants';
+
+// Module
+import { InventoryService } from './inventory.service';
 
 @Controller()
 export class InventoryController {
