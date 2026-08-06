@@ -7,10 +7,9 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { AuthGuard, RolesGuard, Roles } from '@app/common';
-import { USER_ROLE } from '@app/constants';
-import { InventoryProxyService } from '../services';
 import { IsInt, Min } from 'class-validator';
+
+// Docs
 import {
   ApiTags,
   ApiOperation,
@@ -21,6 +20,13 @@ import {
   ApiParam,
   ApiProperty,
 } from '@nestjs/swagger';
+
+// Libs
+import { AuthGuard, RolesGuard, Roles } from '@app/common';
+import { USER_ROLE } from '@app/constants';
+
+// Module
+import { InventoryProxyService } from '../services';
 
 export class UpdateStockDTO {
   @ApiProperty({

@@ -14,7 +14,8 @@ import {
   Headers,
   Res,
 } from '@nestjs/common';
-import type { Response } from 'express';
+
+// Docs
 import {
   ApiTags,
   ApiOperation,
@@ -26,14 +27,21 @@ import {
   ApiUnauthorizedResponse,
   ApiParam,
 } from '@nestjs/swagger';
+
+// Extensions
+import type { Response } from 'express';
+
+// Libs
+import { AuthGuard, RolesGuard, Roles } from '@app/common';
+import { USER_ROLE } from '@app/constants';
+
+// Module
 import { ProductProxyService } from '../services/product-proxy.service';
 import {
   CreateProductDTO,
   UpdateProductDTO,
 } from 'apps/product/src/product.dto';
 import { ProductEntity } from 'apps/product/src/product.entity';
-import { AuthGuard, RolesGuard, Roles } from '@app/common';
-import { USER_ROLE } from '@app/constants';
 
 @ApiTags('Products')
 @ApiBearerAuth()

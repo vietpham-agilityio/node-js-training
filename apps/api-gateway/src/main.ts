@@ -1,15 +1,23 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { VersioningType } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
+
+// Docs
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
+// Extensions
+import { NextFunction, Request, Response } from 'express';
+
+// Libs
 import {
   VersionManagementMiddleware,
   applySecurityHeaders,
   loadHttpsOptions,
 } from '@app/common';
-import { NextFunction, Request, Response } from 'express';
-import { Logger } from 'nestjs-pino';
+
+// Module
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const httpsOptions = loadHttpsOptions();

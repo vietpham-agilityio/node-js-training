@@ -15,10 +15,8 @@ import {
   Headers,
   Res,
 } from '@nestjs/common';
-import type { Response } from 'express';
-import { UserProxyService } from '../services';
-import { AuthGuard, RolesGuard, Roles } from '@app/common';
-import { USER_ROLE } from '@app/constants';
+
+// Docs
 import {
   ApiTags,
   ApiOperation,
@@ -30,6 +28,16 @@ import {
   ApiUnauthorizedResponse,
   ApiParam,
 } from '@nestjs/swagger';
+
+// Extensions
+import type { Response } from 'express';
+
+// Libs
+import { AuthGuard, RolesGuard, Roles } from '@app/common';
+import { USER_ROLE } from '@app/constants';
+
+// Module
+import { UserProxyService } from '../services';
 import { CreateUserDTO, UpdateUserDTO } from 'apps/user/src/user.dto';
 import { UserEntity } from 'apps/user/src/user.entity';
 

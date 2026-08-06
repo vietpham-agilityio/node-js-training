@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+
+// Extensions
 import type { Response } from 'express';
 
-// Common
+// Libs
 import { HttpProxyService } from '@app/common';
-
-// Constants
 import { USER_BASE_URL, API_ENDPOINT } from '@app/constants/shared/router/route';
-import { CreateUserDTO, UpdateUserDTO } from 'apps/user/src/user.dto';
 
-// Entities
+// Module
+import { CreateUserDTO, UpdateUserDTO } from 'apps/user/src/user.dto';
 import { UserEntity } from 'apps/user/src/user.entity';
 
 @Injectable()

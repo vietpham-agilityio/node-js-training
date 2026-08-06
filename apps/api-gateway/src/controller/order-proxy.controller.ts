@@ -10,6 +10,8 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+
+// Docs
 import {
   ApiTags,
   ApiOperation,
@@ -20,10 +22,14 @@ import {
   ApiUnauthorizedResponse,
   ApiParam,
 } from '@nestjs/swagger';
+
+// Libs
+import { AuthGuard } from '@app/common';
+
+// Module
 import { OrderProxyService } from '../services';
 import { CreateOrderDTO, UpdateOrderDTO } from 'apps/order/src/order.dto';
 import { Order } from 'apps/order/src/order.entity';
-import { AuthGuard } from '@app/common';
 
 @ApiTags('Orders')
 @ApiBearerAuth()

@@ -1,4 +1,3 @@
-// Libs
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
@@ -6,7 +5,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 
-// Controller
+// Libs
+import {
+  ResponseLoggingInterceptor,
+  HttpErrorFilter,
+  AppLoggerModule,
+  decodeBase64Key,
+} from '@app/common';
+
+// Module
 import {
   ProxyController,
   HealthController,
@@ -15,16 +22,6 @@ import {
   UserProxyController,
   AuthProxyController,
 } from './controller';
-
-// Extensions
-import {
-  ResponseLoggingInterceptor,
-  HttpErrorFilter,
-  AppLoggerModule,
-  decodeBase64Key,
-} from '@app/common';
-
-// Services
 import {
   InventoryProxyService,
   OrderProxyService,
@@ -32,7 +29,6 @@ import {
   UserProxyService,
   AuthProxyService,
 } from './services';
-
 
 @Module({
   imports: [
