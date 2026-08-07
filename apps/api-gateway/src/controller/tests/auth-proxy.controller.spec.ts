@@ -1,26 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { LazyModuleLoader } from '@nestjs/core';
 import { AuthProxyController } from '..';
-import { AuthProxyService } from '../../services';
 
 describe('AuthProxyController', () => {
   let controller: AuthProxyController;
-  let service: jest.Mocked<AuthProxyService>;
+  let mockAuthProxyService: { login: jest.Mock; register: jest.Mock };
+  let mockLazyModuleLoader: { load: jest.Mock };
 
   beforeEach(async () => {
-    const mockAuthProxyService = {
+    mockAuthProxyService = {
       login: jest.fn(),
       register: jest.fn(),
+    };
+
+    mockLazyModuleLoader = {
+      load: jest.fn().mockResolvedValue({
+        get: jest.fn().mockReturnValue(mockAuthProxyService),
+      }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthProxyController],
       providers: [
-        { provide: AuthProxyService, useValue: mockAuthProxyService },
+        { provide: LazyModuleLoader, useValue: mockLazyModuleLoader },
       ],
     }).compile();
 
     controller = module.get<AuthProxyController>(AuthProxyController);
-    service = module.get(AuthProxyService);
   });
 
   afterEach(() => {
@@ -28,7 +34,9 @@ describe('AuthProxyController', () => {
   });
 
   it('login delegates to the proxy service with email and password', async () => {
-    service.login.mockResolvedValue({ accessToken: 'signed-token' });
+    mockAuthProxyService.login.mockResolvedValue({
+      accessToken: 'signed-token',
+    });
 
     const result = await controller.login({
       email: 'user@example.com',
@@ -36,14 +44,16 @@ describe('AuthProxyController', () => {
     });
 
     expect(result).toEqual({ accessToken: 'signed-token' });
-    expect(service.login).toHaveBeenCalledWith(
+    expect(mockAuthProxyService.login).toHaveBeenCalledWith(
       'user@example.com',
       'Good_user@123',
     );
   });
 
   it('register delegates to the proxy service with the body', async () => {
-    service.register.mockResolvedValue({ accessToken: 'signed-token' });
+    mockAuthProxyService.register.mockResolvedValue({
+      accessToken: 'signed-token',
+    });
 
     const body = {
       firstName: 'Jimmy',
@@ -56,6 +66,17 @@ describe('AuthProxyController', () => {
     const result = await controller.register(body);
 
     expect(result).toEqual({ accessToken: 'signed-token' });
-    expect(service.register).toHaveBeenCalledWith(body);
+    expect(mockAuthProxyService.register).toHaveBeenCalledWith(body);
+  });
+
+  it('loads the lazy auth proxy module only once across multiple calls', async () => {
+    mockAuthProxyService.login.mockResolvedValue({
+      accessToken: 'signed-token',
+    });
+
+    await controller.login({ email: 'a@example.com', password: 'pw' });
+    await controller.login({ email: 'a@example.com', password: 'pw' });
+
+    expect(mockLazyModuleLoader.load).toHaveBeenCalledTimes(1);
   });
 });

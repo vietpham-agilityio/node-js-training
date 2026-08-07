@@ -7,6 +7,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { LazyModuleLoader } from '@nestjs/core';
 import { IsInt, Min } from 'class-validator';
 
 // Docs
@@ -27,6 +28,7 @@ import { USER_ROLE } from '@app/constants';
 
 // Module
 import { InventoryProxyService } from '../services';
+import { InventoryProxyModule } from '../modules';
 
 export class UpdateStockDTO {
   @ApiProperty({
@@ -52,7 +54,20 @@ export class InventoryItemResponseDTO {
 @ApiTags('Inventory')
 @Controller('inventory')
 export class InventoryProxyController {
-  constructor(private readonly inventoryProxyService: InventoryProxyService) {}
+  private inventoryProxyServicePromise?: Promise<InventoryProxyService>;
+
+  constructor(private readonly lazyModuleLoader: LazyModuleLoader) {}
+
+  private getInventoryProxyService(): Promise<InventoryProxyService> {
+    if (!this.inventoryProxyServicePromise) {
+      this.inventoryProxyServicePromise = this.lazyModuleLoader
+        .load(() => InventoryProxyModule)
+        .then((moduleRef) =>
+          moduleRef.get(InventoryProxyService, { strict: false }),
+        );
+    }
+    return this.inventoryProxyServicePromise;
+  }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(USER_ROLE.MERCHANT)
@@ -72,10 +87,11 @@ export class InventoryProxyController {
     description: 'Missing or invalid authentication token',
   })
   @Patch(':productId/stock')
-  updateStock(
+  async updateStock(
     @Param('productId', ParseIntPipe) productId: number,
     @Body(new ValidationPipe()) body: UpdateStockDTO,
   ) {
-    return this.inventoryProxyService.updateStock(productId, body.quantity);
+    const inventoryProxyService = await this.getInventoryProxyService();
+    return inventoryProxyService.updateStock(productId, body.quantity);
   }
 }

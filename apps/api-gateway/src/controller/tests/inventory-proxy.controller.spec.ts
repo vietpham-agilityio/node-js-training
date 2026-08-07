@@ -1,27 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
+import { LazyModuleLoader } from '@nestjs/core';
 import { InventoryProxyController } from '..';
-import { InventoryProxyService } from '../../services';
 
 describe('InventoryProxyController', () => {
   let controller: InventoryProxyController;
-  let service: jest.Mocked<InventoryProxyService>;
+  let mockInventoryProxyService: { updateStock: jest.Mock };
+  let mockLazyModuleLoader: { load: jest.Mock };
 
   beforeEach(async () => {
-    const mockInventoryProxyService = {
+    mockInventoryProxyService = {
       updateStock: jest.fn(),
+    };
+
+    mockLazyModuleLoader = {
+      load: jest.fn().mockResolvedValue({
+        get: jest.fn().mockReturnValue(mockInventoryProxyService),
+      }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [InventoryProxyController],
       providers: [
-        { provide: InventoryProxyService, useValue: mockInventoryProxyService },
+        { provide: LazyModuleLoader, useValue: mockLazyModuleLoader },
         { provide: JwtService, useValue: { verifyAsync: jest.fn() } },
       ],
     }).compile();
 
     controller = module.get<InventoryProxyController>(InventoryProxyController);
-    service = module.get(InventoryProxyService);
   });
 
   afterEach(() => {
@@ -29,7 +35,7 @@ describe('InventoryProxyController', () => {
   });
 
   it('updateStock delegates to the proxy service with the parsed id and quantity', async () => {
-    service.updateStock.mockResolvedValue({
+    mockInventoryProxyService.updateStock.mockResolvedValue({
       id: 1,
       name: 'Laptop',
       quantity: 25,
@@ -38,6 +44,19 @@ describe('InventoryProxyController', () => {
     const result = await controller.updateStock(1, { quantity: 25 });
 
     expect(result).toEqual({ id: 1, name: 'Laptop', quantity: 25 });
-    expect(service.updateStock).toHaveBeenCalledWith(1, 25);
+    expect(mockInventoryProxyService.updateStock).toHaveBeenCalledWith(1, 25);
+  });
+
+  it('loads the lazy inventory proxy module only once across multiple calls', async () => {
+    mockInventoryProxyService.updateStock.mockResolvedValue({
+      id: 1,
+      name: 'Laptop',
+      quantity: 25,
+    });
+
+    await controller.updateStock(1, { quantity: 25 });
+    await controller.updateStock(1, { quantity: 30 });
+
+    expect(mockLazyModuleLoader.load).toHaveBeenCalledTimes(1);
   });
 });

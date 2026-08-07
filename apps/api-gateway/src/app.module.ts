@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 
 // Libs
@@ -23,11 +22,9 @@ import {
   AuthProxyController,
 } from './controller';
 import {
-  InventoryProxyService,
   OrderProxyService,
   ProductProxyService,
   UserProxyService,
-  AuthProxyService,
 } from './services';
 
 @Module({
@@ -42,24 +39,6 @@ import {
         verifyOptions: { algorithms: ['RS256'] },
       }),
     }),
-    ClientsModule.register([
-      {
-        name: 'INVENTORY_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.INVENTORY_SERVICE_HOST,
-          port: 8002,
-        },
-      },
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: process.env.AUTH_SERVICE_HOST,
-          port: 8003,
-        },
-      },
-    ]),
   ],
   controllers: [
     ProxyController,
@@ -71,10 +50,8 @@ import {
   ],
   providers: [
     OrderProxyService,
-    InventoryProxyService,
     UserProxyService,
     ProductProxyService,
-    AuthProxyService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseLoggingInterceptor,
