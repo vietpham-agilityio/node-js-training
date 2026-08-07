@@ -1,98 +1,87 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# node-js-training
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS microservices practice project — a Nest CLI **monorepo** (not Nx), package manager **pnpm**. Six apps talk to each other over HTTP and TCP behind a single API gateway; see [`CLAUDE.md`](./CLAUDE.md) for the full architecture, conventions, and known gotchas, and [`docs/adr/`](./docs/adr/) for the design decisions behind them.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Architecture
 
-## Description
+```
+apps/
+  api-gateway/   HTTP app. Sole client-facing entry point — proxies to order/inventory/user/product/auth.
+  order/         HTTP + TCP microservice. TypeORM + SQLite.
+  inventory/     TCP-only microservice (no HTTP). TypeORM + SQLite.
+  user/          HTTP + TCP hybrid. TypeORM + SQLite, Swagger, URI versioning (v1/v2).
+  product/       HTTP app. TypeORM + SQLite, Swagger, URI versioning (v1/v2).
+  auth/          TCP-only microservice (no HTTP, no persistence). Issues/signs JWTs.
+libs/
+  common/        Cross-cutting primitives (filters, interceptors, guards, JWT/TLS/cache utils). @app/common
+  constants/     Shared event names + shared domain shapes. @app/constants
+```
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| App         | HTTP port | TCP port | Notes                                                     |
+|-------------|-----------|----------|------------------------------------------------------------|
+| api-gateway | 3002      | —        | `/orders*`, `/users*`, `/products*`, `/inventory/:id/stock`, `/auth/login`, `/auth/register`, `/health`; Swagger at `/api-docs` |
+| order       | 3001      | 8001     | create/list/update/delete orders                          |
+| inventory   | —         | 8002     | pure microservice, no HTTP                                 |
+| auth        | —         | 8003     | pure microservice, no HTTP, no persistence — signs/issues JWTs |
+| user        | 3003      | 8004     | Swagger at `/api-docs`; TCP side validates credentials + creates users for `auth` |
+| product     | 3004      | —        | Swagger at `/api-docs`                                     |
 
-## Project setup
+Key features covered by this practice repo: TCP/HTTP hybrid microservices, an event-driven order↔inventory flow, RS256 JWT auth with per-app local verification, role-based access control, Redis-backed response caching, TLS termination + helmet security headers at the gateway, structured Pino logging, and a Dockerized multi-service deployment.
+
+## Setup
 
 ```bash
 $ pnpm install
 ```
 
-## Compile and run the project
+Copy `.env.example` to `.env` at the repo root and fill in an RS256 keypair (keygen one-liner is in the file) — required by `auth`/`user`/`product`/`api-gateway`. `REDIS_URL` and the `TLS_*` cert paths are optional for local dev (caching/HTTPS both fall back cleanly when unset).
+
+To run the gateway over HTTPS locally, generate a self-signed cert into the gitignored `/certs` folder and point `TLS_KEY_PATH`/`TLS_CERT_PATH` at it:
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+$ mkdir certs
+$ openssl req -x509 -newkey rsa:2048 -nodes -keyout certs/key.pem -out certs/cert.pem -days 365 -subj "/CN=localhost"
 ```
 
-## Run tests
+## Running
+
+Nest CLI monorepo mode: `nest build`/`nest start` alone only target the default project (`api-gateway`).
 
 ```bash
-# unit tests
-$ pnpm run test
+# build every project
+$ pnpm exec nest build --all
 
-# e2e tests
-$ pnpm run test:e2e
+# run one app in watch mode
+$ pnpm run start:gateway   # also: start:order, start:inventory, start:user, start:product, start:auth
 
-# test coverage
+# whole stack (all six apps + Redis) via Docker Compose
+$ pnpm run docker:dev
+$ curl -k https://localhost:3002/health
+```
+
+## Testing
+
+```bash
+# unit tests (co-located *.spec.ts across every app)
+$ pnpm run test:unit
+
+# e2e tests, one script per app with its own persistence
+$ pnpm run test:e2e:order
+$ pnpm run test:e2e:user
+$ pnpm run test:e2e:product
+$ pnpm run test:e2e:inventory
+
+# coverage
 $ pnpm run test:cov
 ```
 
-## Deployment
+CI (`.github/workflows/ci.yml`) runs lint/build/all of the above on every push and PR against a `feat/*` branch.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Further documentation
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- [`CLAUDE.md`](./CLAUDE.md) — full architecture, cross-cutting conventions, env vars, and known/intentional limitations.
+- [`docs/adr/`](./docs/adr/) — lightweight ADRs recording the design decisions behind the non-obvious choices (why TLS only at the gateway, why Redis for caching, why Docker Compose over Kubernetes for now, etc.).
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Private practice project — `UNLICENSED` (see `package.json`).
