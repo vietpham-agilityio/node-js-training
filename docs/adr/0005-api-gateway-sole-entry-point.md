@@ -1,0 +1,16 @@
+# 0005. api-gateway proxies order's full HTTP surface as the sole client-facing entry point
+
+Status: Accepted
+Date: 2026-07-28
+
+## Context
+
+`api-gateway` (port 3002) is meant to be the only service external clients talk to, with `order` (HTTP 3001) and `inventory` (TCP-only 8002) internal to the system. In practice `apps/api-gateway/src/proxy.controller.ts` only proxied one route (`POST /orders/create`, targeting order's actual `POST /orders-create`), using raw `@Req()`/`@Res()` with a manual `res.json()` call that bypassed the gateway's own `ResponseLoggingInterceptor`/`HttpErrorFilter`. Order's other four HTTP routes (list/get-one/update/delete) had no gateway equivalent at all, so a client would have had to call `localhost:3001` directly for those — defeating the point of having a gateway. Separately, `ConsulService` registers a health check against `http://localhost:3002/health`, but no such route existed (`TerminusModule` was imported, unused) — a gap `docs/adr/0003-isolate-consul-to-api-gateway.md` already flagged as deferred rather than fixed. `inventory` exposes only a fire-and-forget `@EventPattern(ORDER_CREATED)` handler and no `@MessagePattern` request/response handler, so there is nothing synchronous on it for the gateway to call. `docs/adr/0004-defer-pattern-work-phases.md` previously deferred "a facade layer in front of the CQRS bus" — a separate, internal command/query-routing concern, not the external HTTP boundary addressed here.
+
+## Decision
+
+Proxy order's complete HTTP surface (create/list/get-one/update/delete) through a new `OrderProxyService`, using Nest's normal handler-return-value flow instead of `@Req`/`@Res` so the existing `ResponseLoggingInterceptor`/`HttpErrorFilter` apply uniformly to every route. Centralize translation of downstream failures (order's un-filtered Nest exception JSON, or a connection failure) into proper `HttpException`s inside `OrderProxyService`, so `HttpErrorFilter` can format them correctly instead of falling through to a generic 500. Wire a self-only `GET /health` via the already-imported `TerminusModule` so Consul's existing check target resolves. Do not proxy `inventory` — it has no request/response handler to call, and opening a second `ClientProxy` straight to its TCP port would itself violate "clients never talk to services directly." Keep the downstream base URL a single hardcoded constant, consistent with this repo's existing no-`@nestjs/config` stance.
+
+## Consequences
+
+External clients now have exactly one HTTP entry point (3002) for order operations; `order`'s own HTTP port (3001) becomes internal by convention only — nothing at the network layer currently prevents a client from calling it directly, and enforcing that (firewalling, service mesh, etc.) is out of scope here. Every route added to `order.controller.ts` in the future must be manually mirrored in `OrderProxyService`/`ProxyController`, since no shared route contract or DTO exists between the two apps (consistent with the "apps never import another app's `src/`" rule). `inventory` remains unreachable through the gateway until it grows a real `@MessagePattern` handler worth exposing. This does not implement ADR 0004's still-deferred "facade layer in front of the CQRS bus" — that remains separate, open future work.
