@@ -1,0 +1,26 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "commitlint",
+    "dtos",
+    "healthcheck",
+    "husky",
+    "isready",
+    "nestjs",
+    "pham",
+    "pino",
+    "pnpm",
+    "showtime",
+    "showtimes",
+    "typeorm",
+    "viet"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "coverage/**",
+    "pnpm-lock.yaml",
+    ".husky/_/**"
+  ]
+}

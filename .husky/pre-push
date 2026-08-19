@@ -1,0 +1,3 @@
+pnpm exec tsc --noEmit -p tsconfig.build.json
+pnpm run lint:check
+pnpm run test

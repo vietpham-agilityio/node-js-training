@@ -1,0 +1,31 @@
+{
+  // This repo runs Prettier THROUGH ESLint (eslint-plugin-prettier), so the
+  // ESLint extension is both linter and formatter. That avoids depending on
+  // esbenp.prettier-vscode, which is not installed in every editor here, and
+  // keeps a single source of truth for formatting.
+  "eslint.enable": true,
+  "eslint.format.enable": true,
+  "eslint.validate": ["typescript", "javascript"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.useFlatConfig": true,
+
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+
+  "files.eol": "\n",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  "search.exclude": {
+    "**/dist": true,
+    "**/coverage": true
+  }
+}
