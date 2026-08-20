@@ -27,7 +27,7 @@ module.exports = {
       ],
     ],
     'subject-case': [2, 'never', ['upper-case', 'pascal-case', 'start-case']],
-    'header-max-length': [2, 'always', 100],
+    'header-max-length': [2, 'always', 120],
     'body-max-line-length': [1, 'always', 100],
   },
 };
