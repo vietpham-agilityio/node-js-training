@@ -1,20 +1,29 @@
 {
   "version": "0.2",
-  "language": "en",
+  "language": "en,en-GB",
   "words": [
+    "agilityio",
     "commitlint",
+    "deployables",
     "dtos",
+    "EDITMSG",
+    "greppable",
     "healthcheck",
     "husky",
     "isready",
     "nestjs",
+    "oneline",
     "pham",
     "pino",
     "pnpm",
+    "PostgREST",
     "showtime",
     "showtimes",
+    "Supabase",
     "typeorm",
-    "viet"
+    "Unindexed",
+    "viet",
+    "vietpham"
   ],
   "ignorePaths": [
     "node_modules/**",
