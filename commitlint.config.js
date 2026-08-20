@@ -1,13 +1,23 @@
 /**
- * Conventional Commits, e.g.
- *   feat(reservations): hold seats for 10 minutes
- *   fix(auth): reject expired refresh tokens
+ * Every commit header is a GitLab issue number in brackets, followed by a
+ * Conventional Commits type and subject — no scope. E.g.:
  *
- * Scopes are free-form; use the module you touched (auth, users, movies,
- * showtimes, reservations, tickets, health, config, db, ci, deps).
+ *   [#185] chore: seed data sample with current database
+ *   [#181] feat: add showtimes and users entities
+ *   [#42] fix: reject expired refresh tokens
+ *
+ * The [#N] prefix is mandatory: a header without it doesn't match
+ * headerPattern below, so type/subject parse as empty and the commit is
+ * rejected by type-empty/subject-empty.
  */
 module.exports = {
   extends: ['@commitlint/config-conventional'],
+  parserPreset: {
+    parserOpts: {
+      headerPattern: /^\[#(\d+)\]\s+(\w+)(!)?:\s+(.+)$/,
+      headerCorrespondence: ['issue', 'type', 'breaking', 'subject'],
+    },
+  },
   rules: {
     'type-enum': [
       2,
