@@ -1,48 +1,42 @@
-## What and why
+# Merge Request
 
-<!-- One paragraph. What changes, and what it is for. Link the ticket. -->
+## 📋 Summary
 
-Closes #
+(Provide a clear description of the changes and why they were made)
 
-## Decision records touched
+## 🔗 Related Issue
 
-<!--
-Which ADRs/DDRs this implements, or contradicts. If none, delete this section.
-If this MR makes a decision worth recording, add the record in the same MR.
--->
+(Link to GitLab issue: #issue-number)
 
-- Implements: ADR-, DDR-
-- Supersedes: —
+## ✨ Changes
 
-## How to verify
+-
+-
+-
 
-<!-- Steps a reviewer can actually run. Not "tested locally". -->
+## 🏷️ Type of Change
 
-1.
-2.
+- [ ] 🐛 Bug fix
+- [ ] ✨ New feature
+- [ ] 💥 Breaking change
+- [ ] ♻️ Refactoring
+- [ ] 📝 Documentation
+- [ ] 🔧 Configuration
 
-## Checklist
+## ✅ Pre-Merge Checklist
 
-- [ ] Commits follow Conventional Commits; the branch name matches the ticket
-- [ ] `pnpm run lint:check` and `pnpm test` pass locally
-- [ ] New env vars added to **both** `src/config/env.validation.ts` and `.env.example`
-- [ ] Schema changes are a migration; `synchronize` still off; new foreign keys indexed (ADR-013)
-- [ ] New list endpoints are paginated (DDR-005); new failures carry an `errorCode` (DDR-006)
-- [ ] DTOs omit any field the client must not control (DDR-007, BR-33)
-- [ ] `docs/decisions-vs-code.md` updated if this changes what is implemented
-- [ ] No secrets, no `.env`, no commented-out code
+- [ ] Self-reviewed code
+- [ ] Follows style guidelines
+- [ ] Added comments where needed
+- [ ] Tests pass locally
+- [ ] Build succeeds
+- [ ] Documentation updated
+- [ ] Reviewers assigned
 
-## Seat-reservation impact
+## 📸 Screenshots
 
-<!--
-Delete this section if the MR does not touch seat_holds, reservations or tickets.
-Otherwise answer all three.
--->
+(Add screenshots or videos if UI changes are included)
 
-- Does this preserve the `uq_seat_hold_active` partial unique index (ADR-007, BR-17)?
-- Does it change the DDR-002 transaction — its step order, its locking, or what runs inside it?
-- Is there a concurrency test covering the change?
+## 📌 Additional Notes
 
-## Screenshots / output
-
-<!-- Swagger, a curl response, a failing-then-passing test. Delete if not relevant. -->
+(Any extra context or follow-up items)

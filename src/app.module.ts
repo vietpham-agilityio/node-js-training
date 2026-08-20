@@ -6,7 +6,13 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { appConfig } from './config/app.config';
 import { envValidationSchema } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
+import { SeedModule } from './database/seed/seed.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
+import { MoviesModule } from './modules/movies/movies.module';
+import { ReservationsModule } from './modules/reservations/reservations.module';
+import { ShowtimesModule } from './modules/showtimes/showtimes.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -20,6 +26,12 @@ import { HealthModule } from './modules/health/health.module';
     }),
     DatabaseModule,
     HealthModule,
+    AuthModule,
+    UsersModule,
+    MoviesModule,
+    ShowtimesModule,
+    ReservationsModule,
+    SeedModule,
   ],
   providers: [
     {
