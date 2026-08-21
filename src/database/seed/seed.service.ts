@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { BCRYPT_SALT_ROUNDS } from '../../modules/auth/constants/auth.constants';
 import { Genre } from '../../modules/movies/entities/genre.entity';
 import { MovieGenre } from '../../modules/movies/entities/movie-genre.entity';
 import { Movie } from '../../modules/movies/entities/movie.entity';
@@ -58,7 +59,7 @@ export class SeedService implements OnApplicationBootstrap {
     const existing = await this.userRepo.findOne({ where: { email } });
     if (existing) return;
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
     await this.userRepo.save(
       this.userRepo.create({
         email,
@@ -84,9 +85,18 @@ export class SeedService implements OnApplicationBootstrap {
   private async seedMovies(genresByName: Map<string, Genre>): Promise<Movie[]> {
     const movies: Movie[] = [];
     for (const fixture of MOVIE_FIXTURES) {
-      const existing = await this.movieRepo.findOne({
-        where: { title: fixture.title },
-      });
+      const {
+        title,
+        synopsis,
+        posterUrl,
+        durationMinutes,
+        language,
+        releaseDate,
+        rating,
+        genreNames,
+      } = fixture;
+
+      const existing = await this.movieRepo.findOne({ where: { title } });
       if (existing) {
         movies.push(existing);
         continue;
@@ -94,18 +104,18 @@ export class SeedService implements OnApplicationBootstrap {
 
       const movie = await this.movieRepo.save(
         this.movieRepo.create({
-          title: fixture.title,
-          synopsis: fixture.synopsis,
-          posterUrl: fixture.posterUrl,
-          durationMinutes: fixture.durationMinutes,
-          language: fixture.language,
-          releaseDate: fixture.releaseDate,
-          rating: fixture.rating,
+          title,
+          synopsis,
+          posterUrl,
+          durationMinutes,
+          language,
+          releaseDate,
+          rating,
           isActive: true,
         }),
       );
 
-      for (const genreName of fixture.genreNames) {
+      for (const genreName of genreNames) {
         const genre = genresByName.get(genreName);
         if (!genre) continue;
         await this.movieGenreRepo.save(
@@ -121,24 +131,20 @@ export class SeedService implements OnApplicationBootstrap {
   private async seedHalls(): Promise<Hall[]> {
     const halls: Hall[] = [];
     for (const fixture of HALL_FIXTURES) {
-      const existing = await this.hallRepo.findOne({
-        where: { name: fixture.name },
-      });
+      const { name, hallType, rows, seatsPerRow } = fixture;
+
+      const existing = await this.hallRepo.findOne({ where: { name } });
       if (existing) {
         halls.push(existing);
         continue;
       }
 
       const hall = await this.hallRepo.save(
-        this.hallRepo.create({
-          name: fixture.name,
-          hallType: fixture.hallType,
-          isActive: true,
-        }),
+        this.hallRepo.create({ name, hallType, isActive: true }),
       );
 
-      const seats = fixture.rows.flatMap((row) =>
-        Array.from({ length: fixture.seatsPerRow }, (_, i) => {
+      const seats = rows.flatMap((row) =>
+        Array.from({ length: seatsPerRow }, (_, i) => {
           const seatColumn = i + 1;
           return this.seatRepo.create({
             hallId: hall.id,
@@ -160,7 +166,7 @@ export class SeedService implements OnApplicationBootstrap {
     if (movies.length === 0 || halls.length === 0) return;
 
     const basePriceByHallName = new Map(
-      HALL_FIXTURES.map((fixture) => [fixture.name, fixture.basePrice]),
+      HALL_FIXTURES.map(({ name, basePrice }) => [name, basePrice]),
     );
     const today = new Date();
     let movieIndex = 0;
@@ -174,24 +180,25 @@ export class SeedService implements OnApplicationBootstrap {
       const status =
         dayOffset < 0 ? ShowtimeStatus.COMPLETED : ShowtimeStatus.SCHEDULED;
 
-      for (const hall of halls) {
+      for (const { id: hallId, name: hallName } of halls) {
         for (const showTime of SHOWTIME_SLOTS) {
-          const movie = movies[movieIndex % movies.length];
+          const { id: movieId, durationMinutes } =
+            movies[movieIndex % movies.length];
           movieIndex++;
 
           const existing = await this.showtimeRepo.findOne({
-            where: { hallId: hall.id, showDate, showTime },
+            where: { hallId, showDate, showTime },
           });
           if (existing) continue;
 
           await this.showtimeRepo.save(
             this.showtimeRepo.create({
-              movieId: movie.id,
-              hallId: hall.id,
+              movieId,
+              hallId,
               showDate,
               showTime,
-              endTime: addMinutesToTimeString(showTime, movie.durationMinutes),
-              basePrice: basePriceByHallName.get(hall.name) ?? 10,
+              endTime: addMinutesToTimeString(showTime, durationMinutes),
+              basePrice: basePriceByHallName.get(hallName) ?? 10,
               status,
             }),
           );
