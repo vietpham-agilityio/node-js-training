@@ -15,6 +15,15 @@ export const envValidationSchema = Joi.object({
   CORS_ORIGIN: Joi.string().default('*'),
   SWAGGER_ENABLED: Joi.boolean().default(true),
 
+  // DDR-008: pino log level for the request-logging interceptor and app logger
+  LOG_LEVEL: Joi.string()
+    .valid('error', 'warn', 'info', 'debug')
+    .default('info'),
+
+  // Rate limiting: requests allowed per window, per client
+  THROTTLE_TTL_SECONDS: Joi.number().positive().default(60),
+  THROTTLE_LIMIT: Joi.number().positive().default(100),
+
   DB_HOST: Joi.string().hostname().required(),
   DB_PORT: Joi.number().port().default(5432),
   DB_USERNAME: Joi.string().required(),

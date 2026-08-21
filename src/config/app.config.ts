@@ -7,6 +7,7 @@ export interface AppConfig {
   apiVersion: string;
   corsOrigin: string;
   swaggerEnabled: boolean;
+  logLevel: string;
 }
 
 export const appConfig = registerAs('app', (): AppConfig => ({
@@ -16,4 +17,5 @@ export const appConfig = registerAs('app', (): AppConfig => ({
   apiVersion: process.env.API_VERSION ?? '1',
   corsOrigin: process.env.CORS_ORIGIN ?? '*',
   swaggerEnabled: process.env.SWAGGER_ENABLED !== 'false',
+  logLevel: process.env.LOG_LEVEL ?? 'info',
 }));

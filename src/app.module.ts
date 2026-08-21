@@ -1,11 +1,15 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { LoggerModule } from 'nestjs-pino';
 
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { appConfig } from './config/app.config';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { appConfig, type AppConfig } from './config/app.config';
 import { envValidationSchema } from './config/env.validation';
 import { jwtConfig } from './config/jwt.config';
+import { throttleConfig, type ThrottleConfig } from './config/throttle.config';
 import { DatabaseModule } from './database/database.module';
 import { SeedModule } from './database/seed/seed.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -20,10 +24,46 @@ import { UsersModule } from './modules/users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [appConfig, jwtConfig],
+      load: [appConfig, jwtConfig, throttleConfig],
       validationSchema: envValidationSchema,
       validationOptions: { abortEarly: false },
       envFilePath: ['.env.local', '.env'],
+    }),
+    LoggerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const { nodeEnv, logLevel } =
+          configService.getOrThrow<AppConfig>('app');
+
+        return {
+          pinoHttp: {
+            level: logLevel,
+            autoLogging: false,
+            redact: {
+              paths: [
+                'req.headers.authorization',
+                'req.headers.cookie',
+                'req.body.password',
+                'req.body.accessToken',
+                'req.body.refreshToken',
+              ],
+              censor: '[REDACTED]',
+            },
+            transport:
+              nodeEnv === 'development'
+                ? { target: 'pino-pretty', options: { singleLine: true } }
+                : undefined,
+          },
+        };
+      },
+    }),
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const { ttlMs, limit } =
+          configService.getOrThrow<ThrottleConfig>('throttle');
+        return [{ ttl: ttlMs, limit }];
+      },
     }),
     DatabaseModule,
     HealthModule,
@@ -47,6 +87,14 @@ import { UsersModule } from './modules/users/users.module';
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
