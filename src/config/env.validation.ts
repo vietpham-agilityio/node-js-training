@@ -27,4 +27,10 @@ export const envValidationSchema = Joi.object({
   // DDR-009: seeds the one admin no API route is allowed to create
   ADMIN_EMAIL: Joi.string().email().required(),
   ADMIN_PASSWORD: Joi.string().min(8).required(),
+
+  // ADR-005: RS256 key pair, base64-encoded PEM, and token lifetimes
+  JWT_PRIVATE_KEY_BASE64: Joi.string().required(),
+  JWT_PUBLIC_KEY_BASE64: Joi.string().required(),
+  JWT_ACCESS_TOKEN_TTL_SECONDS: Joi.number().positive().default(900),
+  JWT_REFRESH_TOKEN_TTL_DAYS: Joi.number().positive().default(7),
 });

@@ -5,6 +5,7 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { appConfig } from './config/app.config';
 import { envValidationSchema } from './config/env.validation';
+import { jwtConfig } from './config/jwt.config';
 import { DatabaseModule } from './database/database.module';
 import { SeedModule } from './database/seed/seed.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -19,7 +20,7 @@ import { UsersModule } from './modules/users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [appConfig],
+      load: [appConfig, jwtConfig],
       validationSchema: envValidationSchema,
       validationOptions: { abortEarly: false },
       envFilePath: ['.env.local', '.env'],
