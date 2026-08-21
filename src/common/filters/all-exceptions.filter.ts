@@ -29,7 +29,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<{ method: string; url: string }>();
+    const { method, url } = ctx.getRequest<{ method: string; url: string }>();
 
     const status: HttpStatus =
       exception instanceof HttpException
@@ -44,7 +44,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(
-        `${request.method} ${request.url} -> ${status}`,
+        `${method} ${url} -> ${status}`,
         exception instanceof Error ? exception.stack : String(exception),
       );
     }
@@ -57,7 +57,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     status: HttpStatus,
   ): Pick<ErrorResponseBody, 'message' | 'errorCode'> {
     if (exception instanceof AppException) {
-      return { message: exception.message, errorCode: exception.errorCode };
+      const { message, errorCode } = exception;
+      return { message, errorCode };
     }
 
     if (exception instanceof HttpException) {

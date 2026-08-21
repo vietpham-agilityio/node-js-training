@@ -39,15 +39,15 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Rotate a refresh token for a new token pair' })
-  refresh(@Body() dto: RefreshTokenDto): Promise<TokenPairDto> {
-    return this.authService.refresh(dto.refreshToken);
+  refresh(@Body() { refreshToken }: RefreshTokenDto): Promise<TokenPairDto> {
+    return this.authService.refresh(refreshToken);
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Revoke a refresh token' })
-  async logout(@Body() dto: RefreshTokenDto): Promise<void> {
-    await this.authService.logout(dto.refreshToken);
+  async logout(@Body() { refreshToken }: RefreshTokenDto): Promise<void> {
+    await this.authService.logout(refreshToken);
   }
 
   @Get('me')

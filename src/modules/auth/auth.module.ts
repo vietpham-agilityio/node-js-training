@@ -18,10 +18,11 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     PassportModule,
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => {
-        const jwt = configService.getOrThrow<JwtConfig>('jwt');
+        const { privateKey, publicKey } =
+          configService.getOrThrow<JwtConfig>('jwt');
         return {
-          privateKey: jwt.privateKey,
-          publicKey: jwt.publicKey,
+          privateKey,
+          publicKey,
           signOptions: { algorithm: 'RS256' },
           verifyOptions: { algorithms: ['RS256'] },
         };

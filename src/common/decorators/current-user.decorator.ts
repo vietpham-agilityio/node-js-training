@@ -7,9 +7,9 @@ import type { AuthenticatedUser } from '../../modules/auth/interfaces/authentica
 // client-supplied one. This is how service code gets it.
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): AuthenticatedUser => {
-    const request = ctx
+    const { user } = ctx
       .switchToHttp()
       .getRequest<Request & { user: AuthenticatedUser }>();
-    return request.user;
+    return user;
   },
 );

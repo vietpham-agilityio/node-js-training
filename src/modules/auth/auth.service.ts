@@ -35,9 +35,17 @@ export class AuthService {
     this.jwt = this.configService.getOrThrow<JwtConfig>('jwt');
   }
 
-  async register(dto: RegisterDto): Promise<TokenPairDto> {
+  async register({
+    email,
+    firstName,
+    lastName,
+    password,
+    address,
+    dateOfBirth,
+    phoneNumber,
+  }: RegisterDto): Promise<TokenPairDto> {
     const existing = await this.userRepo.findOne({
-      where: { email: dto.email },
+      where: { email },
     });
     if (existing) {
       throw new AppException(
@@ -47,27 +55,27 @@ export class AuthService {
       );
     }
 
-    const passwordHash = await bcrypt.hash(dto.password, BCRYPT_SALT_ROUNDS);
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
     const user = await this.userRepo.save(
       this.userRepo.create({
-        email: dto.email,
+        email,
         passwordHash,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        phoneNumber: dto.phoneNumber ?? null,
-        dateOfBirth: dto.dateOfBirth ?? null,
-        address: dto.address ?? null,
+        firstName,
+        lastName,
+        phoneNumber: phoneNumber ?? null,
+        dateOfBirth: dateOfBirth ?? null,
+        address: address ?? null,
         role: UserRole.USER, // BR-33: never taken from the client
         isActive: true,
       }),
     );
 
-    return this.issueTokenPair(user);
+    return this.generateTokenPair(user);
   }
 
-  async login(dto: LoginDto): Promise<TokenPairDto> {
-    const user = await this.userRepo.findOne({ where: { email: dto.email } });
-    if (!user || !(await bcrypt.compare(dto.password, user.passwordHash))) {
+  async login({ email, password }: LoginDto): Promise<TokenPairDto> {
+    const user = await this.userRepo.findOne({ where: { email } });
+    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
       throw new AppException(
         ErrorCode.INVALID_CREDENTIALS,
         'Invalid email or password',
@@ -83,11 +91,12 @@ export class AuthService {
       );
     }
 
-    return this.issueTokenPair(user);
+    return this.generateTokenPair(user);
   }
 
   async refresh(presentedToken: string): Promise<TokenPairDto> {
     const tokenHash = this.hashRefreshToken(presentedToken);
+
     const stored = await this.refreshTokenRepo.findOne({
       where: { tokenHash },
       relations: { user: true },
@@ -102,7 +111,8 @@ export class AuthService {
       );
     }
 
-    if (!stored.user.isActive) {
+    const { user } = stored;
+    if (!user.isActive) {
       throw new AppException(
         ErrorCode.ACCOUNT_INACTIVE,
         'This account has been deactivated',
@@ -113,7 +123,7 @@ export class AuthService {
     stored.revokedAt = new Date();
     await this.refreshTokenRepo.save(stored);
 
-    return this.issueTokenPair(stored.user);
+    return this.generateTokenPair(user);
   }
 
   async logout(presentedToken: string): Promise<void> {
@@ -128,14 +138,16 @@ export class AuthService {
     return crypto.createHash('sha256').update(token).digest('hex');
   }
 
-  private async issueTokenPair(user: User): Promise<TokenPairDto> {
+  private async generateTokenPair({
+    id,
+    email,
+    role,
+  }: User): Promise<TokenPairDto> {
+    const { privateKey, accessTokenTtlSeconds, refreshTokenTtlDays } = this.jwt;
+
     const accessToken = await this.jwtService.signAsync(
-      { sub: user.id, email: user.email, role: user.role },
-      {
-        privateKey: this.jwt.privateKey,
-        algorithm: 'RS256',
-        expiresIn: this.jwt.accessTokenTtlSeconds,
-      },
+      { sub: id, email, role },
+      { privateKey, algorithm: 'RS256', expiresIn: accessTokenTtlSeconds },
     );
 
     const refreshToken = crypto
@@ -144,20 +156,16 @@ export class AuthService {
 
     const expiresAt = new Date();
 
-    expiresAt.setDate(expiresAt.getDate() + this.jwt.refreshTokenTtlDays);
+    expiresAt.setDate(expiresAt.getDate() + refreshTokenTtlDays);
 
     await this.refreshTokenRepo.save(
       this.refreshTokenRepo.create({
-        userId: user.id,
+        userId: id,
         tokenHash: this.hashRefreshToken(refreshToken),
         expiresAt,
       }),
     );
 
-    return {
-      accessToken,
-      refreshToken,
-      expiresIn: this.jwt.accessTokenTtlSeconds,
-    };
+    return { accessToken, refreshToken, expiresIn: accessTokenTtlSeconds };
   }
 }

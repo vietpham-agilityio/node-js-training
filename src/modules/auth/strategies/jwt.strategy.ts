@@ -18,11 +18,11 @@ interface AccessTokenPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(configService: ConfigService) {
-    const jwt = configService.getOrThrow<JwtConfig>('jwt');
+    const { publicKey } = configService.getOrThrow<JwtConfig>('jwt');
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwt.publicKey,
+      secretOrKey: publicKey,
       algorithms: ['RS256'],
     });
   }
