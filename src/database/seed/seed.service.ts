@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { BCRYPT_SALT_ROUNDS } from '../../modules/auth/constants/auth.constants';
 import { Genre } from '../../modules/movies/entities/genre.entity';
 import { MovieGenre } from '../../modules/movies/entities/movie-genre.entity';
 import { Movie } from '../../modules/movies/entities/movie.entity';
@@ -58,7 +59,7 @@ export class SeedService implements OnApplicationBootstrap {
     const existing = await this.userRepo.findOne({ where: { email } });
     if (existing) return;
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
     await this.userRepo.save(
       this.userRepo.create({
         email,
