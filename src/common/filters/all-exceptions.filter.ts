@@ -6,20 +6,21 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
+
+import { AppException } from '../exceptions/app.exception';
 
 export interface ErrorResponseBody {
   statusCode: number;
+  errorCode: string;
   message: string | string[];
-  error: string;
-  path: string;
   timestamp: string;
 }
 
 /**
  * Turns anything thrown inside the request pipeline into one consistent JSON
- * shape. Unknown errors are logged with their stack but reported as a plain
- * 500 so internals never reach the client.
+ * shape (DDR-006). Unknown errors are logged with their stack but reported
+ * as a plain 500 so internals never reach the client.
  */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -28,7 +29,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const request = ctx.getRequest<{ method: string; url: string }>();
 
     const status: HttpStatus =
       exception instanceof HttpException
@@ -37,8 +38,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const body: ErrorResponseBody = {
       statusCode: status,
-      ...this.describe(exception),
-      path: request.url,
+      ...this.describe(exception, status),
       timestamp: new Date().toISOString(),
     };
 
@@ -54,28 +54,26 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   private describe(
     exception: unknown,
-  ): Pick<ErrorResponseBody, 'message' | 'error'> {
+    status: HttpStatus,
+  ): Pick<ErrorResponseBody, 'message' | 'errorCode'> {
+    if (exception instanceof AppException) {
+      return { message: exception.message, errorCode: exception.errorCode };
+    }
+
     if (exception instanceof HttpException) {
       const payload = exception.getResponse();
+      const message =
+        typeof payload === 'string'
+          ? payload
+          : ((payload as { message?: string | string[] }).message ??
+            exception.message);
 
-      if (typeof payload === 'string') {
-        return { message: payload, error: exception.name };
-      }
-
-      const { message, error } = payload as {
-        message?: string | string[];
-        error?: string;
-      };
-
-      return {
-        message: message ?? exception.message,
-        error: error ?? exception.name,
-      };
+      return { message, errorCode: HttpStatus[status] ?? 'ERROR' };
     }
 
     return {
       message: 'Internal server error',
-      error: 'Internal Server Error',
+      errorCode: 'INTERNAL_SERVER_ERROR',
     };
   }
 }

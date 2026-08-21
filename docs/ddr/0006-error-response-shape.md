@@ -56,7 +56,3 @@ thrown from services as specific HTTP exceptions carrying a stable `errorCode`.
 ## Revisit if
 
 A second API consumer appears with different error-handling needs.
-
-> **Code divergence.** `AllExceptionsFilter` currently returns
-> `{ statusCode, message, error, path, timestamp }` — no `errorCode`, plus `error` and `path`
-> this record deliberately excluded. Either change the filter or supersede this record.
