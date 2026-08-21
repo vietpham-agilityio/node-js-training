@@ -1,14 +1,18 @@
-import { Logger, VersioningType } from '@nestjs/common';
+import { VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import { Logger } from 'nestjs-pino';
 
 import { AppModule } from './app.module';
 import type { AppConfig } from './config/app.config';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const logger = app.get(Logger);
+  app.useLogger(logger);
+
   const { corsOrigin, apiPrefix, apiVersion, swaggerEnabled, port } = app
     .get(ConfigService)
     .getOrThrow<AppConfig>('app');
@@ -37,10 +41,16 @@ async function bootstrap(): Promise<void> {
 
   await app.listen(port);
 
-  const logger = new Logger('Bootstrap');
-  logger.log(`API listening on ${await app.getUrl()}/${apiPrefix}`);
+  logger.log(
+    `API listening on ${await app.getUrl()}/${apiPrefix}`,
+    'Bootstrap',
+  );
+
   if (swaggerEnabled) {
-    logger.log(`Swagger UI at ${await app.getUrl()}/${apiPrefix}/docs`);
+    logger.log(
+      `Swagger UI at ${await app.getUrl()}/${apiPrefix}/docs`,
+      'Bootstrap',
+    );
   }
 }
 
