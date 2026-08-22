@@ -28,18 +28,16 @@ documents.**
 | [DDR-008](0008-configuration-and-logging.md)            | Configuration and logging conventions                       | ADR-005          |
 | [DDR-009](0009-seed-data-admin-and-catalogue.md)        | Seed data for the initial admin and demo catalogue          | ADR-006, ADR-014 |
 | [DDR-010](0010-revenue-recognition-without-payment.md)  | Revenue recognition without a payment step                  | ADR-011          |
+| [DDR-011](0011-one-indexed-pagination-convention.md)    | One-indexed pagination convention (supersedes DDR-005)      | ADR-012          |
 
 ## Open divergences from the code
 
-Three records currently disagree with what is committed. Each is flagged in a blockquote at
-the foot of its record; the summary lives in
-[decisions-vs-code.md](../decisions-vs-code.md).
+One record currently disagrees with what is committed. It is flagged in a blockquote at the
+foot of its record; the summary lives in [decisions-vs-code.md](../decisions-vs-code.md).
 
-| Record  | Disagreement                                                         |
-| ------- | -------------------------------------------------------------------- |
-| DDR-005 | Record says zero-indexed pages; the DTO is one-indexed.              |
-| DDR-006 | Record specifies `errorCode`; the filter returns `error` and `path`. |
-| DDR-007 | Record rejects `forbidNonWhitelisted`; the pipe enables it.          |
+| Record  | Disagreement                                                |
+| ------- | ----------------------------------------------------------- |
+| DDR-007 | Record rejects `forbidNonWhitelisted`; the pipe enables it. |
 
 ## Adding a record
 

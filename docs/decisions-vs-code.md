@@ -19,13 +19,13 @@ Last checked: 21 Aug 2026, on `feat/ticket-reservation` (Auth module landed).
 | ADR-014 | `docker-compose.yml`, `.env.example`                                                            |
 | DDR-006 | `src/common/filters/all-exceptions.filter.ts` — `{ statusCode, errorCode, message, timestamp }` |
 | DDR-008 | `src/config/env.validation.ts` — Joi schema, `abortEarly: false`, boot-time failure             |
+| DDR-011 | `src/common/dto/pagination-query.dto.ts` — one-indexed pages, supersedes DDR-005                |
 
 ## Diverging — needs a fix or a superseding record
 
-| Record  | Says                                        | Code does                                             | Where                                    |
-| ------- | ------------------------------------------- | ----------------------------------------------------- | ---------------------------------------- |
-| DDR-005 | Pages are zero-indexed                      | One-indexed (`page = 1`, `skip = (page - 1) * limit`) | `src/common/dto/pagination-query.dto.ts` |
-| DDR-007 | `forbidNonWhitelisted` deliberately **off** | `forbidNonWhitelisted: true`                          | `src/app.module.ts`                      |
+| Record  | Says                                        | Code does                    | Where               |
+| ------- | ------------------------------------------- | ---------------------------- | ------------------- |
+| DDR-007 | `forbidNonWhitelisted` deliberately **off** | `forbidNonWhitelisted: true` | `src/app.module.ts` |
 
 Each is also flagged in a blockquote at the foot of its own record. Resolve them either way —
 change the code, or supersede the record — but do not leave them silently disagreeing.

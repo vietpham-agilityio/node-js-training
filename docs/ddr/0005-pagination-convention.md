@@ -1,6 +1,6 @@
 # DDR-005 — Pagination convention for list endpoints
 
-Accepted · 14 Aug 2026 · Implements ADR-012
+Superseded by DDR-011 · 14 Aug 2026 · Implements ADR-012
 
 ## Context
 
