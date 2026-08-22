@@ -29,6 +29,8 @@ documents.**
 | [DDR-009](0009-seed-data-admin-and-catalogue.md)        | Seed data for the initial admin and demo catalogue          | ADR-006, ADR-014 |
 | [DDR-010](0010-revenue-recognition-without-payment.md)  | Revenue recognition without a payment step                  | ADR-011          |
 | [DDR-011](0011-one-indexed-pagination-convention.md)    | One-indexed pagination convention (supersedes DDR-005)      | ADR-012          |
+| [DDR-012](0012-users-module-endpoint-design.md)         | Users module endpoint and permission design                 | ADR-006, ADR-012 |
+| [DDR-013](0013-password-change-endpoint.md)             | Password change endpoint                                    | ADR-005          |
 
 ## Open divergences from the code
 

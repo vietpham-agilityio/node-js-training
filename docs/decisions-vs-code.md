@@ -20,6 +20,8 @@ Last checked: 21 Aug 2026, on `feat/ticket-reservation` (Auth module landed).
 | DDR-006 | `src/common/filters/all-exceptions.filter.ts` — `{ statusCode, errorCode, message, timestamp }` |
 | DDR-008 | `src/config/env.validation.ts` — Joi schema, `abortEarly: false`, boot-time failure             |
 | DDR-011 | `src/common/dto/pagination-query.dto.ts` — one-indexed pages, supersedes DDR-005                |
+| DDR-012 | `src/modules/users/users.controller.ts`, `users.service.ts` — endpoint/permission design        |
+| DDR-013 | `src/modules/users/users.controller.ts` — `PATCH /users/me/password`                            |
 
 ## Diverging — needs a fix or a superseding record
 
@@ -48,10 +50,11 @@ the application skeleton over a designed schema.
 
 ## Notes
 
-- **Ownership checks (ADR-006, BR-34).** The reusable pieces — `JwtAuthGuard`, `RolesGuard`,
-  `@Roles()`, `@CurrentUser()` — are in place, but there is nothing to apply them to yet:
-  Reservations/Movies/Showtimes have no controllers or services. Wiring ownership checks into
-  `ReservationsService` is deferred to when that module is actually built.
+- **Ownership checks (ADR-006, BR-34).** Wired up for real in the Users module (DDR-012) —
+  `JwtAuthGuard`, `RolesGuard`, `@Roles()` and `@CurrentUser()` are now applied on
+  `UsersController`. Reservations/Movies/Showtimes still have no controllers or services;
+  wiring ownership checks into `ReservationsService` remains deferred to when that module is
+  actually built.
 - **Refresh token reuse detection.** ADR-005/BR-32 are satisfied by rotation + revocation.
   Detecting _reuse_ of an already-revoked token as a theft signal (and revoking the rest of
   that user's sessions in response) was considered and deliberately deferred — it needs a
