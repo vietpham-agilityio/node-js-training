@@ -3,25 +3,27 @@
 What the records say against what is committed on this branch. Keep this table honest — an
 ADR that quietly disagrees with the code is worse than no ADR.
 
-Last checked: 21 Aug 2026, on `feat/ticket-reservation` (Auth module landed).
+Last checked: 24 Aug 2026, on `feat/implement-movie-module` (Movies/Genres module landed).
 
 ## Implemented and matching
 
-| Record  | Where                                                                                           |
-| ------- | ----------------------------------------------------------------------------------------------- |
-| ADR-001 | `src/app.module.ts`, `src/modules/` — one Nest app, modules registered at root                  |
-| ADR-002 | `src/database/data-source.options.ts` — `type: 'postgres'`                                      |
-| ADR-003 | `package.json` — `typeorm`, `@nestjs/typeorm`; migrations under `src/database/migrations/`      |
-| ADR-004 | `src/main.ts` — `NestFactory.create(AppModule)` with no adapter, i.e. Express                   |
-| ADR-005 | `src/modules/auth/` — bcrypt, RS256 JWT access token, SHA-256-hashed refresh tokens             |
-| ADR-006 | `src/common/decorators/roles.decorator.ts`, `src/common/guards/roles.guard.ts`                  |
-| ADR-012 | `src/main.ts` — `SwaggerModule` at `${apiPrefix}/docs`, URI versioning                          |
-| ADR-014 | `docker-compose.yml`, `.env.example`                                                            |
-| DDR-006 | `src/common/filters/all-exceptions.filter.ts` — `{ statusCode, errorCode, message, timestamp }` |
-| DDR-008 | `src/config/env.validation.ts` — Joi schema, `abortEarly: false`, boot-time failure             |
-| DDR-011 | `src/common/dto/pagination-query.dto.ts` — one-indexed pages, supersedes DDR-005                |
-| DDR-012 | `src/modules/users/users.controller.ts`, `users.service.ts` — endpoint/permission design        |
-| DDR-013 | `src/modules/users/users.controller.ts` — `PATCH /users/me/password`                            |
+| Record  | Where                                                                                                                                                                                        |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ADR-001 | `src/app.module.ts`, `src/modules/` — one Nest app, modules registered at root                                                                                                               |
+| ADR-002 | `src/database/data-source.options.ts` — `type: 'postgres'`                                                                                                                                   |
+| ADR-003 | `package.json` — `typeorm`, `@nestjs/typeorm`; migrations under `src/database/migrations/`                                                                                                   |
+| ADR-004 | `src/main.ts` — `NestFactory.create(AppModule)` with no adapter, i.e. Express                                                                                                                |
+| ADR-005 | `src/modules/auth/` — bcrypt, RS256 JWT access token, SHA-256-hashed refresh tokens                                                                                                          |
+| ADR-006 | `src/common/decorators/roles.decorator.ts`, `src/common/guards/roles.guard.ts`                                                                                                               |
+| ADR-010 | `src/modules/users/`, `src/modules/movies/` — `is_active` flag + soft-delete `remove()` on Users and Movies. Showtimes/Reservations/SeatHolds `status` transitions still pending (see below) |
+| ADR-012 | `src/main.ts` — `SwaggerModule` at `${apiPrefix}/docs`, URI versioning                                                                                                                       |
+| ADR-014 | `docker-compose.yml`, `.env.example`                                                                                                                                                         |
+| DDR-006 | `src/common/filters/all-exceptions.filter.ts` — `{ statusCode, errorCode, message, timestamp }`                                                                                              |
+| DDR-008 | `src/config/env.validation.ts` — Joi schema, `abortEarly: false`, boot-time failure                                                                                                          |
+| DDR-011 | `src/common/dto/pagination-query.dto.ts` — one-indexed pages, supersedes DDR-005                                                                                                             |
+| DDR-012 | `src/modules/users/users.controller.ts`, `users.service.ts` — endpoint/permission design                                                                                                     |
+| DDR-013 | `src/modules/users/users.controller.ts` — `PATCH /users/me/password`                                                                                                                         |
+| DDR-014 | `src/modules/movies/genres.controller.ts`, `genres.service.ts`, `movies.controller.ts`, `movies.service.ts` — endpoint/permission design                                                     |
 
 ## Diverging — needs a fix or a superseding record
 
@@ -37,24 +39,26 @@ change the code, or supersede the record — but do not leave them silently disa
 Records that are accepted but have no code behind them yet. This is expected; the branch is
 the application skeleton over a designed schema.
 
-| Record           | Waiting on                                                            |
-| ---------------- | --------------------------------------------------------------------- |
-| ADR-007          | `seat_holds` table and the `uq_seat_hold_active` partial unique index |
-| ADR-008          | State-machine guards for seat hold and reservation                    |
-| ADR-009          | `@nestjs/schedule` — the 60-second sweep and 15-minute completion job |
-| ADR-010          | `is_active` / `status` flags and `ON DELETE RESTRICT` on the schema   |
-| ADR-011, DDR-010 | Reports module and the aggregate queries                              |
-| ADR-013          | Migrations creating the foreign-key and composite indexes             |
-| DDR-001–004      | Reservations module                                                   |
-| DDR-009          | Seed script                                                           |
+| Record           | Waiting on                                                                     |
+| ---------------- | ------------------------------------------------------------------------------ |
+| ADR-007          | `seat_holds` table and the `uq_seat_hold_active` partial unique index          |
+| ADR-008          | State-machine guards for seat hold and reservation                             |
+| ADR-009          | `@nestjs/schedule` — the 60-second sweep and 15-minute completion job          |
+| ADR-010          | `status` flags and their transitions on Showtimes, Seat Holds and Reservations |
+| ADR-011, DDR-010 | Reports module and the aggregate queries                                       |
+| ADR-013          | Migrations creating the foreign-key and composite indexes                      |
+| DDR-001–004      | Reservations module                                                            |
+| DDR-009          | Seed script                                                                    |
 
 ## Notes
 
-- **Ownership checks (ADR-006, BR-34).** Wired up for real in the Users module (DDR-012) —
-  `JwtAuthGuard`, `RolesGuard`, `@Roles()` and `@CurrentUser()` are now applied on
-  `UsersController`. Reservations/Movies/Showtimes still have no controllers or services;
-  wiring ownership checks into `ReservationsService` remains deferred to when that module is
-  actually built.
+- **Ownership checks (ADR-006, BR-34).** Wired up for real in the Users module (DDR-012) and
+  now the Movies/Genres module (DDR-014) — `JwtAuthGuard`, `RolesGuard` and `@Roles()` gate
+  the admin-only routes on `GenresController`/`MoviesController`; `@CurrentUser()` is used
+  optionally there too, via the new `OptionalJwtAuthGuard`, to let an admin's token reveal
+  inactive movies on the otherwise-public list/detail routes. Reservations/Showtimes still
+  have no controllers or services; wiring ownership checks into `ReservationsService` remains
+  deferred to when that module is actually built.
 - **Refresh token reuse detection.** ADR-005/BR-32 are satisfied by rotation + revocation.
   Detecting _reuse_ of an already-revoked token as a theft signal (and revoking the rest of
   that user's sessions in response) was considered and deliberately deferred — it needs a
