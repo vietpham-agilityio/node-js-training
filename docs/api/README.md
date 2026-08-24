@@ -5,8 +5,8 @@ Pagination (all list endpoints): query `page` (default 1), `limit` (default 20, 
 `{ data: [...], meta: { page, limit, total, hasMore } }`. Errors (all endpoints):
 `{ statusCode, errorCode, message, timestamp }`.
 
-Status: **Implemented** = Health, Auth, Users. **Planned** = everything else (Genres, Movies,
-Halls, Showtimes, Seat Holds, Reservations, Reports).
+Status: **Implemented** = Health, Auth, Users, Genres, Movies. **Planned** = everything else
+(Halls, Showtimes, Seat Holds, Reservations, Reports).
 
 ---
 
@@ -139,9 +139,9 @@ Deactivate a user (soft delete).
 
 ---
 
-## Genres — Planned
+## Genres
 
-### `GET /genres`
+### `GET /genres` — Implemented
 
 List genres.
 
@@ -150,27 +150,27 @@ List genres.
 - Success: `200 OK` — paginated `{ id, name }[]`
 - Errors: —
 
-### `POST /genres`
+### `POST /genres` — Implemented
 
 Create a genre.
 
 - Auth: Bearer, admin
 - Request: `{ name }`
 - Success: `201 Created` — `{ id, name }`
-- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `400 BAD_REQUEST` (duplicate name)
+- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `409 GENRE_NAME_ALREADY_EXISTS`, `400 BAD_REQUEST`
 
-### `PATCH /genres/:id`
+### `PATCH /genres/:id` — Implemented
 
 Rename a genre.
 
 - Auth: Bearer, admin
 - Request: `{ name }`
 - Success: `200 OK` — `{ id, name }`
-- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `404 NOT_FOUND`
+- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `409 GENRE_NAME_ALREADY_EXISTS`, `404 NOT_FOUND`
 
-### `DELETE /genres/:id`
+### `DELETE /genres/:id` — Implemented
 
-Delete a genre.
+Delete a genre. Hard delete, not soft — a genre has no history worth preserving (DDR-014).
 
 - Auth: Bearer, admin
 - Request: —
@@ -179,27 +179,27 @@ Delete a genre.
 
 ---
 
-## Movies — Planned
+## Movies
 
-### `GET /movies`
+### `GET /movies` — Implemented
 
 List movies (public catalogue).
 
-- Auth: none (admin token also sees inactive movies)
+- Auth: optional Bearer (admin token also sees inactive movies)
 - Request: query `page?, limit?, genreId?, title?`
 - Success: `200 OK` — paginated movie list with nested `genres[]`
 - Errors: —
 
-### `GET /movies/:id`
+### `GET /movies/:id` — Implemented
 
 Get one movie.
 
-- Auth: none (admin token also sees inactive movies)
+- Auth: optional Bearer (admin token also sees inactive movies)
 - Request: —
 - Success: `200 OK` — movie with nested `genres[]`
 - Errors: `404 NOT_FOUND`
 
-### `POST /movies`
+### `POST /movies` — Implemented
 
 Create a movie.
 
@@ -208,7 +208,7 @@ Create a movie.
 - Success: `201 Created` — movie with nested `genres[]`
 - Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `400 MOVIE_REQUIRES_GENRE`, `400 BAD_REQUEST`
 
-### `PATCH /movies/:id`
+### `PATCH /movies/:id` — Implemented
 
 Update a movie.
 
@@ -217,7 +217,7 @@ Update a movie.
 - Success: `200 OK` — movie with nested `genres[]`
 - Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `400 MOVIE_REQUIRES_GENRE`, `404 NOT_FOUND`
 
-### `DELETE /movies/:id`
+### `DELETE /movies/:id` — Implemented
 
 Deactivate a movie (soft delete).
 
@@ -418,6 +418,7 @@ All reservations across all customers.
 | REFRESH_TOKEN_INVALID       | 401    | Refresh token unknown, expired, or revoked               |
 | UNAUTHENTICATED             | 401    | Missing or invalid access token                          |
 | ADMIN_SELF_ACTION_FORBIDDEN | 403    | Admin targeting their own account on an admin-only route |
+| GENRE_NAME_ALREADY_EXISTS   | 409    | Genre name already in use                                |
 | MOVIE_REQUIRES_GENRE        | 400    | Movie left with zero genres                              |
 | GENRE_IN_USE                | 409    | Genre still assigned to a movie                          |
 | SHOWTIME_OVERLAP            | 409    | Showtime interval overlaps another in the same hall      |
