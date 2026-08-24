@@ -3,12 +3,13 @@
 Design record for the Movie Reservation System capstone. The source documents are Word
 files; these pages are the in-repo, greppable, linkable version of them.
 
-| Area                                         | What it holds                                                               |
-| -------------------------------------------- | --------------------------------------------------------------------------- |
-| [adr/](adr/README.md)                        | 14 Architecture Decision Records — framework, database, locking strategy    |
-| [ddr/](ddr/README.md)                        | 10 Design Decision Records — the values and conventions underneath the ADRs |
-| [database/](database/README.md)              | 11 tables, 14 relationships, 34 business rules, 6 views                     |
-| [decisions-vs-code.md](decisions-vs-code.md) | What is implemented, what diverges, what is not built yet                   |
+| Area                                         | What it holds                                                                                                                     |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| [adr/](adr/README.md)                        | 14 Architecture Decision Records — framework, database, locking strategy                                                          |
+| [ddr/](ddr/README.md)                        | 10 Design Decision Records — the values and conventions underneath the ADRs                                                       |
+| [database/](database/README.md)              | 11 tables, 14 relationships, 34 business rules, 6 views                                                                           |
+| [api/](api/README.md)                        | REST API reference — every endpoint's request/response shape, pagination, error codes, and versioning; 13 implemented, 25 planned |
+| [decisions-vs-code.md](decisions-vs-code.md) | What is implemented, what diverges, what is not built yet                                                                         |
 
 ## Where to start
 
@@ -16,6 +17,8 @@ files; these pages are the in-repo, greppable, linkable version of them.
   for what the system is for, then [adr/README.md](adr/README.md) for how it is built.
 - **About to write code?** Find the ADR or DDR that governs the area, then check
   [decisions-vs-code.md](decisions-vs-code.md) for anything already known to diverge.
+- **About to call or build an endpoint?** [api/README.md](api/README.md) is the request/response
+  contract — conventions once, up front, then one entry per endpoint.
 - **About to make a decision?** Run `/decision-record` — it picks the next number, uses the
   right template and updates the index.
 
@@ -41,6 +44,7 @@ Requirement (R1–R13)
             └─ DDR-001…010                docs/ddr/
                  └─ BR-01…BR-34           docs/database/business-rules.md
                       └─ view / index     docs/database/views.md
+                           └─ endpoint     docs/api/README.md
 ```
 
 Worked example — the overbooking guarantee:
@@ -53,4 +57,5 @@ R12  the design must avoid overbooking
          └─ DDR-002  lock, re-validate, then write
              └─ BR-17  partial unique index on active holds
                  └─ v_showtime_seat_map
+                     └─ GET /showtimes/:id/seats
 ```
