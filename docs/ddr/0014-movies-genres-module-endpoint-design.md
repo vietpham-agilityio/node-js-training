@@ -86,7 +86,8 @@ admin. This record fills in the rest, the way DDR-012 did for Users.
 ## Follow-up
 
 - When Showtimes' `GET /showtimes/:id/seats` (optional Bearer, per `docs/api/README.md`)
-  is implemented, reuse `OptionalJwtAuthGuard` rather than writing a second variant.
+  is implemented, reuse `OptionalJwtAuthGuard` rather than writing a second variant.~~
+  Done — DDR-015 applies it to all three showtime read routes.
 - Correct the Genre entry in `docs/api/README.md` / the source Word doc to say
   `409 GENRE_NAME_ALREADY_EXISTS` instead of `400 BAD_REQUEST`, in the pending docs-sync
   pass.

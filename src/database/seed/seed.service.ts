@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { addMinutesToTimeString } from '../../common/utils/time.util';
 import { BCRYPT_SALT_ROUNDS } from '../../modules/auth/constants/auth.constants';
 import { Genre } from '../../modules/movies/entities/genre.entity';
 import { MovieGenre } from '../../modules/movies/entities/movie-genre.entity';
@@ -17,7 +18,7 @@ import { User } from '../../modules/users/entities/user.entity';
 import { GENRE_NAMES } from './data/genres.data';
 import { HALL_FIXTURES } from './data/halls.data';
 import { MOVIE_FIXTURES } from './data/movies.data';
-import { addDays, addMinutesToTimeString, formatDate } from './date.util';
+import { addDays, formatDate } from './date.util';
 
 const SHOWTIME_SLOTS = ['10:00:00', '14:30:00', '19:00:00'];
 const DAY_OFFSET_START = -1; // one showtime in the past, so BR-29 is demonstrable
