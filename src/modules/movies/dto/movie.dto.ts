@@ -18,6 +18,11 @@ import { PaginationMetaDto } from '../../../common/dto/paginated-response.dto';
 import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
 import { GenreResponseDto } from './genre.dto';
 
+// A cinema release, not a marathon. BR-02 only requires a positive duration;
+// this upper bound is catalogue policy, so it lives in the DTO rather than a
+// CHECK constraint that would need a migration to adjust.
+const MAX_DURATION_MINUTES = 180;
+
 // BR-30 / MOVIE_REQUIRES_GENRE: genreIds is deliberately not @ArrayMinSize(1)
 // — an empty array must reach MoviesService so it can throw the specific
 // errorCode instead of a generic validation 400.
@@ -38,9 +43,10 @@ export class CreateMovieDto {
   @IsString()
   posterUrl?: string;
 
-  @ApiProperty()
+  @ApiProperty({ minimum: 1, maximum: MAX_DURATION_MINUTES })
   @IsInt()
   @Min(1)
+  @Max(MAX_DURATION_MINUTES)
   durationMinutes: number;
 
   @ApiProperty()
@@ -85,10 +91,11 @@ export class UpdateMovieDto {
   @IsString()
   posterUrl?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ minimum: 1, maximum: MAX_DURATION_MINUTES })
   @IsOptional()
   @IsInt()
   @Min(1)
+  @Max(MAX_DURATION_MINUTES)
   durationMinutes?: number;
 
   @ApiPropertyOptional()
