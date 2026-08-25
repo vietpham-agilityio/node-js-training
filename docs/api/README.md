@@ -224,30 +224,31 @@ Deactivate a movie (soft delete).
 - Auth: Bearer, admin
 - Request: —
 - Success: `204 No Content`
-- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `404 NOT_FOUND`
+- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `404 NOT_FOUND`,
+  `409 SHOWTIME_INVALID_STATUS_TRANSITION` (a completed showtime cannot be cancelled)
 
 ---
 
-## Halls — Planned (read-only)
+## Halls — Implemented (read-only)
 
 ### `GET /halls`
 
-List halls (for scheduling showtimes).
+List halls with seat capacity.
 
-- Auth: Bearer, admin
+- Auth: none (DDR-015 — hall name, format and capacity are part of the public catalogue)
 - Request: —
 - Success: `200 OK` — `{ id, name, hallType, totalSeats }[]` (not paginated)
-- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`
+- Errors: —
 
 ---
 
-## Showtimes — Planned
+## Showtimes — Implemented (except `POST /showtimes/:id/hold`)
 
 ### `GET /showtimes`
 
 List showtimes with seat availability.
 
-- Auth: none
+- Auth: none (an admin token additionally reveals cancelled showtimes)
 - Request: query `page?, limit?, date?, movieId?, hallId?`
 - Success: `200 OK` — paginated, each row includes `totalSeats, seatsTaken, availableSeats`
 - Errors: —
@@ -256,9 +257,9 @@ List showtimes with seat availability.
 
 Get one showtime, with nested movie and hall.
 
-- Auth: none
+- Auth: none (an admin token additionally reveals cancelled showtimes)
 - Request: —
-- Success: `200 OK`
+- Success: `200 OK` — also carries `totalSeats, seatsTaken, availableSeats`
 - Errors: `404 NOT_FOUND`
 
 ### `GET /showtimes/:id/seats`
@@ -267,7 +268,8 @@ Seat map for a showtime.
 
 - Auth: optional Bearer (flags caller's own held seats)
 - Request: —
-- Success: `200 OK` — plain array `{ seatId, seatRow, seatColumn, seatLabel, status, isMine? }[]` (not paginated)
+- Success: `200 OK` — plain array `{ seatId, seatRow, seatColumn, seatLabel, status, isMine? }[]` (not paginated).
+  `status` is `available | held | reserved`; `isMine` is omitted entirely for an anonymous caller.
 - Errors: `404 NOT_FOUND`
 
 ### `POST /showtimes`
@@ -286,7 +288,8 @@ Update or reschedule a showtime.
 - Auth: Bearer, admin
 - Request: `{ showDate?, showTime?, basePrice?, status? }`
 - Success: `200 OK`
-- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `409 SHOWTIME_OVERLAP`, `404 NOT_FOUND`
+- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `409 SHOWTIME_OVERLAP`,
+  `409 SHOWTIME_INVALID_STATUS_TRANSITION`, `409 SHOWTIME_NOT_MODIFIABLE`, `404 NOT_FOUND`
 
 ### `DELETE /showtimes/:id`
 
@@ -295,11 +298,12 @@ Cancel a showtime (soft delete).
 - Auth: Bearer, admin
 - Request: —
 - Success: `204 No Content`
-- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `404 NOT_FOUND`
+- Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `404 NOT_FOUND`,
+  `409 SHOWTIME_INVALID_STATUS_TRANSITION` (a completed showtime cannot be cancelled)
 
-### `POST /showtimes/:id/hold`
+### `POST /showtimes/:id/hold` — Planned
 
-Claim one or more seats (10-minute hold).
+Claim one or more seats (10-minute hold). Lands with the Reservations module (DDR-015).
 
 - Auth: Bearer
 - Request: `{ seatIds[] }`
@@ -410,24 +414,26 @@ All reservations across all customers.
 
 ## Error Codes
 
-| errorCode                   | Status | Meaning                                                  |
-| --------------------------- | ------ | -------------------------------------------------------- |
-| INVALID_CREDENTIALS         | 401    | Wrong email/password, or wrong current password          |
-| EMAIL_ALREADY_REGISTERED    | 409    | Email already registered                                 |
-| ACCOUNT_INACTIVE            | 403    | Login attempt on a deactivated account                   |
-| REFRESH_TOKEN_INVALID       | 401    | Refresh token unknown, expired, or revoked               |
-| UNAUTHENTICATED             | 401    | Missing or invalid access token                          |
-| ADMIN_SELF_ACTION_FORBIDDEN | 403    | Admin targeting their own account on an admin-only route |
-| GENRE_NAME_ALREADY_EXISTS   | 409    | Genre name already in use                                |
-| MOVIE_REQUIRES_GENRE        | 400    | Movie left with zero genres                              |
-| GENRE_IN_USE                | 409    | Genre still assigned to a movie                          |
-| SHOWTIME_OVERLAP            | 409    | Showtime interval overlaps another in the same hall      |
-| SHOWTIME_NOT_BOOKABLE       | 409    | Showtime is cancelled or completed                       |
-| SEAT_UNAVAILABLE            | 409    | Seat already held/reserved by someone else               |
-| SEAT_HOLD_EXPIRED           | 409    | Hold's TTL passed before confirmation                    |
-| SEAT_HOLD_NOT_OWNED         | 403    | Hold belongs to a different user                         |
-| RESERVATION_NOT_CANCELLABLE | 409    | Showtime already started, or reservation not confirmed   |
-| BAD_REQUEST                 | 400    | Generic validation failure                               |
-| FORBIDDEN                   | 403    | Generic role/ownership rejection                         |
-| NOT_FOUND                   | 404    | Generic missing resource                                 |
-| INTERNAL_SERVER_ERROR       | 500    | Unhandled error                                          |
+| errorCode                          | Status | Meaning                                                  |
+| ---------------------------------- | ------ | -------------------------------------------------------- |
+| INVALID_CREDENTIALS                | 401    | Wrong email/password, or wrong current password          |
+| EMAIL_ALREADY_REGISTERED           | 409    | Email already registered                                 |
+| ACCOUNT_INACTIVE                   | 403    | Login attempt on a deactivated account                   |
+| REFRESH_TOKEN_INVALID              | 401    | Refresh token unknown, expired, or revoked               |
+| UNAUTHENTICATED                    | 401    | Missing or invalid access token                          |
+| ADMIN_SELF_ACTION_FORBIDDEN        | 403    | Admin targeting their own account on an admin-only route |
+| GENRE_NAME_ALREADY_EXISTS          | 409    | Genre name already in use                                |
+| MOVIE_REQUIRES_GENRE               | 400    | Movie left with zero genres                              |
+| GENRE_IN_USE                       | 409    | Genre still assigned to a movie                          |
+| SHOWTIME_OVERLAP                   | 409    | Showtime interval overlaps another in the same hall      |
+| SHOWTIME_NOT_BOOKABLE              | 409    | Showtime is cancelled or completed                       |
+| SHOWTIME_INVALID_STATUS_TRANSITION | 409    | Showtime status change not allowed (DDR-016)             |
+| SHOWTIME_NOT_MODIFIABLE            | 409    | Showtime rescheduled or repriced after `scheduled`       |
+| SEAT_UNAVAILABLE                   | 409    | Seat already held/reserved by someone else               |
+| SEAT_HOLD_EXPIRED                  | 409    | Hold's TTL passed before confirmation                    |
+| SEAT_HOLD_NOT_OWNED                | 403    | Hold belongs to a different user                         |
+| RESERVATION_NOT_CANCELLABLE        | 409    | Showtime already started, or reservation not confirmed   |
+| BAD_REQUEST                        | 400    | Generic validation failure                               |
+| FORBIDDEN                          | 403    | Generic role/ownership rejection                         |
+| NOT_FOUND                          | 404    | Generic missing resource                                 |
+| INTERNAL_SERVER_ERROR              | 500    | Unhandled error                                          |
