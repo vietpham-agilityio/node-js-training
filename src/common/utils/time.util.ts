@@ -4,7 +4,7 @@
 // other, in particular addMinutesToTimeString and durationBetweenTimeStrings
 // being exact inverses across midnight.
 
-const MINUTES_PER_DAY = 24 * 60;
+import { MILLISECONDS_PER_DAY, MINUTES_PER_DAY } from '../constant';
 
 /** 'HH:mm[:ss]' -> minutes since midnight. Seconds are ignored. */
 export const minutesOfTimeString = (time: string): number => {
@@ -44,3 +44,14 @@ export const durationBetweenTimeStrings = (
 ): number =>
   (minutesOfTimeString(end) - minutesOfTimeString(start) + MINUTES_PER_DAY) %
     MINUTES_PER_DAY || MINUTES_PER_DAY;
+
+export const addDaysToDateString = (date: string, days: number): string =>
+  new Date(Date.parse(`${date}T00:00:00Z`) + days * MILLISECONDS_PER_DAY)
+    .toISOString()
+    .slice(0, 10);
+
+export const daysBetweenDateStrings = (from: string, to: string): number =>
+  Math.round(
+    (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) /
+      MILLISECONDS_PER_DAY,
+  );
