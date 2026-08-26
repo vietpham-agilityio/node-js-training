@@ -242,7 +242,7 @@ List halls with seat capacity.
 
 ---
 
-## Showtimes — Implemented (except `POST /showtimes/:id/hold`)
+## Showtimes — Implemented
 
 ### `GET /showtimes`
 
@@ -301,9 +301,9 @@ Cancel a showtime (soft delete).
 - Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`, `404 NOT_FOUND`,
   `409 SHOWTIME_INVALID_STATUS_TRANSITION` (a completed showtime cannot be cancelled)
 
-### `POST /showtimes/:id/hold` — Planned
+### `POST /showtimes/:id/hold`
 
-Claim one or more seats (10-minute hold). Lands with the Reservations module (DDR-015).
+Claim one or more seats (10-minute hold). Implemented in the Reservations module (DDR-015).
 
 - Auth: Bearer
 - Request: `{ seatIds[] }`
