@@ -12,11 +12,20 @@ import type { PaginatedResponseDto } from '../../common/dto/paginated-response.d
 import { AppException } from '../../common/exceptions/app.exception';
 import { ErrorCode } from '../../common/exceptions/error-codes';
 import {
+  addDaysToDateString,
   addMinutesToTimeString,
+  daysBetweenDateStrings,
   durationBetweenTimeStrings,
   minutesOfTimeString,
   normalizeTimeString,
 } from '../../common/utils/time.util';
+import {
+  ALLOWED_TRANSITIONS,
+  EMPTY_AVAILABILITY,
+  MINUTES_PER_DAY,
+  UNIQUE_VIOLATION,
+} from '../../common/constant';
+import type { Availability } from '../../common/types';
 import { Movie } from '../movies/entities/movie.entity';
 import { SeatHoldStatus } from '../reservations/enums/seat-hold-status.enum';
 import type {
@@ -35,13 +44,7 @@ interface VisibilityOptions {
   includeCancelled: boolean;
 }
 
-interface Availability {
-  totalSeats: number;
-  seatsTaken: number;
-  availableSeats: number;
-}
-
-// One row per (showtime, active seat), with the occupying hold if there is one.
+// One seat (showtime, active seat), with the occupying hold if there is one.
 interface SeatOccupancyRow {
   showtimeId: string;
   seatId: string;
@@ -51,41 +54,6 @@ interface SeatOccupancyRow {
   holdStatus: SeatHoldStatus | null;
   heldByUserId: string | null;
 }
-
-const EMPTY_AVAILABILITY: Availability = {
-  totalSeats: 0,
-  seatsTaken: 0,
-  availableSeats: 0,
-};
-
-const MINUTES_PER_DAY = 24 * 60;
-const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
-const UNIQUE_VIOLATION = '23505';
-
-// DDR-016: what a showtime may become, keyed by what it is now. cancelled
-// returns to scheduled because ADR-010 promises an accidental removal can be
-// undone; completed is the one terminal state.
-const ALLOWED_TRANSITIONS: Record<ShowtimeStatus, ShowtimeStatus[]> = {
-  [ShowtimeStatus.SCHEDULED]: [
-    ShowtimeStatus.ACTIVE,
-    ShowtimeStatus.COMPLETED,
-    ShowtimeStatus.CANCELLED,
-  ],
-  [ShowtimeStatus.ACTIVE]: [ShowtimeStatus.COMPLETED, ShowtimeStatus.CANCELLED],
-  [ShowtimeStatus.COMPLETED]: [],
-  [ShowtimeStatus.CANCELLED]: [ShowtimeStatus.SCHEDULED],
-};
-
-const addDaysToDateString = (date: string, days: number): string =>
-  new Date(Date.parse(`${date}T00:00:00Z`) + days * MILLISECONDS_PER_DAY)
-    .toISOString()
-    .slice(0, 10);
-
-const daysBetweenDateStrings = (from: string, to: string): number =>
-  Math.round(
-    (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) /
-      MILLISECONDS_PER_DAY,
-  );
 
 @Injectable()
 export class ShowtimesService extends BaseAbstractService<Showtime> {
@@ -128,6 +96,7 @@ export class ShowtimesService extends BaseAbstractService<Showtime> {
     }
 
     const [showtimes, total] = await qb.getManyAndCount();
+
     const availability = await this.findAvailability(
       showtimes.map(({ id }) => id),
     );
@@ -517,9 +486,11 @@ export class ShowtimesService extends BaseAbstractService<Showtime> {
       const current = availability.get(showtimeId) ?? { ...EMPTY_AVAILABILITY };
 
       current.totalSeats += 1;
+
       if (holdStatus !== null) {
         current.seatsTaken += 1;
       }
+
       current.availableSeats = current.totalSeats - current.seatsTaken;
 
       return availability.set(showtimeId, current);
