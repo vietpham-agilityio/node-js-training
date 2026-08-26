@@ -13,3 +13,8 @@ export const ALLOWED_TRANSITIONS: Record<ShowtimeStatus, ShowtimeStatus[]> = {
   [ShowtimeStatus.COMPLETED]: [],
   [ShowtimeStatus.CANCELLED]: [ShowtimeStatus.SCHEDULED],
 };
+
+export const NOT_BOOKABLE_STATUSES = new Set([
+  ShowtimeStatus.CANCELLED,
+  ShowtimeStatus.COMPLETED,
+]);
