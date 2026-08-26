@@ -3,7 +3,8 @@
 What the records say against what is committed on this branch. Keep this table honest — an
 ADR that quietly disagrees with the code is worse than no ADR.
 
-Last checked: 25 Aug 2026, on `feat/ticket-reservation` (Showtimes/Halls module landed).
+Last checked: 26 Aug 2026, on `feat/ticket-reservation` (`POST /showtimes/:id/hold` and the
+seat-hold expiry sweep landed).
 
 ## Implemented and matching
 
@@ -28,6 +29,9 @@ Last checked: 25 Aug 2026, on `feat/ticket-reservation` (Showtimes/Halls module 
 | DDR-003 | `src/modules/showtimes/showtimes.service.ts` — `findSeatOccupancyRows` is the one derivation behind both the seat map and the availability triple; no counter column exists                                                                             |
 | DDR-015 | `src/modules/showtimes/halls.controller.ts`, `halls.service.ts`, `showtimes.controller.ts`, `showtimes.service.ts` — endpoint/permission design                                                                                                         |
 | DDR-016 | `src/modules/showtimes/showtimes.service.ts` — `ALLOWED_TRANSITIONS`, `assertStatusTransition`, `assertModifiable`                                                                                                                                      |
+| ADR-007 | `src/modules/reservations/seat-holds.service.ts`, `seat-holds.controller.ts` — `POST /showtimes/:id/hold`; a `23505` on `uq_seat_hold_active` is caught and returned as `409 SEAT_UNAVAILABLE`                                                          |
+| ADR-009 | `src/modules/reservations/seat-hold-sweep.service.ts` — `@nestjs/schedule`, `EVERY_MINUTE` cron releasing expired holds (BR-27). The 15-minute reservation-completion job is not built (see "Not yet built")                                            |
+| DDR-001 | `src/modules/reservations/entities/seat-hold.entity.ts` (10-minute `held_until` DB default), `seat-hold-sweep.service.ts` (60s sweep cadence)                                                                                                           |
 
 ## Diverging — needs a fix or a superseding record
 
@@ -47,31 +51,32 @@ change the code, or supersede the record — but do not leave them silently disa
 Records that are accepted but have no code behind them yet. This is expected; the branch is
 the application skeleton over a designed schema.
 
-| Record           | Waiting on                                                                    |
-| ---------------- | ----------------------------------------------------------------------------- |
-| ADR-007          | `seat_holds` table and the `uq_seat_hold_active` partial unique index         |
-| ADR-008          | State-machine guards for seat hold and reservation (showtimes done — DDR-016) |
-| ADR-009          | `@nestjs/schedule` — the 60-second sweep and 15-minute completion job         |
-| ADR-010          | `status` flags and their transitions on Seat Holds and Reservations           |
-| ADR-011, DDR-010 | Reports module and the aggregate queries                                      |
-| DDR-001–004      | Reservations module (`POST /showtimes/:id/hold` lands there — DDR-015)        |
+| Record           | Waiting on                                                                                                                                                                                                     |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ADR-008          | State-machine guards for seat hold and reservation (showtimes done — DDR-016; seat-hold creation and the sweep only ever perform the two legal transitions into HELD/EXPIRED, so no guard has been needed yet) |
+| ADR-009          | The 15-minute reservation-completion job — the 60-second seat-hold sweep is built (see above)                                                                                                                  |
+| ADR-010          | `status` flags and their transitions on Seat Holds and Reservations                                                                                                                                            |
+| ADR-011, DDR-010 | Reports module and the aggregate queries                                                                                                                                                                       |
+| DDR-002, DDR-004 | Reservation confirmation itself (`POST /reservations`) — the pessimistic-lock transaction and reference-number format; `POST /showtimes/:id/hold` (DDR-001) is now built                                       |
 
 ## Notes
 
-- **Ownership checks (ADR-006, BR-34).** Wired up for real in the Users module (DDR-012) and
-  now the Movies/Genres module (DDR-014) — `JwtAuthGuard`, `RolesGuard` and `@Roles()` gate
-  the admin-only routes on `GenresController`/`MoviesController`; `@CurrentUser()` is used
-  optionally there too, via the new `OptionalJwtAuthGuard`, to let an admin's token reveal
-  inactive movies on the otherwise-public list/detail routes. Reservations/Showtimes still
-  have no controllers or services; wiring ownership checks into `ReservationsService` remains
-  deferred to when that module is actually built.
-  Showtimes now has both (DDR-015), but every route on it is either public or admin-only, so
-  no per-row ownership check arises there — the first one is `POST /showtimes/:id/hold`.
-- **ADR-009's absence is compensated, not ignored.** With no expiry sweep, expired `held`
-  rows stay in `seat_holds`. `findSeatOccupancyRows` requires `held_until > NOW()` in its
-  join condition, so an expired hold reads as an available seat and cannot silently block a
-  booking. The rows still accumulate; only the reads are protected. When the sweep lands, the
-  predicate stays — it costs nothing and keeps the read correct between sweeps.
+- **Ownership checks (ADR-006, BR-34).** Wired up for real in the Users module (DDR-012), the
+  Movies/Genres module (DDR-014) — `JwtAuthGuard`, `RolesGuard` and `@Roles()` gate the
+  admin-only routes on `GenresController`/`MoviesController`; `@CurrentUser()` is used
+  optionally there too, via `OptionalJwtAuthGuard`, to let an admin's token reveal inactive
+  movies on the otherwise-public list/detail routes — and now Reservations: every route on
+  `ShowtimesController` is public or admin-only, so `SeatHoldsController`
+  (`POST /showtimes/:id/hold`) is the first per-row ownership-relevant write in the flow.
+  `userId` comes from `@CurrentUser()`, never the request body (BR-34/DDR-007). Ownership
+  checks on `DELETE /seat-holds/:id` and `POST /reservations` remain deferred — those routes
+  don't exist yet.
+- **ADR-009 is now partially built.** The 60-second seat-hold sweep
+  (`SeatHoldSweepService`) exists and flips expired `held` rows to `expired` (BR-27).
+  `findSeatOccupancyRows`'s `held_until > NOW()` join condition stays regardless — a hold can
+  still be up to a minute stale before the next sweep tick, and the read path was always meant
+  to be correct independent of the sweep having run. The 15-minute reservation-completion job
+  is not built; there is no `POST /reservations` yet for it to complete.
 - **The seed's `DDR-009` row is gone from "Not yet built".** The seed exists at
   `src/database/seed/` and runs on application bootstrap; the old entry was stale.
 - **Refresh token reuse detection.** ADR-005/BR-32 are satisfied by rotation + revocation.
