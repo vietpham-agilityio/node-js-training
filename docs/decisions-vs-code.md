@@ -18,7 +18,7 @@ and the 15-minute completion sweep landed).
 | ADR-006 | `src/common/decorators/roles.decorator.ts`, `src/common/guards/roles.guard.ts`                                                                                                                                                                                                                                          |
 | ADR-010 | `src/modules/users/`, `src/modules/movies/` — `is_active` flag + soft-delete `remove()`; `src/modules/showtimes/showtimes.service.ts` — `remove()` moves `status` to `cancelled`; `ReservationsService`/`SeatHoldSweepService`/`ReservationCompletionSweepService` now cover the Reservations/SeatHolds transitions too |
 | ADR-012 | `src/main.ts` — `SwaggerModule` at `${apiPrefix}/docs`, URI versioning                                                                                                                                                                                                                                                  |
-| ADR-014 | `docker-compose.yml`, `.env.example`                                                                                                                                                                                                                                                                                    |
+| ADR-014 | `docker-compose.yml`, `docker-compose.override.yml`, `Dockerfile`, `.env.example` — `app` and `postgres` now start together; migrations run on container start (`docker-entrypoint.sh`/`docker-entrypoint.dev.sh`); seed data already ran on `SeedService.onApplicationBootstrap`                                       |
 | DDR-006 | `src/common/filters/all-exceptions.filter.ts` — `{ statusCode, errorCode, message, timestamp }`                                                                                                                                                                                                                         |
 | DDR-008 | `src/config/env.validation.ts` — Joi schema, `abortEarly: false`, boot-time failure                                                                                                                                                                                                                                     |
 | DDR-011 | `src/common/dto/pagination-query.dto.ts` — one-indexed pages, supersedes DDR-005                                                                                                                                                                                                                                        |
@@ -93,6 +93,13 @@ the application skeleton over a designed schema.
   effect on revenue correctness either way. Revisit if a future record says otherwise.
 - **The seed's `DDR-009` row is gone from "Not yet built".** The seed exists at
   `src/database/seed/` and runs on application bootstrap; the old entry was stale.
+- **Container images: one `production` target promoted through staging and production.**
+  `Dockerfile` has two targets — `development` (hot reload, full deps, used via the
+  auto-merged `docker-compose.override.yml`) and `production` (lean, compiled, non-root).
+  Staging and production intentionally build and run the _same_ `production` image, differing
+  only by env vars/secrets supplied at deploy time (`docker compose -f docker-compose.yml up`
+  with an environment-specific `--env-file`), not by separate Dockerfile targets — this is the
+  basis the future CI/CD pipeline should build on rather than re-deciding.
 - **Refresh token reuse detection.** ADR-005/BR-32 are satisfied by rotation + revocation.
   Detecting _reuse_ of an already-revoked token as a theft signal (and revoking the rest of
   that user's sessions in response) was considered and deliberately deferred — it needs a
