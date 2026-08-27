@@ -13,8 +13,6 @@ import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
 import { ReservationStatus } from '../enums/reservation-status.enum';
 import { TicketStatus } from '../enums/ticket-status.enum';
 
-// BR-34/DDR-007: userId is never accepted from the client — it comes from
-// @CurrentUser() inside the controller, so it has no field here.
 export class ConfirmReservationDto {
   @ApiProperty({ type: [String] })
   @IsArray()

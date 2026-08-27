@@ -58,7 +58,7 @@ export class ReservationsService {
     dto: ConfirmReservationDto,
     userId: string,
   ): Promise<ReservationResponseDto> {
-    return this.withReferenceRetry(() =>
+    return this.withUniViolentRetry(() =>
       this.reservations.manager.transaction(async (manager) => {
         const { holdIds } = dto;
         const holds = await manager
@@ -76,6 +76,7 @@ export class ReservationsService {
             HttpStatus.FORBIDDEN,
           );
         }
+
         if (
           holds.some(
             (hold) =>
@@ -90,7 +91,9 @@ export class ReservationsService {
           );
         }
 
-        const [showtimeId] = holds.map((hold) => hold.showtimeId);
+        // Select first showtimeId to confirm that all showtimes are same
+        const { showtimeId } = holds[0];
+
         if (holds.some((hold) => hold.showtimeId !== showtimeId)) {
           throw new BadRequestException(
             'All holds in a reservation must belong to the same showtime',
@@ -100,14 +103,17 @@ export class ReservationsService {
         const showtime = await manager.findOneOrFail(Showtime, {
           where: { id: showtimeId },
         });
+
         const seats = await manager.getRepository(Seat).find({
           where: { id: In(holds.map((hold) => hold.seatId)) },
         });
+
         const seatLabelsById = new Map(
           seats.map((seat) => [seat.id, seat.seatLabel]),
         );
 
         const reservationNumber = generateReservationNumber();
+
         const suffix = reservationSuffix(reservationNumber);
 
         const reservation = await manager.save(
@@ -224,6 +230,7 @@ export class ReservationsService {
       await manager.update(Reservation, id, {
         status: ReservationStatus.CANCELLED,
       });
+
       // ADR-008: CONFIRMED holds' only legal exit is RELEASED — this is what
       // actually frees the seats uq_seat_hold_active was blocking on.
       await manager.update(
@@ -231,6 +238,7 @@ export class ReservationsService {
         { reservationId: id, status: SeatHoldStatus.CONFIRMED },
         { status: SeatHoldStatus.RELEASED },
       );
+
       await manager.update(
         Ticket,
         { reservationId: id, status: TicketStatus.VALID },
@@ -252,7 +260,7 @@ export class ReservationsService {
     });
   }
 
-  private async withReferenceRetry<T>(
+  private async withUniViolentRetry<T>(
     attempt: () => Promise<T>,
     attemptsLeft = MAX_REFERENCE_ATTEMPTS,
   ): Promise<T> {
@@ -263,7 +271,7 @@ export class ReservationsService {
         (error as { code?: string }).code === UNIQUE_VIOLATION &&
         attemptsLeft > 1
       ) {
-        return this.withReferenceRetry(attempt, attemptsLeft - 1);
+        return this.withUniViolentRetry(attempt, attemptsLeft - 1);
       }
       throw error;
     }
