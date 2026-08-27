@@ -5,8 +5,8 @@ Pagination (all list endpoints): query `page` (default 1), `limit` (default 20, 
 `{ data: [...], meta: { page, limit, total, hasMore } }`. Errors (all endpoints):
 `{ statusCode, errorCode, message, timestamp }`.
 
-Status: **Implemented** = Health, Auth, Users, Genres, Movies. **Planned** = everything else
-(Halls, Showtimes, Seat Holds, Reservations, Reports).
+Status: **Implemented** = Health, Auth, Users, Genres, Movies, Halls, Showtimes, Reservations.
+**Planned** = Seat Holds (`DELETE /seat-holds/:id` — voluntary release), Reports.
 
 ---
 
@@ -325,7 +325,7 @@ Voluntarily release a held seat.
 
 ---
 
-## Reservations — Planned
+## Reservations — Implemented
 
 ### `POST /reservations`
 

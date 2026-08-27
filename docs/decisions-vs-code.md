@@ -3,35 +3,38 @@
 What the records say against what is committed on this branch. Keep this table honest — an
 ADR that quietly disagrees with the code is worse than no ADR.
 
-Last checked: 26 Aug 2026, on `feat/ticket-reservation` (`POST /showtimes/:id/hold` and the
-seat-hold expiry sweep landed).
+Last checked: 26 Aug 2026, on `feat/ticket-reservation` (reservation confirmation, cancellation,
+and the 15-minute completion sweep landed).
 
 ## Implemented and matching
 
-| Record  | Where                                                                                                                                                                                                                                                   |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ADR-001 | `src/app.module.ts`, `src/modules/` — one Nest app, modules registered at root                                                                                                                                                                          |
-| ADR-002 | `src/database/data-source.options.ts` — `type: 'postgres'`                                                                                                                                                                                              |
-| ADR-003 | `package.json` — `typeorm`, `@nestjs/typeorm`; migrations under `src/database/migrations/`                                                                                                                                                              |
-| ADR-004 | `src/main.ts` — `NestFactory.create(AppModule)` with no adapter, i.e. Express                                                                                                                                                                           |
-| ADR-005 | `src/modules/auth/` — bcrypt, RS256 JWT access token, SHA-256-hashed refresh tokens                                                                                                                                                                     |
-| ADR-006 | `src/common/decorators/roles.decorator.ts`, `src/common/guards/roles.guard.ts`                                                                                                                                                                          |
-| ADR-010 | `src/modules/users/`, `src/modules/movies/` — `is_active` flag + soft-delete `remove()`; `src/modules/showtimes/showtimes.service.ts` — `remove()` moves `status` to `cancelled`. Reservations/SeatHolds `status` transitions still pending (see below) |
-| ADR-012 | `src/main.ts` — `SwaggerModule` at `${apiPrefix}/docs`, URI versioning                                                                                                                                                                                  |
-| ADR-014 | `docker-compose.yml`, `.env.example`                                                                                                                                                                                                                    |
-| DDR-006 | `src/common/filters/all-exceptions.filter.ts` — `{ statusCode, errorCode, message, timestamp }`                                                                                                                                                         |
-| DDR-008 | `src/config/env.validation.ts` — Joi schema, `abortEarly: false`, boot-time failure                                                                                                                                                                     |
-| DDR-011 | `src/common/dto/pagination-query.dto.ts` — one-indexed pages, supersedes DDR-005                                                                                                                                                                        |
-| DDR-012 | `src/modules/users/users.controller.ts`, `users.service.ts` — endpoint/permission design                                                                                                                                                                |
-| DDR-013 | `src/modules/users/users.controller.ts` — `PATCH /users/me/password`                                                                                                                                                                                    |
-| DDR-014 | `src/modules/movies/genres.controller.ts`, `genres.service.ts`, `movies.controller.ts`, `movies.service.ts` — endpoint/permission design                                                                                                                |
-| ADR-013 | `src/database/migrations/1787211926318-InitSchema.ts` — every FK indexed, plus the composite paths ADR-013 names                                                                                                                                        |
-| DDR-003 | `src/modules/showtimes/showtimes.service.ts` — `findSeatOccupancyRows` is the one derivation behind both the seat map and the availability triple; no counter column exists                                                                             |
-| DDR-015 | `src/modules/showtimes/halls.controller.ts`, `halls.service.ts`, `showtimes.controller.ts`, `showtimes.service.ts` — endpoint/permission design                                                                                                         |
-| DDR-016 | `src/modules/showtimes/showtimes.service.ts` — `ALLOWED_TRANSITIONS`, `assertStatusTransition`, `assertModifiable`                                                                                                                                      |
-| ADR-007 | `src/modules/reservations/seat-holds.service.ts`, `seat-holds.controller.ts` — `POST /showtimes/:id/hold`; a `23505` on `uq_seat_hold_active` is caught and returned as `409 SEAT_UNAVAILABLE`                                                          |
-| ADR-009 | `src/modules/reservations/seat-hold-sweep.service.ts` — `@nestjs/schedule`, `EVERY_MINUTE` cron releasing expired holds (BR-27). The 15-minute reservation-completion job is not built (see "Not yet built")                                            |
-| DDR-001 | `src/modules/reservations/entities/seat-hold.entity.ts` (10-minute `held_until` DB default), `seat-hold-sweep.service.ts` (60s sweep cadence)                                                                                                           |
+| Record  | Where                                                                                                                                                                                                                                                                                                                   |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ADR-001 | `src/app.module.ts`, `src/modules/` — one Nest app, modules registered at root                                                                                                                                                                                                                                          |
+| ADR-002 | `src/database/data-source.options.ts` — `type: 'postgres'`                                                                                                                                                                                                                                                              |
+| ADR-003 | `package.json` — `typeorm`, `@nestjs/typeorm`; migrations under `src/database/migrations/`                                                                                                                                                                                                                              |
+| ADR-004 | `src/main.ts` — `NestFactory.create(AppModule)` with no adapter, i.e. Express                                                                                                                                                                                                                                           |
+| ADR-005 | `src/modules/auth/` — bcrypt, RS256 JWT access token, SHA-256-hashed refresh tokens                                                                                                                                                                                                                                     |
+| ADR-006 | `src/common/decorators/roles.decorator.ts`, `src/common/guards/roles.guard.ts`                                                                                                                                                                                                                                          |
+| ADR-010 | `src/modules/users/`, `src/modules/movies/` — `is_active` flag + soft-delete `remove()`; `src/modules/showtimes/showtimes.service.ts` — `remove()` moves `status` to `cancelled`; `ReservationsService`/`SeatHoldSweepService`/`ReservationCompletionSweepService` now cover the Reservations/SeatHolds transitions too |
+| ADR-012 | `src/main.ts` — `SwaggerModule` at `${apiPrefix}/docs`, URI versioning                                                                                                                                                                                                                                                  |
+| ADR-014 | `docker-compose.yml`, `.env.example`                                                                                                                                                                                                                                                                                    |
+| DDR-006 | `src/common/filters/all-exceptions.filter.ts` — `{ statusCode, errorCode, message, timestamp }`                                                                                                                                                                                                                         |
+| DDR-008 | `src/config/env.validation.ts` — Joi schema, `abortEarly: false`, boot-time failure                                                                                                                                                                                                                                     |
+| DDR-011 | `src/common/dto/pagination-query.dto.ts` — one-indexed pages, supersedes DDR-005                                                                                                                                                                                                                                        |
+| DDR-012 | `src/modules/users/users.controller.ts`, `users.service.ts` — endpoint/permission design                                                                                                                                                                                                                                |
+| DDR-013 | `src/modules/users/users.controller.ts` — `PATCH /users/me/password`                                                                                                                                                                                                                                                    |
+| DDR-014 | `src/modules/movies/genres.controller.ts`, `genres.service.ts`, `movies.controller.ts`, `movies.service.ts` — endpoint/permission design                                                                                                                                                                                |
+| ADR-013 | `src/database/migrations/1787211926318-InitSchema.ts` — every FK indexed, plus the composite paths ADR-013 names                                                                                                                                                                                                        |
+| DDR-003 | `src/modules/showtimes/showtimes.service.ts` — `findSeatOccupancyRows` is the one derivation behind both the seat map and the availability triple; no counter column exists                                                                                                                                             |
+| DDR-015 | `src/modules/showtimes/halls.controller.ts`, `halls.service.ts`, `showtimes.controller.ts`, `showtimes.service.ts` — endpoint/permission design                                                                                                                                                                         |
+| DDR-016 | `src/modules/showtimes/showtimes.service.ts` — `ALLOWED_TRANSITIONS`, `assertStatusTransition`, `assertModifiable`                                                                                                                                                                                                      |
+| ADR-007 | `src/modules/reservations/seat-holds.service.ts`, `seat-holds.controller.ts` — `POST /showtimes/:id/hold`; a `23505` on `uq_seat_hold_active` is caught and returned as `409 SEAT_UNAVAILABLE`                                                                                                                          |
+| ADR-008 | `src/modules/reservations/reservations.service.ts` — `confirmReservation` (HELD→CONFIRMED), `cancel` (CONFIRMED→CANCELLED, and the held's own CONFIRMED→RELEASED); `reservation-completion-sweep.service.ts` (CONFIRMED→COMPLETED); `seat-hold-sweep.service.ts` (HELD→EXPIRED)                                         |
+| ADR-009 | `src/modules/reservations/seat-hold-sweep.service.ts` (60s, BR-27) and `reservation-completion-sweep.service.ts` (15-min, `'0 */15 * * * *'` — no `CronExpression.EVERY_15_MINUTES` constant exists) — both jobs now built                                                                                              |
+| DDR-001 | `src/modules/reservations/entities/seat-hold.entity.ts` (10-minute `held_until` DB default), `seat-hold-sweep.service.ts` (60s sweep cadence)                                                                                                                                                                           |
+| DDR-002 | `src/modules/reservations/reservations.service.ts` — `confirmReservation`: lock the holds (`pessimistic_write`), re-validate (`SEAT_HOLD_NOT_OWNED`/`SEAT_HOLD_EXPIRED`), then write — the exact DDR-002 order                                                                                                          |
+| DDR-004 | `src/modules/reservations/utils/reference-number.util.ts` plus `withReferenceRetry` in `reservations.service.ts` — retries the whole confirmation attempt (not a `SAVEPOINT`) on a `23505`, regenerating both the reservation and ticket numbers                                                                        |
 
 ## Diverging — needs a fix or a superseding record
 
@@ -51,32 +54,43 @@ change the code, or supersede the record — but do not leave them silently disa
 Records that are accepted but have no code behind them yet. This is expected; the branch is
 the application skeleton over a designed schema.
 
-| Record           | Waiting on                                                                                                                                                                                                     |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ADR-008          | State-machine guards for seat hold and reservation (showtimes done — DDR-016; seat-hold creation and the sweep only ever perform the two legal transitions into HELD/EXPIRED, so no guard has been needed yet) |
-| ADR-009          | The 15-minute reservation-completion job — the 60-second seat-hold sweep is built (see above)                                                                                                                  |
-| ADR-010          | `status` flags and their transitions on Seat Holds and Reservations                                                                                                                                            |
-| ADR-011, DDR-010 | Reports module and the aggregate queries                                                                                                                                                                       |
-| DDR-002, DDR-004 | Reservation confirmation itself (`POST /reservations`) — the pessimistic-lock transaction and reference-number format; `POST /showtimes/:id/hold` (DDR-001) is now built                                       |
+| Record           | Waiting on                                                                                                                                                                 |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ADR-011, DDR-010 | Reports module and the aggregate queries — `docs/api/README.md`'s `GET /reports/revenue` has no code yet, so DDR-010's derivation is a documented query, not a running one |
+| —                | `DELETE /seat-holds/:id` (voluntary release, `docs/api/README.md`) — the only endpoint left undocumented as _Planned_                                                      |
 
 ## Notes
 
 - **Ownership checks (ADR-006, BR-34).** Wired up for real in the Users module (DDR-012), the
-  Movies/Genres module (DDR-014) — `JwtAuthGuard`, `RolesGuard` and `@Roles()` gate the
-  admin-only routes on `GenresController`/`MoviesController`; `@CurrentUser()` is used
-  optionally there too, via `OptionalJwtAuthGuard`, to let an admin's token reveal inactive
-  movies on the otherwise-public list/detail routes — and now Reservations: every route on
-  `ShowtimesController` is public or admin-only, so `SeatHoldsController`
-  (`POST /showtimes/:id/hold`) is the first per-row ownership-relevant write in the flow.
-  `userId` comes from `@CurrentUser()`, never the request body (BR-34/DDR-007). Ownership
-  checks on `DELETE /seat-holds/:id` and `POST /reservations` remain deferred — those routes
-  don't exist yet.
-- **ADR-009 is now partially built.** The 60-second seat-hold sweep
-  (`SeatHoldSweepService`) exists and flips expired `held` rows to `expired` (BR-27).
-  `findSeatOccupancyRows`'s `held_until > NOW()` join condition stays regardless — a hold can
-  still be up to a minute stale before the next sweep tick, and the read path was always meant
-  to be correct independent of the sweep having run. The 15-minute reservation-completion job
-  is not built; there is no `POST /reservations` yet for it to complete.
+  Movies/Genres module (DDR-014), and now Reservations end to end: `SeatHoldsController`
+  (`POST /showtimes/:id/hold`) and `ReservationsController` (`POST /reservations`,
+  `GET /reservations/:id`, `POST /reservations/:id/cancel`) all take `userId`/`currentUser`
+  from `@CurrentUser()`, never the request body. `GET /reservations/:id` is owner-or-admin;
+  `POST /reservations/:id/cancel` is deliberately owner-only, matching
+  `docs/api/README.md`'s "Auth: Bearer, owner" (no admin override) for that one route. Only
+  `DELETE /seat-holds/:id` remains without an ownership check, since it doesn't exist yet.
+- **ADR-009 is now fully built.** The 60-second seat-hold sweep (`SeatHoldSweepService`)
+  flips expired `held` rows to `expired` (BR-27); `findSeatOccupancyRows`'s `held_until > NOW()`
+  join condition stays regardless — a hold can still be up to a minute stale before the next
+  sweep tick, and the read path was always meant to be correct independent of the sweep having
+  run. `ReservationCompletionSweepService` now covers the 15-minute half, flipping `CONFIRMED`
+  reservations to `COMPLETED` once their showtime has finished.
+- **Nothing flips `showtimes.status` from `scheduled`/`active` to `completed` as real time
+  passes** — `ShowtimesService`'s `ALLOWED_TRANSITIONS` only fires on an admin `PATCH`. Both
+  `ReservationCompletionSweepService` (has this showtime finished?) and
+  `ReservationsService.cancel` (BR-29 — has it started?) therefore compute the answer from
+  `show_date`/`show_time`/`end_time` directly via two new `time.util.ts` helpers
+  (`dateTimeToInstant`, `showtimeEndInstant`), rather than trusting `showtime.status`. Revisit
+  if a job is ever added to advance `showtime.status` itself — at that point the two sources of
+  truth should be reconciled rather than left to agree by construction.
+- **Judgment call: reservation cancellation cascades to its tickets.** ADR-008/BR-24 mandate
+  `CONFIRMED → CANCELLED` on the reservation and, as the only way to actually free the seats,
+  `CONFIRMED → RELEASED` on its `seat_holds` (BR-17's index depends on it). Neither ADR-008 nor
+  `business-rules.md`'s "State machine guards" table says anything about `tickets.status` on
+  cancellation — `ReservationsService.cancel` flips `VALID → CANCELLED` there too, since leaving
+  tickets permanently `valid` under a cancelled reservation makes BR-10's `cancelled` value dead
+  code, and DDR-010's revenue query already filters on `reservation.status` alone so this has no
+  effect on revenue correctness either way. Revisit if a future record says otherwise.
 - **The seed's `DDR-009` row is gone from "Not yet built".** The seed exists at
   `src/database/seed/` and runs on application bootstrap; the old entry was stale.
 - **Refresh token reuse detection.** ADR-005/BR-32 are satisfied by rotation + revocation.

@@ -3,8 +3,6 @@ import { ArrayNotEmpty, ArrayUnique, IsArray, IsUUID } from 'class-validator';
 
 import { SeatHoldStatus } from '../enums/seat-hold-status.enum';
 
-// BR-34/DDR-007: userId is never accepted from the client — it comes from
-// @CurrentUser() inside the controller, so it has no field here.
 export class CreateSeatHoldDto {
   @ApiProperty({ type: [String] })
   @IsArray()

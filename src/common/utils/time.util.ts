@@ -55,3 +55,25 @@ export const daysBetweenDateStrings = (from: string, to: string): number =>
     (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) /
       MILLISECONDS_PER_DAY,
   );
+
+/** 'YYYY-MM-DD' + 'HH:mm[:ss]' -> the UTC instant they name. */
+export const dateTimeToInstant = (date: string, time: string): Date =>
+  new Date(
+    Date.parse(`${date}T00:00:00Z`) + minutesOfTimeString(time) * 60_000,
+  );
+
+/**
+ * The instant a showtime actually ends. end_time is stored wrapped (BR-28's
+ * '23:00 start + 150min movie -> 01:30 same show_date' case), so it cannot be
+ * combined with show_date directly — durationBetweenTimeStrings already
+ * undoes the wrap, so the end instant is the start instant plus that duration.
+ */
+export const showtimeEndInstant = (
+  showDate: string,
+  showTime: string,
+  endTime: string,
+): Date =>
+  new Date(
+    dateTimeToInstant(showDate, showTime).getTime() +
+      durationBetweenTimeStrings(showTime, endTime) * 60_000,
+  );
