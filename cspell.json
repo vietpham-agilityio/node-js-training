@@ -7,13 +7,16 @@
     "dtos",
     "EDITMSG",
     "greppable",
+    "hashtextextended",
     "healthcheck",
     "isready",
     "PostgREST",
+    "Showtimes",
     "Supabase",
     "timestamptz",
     "typeorm",
-    "Unindexed"
+    "Unindexed",
+    "xact"
   ],
   "ignorePaths": [
     "node_modules/**",
