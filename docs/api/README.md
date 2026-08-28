@@ -372,7 +372,7 @@ Cancel a confirmed reservation.
 Revenue by day and movie.
 
 - Auth: Bearer, admin
-- Request: query `page?, limit?, from?, to?, movieId?`
+- Request: query `page?, limit?, from?, to?, movieId?, sortBy? (showDate|movieTitle|ticketsSold|revenue, default showDate), sortOrder? (asc|desc, default desc)`
 - Success: `200 OK` — paginated `{ showDate, movieId, movieTitle, ticketsSold, revenue }[]`
 - Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`
 
@@ -381,7 +381,7 @@ Revenue by day and movie.
 Occupancy per showtime.
 
 - Auth: Bearer, admin
-- Request: query `page?, limit?, from?, to?, hallId?, status?`
+- Request: query `page?, limit?, from?, to?, hallId?, status?, sortBy? (showDate|showTime|movieTitle|hallName|totalSeats|seatsTaken|occupancyPct, default showDate), sortOrder? (asc|desc, default asc)`
 - Success: `200 OK` — paginated `{ showtimeId, movieTitle, hallName, showDate, showTime, status, totalSeats, seatsTaken, occupancyPct }[]`
 - Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`
 
@@ -390,7 +390,7 @@ Occupancy per showtime.
 All reservations across all customers.
 
 - Auth: Bearer, admin
-- Request: query `page?, limit?, from?, to?, status?`
+- Request: query `page?, limit?, from?, to?, status?, sortBy? (createdAt|showDate|customerEmail|movieTitle|totalSeats|totalAmount|status, default createdAt), sortOrder? (asc|desc, default desc)`
 - Success: `200 OK` — paginated `{ reservationId, reservationNumber, customerEmail, firstName, lastName, movieTitle, showDate, showTime, status, totalSeats, totalAmount, createdAt }[]`
 - Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`
 
