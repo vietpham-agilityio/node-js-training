@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import type { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
 import type { PaginatedResponseDto } from '../../common/dto/paginated-response.dto';
+import { SortOrder } from '../../common/enums/sort-order.enum';
 import { Reservation } from '../reservations/entities/reservation.entity';
 import { Ticket } from '../reservations/entities/ticket.entity';
 import { ReservationStatus } from '../reservations/enums/reservation-status.enum';
 import { SeatHoldStatus } from '../reservations/enums/seat-hold-status.enum';
 import { TicketStatus } from '../reservations/enums/ticket-status.enum';
 import { Showtime } from '../showtimes/entities/showtime.entity';
+
 import type {
   CapacityReportQueryDto,
   RevenueReportQueryDto,
@@ -24,6 +26,14 @@ import {
   CapacityReportRawRow,
   RevenueReportRawRow,
 } from 'src/common/types';
+import {
+  REVENUE_ORDER_COLUMN,
+  CAPACITY_ORDER_COLUMN,
+  RESERVATIONS_ORDER_COLUMN,
+} from 'src/common/constant/columns';
+
+const sqlDirection = (order: SortOrder): 'ASC' | 'DESC' =>
+  order === SortOrder.ASC ? 'ASC' : 'DESC';
 
 @Injectable()
 export class ReportsService {
@@ -42,6 +52,8 @@ export class ReportsService {
     from,
     to,
     movieId,
+    sortBy,
+    sortOrder,
   }: RevenueReportQueryDto): Promise<
     PaginatedResponseDto<RevenueReportRowDto>
   > {
@@ -78,8 +90,10 @@ export class ReportsService {
     const total = await this.countGroups(qb, this.tickets);
     const rows = await qb
       .clone()
-      .orderBy('showtime.showDate', 'DESC')
-      .addOrderBy('movie.title', 'ASC')
+      .orderBy(REVENUE_ORDER_COLUMN[sortBy], sqlDirection(sortOrder))
+      // Tiebreak on the group's own key so pagination stays deterministic
+      // even when many rows share the same sortBy value (e.g. equal revenue).
+      .addOrderBy('movie.id', 'ASC')
       .offset(skip)
       .limit(limit)
       .getRawMany<RevenueReportRawRow>();
@@ -104,6 +118,8 @@ export class ReportsService {
     to,
     hallId,
     status,
+    sortBy,
+    sortOrder,
   }: CapacityReportQueryDto): Promise<
     PaginatedResponseDto<CapacityReportRowDto>
   > {
@@ -156,8 +172,10 @@ export class ReportsService {
     const total = await this.countGroups(qb, this.showtimes);
     const rows = await qb
       .clone()
-      .orderBy('showtime.showDate', 'ASC')
-      .addOrderBy('showtime.showTime', 'ASC')
+      .orderBy(CAPACITY_ORDER_COLUMN[sortBy], sqlDirection(sortOrder))
+      // Tiebreak on the showtime's own id — always unique, so pagination
+      // stays deterministic regardless of which column sortBy picks.
+      .addOrderBy('showtime.id', 'ASC')
       .offset(skip)
       .limit(limit)
       .getRawMany<CapacityReportRawRow>();
@@ -185,6 +203,8 @@ export class ReportsService {
     from,
     to,
     status,
+    sortBy,
+    sortOrder,
   }: ReservationsReportQueryDto): Promise<
     PaginatedResponseDto<AdminReservationRowDto>
   > {
@@ -233,7 +253,10 @@ export class ReportsService {
     const total = await this.countGroups(qb, this.reservations);
     const rows = await qb
       .clone()
-      .orderBy('reservation.createdAt', 'DESC')
+      .orderBy(RESERVATIONS_ORDER_COLUMN[sortBy], sqlDirection(sortOrder))
+      // Tiebreak on the reservation's own id — always unique, so pagination
+      // stays deterministic regardless of which column sortBy picks.
+      .addOrderBy('reservation.id', 'ASC')
       .offset(skip)
       .limit(limit)
       .getRawMany<AdminReservationRawRow>();

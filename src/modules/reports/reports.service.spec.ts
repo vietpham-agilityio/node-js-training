@@ -1,17 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
+import { SortOrder } from '../../common/enums/sort-order.enum';
 import { Reservation } from '../reservations/entities/reservation.entity';
 import { Ticket } from '../reservations/entities/ticket.entity';
 import { ReservationStatus } from '../reservations/enums/reservation-status.enum';
 import { Showtime } from '../showtimes/entities/showtime.entity';
 import { ShowtimeStatus } from '../showtimes/enums/showtime-status.enum';
+import { CapacityReportSortField } from './enums/capacity-report-sort-field.enum';
+import { ReservationsReportSortField } from './enums/reservations-report-sort-field.enum';
+import { RevenueReportSortField } from './enums/revenue-report-sort-field.enum';
 import { ReportsService } from './reports.service';
 
 // Every report method calls qb.getQueryAndParameters() once (for the count
 // subquery) and qb.clone().orderBy()...getRawMany() once (for the page of
-// rows) — clone() hands back an independent builder pre-loaded with the same
-// raw rows the test wants back.
+// rows). clone() hands back the same tracked builder — these tests only
+// assert which SQL was requested, never mimic real sorting/filtering, so a
+// self-referential clone keeps every call visible on one object.
 function mockQueryBuilder(rawRows: unknown[] = []) {
   const qb: Record<string, jest.Mock> = {};
   for (const method of [
@@ -30,7 +35,7 @@ function mockQueryBuilder(rawRows: unknown[] = []) {
   ]) {
     qb[method] = jest.fn().mockReturnValue(qb);
   }
-  qb.clone = jest.fn(() => mockQueryBuilder(rawRows));
+  qb.clone = jest.fn().mockReturnValue(qb);
   qb.getQueryAndParameters = jest.fn().mockReturnValue(['SELECT 1', []]);
   qb.getRawMany = jest.fn().mockResolvedValue(rawRows);
   return qb;
@@ -96,6 +101,8 @@ describe('ReportsService', () => {
         from: '2026-08-01',
         to: '2026-08-31',
         movieId: 'm1',
+        sortBy: RevenueReportSortField.SHOW_DATE,
+        sortOrder: SortOrder.DESC,
       });
 
       expect(tickets.qb.andWhere).toHaveBeenCalledWith(
@@ -109,6 +116,7 @@ describe('ReportsService', () => {
       expect(tickets.qb.andWhere).toHaveBeenCalledWith('movie.id = :movieId', {
         movieId: 'm1',
       });
+      expect(tickets.qb.orderBy).toHaveBeenCalledWith('"showDate"', 'DESC');
       expect(result.data).toEqual([
         {
           showDate: '2026-08-01',
@@ -139,6 +147,8 @@ describe('ReportsService', () => {
         page: 1,
         limit: 20,
         skip: 0,
+        sortBy: RevenueReportSortField.SHOW_DATE,
+        sortOrder: SortOrder.DESC,
       });
 
       expect(tickets.qb.andWhere).not.toHaveBeenCalledWith(
@@ -149,6 +159,27 @@ describe('ReportsService', () => {
         'movie.id = :movieId',
         expect.anything(),
       );
+    });
+
+    it('maps a non-default sortBy to its SELECT alias', async () => {
+      const tickets = mockRepository([], 0);
+
+      await buildService({
+        tickets,
+        reservations: mockRepository([], 0),
+        showtimes: mockRepository([], 0),
+      });
+
+      await service.getRevenueReport({
+        page: 1,
+        limit: 20,
+        skip: 0,
+        sortBy: RevenueReportSortField.TICKETS_SOLD,
+        sortOrder: SortOrder.ASC,
+      });
+
+      expect(tickets.qb.orderBy).toHaveBeenCalledWith('"ticketsSold"', 'ASC');
+      expect(tickets.qb.addOrderBy).toHaveBeenCalledWith('movie.id', 'ASC');
     });
   });
 
@@ -183,6 +214,8 @@ describe('ReportsService', () => {
         skip: 0,
         hallId: 'h1',
         status: ShowtimeStatus.SCHEDULED,
+        sortBy: CapacityReportSortField.SHOW_DATE,
+        sortOrder: SortOrder.ASC,
       });
 
       expect(showtimes.qb.andWhere).toHaveBeenCalledWith('hall.id = :hallId', {
@@ -191,6 +224,11 @@ describe('ReportsService', () => {
       expect(showtimes.qb.andWhere).toHaveBeenCalledWith(
         'showtime.status = :status',
         { status: ShowtimeStatus.SCHEDULED },
+      );
+      expect(showtimes.qb.orderBy).toHaveBeenCalledWith('"showDate"', 'ASC');
+      expect(showtimes.qb.addOrderBy).toHaveBeenCalledWith(
+        'showtime.id',
+        'ASC',
       );
       expect(result.data[0]).toEqual({
         showtimeId: 'st1',
@@ -203,6 +241,29 @@ describe('ReportsService', () => {
         seatsTaken: 0,
         occupancyPct: 0,
       });
+    });
+
+    it('maps a non-default sortBy to its SELECT alias, descending', async () => {
+      const showtimes = mockRepository([], 0);
+
+      await buildService({
+        tickets: mockRepository([], 0),
+        reservations: mockRepository([], 0),
+        showtimes,
+      });
+
+      await service.getCapacityReport({
+        page: 1,
+        limit: 20,
+        skip: 0,
+        sortBy: CapacityReportSortField.OCCUPANCY_PCT,
+        sortOrder: SortOrder.DESC,
+      });
+
+      expect(showtimes.qb.orderBy).toHaveBeenCalledWith(
+        '"occupancyPct"',
+        'DESC',
+      );
     });
   });
 
@@ -239,11 +300,21 @@ describe('ReportsService', () => {
         limit: 20,
         skip: 0,
         status: ReservationStatus.CONFIRMED,
+        sortBy: ReservationsReportSortField.CREATED_AT,
+        sortOrder: SortOrder.DESC,
       });
 
       expect(reservations.qb.andWhere).toHaveBeenCalledWith(
         'reservation.status = :status',
         { status: ReservationStatus.CONFIRMED },
+      );
+      expect(reservations.qb.orderBy).toHaveBeenCalledWith(
+        '"createdAt"',
+        'DESC',
+      );
+      expect(reservations.qb.addOrderBy).toHaveBeenCalledWith(
+        'reservation.id',
+        'ASC',
       );
       expect(result.data[0]).toEqual({
         reservationId: 'r1',
@@ -259,6 +330,29 @@ describe('ReportsService', () => {
         totalAmount: 21,
         createdAt: new Date('2026-07-01T00:00:00Z'),
       });
+    });
+
+    it('maps a non-default sortBy to its SELECT alias', async () => {
+      const reservations = mockRepository([], 0);
+
+      await buildService({
+        tickets: mockRepository([], 0),
+        reservations,
+        showtimes: mockRepository([], 0),
+      });
+
+      await service.getReservationsReport({
+        page: 1,
+        limit: 20,
+        skip: 0,
+        sortBy: ReservationsReportSortField.TOTAL_AMOUNT,
+        sortOrder: SortOrder.ASC,
+      });
+
+      expect(reservations.qb.orderBy).toHaveBeenCalledWith(
+        '"totalAmount"',
+        'ASC',
+      );
     });
   });
 });
