@@ -3,8 +3,8 @@
 What the records say against what is committed on this branch. Keep this table honest — an
 ADR that quietly disagrees with the code is worse than no ADR.
 
-Last checked: 26 Aug 2026, on `feat/ticket-reservation` (reservation confirmation, cancellation,
-and the 15-minute completion sweep landed).
+Last checked: 28 Aug 2026, on `feat/ticket-reservation` (reservation confirmation, cancellation,
+the 15-minute completion sweep, and the Reports module landed).
 
 ## Implemented and matching
 
@@ -35,16 +35,18 @@ and the 15-minute completion sweep landed).
 | DDR-001 | `src/modules/reservations/entities/seat-hold.entity.ts` (10-minute `held_until` DB default), `seat-hold-sweep.service.ts` (60s sweep cadence)                                                                                                                                                                           |
 | DDR-002 | `src/modules/reservations/reservations.service.ts` — `confirmReservation`: lock the holds (`pessimistic_write`), re-validate (`SEAT_HOLD_NOT_OWNED`/`SEAT_HOLD_EXPIRED`), then write — the exact DDR-002 order                                                                                                          |
 | DDR-004 | `src/modules/reservations/utils/reference-number.util.ts` plus `withReferenceRetry` in `reservations.service.ts` — retries the whole confirmation attempt (not a `SAVEPOINT`) on a `23505`, regenerating both the reservation and ticket numbers                                                                        |
+| ADR-011 | `src/modules/reports/reports.service.ts` — `getRevenueReport`/`getCapacityReport`/`getReservationsReport`, each a `GROUP BY`/`COUNT`/`SUM` query builder against indexed columns, no summary table                                                                                                                      |
+| DDR-010 | `src/modules/reports/reports.service.ts` — `getRevenueReport` filters `ticket.status = 'valid' AND reservation.status != 'cancelled'`, the exact DDR-010 predicate                                                                                                                                                      |
 
 ## Diverging — needs a fix or a superseding record
 
-| Record                   | Says                                                                               | Code does                                                                                                 | Where                                                 |
-| ------------------------ | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| DDR-007                  | `forbidNonWhitelisted` deliberately **off**                                        | `forbidNonWhitelisted: true`                                                                              | `src/app.module.ts`                                   |
-| `docs/database/views.md` | Defines six database views                                                         | **None of them exist** — no `CREATE VIEW` anywhere; the two showtime views are rebuilt as a query builder | `1787211926318-InitSchema.ts`, `showtimes.service.ts` |
-| `docs/database/views.md` | `v_showtime_seat_map` / `v_showtime_availability` are for "any authenticated user" | Both readings are public (DDR-015) — availability is catalogue data, auth begins at seat selection        | `showtimes.controller.ts`                             |
-| `docs/database/views.md` | `total_seats` is never needed outside a specific showtime's availability           | `GET /halls` returns `totalSeats` per hall (DDR-015)                                                      | `halls.service.ts`                                    |
-| `docs/api/README.md`     | `GET /halls` is `Bearer, admin`                                                    | Public (DDR-015); the API doc has been updated to match                                                   | `halls.controller.ts`                                 |
+| Record                   | Says                                                                               | Code does                                                                                                                                                                                             | Where                                                                       |
+| ------------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| DDR-007                  | `forbidNonWhitelisted` deliberately **off**                                        | `forbidNonWhitelisted: true`                                                                                                                                                                          | `src/app.module.ts`                                                         |
+| `docs/database/views.md` | Defines six database views                                                         | **None of them exist** — no `CREATE VIEW` anywhere; all six are rebuilt as query builders (two in Showtimes, three in Reports; `v_reservation_summary`'s logic is inlined into `ReservationsService`) | `1787211926318-InitSchema.ts`, `showtimes.service.ts`, `reports.service.ts` |
+| `docs/database/views.md` | `v_showtime_seat_map` / `v_showtime_availability` are for "any authenticated user" | Both readings are public (DDR-015) — availability is catalogue data, auth begins at seat selection                                                                                                    | `showtimes.controller.ts`                                                   |
+| `docs/database/views.md` | `total_seats` is never needed outside a specific showtime's availability           | `GET /halls` returns `totalSeats` per hall (DDR-015)                                                                                                                                                  | `halls.service.ts`                                                          |
+| `docs/api/README.md`     | `GET /halls` is `Bearer, admin`                                                    | Public (DDR-015); the API doc has been updated to match                                                                                                                                               | `halls.controller.ts`                                                       |
 
 Each is also flagged in a blockquote at the foot of its own record. Resolve them either way —
 change the code, or supersede the record — but do not leave them silently disagreeing.
@@ -54,10 +56,9 @@ change the code, or supersede the record — but do not leave them silently disa
 Records that are accepted but have no code behind them yet. This is expected; the branch is
 the application skeleton over a designed schema.
 
-| Record           | Waiting on                                                                                                                                                                 |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ADR-011, DDR-010 | Reports module and the aggregate queries — `docs/api/README.md`'s `GET /reports/revenue` has no code yet, so DDR-010's derivation is a documented query, not a running one |
-| —                | `DELETE /seat-holds/:id` (voluntary release, `docs/api/README.md`) — the only endpoint left undocumented as _Planned_                                                      |
+| Record | Waiting on                                                                                                            |
+| ------ | --------------------------------------------------------------------------------------------------------------------- |
+| —      | `DELETE /seat-holds/:id` (voluntary release, `docs/api/README.md`) — the only endpoint left undocumented as _Planned_ |
 
 ## Notes
 

@@ -5,8 +5,8 @@ Pagination (all list endpoints): query `page` (default 1), `limit` (default 20, 
 `{ data: [...], meta: { page, limit, total, hasMore } }`. Errors (all endpoints):
 `{ statusCode, errorCode, message, timestamp }`.
 
-Status: **Implemented** = Health, Auth, Users, Genres, Movies, Halls, Showtimes, Reservations.
-**Planned** = Seat Holds (`DELETE /seat-holds/:id` — voluntary release), Reports.
+Status: **Implemented** = Health, Auth, Users, Genres, Movies, Halls, Showtimes, Reservations,
+Reports. **Planned** = Seat Holds (`DELETE /seat-holds/:id` — voluntary release).
 
 ---
 
@@ -365,7 +365,7 @@ Cancel a confirmed reservation.
 
 ---
 
-## Reports — Planned (admin only)
+## Reports — Implemented (admin only)
 
 ### `GET /reports/revenue`
 
@@ -381,8 +381,8 @@ Revenue by day and movie.
 Occupancy per showtime.
 
 - Auth: Bearer, admin
-- Request: query `page?, limit?, from?, to?, hallId?`
-- Success: `200 OK` — paginated `{ showtimeId, movieTitle, hallName, showDate, showTime, totalSeats, seatsTaken, occupancyPct }[]`
+- Request: query `page?, limit?, from?, to?, hallId?, status?`
+- Success: `200 OK` — paginated `{ showtimeId, movieTitle, hallName, showDate, showTime, status, totalSeats, seatsTaken, occupancyPct }[]`
 - Errors: `401 UNAUTHENTICATED`, `403 FORBIDDEN`
 
 ### `GET /reports/reservations`

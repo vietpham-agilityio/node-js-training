@@ -16,6 +16,7 @@ import { SeedModule } from './database/seed/seed.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { MoviesModule } from './modules/movies/movies.module';
+import { ReportsModule } from './modules/reports/reports.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { ShowtimesModule } from './modules/showtimes/showtimes.module';
 import { UsersModule } from './modules/users/users.module';
@@ -76,6 +77,7 @@ import { UsersModule } from './modules/users/users.module';
     MoviesModule,
     ShowtimesModule,
     ReservationsModule,
+    ReportsModule,
     SeedModule,
   ],
   providers: [

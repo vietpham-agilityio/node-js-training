@@ -1,1 +1,2 @@
-export * from './availability.type';
+export * from './availability';
+export * from './report';
