@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Button Component Rendering should render matching snapshot 1`] = `
+<View
+  accessibilityLabel="Test Button"
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": undefined,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "opacity": 1,
+    }
+  }
+  testID="test-button"
+>
+  <View
+    className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-secondary to-primary"
+  >
+    <Text
+      accessible={false}
+      className="font-montserrat-medium text-white text-center text-lg leading-6"
+      importantForAccessibility="no"
+      maxFontSizeMultiplier={1.2}
+      testID="test-button-text"
+    >
+      Test Button
+    </Text>
+  </View>
+</View>
+`;

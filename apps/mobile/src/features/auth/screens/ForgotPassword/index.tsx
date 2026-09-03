@@ -1,0 +1,123 @@
+import { useRouter } from 'expo-router';
+import { useCallback } from 'react';
+import { Resolver, useForm } from 'react-hook-form';
+import { View } from 'react-native';
+
+// Constants
+import {
+  ForgotPasswordFormData,
+  forgotPasswordSchema as forgotPasswordSchemaEffect,
+  ROUTES,
+  ToastType,
+} from '@/constants';
+
+// Hooks
+import { useResetPassword } from '@/hooks/useSession';
+import { useToastAlert } from '@/hooks/useToast';
+
+// Components
+import { EmailInput } from '@/components/EmailInput';
+import { Typo } from '@/components/Typo';
+
+// Layout
+import { Button } from '@/components/Button';
+import { AccessLayout } from '@/layouts/AccessLayout';
+
+// Utils
+import { effectTsResolver } from '@hookform/resolvers/effect-ts';
+
+const ForgotPasswordScreen = () => {
+  const toast = useToastAlert();
+  const router = useRouter();
+  const { mutate: resetPassword, isPending } = useResetPassword();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<ForgotPasswordFormData>({
+    resolver: effectTsResolver(
+      forgotPasswordSchemaEffect,
+    ) as unknown as Resolver<ForgotPasswordFormData>,
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    defaultValues: {
+      email: '',
+    },
+  });
+
+  const isDisabled = isSubmitting || isPending || !isDirty;
+
+  const handleSubmitForm = useCallback(
+    (data: ForgotPasswordFormData) => {
+      resetPassword(data.email, {
+        onSuccess: () => {
+          toast.withAction(
+            'Password reset link has been sent to your email.',
+            {
+              label: 'OK',
+              onPress: () => router.replace(ROUTES.LOGIN),
+            },
+            ToastType.SUCCESS,
+          );
+        },
+        onError: () => {
+          toast.error('Failed to send reset link');
+        },
+      });
+    },
+    [resetPassword, router, toast],
+  );
+
+  const handleBackToLogin = useCallback(() => {
+    router.replace(ROUTES.LOGIN);
+  }, [router]);
+
+  return (
+    <AccessLayout mode="signup" loading={isPending}>
+      <View className="gap-1 mt-8 mb-[30]">
+        <Typo size="2xl" weight="medium" accessibilityRole="header">
+          Forgot Password?
+        </Typo>
+      </View>
+
+      <View className="gap-4">
+        <Typo size="sm" className="text-text-secondary mb-2">
+          Enter your email address and we&apos;ll send you a link to reset your
+          password.
+        </Typo>
+
+        <View className={errors.email ? 'mb-0' : 'mb-5'}>
+          <EmailInput
+            control={control}
+            name="email"
+            testID="signup-email-input"
+            returnKeyType="next"
+          />
+        </View>
+
+        <Button
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="Send password reset link"
+          accessibilityHint="Sends an email with password reset instructions"
+          disabled={isDisabled}
+          title={isPending ? 'Sending...' : 'Send Reset Link'}
+          onPress={handleSubmit(handleSubmitForm)}
+        />
+
+        <Button
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="Back to login"
+          accessibilityHint="Navigate back to the Login screen"
+          title="Back to Login"
+          isPrimary={false}
+          onPress={handleBackToLogin}
+        />
+      </View>
+    </AccessLayout>
+  );
+};
+
+export default ForgotPasswordScreen;

@@ -1,0 +1,17 @@
+# App-local ignores. Everything shared (node_modules, coverage, Expo/EAS
+# artefacts, env files, secrets) lives in the monorepo root .gitignore.
+
+# generated native folders
+/ios
+/android
+
+# uniwind / nativewind generated typings
+nativewind-env.d.ts
+
+# one-off data scripts
+fetch_tmdb_movies.js
+movies_120_insert.sql
+
+# local agent rules
+.agents/
+.cursor/

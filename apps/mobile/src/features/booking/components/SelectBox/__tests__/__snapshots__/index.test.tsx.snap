@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`SelectBox Component Rendering should render matching snapshot 1`] = `
+<View
+  accessibilityHint="Test Value is currently selected"
+  accessibilityLabel="Test Value"
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": undefined,
+      "expanded": undefined,
+      "selected": true,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "opacity": 1,
+    }
+  }
+  testID="test-select-box"
+>
+  <View
+    className="items-center justify-center gap-2 rounded-lg bg-secondary"
+  >
+    <Text
+      accessible={true}
+      allowFontScaling={false}
+      className="text-white text-base font-montserrat-medium text-center max-w-15.5 min-w-13 leading-5"
+      maxFontSizeMultiplier={1.2}
+    >
+      Test Value
+    </Text>
+  </View>
+</View>
+`;

@@ -1,0 +1,5 @@
+export const TABS_HEADER_HEIGHT = 108;
+export const TABS_FOOTER_HEIGHT = 104;
+export const SCREEN_HEADER_HEIGHT = 62;
+export const SCREEN_HEADER_HEIGHT_WITH_TITLE = 120;
+export const KEYBOARD_BOTTOM_PADDING = 160;
