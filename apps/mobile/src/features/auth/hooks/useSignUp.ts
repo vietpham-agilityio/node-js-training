@@ -4,6 +4,9 @@ import { Effect } from 'effect';
 // Services
 import { ERROR_MESSAGES, MESSAGES, ToastType } from '@/constants';
 
+// Stores
+import { useAuthStore } from '@/features/auth/store/auth';
+
 // Types
 import { SignUpData } from '@/features/auth/types/auth';
 
@@ -21,6 +24,7 @@ import { AuthService } from '@/features/auth/effect/services';
 import { AuthServiceLayer } from '@/features/auth/layer';
 
 export const useSignUp = () => {
+  const setSession = useAuthStore(state => state.setSession);
   const toast = useToastAlert();
 
   return useMutation({
@@ -34,15 +38,12 @@ export const useSignUp = () => {
       );
       return result;
     },
-    onSuccess: () => {
-      toast.alert(
-        MESSAGES.SIGNUP_SUCCESS,
-        MESSAGES.ACCOUNT_VERIFICATION_SUCCESS,
-        [],
-        {
-          type: ToastType.SUCCESS,
-        },
-      );
+    onSuccess: data => {
+      // register issues a token pair — the user is signed in already.
+      setSession(data.session);
+      toast.alert(MESSAGES.SIGNUP_SUCCESS, MESSAGES.ACCOUNT_CREATED, [], {
+        type: ToastType.SUCCESS,
+      });
     },
     onError: error => {
       const message =

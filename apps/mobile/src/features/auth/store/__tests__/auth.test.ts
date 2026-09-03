@@ -53,23 +53,6 @@ describe('useAuthStore', () => {
       session: null,
       isLoading: false,
       isAuthenticated: false,
-      isSigningUp: false,
-    });
-  });
-
-  describe('setSigningUp', () => {
-    it('should update isSigningUp state', () => {
-      act(() => {
-        useAuthStore.getState().setSigningUp(true);
-      });
-
-      expect(useAuthStore.getState().isSigningUp).toBe(true);
-
-      act(() => {
-        useAuthStore.getState().setSigningUp(false);
-      });
-
-      expect(useAuthStore.getState().isSigningUp).toBe(false);
     });
   });
 

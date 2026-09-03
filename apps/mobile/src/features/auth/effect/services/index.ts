@@ -1,9 +1,6 @@
 // Effect
 import { Effect } from 'effect';
 
-// Supabase
-import { Session } from '@supabase/supabase-js';
-
 // Types
 import { SignInData, SignUpData } from '../../types/auth';
 
@@ -15,29 +12,9 @@ export class AuthService extends Effect.Service<AuthService>()(
   {
     effect: Effect.gen(function* () {
       return {
-        signUp: (data: SignUpData) =>
-          Effect.map(authServiceEffect.signUp(data), authData => ({
-            user: authData.user,
-            session: authData.session,
-          })),
+        signUp: (data: SignUpData) => authServiceEffect.signUp(data),
 
-        signIn: (data: SignInData) =>
-          Effect.map(authServiceEffect.signIn(data), authData => ({
-            user: authData.user,
-            session: authData.session,
-          })),
-
-        signInWithGoogle: () =>
-          Effect.map(authServiceEffect.signInWithGoogle(), authData => ({
-            user: authData.user,
-            session: authData.session,
-          })),
-
-        signInWithFacebook: () =>
-          Effect.map(authServiceEffect.signInWithFacebook(), authData => ({
-            user: authData.user,
-            session: authData.session,
-          })),
+        signIn: (data: SignInData) => authServiceEffect.signIn(data),
 
         signOut: () => authServiceEffect.signOut(),
 
@@ -53,14 +30,6 @@ export class AuthService extends Effect.Service<AuthService>()(
 
         updatePassword: (newPassword: string) =>
           authServiceEffect.updatePassword(newPassword),
-
-        onAuthStateChange: (
-          callback: (event: string, session: Session) => void,
-        ) =>
-          Effect.sync(() => {
-            const result = authServiceEffect.onAuthStateChange(callback);
-            return result;
-          }),
       } as const;
     }),
   },

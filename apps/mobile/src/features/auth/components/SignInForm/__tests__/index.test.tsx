@@ -6,12 +6,10 @@ import { SignInForm } from '../';
 
 describe('SignInForm Component', () => {
   const mockOnSubmit = jest.fn();
-  const mockOnForgotPassword = jest.fn();
 
   const defaultProps = {
     isPending: false,
     onSubmit: mockOnSubmit,
-    onForgotPassword: mockOnForgotPassword,
   };
 
   beforeEach(() => {
@@ -37,11 +35,6 @@ describe('SignInForm Component', () => {
     it('should render submit button', () => {
       const { getByTestId } = render(<SignInForm {...defaultProps} />);
       expect(getByTestId('signin-submit-button')).toBeTruthy();
-    });
-
-    it('should render "Forgot Password?" link', () => {
-      const { getByText } = render(<SignInForm {...defaultProps} />);
-      expect(getByText('Forgot Password?')).toBeTruthy();
     });
 
     it('should display correct labels', () => {
@@ -82,25 +75,6 @@ describe('SignInForm Component', () => {
       expect(focusSpy).toHaveBeenCalledTimes(1);
 
       focusSpy.mockRestore();
-    });
-
-    it('should call onForgotPassword when "Forgot Password?" is pressed', () => {
-      const { getByText } = render(<SignInForm {...defaultProps} />);
-      const forgotPasswordLink = getByText('Forgot Password?');
-
-      fireEvent.press(forgotPasswordLink);
-      expect(mockOnForgotPassword).toHaveBeenCalledTimes(1);
-    });
-
-    it('should not call onForgotPassword if prop is not provided', () => {
-      const { getByText } = render(
-        <SignInForm isPending={false} onSubmit={mockOnSubmit} />,
-      );
-      const forgotPasswordLink = getByText('Forgot Password?');
-
-      fireEvent.press(forgotPasswordLink);
-      // Should not crash even if onForgotPassword is undefined
-      expect(mockOnForgotPassword).not.toHaveBeenCalled();
     });
   });
 
