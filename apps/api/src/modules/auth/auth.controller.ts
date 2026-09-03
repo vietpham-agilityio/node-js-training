@@ -7,13 +7,20 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AuthService } from './auth.service';
 import { TokenPairDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
+import { MeResponseDto } from './dto/me-response.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import type { AuthenticatedUser } from './interfaces/authenticated-user.interface';
@@ -25,6 +32,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Create an account and issue a token pair' })
+  @ApiCreatedResponse({ type: TokenPairDto })
   register(@Body() dto: RegisterDto): Promise<TokenPairDto> {
     return this.authService.register(dto);
   }
@@ -32,6 +40,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Authenticate and issue a token pair' })
+  @ApiOkResponse({ type: TokenPairDto })
   login(@Body() dto: LoginDto): Promise<TokenPairDto> {
     return this.authService.login(dto);
   }
@@ -39,6 +48,7 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Rotate a refresh token for a new token pair' })
+  @ApiOkResponse({ type: TokenPairDto })
   refresh(@Body() { refreshToken }: RefreshTokenDto): Promise<TokenPairDto> {
     return this.authService.refresh(refreshToken);
   }
@@ -54,6 +64,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'The authenticated user, from the access token' })
+  @ApiOkResponse({ type: MeResponseDto })
   me(@CurrentUser() user: AuthenticatedUser): AuthenticatedUser {
     return user;
   }
