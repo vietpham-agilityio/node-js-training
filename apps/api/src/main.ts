@@ -1,12 +1,13 @@
 import { VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 
 import { AppModule } from './app.module';
 import type { AppConfig } from './config/app.config';
+import { buildOpenApiDocument } from './swagger';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -27,16 +28,11 @@ async function bootstrap(): Promise<void> {
   app.enableShutdownHooks();
 
   if (swaggerEnabled) {
-    const document = SwaggerModule.createDocument(
+    SwaggerModule.setup(
+      `${apiPrefix}/docs`,
       app,
-      new DocumentBuilder()
-        .setTitle('Movie Reservation System')
-        .setDescription('Ticket reservation API')
-        .setVersion(apiVersion)
-        .addBearerAuth()
-        .build(),
+      buildOpenApiDocument(app, apiVersion),
     );
-    SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
   }
 
   await app.listen(port);

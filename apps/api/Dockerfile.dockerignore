@@ -1,0 +1,30 @@
+# BuildKit reads `<dockerfile>.dockerignore` in preference to the context-root
+# `.dockerignore`, which lets this stay next to the Dockerfile it belongs to
+# even though the build context is the workspace root. Paths below are
+# therefore relative to the WORKSPACE ROOT.
+
+**/node_modules
+**/dist
+**/coverage
+**/.turbo
+.git
+.gitignore
+*.log
+.vscode
+.idea
+.claude
+
+# the mobile app never enters the API image
+apps/mobile
+docs
+postman
+apps/api/test
+
+# secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# build plumbing that would invalidate cache for no reason
+**/Dockerfile*
+docker-compose*.yml
