@@ -111,6 +111,14 @@ the application skeleton over a designed schema.
   Detecting _reuse_ of an already-revoked token as a theft signal (and revoking the rest of
   that user's sessions in response) was considered and deliberately deferred — it needs a
   schema change (tracking token lineage) beyond what either record asks for.
+- **Mobile auth is migrating off Supabase.** `apps/mobile` sign in, sign up, session
+  bootstrap and sign out now call `@movea/api` (`/auth/register|login|refresh|logout|me`)
+  via `apps/mobile/src/services/api/client.ts`; the token pair is persisted in
+  `secureStorage`. OAuth (Google/Facebook) and the password-reset screens were removed or
+  hidden — the API has no equivalent yet (`PATCH /users/me/password` exists for change, not
+  reset). Movies, booking, wallet, tickets and profile still read Supabase directly, so
+  `apps/mobile/src/services/supabase/client.ts` stays until those features migrate; until
+  then `useAuthStore().user.id` is an `@movea/api` id that will not match Supabase rows.
 
 ## Keeping this current
 
