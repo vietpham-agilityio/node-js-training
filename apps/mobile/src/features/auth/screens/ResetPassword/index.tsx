@@ -41,7 +41,7 @@ const ResetPasswordScreen = () => {
           </Typo>
           <Button
             title="Request New Link"
-            onPress={() => router.replace(ROUTES.FORGOT_PASSWORD)}
+            onPress={() => router.replace(ROUTES.LOGIN)}
             testID="request-new-link-button"
           />
         </View>
