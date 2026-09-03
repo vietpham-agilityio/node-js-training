@@ -10,12 +10,12 @@ const normalizedStories = [
     directory: './src/components',
     files: '**/*.stories.@(ts|tsx|js|jsx)',
     importPathMatcher:
-      /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(ts|tsx|js|jsx))$/,
+      /^\.(?:(?:^|[\\/]|(?:(?:(?!(?:^|[\\/])\.).)*?)[\\/])(?!\.)(?=.)[^\\/]*?\.stories\.(ts|tsx|js|jsx))$/,
     // @ts-ignore
     req: require.context(
       '../src/components',
       true,
-      /^\.(?:(?:^|\/|(?:(?:(?!(?:^|\/)\.).)*?)\/)(?!\.)(?=.)[^/]*?\.stories\.(ts|tsx|js|jsx))$/,
+      /^\.(?:(?:^|[\\/]|(?:(?:(?!(?:^|[\\/])\.).)*?)[\\/])(?!\.)(?=.)[^\\/]*?\.stories\.(ts|tsx|js|jsx))$/,
     ),
   },
 ];

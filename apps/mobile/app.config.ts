@@ -1,4 +1,13 @@
+import { existsSync } from 'node:fs';
+
 import { ConfigContext, ExpoConfig } from 'expo/config';
+
+// FCM push is not wired up yet, so google-services.json is optional. Point at it
+// only when it is actually present (env var or checked-in file); otherwise leave
+// the key off so `expo run:android` / prebuild does not fail on a missing file.
+const googleServicesFile =
+  process.env.GOOGLE_SERVICES_JSON ??
+  (existsSync('./google-services.json') ? './google-services.json' : undefined);
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -56,8 +65,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         category: ['BROWSABLE', 'DEFAULT'],
       },
     ],
-    googleServicesFile:
-      process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
+    ...(googleServicesFile ? { googleServicesFile } : {}),
   },
   web: {
     output: 'static',
