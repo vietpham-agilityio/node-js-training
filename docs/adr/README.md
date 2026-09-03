@@ -31,6 +31,8 @@ lasts ten minutes. **No decision appears in both documents.**
 | [ADR-012](0012-rest-api-with-generated-openapi.md)      | REST API with Generated OpenAPI Documentation               | DDR-005, DDR-006, DDR-011, DDR-012 |
 | [ADR-013](0013-index-all-foreign-keys.md)               | Index All Foreign Keys                                      | —                                  |
 | [ADR-014](0014-docker-compose-for-local-and-grading.md) | Docker Compose for Local Development and Grading            | DDR-009                            |
+| [ADR-015](0015-pnpm-workspace-monorepo.md)              | pnpm Workspace Monorepo for the API and the Mobile Client   | DDR-017                            |
+| [ADR-016](0016-independent-per-app-ci-pipelines.md)     | Independent Per-App CI Pipelines in One Repository          | —                                  |
 
 ## Numbering policy
 
