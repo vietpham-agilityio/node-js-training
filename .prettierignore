@@ -1,4 +1,14 @@
+node_modules
 dist
 coverage
-node_modules
+.turbo
 pnpm-lock.yaml
+
+# generated from the API's OpenAPI document — never hand-edit
+packages/api-contract/openapi.json
+packages/api-contract/src/generated
+
+# Expo build output
+apps/mobile/.expo
+apps/mobile/ios
+apps/mobile/android
