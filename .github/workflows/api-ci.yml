@@ -1,14 +1,37 @@
-name: CI — Build & Quality Checks
+name: API CI — Build & Quality Checks
 
+# Path-filtered so the API pipeline is independent of the mobile one: a change
+# touching only apps/mobile never queues these jobs, and when a change touches
+# both, the two workflows run side by side rather than in sequence.
 on:
   push:
     branches:
       - main
       - feat/ticket-reservation
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - '.github/workflows/api-ci.yml'
+      - '.github/actions/setup-node-and-pnpm/**'
   pull_request:
     branches:
       - main
       - feat/ticket-reservation
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - '.github/workflows/api-ci.yml'
+      - '.github/actions/setup-node-and-pnpm/**'
+
+concurrency:
+  group: api-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   quality:
@@ -22,10 +45,10 @@ jobs:
         uses: ./.github/actions/setup-node-and-pnpm
 
       - name: Format check
-        run: pnpm format:check
+        run: pnpm --filter @movea/api format:check
 
       - name: Lint
-        run: pnpm lint:check
+        run: pnpm --filter @movea/api lint:check
 
   security:
     name: Verify Package Security
@@ -56,7 +79,7 @@ jobs:
         uses: ./.github/actions/setup-node-and-pnpm
 
       - name: Run unit tests
-        run: pnpm test
+        run: pnpm --filter @movea/api test
 
   build:
     name: Build
@@ -69,8 +92,11 @@ jobs:
       - name: Setup Node and pnpm workspace
         uses: ./.github/actions/setup-node-and-pnpm
 
+      - name: Build workspace dependencies
+        run: pnpm --filter @movea/api-contract build
+
       - name: Build
-        run: pnpm build
+        run: pnpm --filter @movea/api build
 
   docker:
     name: Docker Build & Push
@@ -96,14 +122,16 @@ jobs:
             type=ref,event=branch
             type=sha,prefix=sha-
 
+      # Context is the workspace root: the image needs the root lockfile and
+      # pnpm-workspace.yaml to resolve @movea/api and its workspace deps.
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile
+          file: apps/api/Dockerfile
           target: production
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ github.ref_name }}
-          cache-to: type=gha,scope=${{ github.ref_name }},mode=max
+          cache-from: type=gha,scope=api-${{ github.ref_name }}
+          cache-to: type=gha,scope=api-${{ github.ref_name }},mode=max

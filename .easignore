@@ -1,0 +1,16 @@
+# EAS uploads the whole workspace root. Nothing outside the mobile app and the
+# packages it depends on needs to travel to the build server.
+apps/api/
+docs/
+.github/
+.gitlab/
+.husky/
+.claude/
+docker-compose*.yml
+cspell.json
+
+# large local artefacts
+**/node_modules/
+**/dist/
+**/coverage/
+**/.turbo/

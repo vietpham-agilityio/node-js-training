@@ -1,0 +1,31 @@
+name: 'EAS Build Common Steps'
+description: 'Common steps for Expo EAS builds from the apps/mobile workspace'
+inputs:
+  profile:
+    description: 'EAS build profile (development, preview, production)'
+    required: true
+  platform:
+    description: 'Platform to build (android, ios)'
+    required: true
+  expo_token:
+    description: 'Expo token secret'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    # Install at the workspace root — EAS resolves the monorepo from
+    # pnpm-workspace.yaml and the single root lockfile.
+    - name: Setup Node and pnpm workspace
+      uses: ./.github/actions/setup-node-and-pnpm
+
+    - name: Setup Expo and EAS
+      uses: expo/expo-github-action@v8
+      with:
+        eas-version: latest
+        token: ${{ inputs.expo_token }}
+
+    - name: Run ${{ inputs.platform }} Cloud Build
+      run: eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive --clear-cache
+      shell: bash
+      working-directory: apps/mobile

@@ -1,0 +1,80 @@
+name: Mobile EAS Build - Production
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        type: choice
+        options:
+          - all
+          - android
+          - ios
+
+env:
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+  PROFILE: production
+
+jobs:
+  build-android:
+    name: EAS Build Android (Production)
+    runs-on: macos-26
+    if: |
+      startsWith(github.head_ref, 'production/') &&
+      (github.event_name != 'workflow_dispatch' ||
+       github.event.inputs.platform == 'android' ||
+       github.event.inputs.platform == 'all')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/eas-build
+        with:
+          profile: ${{ env.PROFILE }}
+          platform: android
+          expo_token: ${{ env.EXPO_TOKEN }}
+
+      - name: Save Android build link
+        run: echo "ANDROID_BUILD_URL=https://expo.dev/accounts/${{ github.repository_owner }}/projects/movie-ticket-booking/builds" >> $GITHUB_ENV
+
+  build-ios:
+    name: EAS Build iOS (Production)
+    runs-on: macos-26
+    if: |
+      startsWith(github.head_ref, 'production/') &&
+      (github.event_name != 'workflow_dispatch' ||
+       github.event.inputs.platform == 'ios' ||
+       github.event.inputs.platform == 'all')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/eas-build
+        with:
+          profile: ${{ env.PROFILE }}
+          platform: ios
+          expo_token: ${{ env.EXPO_TOKEN }}
+
+      - name: Save iOS build link
+        run: echo "IOS_BUILD_URL=https://expo.dev/accounts/${{ github.repository_owner }}/projects/movie-ticket-booking/builds" >> $GITHUB_ENV
+
+  summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios]
+    if: always()
+    steps:
+      - name: Write summary
+        run: |
+          echo "## ✅ Build Summary (Production)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 🤖 Android: ${{ needs.build-android.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 📱 iOS: ${{ needs.build-ios.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "👉 View builds: https://expo.dev/accounts/${{ github.repository_owner }}/projects/movie-ticket-booking/builds" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*Profile: Production*" >> $GITHUB_STEP_SUMMARY

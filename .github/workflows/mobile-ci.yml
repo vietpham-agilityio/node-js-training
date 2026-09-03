@@ -1,0 +1,111 @@
+name: Mobile CI
+
+# Independent of api-ci.yml by design (see ADR on the monorepo CI layout): the
+# two pipelines share only the setup action and the root lockfile, so they are
+# queued separately and run in parallel.
+on:
+  push:
+    branches:
+      - main
+      - feat/ticket-reservation
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - '.github/workflows/mobile-ci.yml'
+      - '.github/actions/setup-node-and-pnpm/**'
+  pull_request:
+    branches:
+      - main
+      - feat/ticket-reservation
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - '.github/workflows/mobile-ci.yml'
+      - '.github/actions/setup-node-and-pnpm/**'
+
+concurrency:
+  group: mobile-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: apps/mobile
+
+jobs:
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-and-pnpm
+
+      - name: Run ESLint
+        run: pnpm lint
+
+      - name: Check Prettier formatting
+        run: pnpm format --check
+
+      - name: TypeScript type check
+        run: pnpm typecheck
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-and-pnpm
+
+      - name: Run tests with coverage
+        run: pnpm test:coverage
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-coverage-report
+          path: apps/mobile/coverage/
+          retention-days: 30
+
+  build-validation:
+    name: Build Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-and-pnpm
+
+      - name: Validate EAS configuration
+        run: |
+          if [ ! -f "eas.json" ]; then
+            echo "eas.json not found"
+            exit 1
+          fi
+          echo "eas.json found"
+
+      - name: Validate Expo config
+        run: npx expo config --type public
+
+      - name: Print Expo app info
+        run: npx expo config --json | jq '.expo.name, .expo.version'
+
+  ci-success:
+    name: Mobile CI Success
+    runs-on: ubuntu-latest
+    needs: [code-quality, test, build-validation]
+    if: always()
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [ "${{ needs.code-quality.result }}" != "success" ] || \
+             [ "${{ needs.test.result }}" != "success" ] || \
+             [ "${{ needs.build-validation.result }}" != "success" ]; then
+            echo "One or more mobile CI jobs failed"
+            exit 1
+          fi
+          echo "All mobile CI checks passed successfully!"
