@@ -1,0 +1,439 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ResetPasswordScreen Valid Recovery Session should render match snapshot 1`] = `
+<RNCSafeAreaView
+  accessibilityLabel="Reset Password screen"
+  className="flex-1 bg-bg-primary"
+  edges={
+    {
+      "bottom": "additive",
+      "left": "off",
+      "right": "off",
+      "top": "off",
+    }
+  }
+  testID="reset-password-screen"
+>
+  <RCTScrollView
+    contentContainerClassName="flex-1 px-6 pb-16"
+    showsVerticalScrollIndicator={false}
+    testID="reset-password-scroll-view"
+  >
+    <View>
+      <View
+        className="flex-1 justify-between"
+        testID="reset-password-form"
+      >
+        <View
+          className="w-full"
+        >
+          <Text
+            accessible={true}
+            className="text-white text-2xl font-montserrat-semibold mb-2"
+            maxFontSizeMultiplier={1.2}
+          >
+            Reset Password
+          </Text>
+          <Text
+            accessible={true}
+            className="text-base font-montserrat-regular text-text-secondary mb-8"
+            maxFontSizeMultiplier={1.2}
+          >
+            Enter your new password below
+          </Text>
+          <View
+            className="mb-9"
+          >
+            <View
+              className="w-full"
+              testID="new-password-input"
+            >
+              <View
+                className="relative"
+              >
+                <View
+                  className="bg-dark-blue px-1 z-1 left-4 absolute"
+                  collapsable={false}
+                  style={
+                    {
+                      "top": 14,
+                      "transform": [
+                        {
+                          "translateY": 0,
+                        },
+                      ],
+                    }
+                  }
+                >
+                  <Text
+                    accessibilityLabel="New Password"
+                    accessibilityRole="text"
+                    accessible={true}
+                    allowFontScaling={false}
+                    collapsable={false}
+                    onPress={[Function]}
+                  >
+                    <Text
+                      accessible={true}
+                      allowFontScaling={false}
+                      className="text-sm font-montserrat-regular text-overlay-soft"
+                      maxFontSizeMultiplier={1.2}
+                    >
+                      New Password
+                    </Text>
+                  </Text>
+                </View>
+                <TextInput
+                  accessibilityHint="Type your new password"
+                  accessibilityLabel="New Password input field"
+                  accessibilityRole="text"
+                  accessible={true}
+                  allowFontScaling={false}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+                  onBlur={[Function]}
+                  onChangeText={[Function]}
+                  onFocus={[Function]}
+                  onSubmitEditing={[Function]}
+                  returnKeyType="next"
+                  secureTextEntry={true}
+                  testID="new-password-input-input"
+                  value=""
+                />
+                <View
+                  accessibilityHint="Toggle password visibility"
+                  accessibilityLabel="Toggle password visibility"
+                  accessibilityRole="button"
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
+                  accessible={true}
+                  collapsable={false}
+                  focusable={true}
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  style={
+                    {
+                      "opacity": 1,
+                    }
+                  }
+                  testID="new-password-input-password-toggle"
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight={24}
+                    bbWidth={24}
+                    focusable={false}
+                    height={24}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "flex": 0,
+                          "height": 24,
+                          "width": 24,
+                        },
+                      ]
+                    }
+                    vbHeight={24}
+                    vbWidth={24}
+                    width={24}
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
+                        }
+                      }
+                    >
+                      <RNSVGPath
+                        clipRule={0}
+                        d="M2.293 2.293a1 1 0 0 1 1.414 0l18 18a1 1 0 0 1-1.414 1.414l-18-18a1 1 0 0 1 0-1.414Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                        fillRule={0}
+                        propList={
+                          [
+                            "fillRule",
+                          ]
+                        }
+                      />
+                      <RNSVGPath
+                        clipRule={0}
+                        d="M7.15 6.563c-.228.144-.447.294-.659.446-1.51 1.087-2.71 2.391-3.45 3.29a2.66 2.66 0 0 0 0 3.402c.74.899 1.94 2.203 3.45 3.29C7.994 18.073 9.891 19 12.001 19s4.005-.927 5.508-2.009l.04-.028-2.443-2.443A4 4 0 1 1 9.48 8.893l-2.33-2.33Zm8.813 5.986a4 4 0 0 0-4.511-4.511l-1.9-1.9c-.254-.254-.164-.685.18-.79A7.776 7.776 0 0 1 12 5c2.11 0 4.006.927 5.51 2.009 1.51 1.087 2.71 2.391 3.45 3.29a2.66 2.66 0 0 1 0 3.402 20.884 20.884 0 0 1-1.513 1.65.49.49 0 0 1-.69-.008l-2.794-2.794Zm-5.054-2.226a2 2 0 1 0 2.767 2.767l-2.767-2.767Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                        fillRule={0}
+                        propList={
+                          [
+                            "fillRule",
+                          ]
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View
+            className="mb-5"
+          >
+            <View
+              className="w-full"
+              testID="confirm-password-input"
+            >
+              <View
+                className="relative"
+              >
+                <View
+                  className="bg-dark-blue px-1 z-1 left-4 absolute"
+                  collapsable={false}
+                  style={
+                    {
+                      "top": 14,
+                      "transform": [
+                        {
+                          "translateY": 0,
+                        },
+                      ],
+                    }
+                  }
+                >
+                  <Text
+                    accessibilityLabel="Confirm Password"
+                    accessibilityRole="text"
+                    accessible={true}
+                    allowFontScaling={false}
+                    collapsable={false}
+                    onPress={[Function]}
+                  >
+                    <Text
+                      accessible={true}
+                      allowFontScaling={false}
+                      className="text-sm font-montserrat-regular text-overlay-soft"
+                      maxFontSizeMultiplier={1.2}
+                    >
+                      Confirm Password
+                    </Text>
+                  </Text>
+                </View>
+                <TextInput
+                  accessibilityHint="Type your confirm password"
+                  accessibilityLabel="Confirm Password input field"
+                  accessibilityRole="text"
+                  accessible={true}
+                  allowFontScaling={false}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  className="w-full h-12 px-4 pb-0.5 text-white text-sm border rounded-base border-overlay-soft"
+                  onBlur={[Function]}
+                  onChangeText={[Function]}
+                  onFocus={[Function]}
+                  returnKeyType="done"
+                  secureTextEntry={true}
+                  testID="confirm-password-input-input"
+                  value=""
+                />
+                <View
+                  accessibilityHint="Toggle password visibility"
+                  accessibilityLabel="Toggle password visibility"
+                  accessibilityRole="button"
+                  accessibilityState={
+                    {
+                      "busy": undefined,
+                      "checked": undefined,
+                      "disabled": undefined,
+                      "expanded": undefined,
+                      "selected": undefined,
+                    }
+                  }
+                  accessibilityValue={
+                    {
+                      "max": undefined,
+                      "min": undefined,
+                      "now": undefined,
+                      "text": undefined,
+                    }
+                  }
+                  accessible={true}
+                  collapsable={false}
+                  focusable={true}
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  style={
+                    {
+                      "opacity": 1,
+                    }
+                  }
+                  testID="confirm-password-input-password-toggle"
+                >
+                  <RNSVGSvgView
+                    align="xMidYMid"
+                    bbHeight={24}
+                    bbWidth={24}
+                    focusable={false}
+                    height={24}
+                    meetOrSlice={0}
+                    minX={0}
+                    minY={0}
+                    style={
+                      [
+                        {
+                          "backgroundColor": "transparent",
+                          "borderWidth": 0,
+                        },
+                        {
+                          "flex": 0,
+                          "height": 24,
+                          "width": 24,
+                        },
+                      ]
+                    }
+                    vbHeight={24}
+                    vbWidth={24}
+                    width={24}
+                  >
+                    <RNSVGGroup
+                      fill={
+                        {
+                          "payload": 4278190080,
+                          "type": 0,
+                        }
+                      }
+                    >
+                      <RNSVGPath
+                        clipRule={0}
+                        d="M2.293 2.293a1 1 0 0 1 1.414 0l18 18a1 1 0 0 1-1.414 1.414l-18-18a1 1 0 0 1 0-1.414Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                        fillRule={0}
+                        propList={
+                          [
+                            "fillRule",
+                          ]
+                        }
+                      />
+                      <RNSVGPath
+                        clipRule={0}
+                        d="M7.15 6.563c-.228.144-.447.294-.659.446-1.51 1.087-2.71 2.391-3.45 3.29a2.66 2.66 0 0 0 0 3.402c.74.899 1.94 2.203 3.45 3.29C7.994 18.073 9.891 19 12.001 19s4.005-.927 5.508-2.009l.04-.028-2.443-2.443A4 4 0 1 1 9.48 8.893l-2.33-2.33Zm8.813 5.986a4 4 0 0 0-4.511-4.511l-1.9-1.9c-.254-.254-.164-.685.18-.79A7.776 7.776 0 0 1 12 5c2.11 0 4.006.927 5.51 2.009 1.51 1.087 2.71 2.391 3.45 3.29a2.66 2.66 0 0 1 0 3.402 20.884 20.884 0 0 1-1.513 1.65.49.49 0 0 1-.69-.008l-2.794-2.794Zm-5.054-2.226a2 2 0 1 0 2.767 2.767l-2.767-2.767Z"
+                        fill={
+                          {
+                            "payload": 4278190080,
+                            "type": 0,
+                          }
+                        }
+                        fillRule={0}
+                        propList={
+                          [
+                            "fillRule",
+                          ]
+                        }
+                      />
+                    </RNSVGGroup>
+                  </RNSVGSvgView>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          accessibilityLabel="Reset Password"
+          accessibilityRole="button"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": true,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={false}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+          testID="reset-password-submit-button"
+        >
+          <View
+            className="py-5 px-6 items-center justify-center rounded-xl bg-gradient-to-r from-bg-none-active to-bg-none-active"
+          >
+            <Text
+              accessible={false}
+              className="font-montserrat-medium text-white text-center text-lg leading-6"
+              importantForAccessibility="no"
+              maxFontSizeMultiplier={1.2}
+              testID="reset-password-submit-button-text"
+            >
+              Reset Password
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</RNCSafeAreaView>
+`;

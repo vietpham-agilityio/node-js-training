@@ -1,0 +1,167 @@
+name: Dependency Review & Security
+
+on:
+  pull_request:
+    branches: [main, feat/ticket-reservation]
+    types: [opened, synchronize, reopened]
+  schedule:
+    # Run security scan weekly on Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  # Dependency Review - checks for vulnerabilities in PR dependency changes
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          comment-summary-in-pr: always
+
+  # Security audit using pnpm audit
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-and-pnpm
+
+      - name: Run pnpm Audit
+        id: pnpm-audit
+        # --groups/--level are npm flags; pnpm rejects them outright, so this
+        # step used to error, get swallowed by `|| true`, and leave the next
+        # step grepping an error message for the word "critical" — reporting
+        # green while auditing nothing.
+        run: |
+          echo "Running pnpm audit..."
+          pnpm audit --prod --audit-level moderate | tee audit-report.txt || true
+
+      - name: Check for critical vulnerabilities
+        run: |
+          if grep -q "critical" audit-report.txt; then
+            echo "⚠️  Critical vulnerabilities found!"
+            cat audit-report.txt
+            exit 1
+          elif grep -q "high" audit-report.txt; then
+            echo "⚠️  High severity vulnerabilities found!"
+            cat audit-report.txt
+            exit 1
+          else
+            echo "✅ No critical or high severity vulnerabilities found"
+          fi
+        continue-on-error: true
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-report
+          path: audit-report.txt
+          retention-days: 30
+
+  # Check for outdated dependencies
+  outdated-dependencies:
+    name: Check Outdated Dependencies
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-and-pnpm
+
+      - name: Check for outdated packages
+        run: |
+          echo "Checking for outdated packages..."
+          pnpm outdated || true
+          pnpm outdated > outdated-report.txt 2>&1 || true
+
+      - name: Upload outdated report
+        uses: actions/upload-artifact@v4
+        with:
+          name: outdated-dependencies-report
+          path: outdated-report.txt
+          retention-days: 30
+
+  # License compliance check
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-and-pnpm
+
+      - name: Install license checker
+        run: pnpm install -g license-checker
+
+      - name: Check licenses
+        run: |
+          echo "Checking package licenses..."
+          license-checker --summary > license-summary.txt || true
+          license-checker --json > license-report.json || true
+
+      - name: Review problematic licenses
+        run: |
+          # Check for GPL licenses which might be problematic
+          if grep -qi "gpl" license-summary.txt; then
+            echo "⚠️  GPL licenses found - please review"
+            cat license-summary.txt
+          else
+            echo "✅ No problematic licenses found"
+          fi
+        continue-on-error: true
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: |
+            license-summary.txt
+            license-report.json
+          retention-days: 30
+
+  # Summary job
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [security-audit, license-check]
+    if: always()
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "# 🔒 Security & Dependency Review Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.security-audit.result }}" == "success" ]; then
+            echo "- ✅ Security Audit: **Passed**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️  Security Audit: **Issues Found**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ needs.license-check.result }}" == "success" ]; then
+            echo "- ✅ License Check: **Passed**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️  License Check: **Review Needed**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Recommendations" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review security audit reports for any vulnerabilities" >> $GITHUB_STEP_SUMMARY
+          echo "2. Update dependencies with security patches promptly" >> $GITHUB_STEP_SUMMARY
+          echo "3. Check license compliance for new dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "4. Enable Dependabot for automatic security updates" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Security scan completed at $(date)*" >> $GITHUB_STEP_SUMMARY

@@ -1,7 +1,8 @@
 # compiled output
-/dist
-/node_modules
-/build
+dist/
+node_modules/
+build/
+.turbo/
 
 # Logs
 logs
@@ -16,8 +17,29 @@ lerna-debug.log*
 .DS_Store
 
 # Tests
-/coverage
+coverage/
 /.nyc_output
+
+# Expo / React Native (apps/mobile)
+.expo/
+web-build/
+expo-env.d.ts
+.metro-health-check*
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+apps/mobile/ios/
+apps/mobile/android/
+app-example
+
+# Secrets pulled in by the mobile app
+google-services.json
+movies-ticket-booking.json
 
 # IDEs and editors
 /.idea

@@ -34,6 +34,7 @@ documents.**
 | [DDR-014](0014-movies-genres-module-endpoint-design.md)   | Movies/Genres module endpoint design                        | ADR-001, ADR-006, ADR-010, ADR-012 |
 | [DDR-015](0015-showtimes-halls-module-endpoint-design.md) | Showtimes/Halls module endpoint design                      | ADR-001, ADR-006, ADR-010, ADR-012 |
 | [DDR-016](0016-showtime-status-state-machine.md)          | Showtime status state machine                               | ADR-008, ADR-010                   |
+| [DDR-017](0017-workspace-layout-and-package-naming.md)    | Workspace layout and package naming                         | ADR-015, ADR-016                   |
 
 ## Open divergences from the code
 

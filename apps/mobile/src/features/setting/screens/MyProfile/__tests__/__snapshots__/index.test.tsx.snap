@@ -1,0 +1,1134 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`MyProfileScreen Snapshot should match snapshot 1`] = `
+<View
+  accessibilityHint="Profile screen"
+  accessibilityLabel="Profile screen"
+  className="flex-1 bg-bg-primary"
+  edges={
+    [
+      "bottom",
+    ]
+  }
+>
+  <RCTScrollView
+    contentContainerClassName="flex-1 px-6"
+    showsVerticalScrollIndicator={false}
+  >
+    <View>
+      <View
+        className="justify-center items-center gap-6"
+      >
+        <View
+          accessibilityLabel="Profile avatar"
+          accessibilityRole="image"
+          accessible={true}
+          className="relative w-33 h-33"
+          testID="avatar-container"
+        >
+          Image
+        </View>
+        <View
+          className="gap-1 items-center"
+        >
+          <Text
+            accessible={true}
+            className="text-white text-lg font-montserrat-medium"
+            maxFontSizeMultiplier={1.2}
+          >
+            John Doe
+          </Text>
+          <Text
+            accessible={true}
+            className="text-base font-montserrat-regular text-overlay-soft"
+            maxFontSizeMultiplier={1.2}
+          >
+            john@example.com
+          </Text>
+        </View>
+      </View>
+      <View
+        className="mt-8 gap-5"
+      >
+        <View
+          accessibilityHint="Tap to open setting"
+          accessibilityLabel="Edit setting"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+          testID="edit"
+        >
+          <View
+            className="flex-row justify-start items-center"
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={24}
+              bbWidth={24}
+              fill="none"
+              focusable={false}
+              height={24}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 24,
+                    "width": 24,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={24}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              >
+                <RNSVGPath
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z"
+                  fill={
+                    {
+                      "brushRef": "a",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M7.07 18.28c.43-.9 3.05-1.78 4.93-1.78s4.51.88 4.93 1.78A7.893 7.893 0 0 1 12 20c-1.86 0-3.57-.64-4.93-1.72Z"
+                  fill={
+                    {
+                      "payload": 4288920575,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M18.36 16.83c-1.43-1.74-4.9-2.33-6.36-2.33s-4.93.59-6.36 2.33A7.95 7.95 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8c0 1.82-.62 3.49-1.64 4.83Z"
+                  fill={
+                    {
+                      "brushRef": "b",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M12 6c-1.94 0-3.5 1.56-3.5 3.5S10.06 13 12 13s3.5-1.56 3.5-3.5S13.94 6 12 6Z"
+                  fill={
+                    {
+                      "payload": 4288920575,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M12 11c-.83 0-1.5-.67-1.5-1.5S11.17 8 12 8s1.5.67 1.5 1.5S12.83 11 12 11Z"
+                  fill={
+                    {
+                      "payload": 4288920575,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGDefs>
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="a"
+                    x1={-3.789}
+                    x2={30.506}
+                    y1={-19.25}
+                    y2={-12.986}
+                  />
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="b"
+                    x1={-0.632}
+                    x2={26.321}
+                    y1={-9.632}
+                    y2={-3.492}
+                  />
+                </RNSVGDefs>
+              </RNSVGGroup>
+            </RNSVGSvgView>
+            <Text
+              accessible={true}
+              className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
+            >
+              Edit
+            </Text>
+          </View>
+          <View
+            className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+            testID="divider"
+          />
+        </View>
+        <View
+          accessibilityHint="Tap to open setting"
+          accessibilityLabel="My Wallet setting"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+          testID="my_wallet"
+        >
+          <View
+            className="flex-row justify-start items-center"
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={24}
+              bbWidth={24}
+              fill="none"
+              focusable={false}
+              height={24}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 24,
+                    "width": 24,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={24}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              >
+                <RNSVGPath
+                  d="M20.5 7.28V5c0-1.1-.9-2-2-2h-14a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-2.28a2 2 0 0 0 1-1.72V9a2 2 0 0 0-1-1.72Z"
+                  fill={
+                    {
+                      "brushRef": "a",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M19.5 9v6h-7V9h7Z"
+                  fill={
+                    {
+                      "brushRef": "b",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M4.5 19V5h14v2h-6c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h6v2h-14Z"
+                  fill={
+                    {
+                      "payload": 4288920575,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M15.5 10.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"
+                  fill={
+                    {
+                      "payload": 4288920575,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGDefs>
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="a"
+                    x1={-3}
+                    x2={29.461}
+                    y1={-16.125}
+                    y2={-9.866}
+                  />
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="b"
+                    x1={10.474}
+                    x2={22.339}
+                    y1={2.625}
+                    y2={5.153}
+                  />
+                </RNSVGDefs>
+              </RNSVGGroup>
+            </RNSVGSvgView>
+            <Text
+              accessible={true}
+              className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
+            >
+              My Wallet
+            </Text>
+          </View>
+          <View
+            className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+            testID="divider"
+          />
+        </View>
+        <View
+          accessibilityHint="Tap to open setting"
+          accessibilityLabel="Change Language setting"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+          testID="change_language"
+        >
+          <View
+            className="flex-row justify-start items-center"
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={24}
+              bbWidth={24}
+              fill="none"
+              focusable={false}
+              height={24}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 24,
+                    "width": 24,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={24}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              >
+                <RNSVGPath
+                  d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04Z"
+                  fill={
+                    {
+                      "payload": 4288920575,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12Z"
+                  fill={
+                    {
+                      "brushRef": "a",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="m15.88 17 1.62-4.33L19.12 17h-3.24Z"
+                  fill={
+                    {
+                      "payload": 4278456378,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGDefs>
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="a"
+                    x1={8.816}
+                    x2={27.776}
+                    y1={-2.75}
+                    y2={0.425}
+                  />
+                </RNSVGDefs>
+              </RNSVGGroup>
+            </RNSVGSvgView>
+            <Text
+              accessible={true}
+              className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
+            >
+              Change Language
+            </Text>
+          </View>
+          <View
+            className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+            testID="divider"
+          />
+        </View>
+        <View
+          accessibilityHint="Tap to open setting"
+          accessibilityLabel="Help Center setting"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+          testID="help_center"
+        >
+          <View
+            className="flex-row justify-start items-center"
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={24}
+              bbWidth={24}
+              fill="none"
+              focusable={false}
+              height={24}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 24,
+                    "width": 24,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={24}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              >
+                <RNSVGPath
+                  d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Z"
+                  fill={
+                    {
+                      "brushRef": "a",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M19 11c0 4.52-2.98 8.69-7 9.93-4.02-1.24-7-5.41-7-9.93V6.3l7-3.11 7 3.11V11Z"
+                  fill={
+                    {
+                      "brushRef": "b",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M7.41 11.59 6 13l4 4 8-8-1.41-1.42L10 14.17l-2.59-2.58Z"
+                  fill={
+                    {
+                      "payload": 4288920575,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGDefs>
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="a"
+                    x1={-2.211}
+                    x2={28.988}
+                    y1={-22.375}
+                    y2={-17.712}
+                  />
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="b"
+                    x1={0.947}
+                    x2={25.25}
+                    y1={-15.659}
+                    y2={-12.155}
+                  />
+                </RNSVGDefs>
+              </RNSVGGroup>
+            </RNSVGSvgView>
+            <Text
+              accessible={true}
+              className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
+            >
+              Help Center
+            </Text>
+          </View>
+          <View
+            className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+            testID="divider"
+          />
+        </View>
+        <View
+          accessibilityHint="Tap to open setting"
+          accessibilityLabel="Rate Movea App setting"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+          testID="rate_app"
+        >
+          <View
+            className="flex-row justify-start items-center"
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={24}
+              bbWidth={24}
+              fill="none"
+              focusable={false}
+              height={24}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 24,
+                    "width": 24,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={24}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              >
+                <RNSVGPath
+                  d="M9 22h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 2 7.58 8.59C7.22 8.95 7 9.45 7 10v10c0 1.1.9 2 2 2Z"
+                  fill={
+                    {
+                      "brushRef": "a",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="m9 10 4.34-4.34L12 11h9v2l-3 7H9V10Z"
+                  fill={
+                    {
+                      "brushRef": "b",
+                      "type": 1,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGPath
+                  d="M1 10h4v12H1V10Z"
+                  fill={
+                    {
+                      "payload": 4288920575,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                    ]
+                  }
+                />
+                <RNSVGDefs>
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="a"
+                    x1={2.368}
+                    x2={30.127}
+                    y1={-19.25}
+                    y2={-15.194}
+                  />
+                  <RNSVGLinearGradient
+                    gradient={
+                      [
+                        0,
+                        -12689159,
+                        1,
+                        -12757768,
+                      ]
+                    }
+                    gradientTransform={null}
+                    gradientUnits={1}
+                    name="b"
+                    x1={5.526}
+                    x2={26.304}
+                    y1={-9.576}
+                    y2={-6.4}
+                  />
+                </RNSVGDefs>
+              </RNSVGGroup>
+            </RNSVGSvgView>
+            <Text
+              accessible={true}
+              className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
+            >
+              Rate Movea App
+            </Text>
+          </View>
+          <View
+            className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+            testID="divider"
+          />
+        </View>
+        <View
+          accessibilityHint="Tap to open setting"
+          accessibilityLabel="Change Password setting"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+          testID="change_password"
+        >
+          <View
+            className="flex-row justify-start items-center"
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={24}
+              bbWidth={24}
+              fill="none"
+              focusable={false}
+              height={24}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 24,
+                    "width": 24,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={24}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              >
+                <RNSVGPath
+                  clipRule={0}
+                  d="M7 10V8a5 5 0 0 1 10 0v2h1.5A1.5 1.5 0 0 1 20 11.5v7A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5v-7A1.5 1.5 0 0 1 5.5 10H7Zm2-2a3 3 0 1 1 6 0v2H9V8Zm3 4a1.5 1.5 0 0 0-.75 2.799V16a.75.75 0 0 0 1.5 0v-1.201A1.5 1.5 0 0 0 12 12Z"
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                  fillRule={0}
+                  propList={
+                    [
+                      "fillRule",
+                    ]
+                  }
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
+            <Text
+              accessible={true}
+              className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
+            >
+              Change Password
+            </Text>
+          </View>
+          <View
+            className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+            testID="divider"
+          />
+        </View>
+        <View
+          accessibilityHint="Tap to open setting"
+          accessibilityLabel="Logout setting"
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
+          accessibilityValue={
+            {
+              "max": undefined,
+              "min": undefined,
+              "now": undefined,
+              "text": undefined,
+            }
+          }
+          accessible={true}
+          collapsable={false}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            {
+              "opacity": 1,
+            }
+          }
+          testID="logout"
+        >
+          <View
+            className="flex-row justify-start items-center"
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={24}
+              bbWidth={24}
+              fill="none"
+              focusable={false}
+              height={24}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 24,
+                    "width": 24,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={24}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                  ]
+                }
+              >
+                <RNSVGPath
+                  clipRule={0}
+                  d="M4 4.75A1.75 1.75 0 0 1 5.75 3h6.5a.75.75 0 0 1 0 1.5h-6.5A.25.25 0 0 0 5.5 4.75v14.5c0 .138.112.25.25.25h6.5a.75.75 0 0 1 0 1.5h-6.5A1.75 1.75 0 0 1 4 19.25V4.75Zm10.47 3.22a.75.75 0 0 1 1.06 0l3.22 3.22a.75.75 0 0 1 0 1.06l-3.22 3.22a.75.75 0 1 1-1.06-1.06L16.44 13H9.75a.75.75 0 0 1 0-1.5h6.69l-1.97-1.97a.75.75 0 0 1 0-1.06Z"
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                  fillRule={0}
+                  propList={
+                    [
+                      "fillRule",
+                    ]
+                  }
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
+            <Text
+              accessible={true}
+              className="text-white text-base font-montserrat-regular ml-3"
+              maxFontSizeMultiplier={1.2}
+            >
+              Logout
+            </Text>
+          </View>
+          <View
+            className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+            testID="divider"
+          />
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;

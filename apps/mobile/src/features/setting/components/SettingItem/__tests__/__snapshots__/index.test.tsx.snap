@@ -1,0 +1,159 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`SettingItem Component Snapshot should match snapshot 1`] = `
+<View
+  accessibilityHint="Tap to open setting"
+  accessibilityLabel="Edit Profile setting"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": undefined,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "opacity": 1,
+    }
+  }
+  testID="setting-item"
+>
+  <View
+    className="flex-row justify-start items-center"
+  >
+    <Text
+      accessible={true}
+      className="text-white text-base font-montserrat-regular ml-3"
+      maxFontSizeMultiplier={1.2}
+    >
+      Edit Profile
+    </Text>
+  </View>
+  <View
+    className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+    testID="divider"
+  />
+</View>
+`;
+
+exports[`SettingItem Component Snapshot should match snapshot with icon 1`] = `
+<View
+  accessibilityHint="Tap to open setting"
+  accessibilityLabel="Edit Profile setting"
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": undefined,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "opacity": 1,
+    }
+  }
+  testID="setting-item"
+>
+  <View
+    className="flex-row justify-start items-center"
+  >
+    <RNSVGSvgView
+      align="xMidYMid"
+      bbHeight={24}
+      bbWidth={24}
+      fill="none"
+      focusable={false}
+      height={24}
+      meetOrSlice={0}
+      minX={0}
+      minY={0}
+      style={
+        [
+          {
+            "backgroundColor": "transparent",
+            "borderWidth": 0,
+          },
+          {
+            "flex": 0,
+            "height": 24,
+            "width": 24,
+          },
+        ]
+      }
+      vbHeight={24}
+      vbWidth={24}
+      width={24}
+    >
+      <RNSVGGroup
+        fill={null}
+        propList={
+          [
+            "fill",
+          ]
+        }
+      >
+        <RNSVGPath
+          d="m10 0 1.762 1.762L4.787 8.75H20v2.5H4.787l6.975 6.988L10 20 0 10 10 0Z"
+          fill={
+            {
+              "payload": 4278190080,
+              "type": 0,
+            }
+          }
+        />
+      </RNSVGGroup>
+    </RNSVGSvgView>
+    <Text
+      accessible={true}
+      className="text-white text-base font-montserrat-regular ml-3"
+      maxFontSizeMultiplier={1.2}
+    >
+      Edit Profile
+    </Text>
+  </View>
+  <View
+    className="h-0.5 border-b-2 border-dashed border-white/60 rounded-full"
+    testID="divider"
+  />
+</View>
+`;
