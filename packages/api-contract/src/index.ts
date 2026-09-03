@@ -25,3 +25,14 @@ export type Schemas = components['schemas'];
  * here as the mobile app migrates each feature off Supabase, so the app
  * imports intent-revealing names rather than reaching into `Schemas` directly.
  */
+
+/** `POST /auth/login` request body. */
+export type LoginRequest = Schemas['LoginDto'];
+/** `POST /auth/register` request body. */
+export type RegisterRequest = Schemas['RegisterDto'];
+/** `POST /auth/refresh` and `POST /auth/logout` request body. */
+export type RefreshTokenRequest = Schemas['RefreshTokenDto'];
+/** What `login`, `register` and `refresh` return. */
+export type TokenPair = Schemas['TokenPairDto'];
+/** What `GET /auth/me` returns — the authenticated user from the access token. */
+export type AuthUser = Schemas['MeResponseDto'];

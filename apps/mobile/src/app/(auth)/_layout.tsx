@@ -30,8 +30,6 @@ const AuthLayout = () => (
       }}
     />
     <Stack.Screen name={SCREENS.AUTH.SIGNUP} />
-    <Stack.Screen name={SCREENS.AUTH.FORGOT_PASSWORD} />
-    <Stack.Screen name={SCREENS.AUTH.RESET_PASSWORD} />
   </Stack>
 );
 

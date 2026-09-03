@@ -37,19 +37,9 @@ enum SettingKey {
 const MyProfileScreen = () => {
   const { data: profile, isLoading: isProfileLoading } = useProfile();
   const { signOut } = useAuth();
-  const { user: userInfo } = useAuth();
 
-  const visibleSettings = useMemo(() => {
-    const isOAuthUser = userInfo?.app_metadata.provider !== 'email';
-
-    return SETTING_ITEMS.filter(setting => {
-      // Hide ChangePassword for OAuth users
-      if (setting.TEST_ID === SettingKey.ChangePassword && isOAuthUser) {
-        return false;
-      }
-      return true;
-    });
-  }, [userInfo?.app_metadata.provider]);
+  // Every account is email/password now, so every setting is visible.
+  const visibleSettings = SETTING_ITEMS;
 
   const SETTING_ACTIONS: Record<SettingKey, () => void> = useMemo(
     () => ({

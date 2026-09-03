@@ -8,7 +8,6 @@ import { Button } from '@/components/Button';
 import { EmailInput } from '@/components/EmailInput';
 import { Input } from '@/components/Input';
 import { PasswordInput } from '@/components/PasswordInput';
-import { EditableAvatar } from '@/features/camera/components/EditableAvatar';
 
 // Types
 import { SignUpData } from '@/features/auth/types/auth';
@@ -25,7 +24,8 @@ interface SignUpFormProps {
 }
 
 export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
-  const fullNameRef = useRef<TextInput>(null);
+  const firstNameRef = useRef<TextInput>(null);
+  const lastNameRef = useRef<TextInput>(null);
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
@@ -41,17 +41,21 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     defaultValues: {
-      fullName: '',
+      firstName: '',
+      lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
-      avatarUrl: undefined,
     },
   });
 
   const isDisabled = isSubmitting || isPending || !isDirty;
 
-  const handleFullNameSubmit = useCallback(() => {
+  const handleFirstNameSubmit = useCallback(() => {
+    lastNameRef.current?.focus();
+  }, []);
+
+  const handleLastNameSubmit = useCallback(() => {
     emailRef.current?.focus();
   }, []);
 
@@ -66,10 +70,10 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
   const handleSubmitForm = useCallback(
     (data: SignUpFormData): void => {
       const signUpData: SignUpData = {
-        fullName: data.fullName,
+        firstName: data.firstName,
+        lastName: data.lastName,
         email: data.email,
         password: data.password,
-        avatarUrl: data.avatarUrl,
       };
       onSubmit(signUpData);
     },
@@ -78,44 +82,59 @@ export const SignUpForm = memo(({ isPending, onSubmit }: SignUpFormProps) => {
 
   return (
     <View className="w-full" testID="signup-form">
-      <Controller
-        control={control}
-        name="avatarUrl"
-        render={({ field: { value, onChange } }) => (
-          <View className="items-center mb-12">
-            <EditableAvatar
-              source={value}
-              accessibilityLabel="Select avatar"
-              onChangeImage={uri => onChange(uri)}
-            />
-          </View>
-        )}
-      />
-
-      {/* Full Name Input */}
-      <View className={errors.fullName ? 'mb-4' : 'mb-9'}>
+      {/* First Name Input */}
+      <View className={errors.firstName ? 'mb-4' : 'mb-9'}>
         <Controller
           control={control}
-          name="fullName"
+          name="firstName"
           render={({
             field: { onChange, onBlur, value },
             fieldState: { error },
           }) => (
             <Input
-              ref={fullNameRef}
+              ref={firstNameRef}
               accessibilityRole="text"
-              accessibilityLabel="Full Name input field"
-              accessibilityHint="Type your full name"
-              label="Full Name"
+              accessibilityLabel="First Name input field"
+              accessibilityHint="Type your first name"
+              label="First Name"
               value={value}
               error={error?.message}
-              testID="signup-fullname-input"
+              testID="signup-firstname-input"
               returnKeyType="next"
               autoCapitalize="words"
               autoCorrect={false}
               onChangeText={onChange}
               onBlur={onBlur}
-              onSubmitEditing={handleFullNameSubmit}
+              onSubmitEditing={handleFirstNameSubmit}
+            />
+          )}
+        />
+      </View>
+
+      {/* Last Name Input */}
+      <View className={errors.lastName ? 'mb-4' : 'mb-9'}>
+        <Controller
+          control={control}
+          name="lastName"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <Input
+              ref={lastNameRef}
+              accessibilityRole="text"
+              accessibilityLabel="Last Name input field"
+              accessibilityHint="Type your last name"
+              label="Last Name"
+              value={value}
+              error={error?.message}
+              testID="signup-lastname-input"
+              returnKeyType="next"
+              autoCapitalize="words"
+              autoCorrect={false}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              onSubmitEditing={handleLastNameSubmit}
             />
           )}
         />

@@ -1,4 +1,3 @@
-import { Session, User } from '@supabase/supabase-js';
 import { Effect } from 'effect';
 import { create } from 'zustand';
 
@@ -6,23 +5,23 @@ import { create } from 'zustand';
 import { AuthService } from '../effect/services';
 import { AuthServiceLayer } from '../layer';
 
+// Types
+import { AuthSession, AuthUser } from '@/features/auth/types/auth';
+
 // Store
 import { secureStorage } from '@/services/storage/secure';
 
 // Utils
-import { wipeSupabaseSecrets } from '@/services/supabase/client';
 import { runEffectForQuery } from '@/utils/effect';
 
 interface AuthState {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
+  session: AuthSession | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  isSigningUp: boolean;
 
-  setSigningUp: (isSigningUp: boolean) => void;
-  setUser: (user: User | null) => void;
-  setSession: (session: Session | null) => void;
+  setUser: (user: AuthUser | null) => void;
+  setSession: (session: AuthSession | null) => void;
   setLoading: (loading: boolean) => void;
   initialize: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -34,16 +33,13 @@ export const useAuthStore = create<AuthState>(set => ({
   session: null,
   isLoading: true,
   isAuthenticated: false,
-  isSigningUp: false,
-
-  setSigningUp: isSigningUp => set({ isSigningUp }),
 
   setUser: user => set({ user, isAuthenticated: !!user }),
 
   setSession: session =>
     set({
       session,
-      user: session?.user || null,
+      user: session?.user ?? null,
       isAuthenticated: !!session?.user,
     }),
 
@@ -89,7 +85,6 @@ export const useAuthStore = create<AuthState>(set => ({
         session: null,
         isAuthenticated: false,
       });
-      wipeSupabaseSecrets();
     } catch (error) {
       throw error;
     }

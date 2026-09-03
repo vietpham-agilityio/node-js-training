@@ -133,10 +133,15 @@ pnpm install
 - Option 1: Create your **.env** file:
 
 ```bash
+EXPO_PUBLIC_API_URL=http://localhost:3000/api/v1
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
 GOOGLE_SERVICES_JSON=
 ```
+
+`EXPO_PUBLIC_API_URL` points at the running `@movea/api` (auth); the Supabase vars
+still back the features not yet migrated. On a device, replace `localhost` with your
+machine's LAN IP.
 
 - Option 2: Pull environment variables for your local development (need to Expo account)
 

@@ -6,8 +6,6 @@ import LoginScreen from '../index';
 
 // Mock dependencies
 const mockSignIn = jest.fn();
-const mockSignInWithGoogle = jest.fn();
-const mockSignInWithFacebook = jest.fn();
 const mockToastAlert = jest.fn();
 const mockPush = jest.fn();
 const mockRouterPush = jest.fn();
@@ -19,20 +17,12 @@ jest.mock('expo-router', () => ({
   router: {
     push: mockPush,
   },
-  Link: ({ children, href }: any) => children,
+  Link: ({ children }: any) => children,
 }));
 
 jest.mock('@/features/auth/hooks/useSignIn', () => ({
   useSignIn: () => ({
     mutate: mockSignIn,
-    isPending: false,
-  }),
-  useSignInWithGoogle: () => ({
-    mutate: mockSignInWithGoogle,
-    isPending: false,
-  }),
-  useSignInWithFacebook: () => ({
-    mutate: mockSignInWithFacebook,
     isPending: false,
   }),
 }));
@@ -75,10 +65,10 @@ describe('LoginScreen', () => {
       expect(getByText('Sign Up')).toBeTruthy();
     });
 
-    it('should render third-party sign-in buttons', () => {
-      const { getByTestId } = render(<LoginScreen />);
-      expect(getByTestId('signin-google-button')).toBeTruthy();
-      expect(getByTestId('signin-facebook-button')).toBeTruthy();
+    it('should not render third-party sign-in buttons', () => {
+      const { queryByTestId } = render(<LoginScreen />);
+      expect(queryByTestId('signin-google-button')).toBeNull();
+      expect(queryByTestId('signin-facebook-button')).toBeNull();
     });
 
     it('should render StatusBar', () => {
@@ -163,80 +153,6 @@ describe('LoginScreen', () => {
       expect(mockToastAlert).toHaveBeenCalledWith(
         'Login failed. Please try again.',
         '', // Empty message propagated from error.message
-        [],
-        {
-          type: 'error',
-        },
-      );
-    });
-  });
-
-  describe('Third-Party Sign In', () => {
-    it('should call signInWithGoogle when Google button is pressed', () => {
-      const { getByTestId } = render(<LoginScreen />);
-      const googleButton = getByTestId('signin-google-button');
-
-      fireEvent.press(googleButton);
-
-      expect(mockSignInWithGoogle).toHaveBeenCalledWith(
-        undefined,
-        expect.objectContaining({
-          onError: expect.any(Function),
-        }),
-      );
-    });
-
-    it('should show error toast when Google sign in fails', () => {
-      const { getByTestId } = render(<LoginScreen />);
-      const googleButton = getByTestId('signin-google-button');
-
-      fireEvent.press(googleButton);
-
-      const googleCall = mockSignInWithGoogle.mock.calls[0];
-      const onErrorCallback = googleCall[1].onError;
-
-      const error = new Error('Google sign in failed');
-      onErrorCallback(error);
-
-      expect(mockToastAlert).toHaveBeenCalledWith(
-        'Google Sign In Failed',
-        'Google sign in failed',
-        [],
-        {
-          type: 'error',
-        },
-      );
-    });
-
-    it('should call signInWithFacebook when Facebook button is pressed', () => {
-      const { getByTestId } = render(<LoginScreen />);
-      const facebookButton = getByTestId('signin-facebook-button');
-
-      fireEvent.press(facebookButton);
-
-      expect(mockSignInWithFacebook).toHaveBeenCalledWith(
-        undefined,
-        expect.objectContaining({
-          onError: expect.any(Function),
-        }),
-      );
-    });
-
-    it('should show error toast when Facebook sign in fails', () => {
-      const { getByTestId } = render(<LoginScreen />);
-      const facebookButton = getByTestId('signin-facebook-button');
-
-      fireEvent.press(facebookButton);
-
-      const facebookCall = mockSignInWithFacebook.mock.calls[0];
-      const onErrorCallback = facebookCall[1].onError;
-
-      const error = new Error('Facebook sign in failed');
-      onErrorCallback(error);
-
-      expect(mockToastAlert).toHaveBeenCalledWith(
-        'Facebook Sign In Failed',
-        'Facebook sign in failed',
         [],
         {
           type: 'error',

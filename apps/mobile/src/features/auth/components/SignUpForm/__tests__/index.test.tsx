@@ -24,12 +24,13 @@ describe('SignUpForm Component', () => {
   describe('Rendering', () => {
     it('should render without crashing', () => {
       const { getByTestId } = render(<SignUpForm {...defaultProps} />);
-      expect(getByTestId('signup-fullname-input')).toBeTruthy();
+      expect(getByTestId('signup-firstname-input')).toBeTruthy();
     });
 
-    it('should render full name input field', () => {
+    it('should render first and last name input fields', () => {
       const { getByTestId } = render(<SignUpForm {...defaultProps} />);
-      expect(getByTestId('signup-fullname-input')).toBeTruthy();
+      expect(getByTestId('signup-firstname-input')).toBeTruthy();
+      expect(getByTestId('signup-lastname-input')).toBeTruthy();
     });
 
     it('should render email input field', () => {
@@ -54,7 +55,8 @@ describe('SignUpForm Component', () => {
 
     it('should display correct labels', () => {
       const { getByText } = render(<SignUpForm {...defaultProps} />);
-      expect(getByText('Full Name')).toBeTruthy();
+      expect(getByText('First Name')).toBeTruthy();
+      expect(getByText('Last Name')).toBeTruthy();
       expect(getByText('Email Address')).toBeTruthy();
       expect(getByText('Password')).toBeTruthy();
       expect(getByText('Confirm Password')).toBeTruthy();
@@ -62,12 +64,20 @@ describe('SignUpForm Component', () => {
   });
 
   describe('Form Interaction', () => {
-    it('should allow typing in full name input', () => {
+    it('should allow typing in first name input', () => {
       const { getByTestId } = render(<SignUpForm {...defaultProps} />);
-      const fullNameInput = getByTestId('signup-fullname-input-input');
+      const firstNameInput = getByTestId('signup-firstname-input-input');
 
-      fireEvent.changeText(fullNameInput, 'John Doe');
-      expect(fullNameInput.props.value).toBe('John Doe');
+      fireEvent.changeText(firstNameInput, 'John');
+      expect(firstNameInput.props.value).toBe('John');
+    });
+
+    it('should allow typing in last name input', () => {
+      const { getByTestId } = render(<SignUpForm {...defaultProps} />);
+      const lastNameInput = getByTestId('signup-lastname-input-input');
+
+      fireEvent.changeText(lastNameInput, 'Doe');
+      expect(lastNameInput.props.value).toBe('Doe');
     });
 
     it('should allow typing in email input', () => {
@@ -96,13 +106,26 @@ describe('SignUpForm Component', () => {
       expect(confirmPasswordInput.props.value).toBe('Test123!');
     });
 
-    it('should focus email input when full name input submits', () => {
+    it('should focus last name input when first name input submits', () => {
       const { getByTestId } = render(<SignUpForm {...defaultProps} />);
-      const fullNameInput = getByTestId('signup-fullname-input-input');
+      const firstNameInput = getByTestId('signup-firstname-input-input');
 
       const focusSpy = jest.spyOn(TextInput.prototype, 'focus');
 
-      fireEvent(fullNameInput, 'submitEditing');
+      fireEvent(firstNameInput, 'submitEditing');
+
+      expect(focusSpy).toHaveBeenCalledTimes(1);
+
+      focusSpy.mockRestore();
+    });
+
+    it('should focus email input when last name input submits', () => {
+      const { getByTestId } = render(<SignUpForm {...defaultProps} />);
+      const lastNameInput = getByTestId('signup-lastname-input-input');
+
+      const focusSpy = jest.spyOn(TextInput.prototype, 'focus');
+
+      fireEvent(lastNameInput, 'submitEditing');
 
       expect(focusSpy).toHaveBeenCalledTimes(1);
 
@@ -144,17 +167,17 @@ describe('SignUpForm Component', () => {
       expect(submitButton.props.disabled).toBe(undefined);
     });
 
-    it('should show validation error for invalid full name', async () => {
+    it('should show validation error for invalid first name', async () => {
       const { getByTestId, queryByTestId } = render(
         <SignUpForm {...defaultProps} />,
       );
-      const fullNameInput = getByTestId('signup-fullname-input-input');
+      const firstNameInput = getByTestId('signup-firstname-input-input');
 
-      fireEvent.changeText(fullNameInput, 'A');
-      fireEvent(fullNameInput, 'blur');
+      fireEvent.changeText(firstNameInput, 'A');
+      fireEvent(firstNameInput, 'blur');
 
       await waitFor(() => {
-        const errorMessage = queryByTestId('signup-fullname-input-error');
+        const errorMessage = queryByTestId('signup-firstname-input-error');
         expect(errorMessage).toBeTruthy();
       });
     });
@@ -193,7 +216,8 @@ describe('SignUpForm Component', () => {
   describe('Form Submission', () => {
     it('should call onSubmit with form data when valid form is submitted', async () => {
       const { getByTestId } = render(<SignUpForm {...defaultProps} />);
-      const fullNameInput = getByTestId('signup-fullname-input-input');
+      const firstNameInput = getByTestId('signup-firstname-input-input');
+      const lastNameInput = getByTestId('signup-lastname-input-input');
       const emailInput = getByTestId('signup-email-input-input');
       const passwordInput = getByTestId('signup-password-input-input');
       const confirmPasswordInput = getByTestId(
@@ -201,12 +225,12 @@ describe('SignUpForm Component', () => {
       );
       const submitButton = getByTestId('signup-submit-button');
 
-      fireEvent.changeText(fullNameInput, 'John Doe');
+      fireEvent.changeText(firstNameInput, 'John');
+      fireEvent.changeText(lastNameInput, 'Doe');
       fireEvent.changeText(emailInput, 'john@example.com');
       fireEvent.changeText(passwordInput, 'Test123!@');
       fireEvent.changeText(confirmPasswordInput, 'Test123!@');
 
-      // Wait for form to be valid and button to be enabled
       await waitFor(() => {
         expect(submitButton.props.disabled).toBe(undefined);
       });
@@ -215,10 +239,10 @@ describe('SignUpForm Component', () => {
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
-          fullName: 'John Doe',
+          firstName: 'John',
+          lastName: 'Doe',
           email: 'john@example.com',
           password: 'Test123!@',
-          avatarUrl: undefined,
         });
       });
     });

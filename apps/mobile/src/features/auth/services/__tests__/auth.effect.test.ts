@@ -1,36 +1,56 @@
 import { ROUTES } from '@/constants';
 import { AuthenticationError } from '@/features/auth/error/auth';
+import { apiRequest } from '@/services/api/client';
 import { supabase } from '@/services/supabase/client';
 import { Cause, Chunk, Effect, Exit } from 'effect';
 import { makeRedirectUri } from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
 import { authServiceEffect } from '../auth.effect';
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  saveTokens,
+} from '../token-storage';
 
-// Mocking supabase client
+// The @movea/api HTTP client
+jest.mock('@/services/api/client', () => ({
+  apiRequest: jest.fn(),
+}));
+
+// Token persistence
+jest.mock('../token-storage', () => ({
+  saveTokens: jest.fn().mockResolvedValue(undefined),
+  clearTokens: jest.fn().mockResolvedValue(undefined),
+  getAccessToken: jest.fn(),
+  getRefreshToken: jest.fn(),
+}));
+
+// Supabase — still backs the password-reset methods
 jest.mock('@/services/supabase/client', () => ({
   supabase: {
     auth: {
-      signUp: jest.fn(),
       signInWithPassword: jest.fn(),
-      signInWithOAuth: jest.fn(),
-      signOut: jest.fn(),
-      getSession: jest.fn(),
-      refreshSession: jest.fn(),
       resetPasswordForEmail: jest.fn(),
       updateUser: jest.fn(),
-      setSession: jest.fn(),
-      onAuthStateChange: jest.fn(),
     },
   },
 }));
 
-// Mocking expo-web-browser
-jest.mock('expo-web-browser');
-
-// Mocking expo-auth-session
 jest.mock('expo-auth-session');
 
-// Helper to test Effect failures
+const mockApiRequest = apiRequest as jest.Mock;
+const mockSaveTokens = saveTokens as jest.Mock;
+const mockClearTokens = clearTokens as jest.Mock;
+const mockGetAccessToken = getAccessToken as jest.Mock;
+const mockGetRefreshToken = getRefreshToken as jest.Mock;
+
+const TOKENS = {
+  accessToken: 'access-1',
+  refreshToken: 'refresh-1',
+  expiresIn: 900,
+};
+const USER = { id: 'u-1', email: 'test@example.com', role: 'user' as const };
+
 const expectEffectFailure = async <A, E>(
   effect: Effect.Effect<A, E>,
   assertion: (error: E) => void,
@@ -40,187 +60,237 @@ const expectEffectFailure = async <A, E>(
   Exit.match(exit, {
     onFailure: cause => {
       const failures = Cause.failures(cause);
-      const firstFailure = Chunk.unsafeGet(failures, 0);
-      assertion(firstFailure);
+      assertion(Chunk.unsafeGet(failures, 0));
     },
-    onSuccess: () => {
-      fail('Expected effect to fail');
-    },
+    onSuccess: () => fail('Expected effect to fail'),
   });
 };
 
 describe('AuthService', () => {
-  let service: typeof authServiceEffect;
-
   beforeEach(() => {
-    // Reset mocks before each test
     jest.clearAllMocks();
-    service = authServiceEffect;
+    mockSaveTokens.mockResolvedValue(undefined);
+    mockClearTokens.mockResolvedValue(undefined);
   });
 
-  it('should be a singleton', () => {
-    const instance1 = authServiceEffect;
-    const instance2 = authServiceEffect;
-    expect(instance1).toBe(instance2);
-    expect(instance1).toBe(authServiceEffect);
+  it('is a singleton', () => {
+    expect(authServiceEffect).toBe(authServiceEffect);
   });
 
-  // Test for signUp
   describe('signUp', () => {
-    it('should sign up a user successfully', async () => {
-      const signUpData = {
-        email: 'test@example.com',
-        password: 'password',
-        fullName: 'Test User',
-      };
-      const expectedAuthData = { user: { id: '123' }, session: null };
-      (supabase.auth.signUp as jest.Mock).mockResolvedValue({
-        data: expectedAuthData,
-        error: null,
-      });
+    const data = {
+      email: 'test@example.com',
+      password: 'password',
+      firstName: 'Test',
+      lastName: 'User',
+    };
 
-      const result = await Effect.runPromise(service.signUp(signUpData));
+    it('registers, persists the tokens and returns the user + session', async () => {
+      mockApiRequest
+        .mockResolvedValueOnce(TOKENS) // POST /auth/register
+        .mockResolvedValueOnce(USER); // GET /auth/me
 
-      expect(supabase.auth.signUp).toHaveBeenCalledWith({
-        email: signUpData.email,
-        password: signUpData.password,
-        options: {
-          data: {
-            full_name: signUpData.fullName,
-          },
+      const result = await Effect.runPromise(authServiceEffect.signUp(data));
+
+      expect(mockApiRequest).toHaveBeenNthCalledWith(1, '/auth/register', {
+        method: 'POST',
+        body: {
+          email: data.email,
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
         },
       });
-      expect(result).toEqual(expectedAuthData);
-    });
-
-    it('should throw AuthenticationError if sign up fails', async () => {
-      const signUpData = { email: 'test@example.com', password: 'password' };
-      const error = new Error('Sign up failed');
-      (supabase.auth.signUp as jest.Mock).mockResolvedValue({
-        data: null,
-        error,
+      expect(mockSaveTokens).toHaveBeenCalledWith(TOKENS);
+      expect(mockApiRequest).toHaveBeenNthCalledWith(2, '/auth/me', {
+        auth: true,
+        accessToken: TOKENS.accessToken,
       });
-
-      await expectEffectFailure(service.signUp(signUpData), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe('Sign up failed');
+      expect(result).toEqual({
+        user: USER,
+        session: { user: USER, accessToken: TOKENS.accessToken },
       });
     });
-  });
 
-  // Test for signIn
-  describe('signIn', () => {
-    it('should sign in a user successfully', async () => {
-      const signInData = { email: 'test@example.com', password: 'password' };
-      const expectedAuthData = {
-        user: { id: '123' },
-        session: { access_token: 'abc' },
-      };
-      (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
-        data: expectedAuthData,
-        error: null,
-      });
+    it('fails with AuthenticationError when register is rejected', async () => {
+      mockApiRequest.mockRejectedValueOnce(
+        new Error('Email already registered'),
+      );
 
-      const result = await Effect.runPromise(service.signIn(signInData));
-
-      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith(signInData);
-      expect(result).toEqual(expectedAuthData);
-    });
-
-    it('should throw AuthenticationError if sign in fails', async () => {
-      const signInData = { email: 'test@example.com', password: 'password' };
-      const error = new Error('Sign in failed');
-      (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
-        data: null,
-        error,
-      });
-
-      await expectEffectFailure(service.signIn(signInData), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe('Sign in failed');
-      });
-    });
-  });
-
-  // Test for signOut
-  describe('signOut', () => {
-    it('should sign out a user successfully', async () => {
-      (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null });
-      await Effect.runPromise(service.signOut());
-      expect(supabase.auth.signOut).toHaveBeenCalled();
-    });
-
-    it('should throw AuthenticationError if sign out fails', async () => {
-      const error = new Error('Sign out failed');
-      (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error });
-
-      await expectEffectFailure(service.signOut(), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe('Sign out failed');
-      });
-    });
-  });
-
-  // Test for getSession
-  describe('getSession', () => {
-    it('should get the current session successfully', async () => {
-      const session = { access_token: 'abc' };
-      (supabase.auth.getSession as jest.Mock).mockResolvedValue({
-        data: { session },
-        error: null,
-      });
-
-      const result = await Effect.runPromise(service.getSession());
-
-      expect(supabase.auth.getSession).toHaveBeenCalled();
-      expect(result).toEqual(session);
-    });
-
-    it('should throw AuthenticationError if getSession fails', async () => {
-      const error = new Error('Get session failed');
-      (supabase.auth.getSession as jest.Mock).mockResolvedValue({
-        data: { session: null },
-        error,
-      });
-
-      await expectEffectFailure(service.getSession(), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe('Get session failed');
-      });
-    });
-  });
-
-  // Test for refreshSession
-  describe('refreshSession', () => {
-    it('should refresh the session successfully', async () => {
-      const session = { access_token: 'def' };
-      (supabase.auth.refreshSession as jest.Mock).mockResolvedValue({
-        data: { session },
-        error: null,
-      });
-
-      const result = await Effect.runPromise(service.refreshSession());
-      expect(supabase.auth.refreshSession).toHaveBeenCalled();
-      expect(result).toEqual(session);
-    });
-
-    it('should throw AuthenticationError if refreshSession fails', async () => {
-      const error = new Error('Refresh session failed');
-      (supabase.auth.refreshSession as jest.Mock).mockResolvedValue({
-        data: { session: null },
-        error,
-      });
-
-      await expectEffectFailure(service.refreshSession(), err => {
+      await expectEffectFailure(authServiceEffect.signUp(data), err => {
         expect(err).toBeInstanceOf(AuthenticationError);
         expect((err as AuthenticationError).message).toBe(
-          'Refresh session failed',
+          'Email already registered',
+        );
+      });
+      expect(mockSaveTokens).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('signIn', () => {
+    const data = { email: 'test@example.com', password: 'password' };
+
+    it('logs in, persists the tokens and returns the user + session', async () => {
+      mockApiRequest.mockResolvedValueOnce(TOKENS).mockResolvedValueOnce(USER);
+
+      const result = await Effect.runPromise(authServiceEffect.signIn(data));
+
+      expect(mockApiRequest).toHaveBeenNthCalledWith(1, '/auth/login', {
+        method: 'POST',
+        body: data,
+      });
+      expect(mockSaveTokens).toHaveBeenCalledWith(TOKENS);
+      expect(result).toEqual({
+        user: USER,
+        session: { user: USER, accessToken: TOKENS.accessToken },
+      });
+    });
+
+    it('fails with AuthenticationError on bad credentials', async () => {
+      mockApiRequest.mockRejectedValueOnce(
+        new Error('Invalid email or password'),
+      );
+
+      await expectEffectFailure(authServiceEffect.signIn(data), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Invalid email or password',
         );
       });
     });
   });
 
-  // Test for resetPassword
+  describe('signOut', () => {
+    it('revokes the stored refresh token and clears storage', async () => {
+      mockGetRefreshToken.mockResolvedValue('refresh-1');
+      mockApiRequest.mockResolvedValueOnce(undefined);
+
+      await Effect.runPromise(authServiceEffect.signOut());
+
+      expect(mockApiRequest).toHaveBeenCalledWith('/auth/logout', {
+        method: 'POST',
+        body: { refreshToken: 'refresh-1' },
+      });
+      expect(mockClearTokens).toHaveBeenCalled();
+    });
+
+    it('still clears storage when there is no refresh token', async () => {
+      mockGetRefreshToken.mockResolvedValue(null);
+
+      await Effect.runPromise(authServiceEffect.signOut());
+
+      expect(mockApiRequest).not.toHaveBeenCalled();
+      expect(mockClearTokens).toHaveBeenCalled();
+    });
+
+    it('still clears storage when the revoke call fails', async () => {
+      mockGetRefreshToken.mockResolvedValue('refresh-1');
+      mockApiRequest.mockRejectedValueOnce(new Error('network'));
+
+      await Effect.runPromise(authServiceEffect.signOut());
+
+      expect(mockClearTokens).toHaveBeenCalled();
+    });
+  });
+
+  describe('getSession', () => {
+    it('returns null when there are no stored tokens', async () => {
+      mockGetAccessToken.mockResolvedValue(null);
+      mockGetRefreshToken.mockResolvedValue(null);
+
+      const result = await Effect.runPromise(authServiceEffect.getSession());
+
+      expect(result).toBeNull();
+      expect(mockApiRequest).not.toHaveBeenCalled();
+    });
+
+    it('hydrates the session from a valid access token', async () => {
+      mockGetAccessToken.mockResolvedValue('access-1');
+      mockGetRefreshToken.mockResolvedValue('refresh-1');
+      mockApiRequest.mockResolvedValueOnce(USER);
+
+      const result = await Effect.runPromise(authServiceEffect.getSession());
+
+      expect(mockApiRequest).toHaveBeenCalledWith('/auth/me', {
+        auth: true,
+        accessToken: 'access-1',
+      });
+      expect(result).toEqual({ user: USER, accessToken: 'access-1' });
+    });
+
+    it('refreshes once when the access token is rejected', async () => {
+      mockGetAccessToken.mockResolvedValue('stale');
+      mockGetRefreshToken.mockResolvedValue('refresh-1');
+      mockApiRequest
+        .mockRejectedValueOnce(new Error('401')) // GET /auth/me with stale token
+        .mockResolvedValueOnce(TOKENS) // POST /auth/refresh
+        .mockResolvedValueOnce(USER); // GET /auth/me with new token
+
+      const result = await Effect.runPromise(authServiceEffect.getSession());
+
+      expect(mockApiRequest).toHaveBeenNthCalledWith(2, '/auth/refresh', {
+        method: 'POST',
+        body: { refreshToken: 'refresh-1' },
+      });
+      expect(mockSaveTokens).toHaveBeenCalledWith(TOKENS);
+      expect(result).toEqual({ user: USER, accessToken: TOKENS.accessToken });
+    });
+
+    it('clears storage and returns null when the refresh also fails', async () => {
+      mockGetAccessToken.mockResolvedValue('stale');
+      mockGetRefreshToken.mockResolvedValue('refresh-1');
+      mockApiRequest
+        .mockRejectedValueOnce(new Error('401'))
+        .mockRejectedValueOnce(new Error('refresh invalid'));
+
+      const result = await Effect.runPromise(authServiceEffect.getSession());
+
+      expect(result).toBeNull();
+      expect(mockClearTokens).toHaveBeenCalled();
+    });
+  });
+
+  describe('refreshSession', () => {
+    it('rotates the token pair and returns the session', async () => {
+      mockGetRefreshToken.mockResolvedValue('refresh-1');
+      mockApiRequest.mockResolvedValueOnce(TOKENS).mockResolvedValueOnce(USER);
+
+      const result = await Effect.runPromise(
+        authServiceEffect.refreshSession(),
+      );
+
+      expect(mockApiRequest).toHaveBeenNthCalledWith(1, '/auth/refresh', {
+        method: 'POST',
+        body: { refreshToken: 'refresh-1' },
+      });
+      expect(mockSaveTokens).toHaveBeenCalledWith(TOKENS);
+      expect(result).toEqual({ user: USER, accessToken: TOKENS.accessToken });
+    });
+
+    it('fails with AuthenticationError when there is no refresh token', async () => {
+      mockGetRefreshToken.mockResolvedValue(null);
+
+      await expectEffectFailure(authServiceEffect.refreshSession(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+      });
+    });
+
+    it('fails with AuthenticationError when refresh is rejected', async () => {
+      mockGetRefreshToken.mockResolvedValue('refresh-1');
+      mockApiRequest.mockRejectedValueOnce(
+        new Error('Refresh token is invalid'),
+      );
+
+      await expectEffectFailure(authServiceEffect.refreshSession(), err => {
+        expect(err).toBeInstanceOf(AuthenticationError);
+        expect((err as AuthenticationError).message).toBe(
+          'Refresh token is invalid',
+        );
+      });
+    });
+  });
+
+  // Password reset / change — still on Supabase
   describe('resetPassword', () => {
     beforeEach(() => {
       (makeRedirectUri as jest.Mock).mockReturnValue(
@@ -228,90 +298,89 @@ describe('AuthService', () => {
       );
     });
 
-    it('should reset password successfully', async () => {
-      const email = 'test@example.com';
+    it('sends a reset email', async () => {
       (supabase.auth.resetPasswordForEmail as jest.Mock).mockResolvedValue({
         error: null,
       });
 
-      await Effect.runPromise(service.resetPassword(email));
+      await Effect.runPromise(authServiceEffect.resetPassword('a@b.com'));
 
-      expect(supabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(email, {
-        redirectTo: `movieticketbooking://${ROUTES.RESET_PASSWORD}`,
-      });
+      expect(supabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(
+        'a@b.com',
+        { redirectTo: `movieticketbooking://${ROUTES.RESET_PASSWORD}` },
+      );
     });
 
-    it('should throw AuthenticationError if reset password fails', async () => {
-      const email = 'test@example.com';
-      const error = new Error('Reset password failed');
+    it('fails with AuthenticationError when Supabase errors', async () => {
       (supabase.auth.resetPasswordForEmail as jest.Mock).mockResolvedValue({
-        error,
+        error: new Error('Reset password failed'),
       });
 
-      await expectEffectFailure(service.resetPassword(email), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe(
-          'Reset password failed',
-        );
-      });
+      await expectEffectFailure(
+        authServiceEffect.resetPassword('a@b.com'),
+        err => {
+          expect(err).toBeInstanceOf(AuthenticationError);
+          expect((err as AuthenticationError).message).toBe(
+            'Reset password failed',
+          );
+        },
+      );
     });
   });
 
-  // Test for updatePassword
   describe('updatePassword', () => {
-    it('should update password successfully', async () => {
-      const newPassword = 'newPassword123';
+    it('updates the password', async () => {
       (supabase.auth.updateUser as jest.Mock).mockResolvedValue({
         error: null,
       });
 
-      await Effect.runPromise(service.updatePassword(newPassword));
+      const result = await Effect.runPromise(
+        authServiceEffect.updatePassword('newPassword123'),
+      );
 
+      expect(result).toBe(true);
       expect(supabase.auth.updateUser).toHaveBeenCalledWith({
-        password: newPassword,
+        password: 'newPassword123',
       });
     });
 
-    it('should throw AuthenticationError if update password fails', async () => {
-      const newPassword = 'newPassword123';
-      const error = new Error('Update password failed');
-      (supabase.auth.updateUser as jest.Mock).mockResolvedValue({ error });
-
-      await expectEffectFailure(service.updatePassword(newPassword), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe(
-          'Update password failed',
-        );
+    it('fails with AuthenticationError when Supabase errors', async () => {
+      (supabase.auth.updateUser as jest.Mock).mockResolvedValue({
+        error: new Error('Update password failed'),
       });
+
+      await expectEffectFailure(
+        authServiceEffect.updatePassword('newPassword123'),
+        err => {
+          expect(err).toBeInstanceOf(AuthenticationError);
+          expect((err as AuthenticationError).message).toBe(
+            'Update password failed',
+          );
+        },
+      );
     });
   });
 
-  // Test for verifyCurrentPassword
   describe('verifyCurrentPassword', () => {
-    const email = 'test@example.com';
-    const password = 'currentPassword';
-
-    it('should return true for correct password', async () => {
+    it('returns true for the correct password', async () => {
       (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
         error: null,
       });
+
       const result = await Effect.runPromise(
-        service.verifyCurrentPassword(email, password),
+        authServiceEffect.verifyCurrentPassword('a@b.com', 'pw'),
       );
+
       expect(result).toBe(true);
-      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
-        email,
-        password,
-      });
     });
 
-    it('should throw AuthenticationError for incorrect password', async () => {
+    it('fails with AuthenticationError for the wrong password', async () => {
       (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
         error: new Error('invalid credentials'),
       });
 
       await expectEffectFailure(
-        service.verifyCurrentPassword(email, password),
+        authServiceEffect.verifyCurrentPassword('a@b.com', 'pw'),
         err => {
           expect(err).toBeInstanceOf(AuthenticationError);
           expect((err as AuthenticationError).message).toBe(
@@ -319,223 +388,6 @@ describe('AuthService', () => {
           );
         },
       );
-    });
-  });
-
-  // Test for onAuthStateChange
-  describe('onAuthStateChange', () => {
-    it('should call supabase.auth.onAuthStateChange with the callback', () => {
-      const callback = jest.fn();
-      service.onAuthStateChange(callback);
-      expect(supabase.auth.onAuthStateChange).toHaveBeenCalledWith(callback);
-    });
-  });
-
-  // Test for signInWithGoogle
-  describe('signInWithGoogle', () => {
-    const redirectUrl = 'movieticketbooking://auth/callback';
-    const oAuthUrl = 'https://supabase.io/auth/v1/authorize?provider=google';
-    const accessToken = 'test-access-token';
-    const refreshToken = 'test-refresh-token';
-
-    beforeEach(() => {
-      (makeRedirectUri as jest.Mock).mockReturnValue(redirectUrl);
-    });
-
-    it('should sign in with Google successfully', async () => {
-      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
-        data: { url: oAuthUrl },
-        error: null,
-      });
-
-      (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValue({
-        type: 'success',
-        url: `${redirectUrl}#access_token=${accessToken}&refresh_token=${refreshToken}`,
-      });
-
-      const sessionData = { session: { access_token: accessToken } };
-      (supabase.auth.setSession as jest.Mock).mockResolvedValue({
-        data: sessionData,
-        error: null,
-      });
-
-      const result = await Effect.runPromise(service.signInWithGoogle());
-
-      expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
-          skipBrowserRedirect: true,
-        },
-      });
-      expect(WebBrowser.openAuthSessionAsync).toHaveBeenCalledWith(
-        oAuthUrl,
-        redirectUrl,
-      );
-      expect(supabase.auth.setSession).toHaveBeenCalledWith({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-      expect(result).toEqual(sessionData);
-    });
-
-    it('should throw AuthenticationError if signInWithOAuth fails', async () => {
-      const error = new Error('OAuth provider error');
-      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
-        data: { url: null },
-        error,
-      });
-
-      await expectEffectFailure(service.signInWithGoogle(), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-      });
-    });
-
-    it('should throw AuthenticationError if user cancels auth session', async () => {
-      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
-        data: { url: oAuthUrl },
-        error: null,
-      });
-
-      (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValue({
-        type: 'cancel',
-      });
-
-      await expectEffectFailure(service.signInWithGoogle(), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe(
-          'Authentication was cancelled',
-        );
-      });
-    });
-
-    it('should throw AuthenticationError if OAuth callback has an error', async () => {
-      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
-        data: { url: oAuthUrl },
-        error: null,
-      });
-
-      const errorMessage = 'access_denied';
-      (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValue({
-        type: 'success',
-        url: `${redirectUrl}?error_description=${errorMessage}`,
-      });
-
-      await expectEffectFailure(service.signInWithGoogle(), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe(errorMessage);
-      });
-    });
-
-    it('should throw AuthenticationError if tokens are not in callback URL', async () => {
-      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
-        data: { url: oAuthUrl },
-        error: null,
-      });
-
-      (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValue({
-        type: 'success',
-        url: redirectUrl,
-      });
-
-      await expectEffectFailure(service.signInWithGoogle(), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe(
-          'Failed to parse authentication tokens from callback URL',
-        );
-      });
-    });
-
-    it('should throw AuthenticationError if setSession fails', async () => {
-      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
-        data: { url: oAuthUrl },
-        error: null,
-      });
-
-      (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValue({
-        type: 'success',
-        url: `${redirectUrl}#access_token=${accessToken}&refresh_token=${refreshToken}`,
-      });
-
-      const sessionError = new Error('Failed to set session');
-      (supabase.auth.setSession as jest.Mock).mockResolvedValue({
-        data: null,
-        error: sessionError,
-      });
-
-      await expectEffectFailure(service.signInWithGoogle(), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe(
-          'Failed to set session',
-        );
-      });
-    });
-  });
-
-  // Test for signInWithFacebook
-  describe('signInWithFacebook', () => {
-    const redirectUrl = 'movieticketbooking://auth/callback';
-    const oAuthUrl = 'https://supabase.io/auth/v1/authorize?provider=facebook';
-    const accessToken = 'fb-access-token';
-    const refreshToken = 'fb-refresh-token';
-
-    beforeEach(() => {
-      (makeRedirectUri as jest.Mock).mockReturnValue(redirectUrl);
-    });
-
-    it('should sign in with Facebook successfully', async () => {
-      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
-        data: { url: oAuthUrl },
-        error: null,
-      });
-
-      (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValue({
-        type: 'success',
-        url: `${redirectUrl}#access_token=${accessToken}&refresh_token=${refreshToken}`,
-      });
-
-      const sessionData = { session: { access_token: accessToken } };
-      (supabase.auth.setSession as jest.Mock).mockResolvedValue({
-        data: sessionData,
-        error: null,
-      });
-
-      const result = await Effect.runPromise(service.signInWithFacebook());
-
-      expect(supabase.auth.signInWithOAuth).toHaveBeenCalledWith({
-        provider: 'facebook',
-        options: {
-          redirectTo: redirectUrl,
-          skipBrowserRedirect: true,
-        },
-      });
-      expect(WebBrowser.openAuthSessionAsync).toHaveBeenCalledWith(
-        oAuthUrl,
-        redirectUrl,
-      );
-      expect(supabase.auth.setSession).toHaveBeenCalledWith({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-      expect(result).toEqual(sessionData);
-    });
-
-    it('should throw AuthenticationError if user cancels auth session', async () => {
-      (supabase.auth.signInWithOAuth as jest.Mock).mockResolvedValue({
-        data: { url: oAuthUrl },
-        error: null,
-      });
-
-      (WebBrowser.openAuthSessionAsync as jest.Mock).mockResolvedValue({
-        type: 'cancel',
-      });
-
-      await expectEffectFailure(service.signInWithFacebook(), err => {
-        expect(err).toBeInstanceOf(AuthenticationError);
-        expect((err as AuthenticationError).message).toBe(
-          'Authentication was cancelled',
-        );
-      });
     });
   });
 });

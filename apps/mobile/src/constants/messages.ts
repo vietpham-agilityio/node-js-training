@@ -32,6 +32,10 @@ export const ERROR_MESSAGES = {
     `Full name must be at least ${length} characters`,
   FULL_NAME_MAX_LENGTH: (length: number) =>
     `Full name must not exceed ${length} characters`,
+  FIRST_NAME_REQUIRED: 'First name is required',
+  LAST_NAME_REQUIRED: 'Last name is required',
+  NAME_MIN_LENGTH: (length: number) => `Must be at least ${length} characters`,
+  NAME_MAX_LENGTH: (length: number) => `Must not exceed ${length} characters`,
   PASSWORD_MIN_LENGTH: (length: number) =>
     `Password must be at least ${length} characters`,
   PASSWORD_UPPERCASE: 'Password must contain at least one uppercase letter',
@@ -71,8 +75,7 @@ export const MESSAGES = {
     'Sorry, we need camera permissions to take photos!',
   SIGNUP_SUCCESS: 'Sign up successful',
   SIGNIN_SUCCESS: 'Successfully signed in!',
-  ACCOUNT_VERIFICATION_SUCCESS:
-    'Account created successfully! Please check your email to verify your account.',
+  ACCOUNT_CREATED: 'Your account is ready. Enjoy the movies!',
   NO_RESULT_FOUND: 'No results found. Please try a different search.',
   NO_TICKETS: 'Start your movie journey by booking a ticket',
   NO_ACTIVE_TICKETS: 'Book a movie to see your active tickets here',

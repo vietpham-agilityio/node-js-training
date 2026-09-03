@@ -1,5 +1,6 @@
 // Load test environment variables
 if (process.env.NODE_ENV === 'test') {
+  process.env.EXPO_PUBLIC_API_URL = 'http://localhost:3000/api/v1';
   process.env.EXPO_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
 }

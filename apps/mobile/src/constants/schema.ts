@@ -74,6 +74,38 @@ export const FullNameBrand = Schema.String.pipe(
 });
 export type FullNameType = Schema.Schema.Type<typeof FullNameBrand>;
 
+// First Name Brand
+export const FirstNameBrand = Schema.String.pipe(
+  Schema.nonEmptyString({ message: () => ERROR_MESSAGES.FIRST_NAME_REQUIRED }),
+  Schema.minLength(2, { message: () => ERROR_MESSAGES.NAME_MIN_LENGTH(2) }),
+  Schema.maxLength(50, { message: () => ERROR_MESSAGES.NAME_MAX_LENGTH(50) }),
+  Schema.brand('FirstName'),
+).annotations({
+  identifier: 'firstName',
+  title: 'First Name',
+  description: 'First name of the user',
+  type: 'string',
+  required: true,
+  example: ['John', 'Kimi'],
+});
+export type FirstNameType = Schema.Schema.Type<typeof FirstNameBrand>;
+
+// Last Name Brand
+export const LastNameBrand = Schema.String.pipe(
+  Schema.nonEmptyString({ message: () => ERROR_MESSAGES.LAST_NAME_REQUIRED }),
+  Schema.minLength(2, { message: () => ERROR_MESSAGES.NAME_MIN_LENGTH(2) }),
+  Schema.maxLength(50, { message: () => ERROR_MESSAGES.NAME_MAX_LENGTH(50) }),
+  Schema.brand('LastName'),
+).annotations({
+  identifier: 'lastName',
+  title: 'Last Name',
+  description: 'Last name of the user',
+  type: 'string',
+  required: true,
+  example: ['Doe', 'Johnson'],
+});
+export type LastNameType = Schema.Schema.Type<typeof LastNameBrand>;
+
 // Phone Number Brand
 export const PhoneNumberBrand = Schema.NullOr(Schema.String)
   .pipe(
@@ -128,7 +160,8 @@ export type SignInFormData = Schema.Schema.Type<typeof signInSchema>;
 
 // Sign Up Schema with password confirmation
 export const signUpSchema = Schema.Struct({
-  fullName: FullNameBrand,
+  firstName: FirstNameBrand,
+  lastName: LastNameBrand,
   email: EmailBrand,
   password: PasswordBrand,
   confirmPassword: Schema.String.pipe(
@@ -136,7 +169,6 @@ export const signUpSchema = Schema.Struct({
       message: () => ERROR_MESSAGES.CONFIRM_PASSWORD_REQUIRED,
     }),
   ),
-  avatarUrl: Schema.optional(Schema.String),
 }).pipe(
   Schema.filter(data => data.password === data.confirmPassword, {
     message: () => ERROR_MESSAGES.PASSWORD_NOT_MATCH,

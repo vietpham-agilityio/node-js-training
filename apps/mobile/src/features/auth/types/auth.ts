@@ -1,17 +1,29 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
+import type { AuthUser } from '@movea/api-contract';
 import { Schema } from 'effect';
+
+export type { AuthUser };
 
 export const SignUpDataSchema = Schema.Struct({
   email: Schema.String,
   password: Schema.String,
-  fullName: Schema.optional(Schema.String),
-  avatarUrl: Schema.optional(Schema.String),
+  firstName: Schema.String,
+  lastName: Schema.String,
 });
 
 export const SignInDataSchema = Schema.Struct({
   email: Schema.String,
   password: Schema.String,
 });
+
+/**
+ * A live session: the authenticated user plus the access token that proves it.
+ * The refresh token is not carried here — it lives only in secure storage.
+ */
+export interface AuthSession {
+  user: AuthUser;
+  accessToken: string;
+}
 
 export const UserProfileSchema = Schema.Struct({
   id: Schema.String,

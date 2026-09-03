@@ -1,4 +1,4 @@
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback } from 'react';
 import { Pressable, View } from 'react-native';
@@ -7,11 +7,7 @@ import { Pressable, View } from 'react-native';
 import { ERROR_MESSAGES, ROUTES, ToastType } from '@/constants';
 
 // Hooks
-import {
-  useSignIn,
-  useSignInWithFacebook,
-  useSignInWithGoogle,
-} from '@/features/auth/hooks/useSignIn';
+import { useSignIn } from '@/features/auth/hooks/useSignIn';
 import { useToastAlert } from '@/hooks/useToast';
 
 // Types
@@ -26,10 +22,6 @@ import { useResolveClassNames, useUniwind } from 'uniwind';
 // Components
 import { Typo } from '@/components/Typo';
 import { SignInForm } from '@/features/auth/components/SignInForm';
-import {
-  ThirdPartyButton,
-  ThirdPartyButtonType,
-} from '@/features/auth/components/ThirdPartyButton';
 
 // Layout
 import { AccessLayout } from '@/layouts/AccessLayout';
@@ -39,10 +31,6 @@ const LoginScreen = () => {
   const { theme } = useUniwind();
 
   const { mutate: signIn, isPending: isSigningIn } = useSignIn();
-  const { mutate: signInWithGoogle, isPending: isGoogleLoading } =
-    useSignInWithGoogle();
-  const { mutate: signInWithFacebook, isPending: isFacebookLoading } =
-    useSignInWithFacebook();
 
   const appIconColorConfig = useResolveClassNames('text-white bg-secondary');
 
@@ -59,30 +47,8 @@ const LoginScreen = () => {
     [signIn, toast],
   );
 
-  const handleGoogleSignIn = useCallback(() => {
-    signInWithGoogle(undefined, {
-      onError: (error: Error) => {
-        toast.alert(ERROR_MESSAGES.GOOGLE_SIGN_IN_FAILED, error.message, [], {
-          type: ToastType.ERROR,
-        });
-      },
-    });
-  }, [signInWithGoogle, toast]);
-
-  const handleFacebookSignIn = useCallback(() => {
-    signInWithFacebook(undefined, {
-      onError: (error: Error) => {
-        toast.alert(ERROR_MESSAGES.FACEBOOK_SIGN_IN_FAILED, error.message, [], {
-          type: ToastType.ERROR,
-        });
-      },
-    });
-  }, [signInWithFacebook, toast]);
-
-  const isLoading = isSigningIn || isGoogleLoading || isFacebookLoading;
-
   return (
-    <AccessLayout mode="signin" loading={isLoading}>
+    <AccessLayout mode="signin" loading={isSigningIn}>
       <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
       <View className="mt-8">
         <AppIcon
@@ -111,11 +77,7 @@ const LoginScreen = () => {
         </Typo>
       </View>
 
-      <SignInForm
-        isPending={isSigningIn}
-        onSubmit={handleSubmit}
-        onForgotPassword={() => router.push(ROUTES.FORGOT_PASSWORD)}
-      />
+      <SignInForm isPending={isSigningIn} onSubmit={handleSubmit} />
 
       <View className="flex-row justify-center items-center gap-1 mt-5">
         <Typo weight="regular" size="xs">
@@ -132,21 +94,6 @@ const LoginScreen = () => {
             </Typo>
           </Pressable>
         </Link>
-      </View>
-
-      <View className="flex-row justify-center items-center gap-8 mt-7">
-        <ThirdPartyButton
-          testID="signin-google-button"
-          type={ThirdPartyButtonType.GOOGLE}
-          onPress={handleGoogleSignIn}
-          isPending={isLoading}
-        />
-        <ThirdPartyButton
-          testID="signin-facebook-button"
-          type={ThirdPartyButtonType.FACEBOOK}
-          onPress={handleFacebookSignIn}
-          isPending={isLoading}
-        />
       </View>
     </AccessLayout>
   );

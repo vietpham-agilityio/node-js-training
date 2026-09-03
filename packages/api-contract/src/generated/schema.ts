@@ -470,12 +470,24 @@ export interface components {
             dateOfBirth?: string;
             address?: string;
         };
+        TokenPairDto: {
+            accessToken: string;
+            refreshToken: string;
+            /** @description Access token lifetime in seconds */
+            expiresIn: number;
+        };
         LoginDto: {
             email: string;
             password: string;
         };
         RefreshTokenDto: {
             refreshToken: string;
+        };
+        MeResponseDto: {
+            id: string;
+            email: string;
+            /** @enum {string} */
+            role: "user" | "admin";
         };
         Object: Record<string, never>;
         UserResponseDto: {
@@ -891,7 +903,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TokenPairDto"];
+                };
             };
         };
     };
@@ -912,7 +926,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TokenPairDto"];
+                };
             };
         };
     };
@@ -933,7 +949,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TokenPairDto"];
+                };
             };
         };
     };
@@ -971,7 +989,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeResponseDto"];
+                };
             };
         };
     };
