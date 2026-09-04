@@ -22,8 +22,6 @@
     "mobile": "pnpm --filter @movea/mobile",
     "contract": "pnpm --filter @movea/api-contract",
     "contract:generate": "pnpm --filter @movea/api generate:openapi && pnpm --filter @movea/api-contract generate && pnpm --filter @movea/api-contract build",
-    "db:up": "docker compose up -d --wait postgres",
-    "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres",
     "docker:build": "docker compose build app",
     "docker:up": "docker compose up -d",
