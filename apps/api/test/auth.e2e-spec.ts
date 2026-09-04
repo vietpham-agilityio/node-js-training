@@ -68,6 +68,16 @@ describe('Auth (e2e)', () => {
       .expect(200);
     expect(meRes.body.email).toBe(email);
 
+    const profileRes = await request(app.getHttpServer())
+      .get('/api/v1/users/me')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+    expect(profileRes.body).toMatchObject({
+      email,
+      firstName: 'E2E',
+      lastName: 'Test',
+    });
+
     const refreshRes = await request(app.getHttpServer())
       .post('/api/v1/auth/refresh')
       .send({ refreshToken })

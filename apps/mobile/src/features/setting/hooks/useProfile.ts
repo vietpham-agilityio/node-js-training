@@ -28,7 +28,7 @@ export const useProfile = () => {
       runEffectForQuery(
         Effect.gen(function* () {
           const profileService = yield* ProfileService;
-          return yield* profileService.getProfile(user!.id);
+          return yield* profileService.getProfile();
         }),
         ProfileServiceLayer,
       ),
@@ -46,7 +46,7 @@ export const useUpdateProfile = () => {
       runEffectForQuery(
         Effect.gen(function* () {
           const profileService = yield* ProfileService;
-          return yield* profileService.updateProfile(user!.id, data);
+          return yield* profileService.updateProfile(data);
         }),
         ProfileServiceLayer,
       ),

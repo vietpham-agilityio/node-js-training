@@ -55,6 +55,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "The authenticated user's full profile" })
+  @ApiOkResponse({ type: UserResponseDto })
   getProfile(@CurrentUser() user: AuthenticatedUser): Promise<UserResponseDto> {
     return this.usersService.getProfile(user.id);
   }
@@ -63,6 +64,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update the authenticated user's profile" })
+  @ApiOkResponse({ type: UserResponseDto })
   updateProfile(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateProfileDto,

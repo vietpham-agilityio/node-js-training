@@ -36,3 +36,7 @@ export type RefreshTokenRequest = Schemas['RefreshTokenDto'];
 export type TokenPair = Schemas['TokenPairDto'];
 /** What `GET /auth/me` returns — the authenticated user from the access token. */
 export type AuthUser = Schemas['MeResponseDto'];
+/** The authenticated user's full profile — what `GET /users/me` returns. */
+export type UserProfile = Schemas['UserResponseDto'];
+/** `PATCH /users/me` request body. */
+export type UpdateUserProfileRequest = Schemas['UpdateProfileDto'];

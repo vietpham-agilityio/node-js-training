@@ -381,7 +381,14 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -409,7 +416,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1917,19 +1931,19 @@
             "type": "string"
           },
           "phoneNumber": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "dateOfBirth": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "address": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "role": {

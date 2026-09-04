@@ -495,10 +495,10 @@ export interface components {
             email: string;
             firstName: string;
             lastName: string;
-            phoneNumber?: Record<string, never> | null;
-            dateOfBirth?: Record<string, never> | null;
-            address?: Record<string, never> | null;
-            avatarUrl?: Record<string, never> | null;
+            phoneNumber?: string | null;
+            dateOfBirth?: string | null;
+            address?: string | null;
+            avatarUrl?: string | null;
             /** @enum {string} */
             role: "user" | "admin";
             isActive: boolean;
@@ -1030,7 +1030,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
             };
         };
     };
@@ -1051,7 +1053,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
             };
         };
     };

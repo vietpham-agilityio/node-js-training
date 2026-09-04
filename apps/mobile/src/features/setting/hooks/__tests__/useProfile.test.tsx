@@ -94,7 +94,7 @@ describe('useProfile', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(profileService.getProfile).toHaveBeenCalledWith('user-123');
+    expect(profileService.getProfile).toHaveBeenCalledWith();
     expect(result.current.data).toEqual(mockProfile);
   });
 
@@ -161,7 +161,7 @@ describe('useUpdateProfile', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(profileService.updateProfile).toHaveBeenCalledWith('user-123', {
+    expect(profileService.updateProfile).toHaveBeenCalledWith({
       fullName: 'Jane Doe',
     });
     expect(result.current.data).toEqual(updatedProfile);
@@ -242,7 +242,7 @@ describe('useUpdateProfile', () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(profileService.updateProfile).toHaveBeenCalledWith('user-123', {
+    expect(profileService.updateProfile).toHaveBeenCalledWith({
       fullName: 'Jane Doe',
     });
   });
