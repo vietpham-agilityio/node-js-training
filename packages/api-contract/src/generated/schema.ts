@@ -507,7 +507,12 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
-        PaginationMetaDto: Record<string, never>;
+        PaginationMetaDto: {
+            page: number;
+            limit: number;
+            total: number;
+            hasMore: boolean;
+        };
         PaginatedUserResponseDto: {
             data: components["schemas"]["UserResponseDto"][];
             meta: components["schemas"]["PaginationMetaDto"];
@@ -546,12 +551,12 @@ export interface components {
         MovieResponseDto: {
             id: string;
             title: string;
-            synopsis?: Record<string, never> | null;
-            posterUrl?: Record<string, never> | null;
+            synopsis?: string | null;
+            posterUrl?: string | null;
             durationMinutes: number;
             language: string;
             releaseDate: string;
-            rating?: Record<string, never> | null;
+            rating?: number | null;
             isActive: boolean;
             /** Format: date-time */
             createdAt: string;
@@ -595,9 +600,9 @@ export interface components {
             id: string;
             title: string;
             durationMinutes: number;
-            posterUrl?: Record<string, never> | null;
+            posterUrl?: string | null;
             language: string;
-            rating?: Record<string, never> | null;
+            rating?: number | null;
         };
         ShowtimeHallDto: {
             id: string;

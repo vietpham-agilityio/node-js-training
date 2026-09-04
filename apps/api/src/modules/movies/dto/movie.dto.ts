@@ -144,10 +144,10 @@ export class MovieResponseDto {
   @ApiProperty()
   title: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   synopsis: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   posterUrl: string | null;
 
   @ApiProperty()
@@ -159,7 +159,7 @@ export class MovieResponseDto {
   @ApiProperty()
   releaseDate: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: Number, nullable: true })
   rating: number | null;
 
   @ApiProperty()
