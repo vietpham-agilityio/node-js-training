@@ -1978,7 +1978,26 @@
       },
       "PaginationMetaDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "hasMore"
+        ]
       },
       "PaginatedUserResponseDto": {
         "type": "object",
@@ -2117,11 +2136,11 @@
             "type": "string"
           },
           "synopsis": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "posterUrl": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "durationMinutes": {
@@ -2134,7 +2153,7 @@
             "type": "string"
           },
           "rating": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           },
           "isActive": {
@@ -2306,14 +2325,14 @@
             "type": "number"
           },
           "posterUrl": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "language": {
             "type": "string"
           },
           "rating": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           }
         },

@@ -11,6 +11,9 @@ export const PromoCodeStatusSchema = Schema.Literal(
   'percentage',
   'fixed_amount',
 );
+
+// Legacy genre vocabulary. Kept for callers that still key off fixed names; the
+// live genre list now comes from `GET /genres` (see `useGenres`).
 export const GenreMovieSchema = Schema.Literal(
   'all',
   'action',
@@ -56,16 +59,19 @@ export const MovieSchema = Schema.Struct({
   title: Schema.String,
   synopsis: Schema.String,
   posterUrl: Schema.String,
-  trailerUrl: Schema.Array(Schema.String),
   durationMinutes: Schema.Number,
   releaseDate: Schema.String,
   rating: Schema.Number,
-  genre: Schema.Array(GenreMovieSchema),
-  castCrew: CastCrewSchema,
+  // Genre names from the API (`GET /genres`); no longer a fixed vocabulary.
+  genre: Schema.Array(Schema.String),
   language: Schema.optional(Schema.String),
+  // Derived client-side from `releaseDate` — the API has no status field.
   status: MovieStatusSchema,
   createdAt: Schema.String,
   updatedAt: Schema.String,
+  // The API does not carry these; populated only where a legacy source does.
+  trailerUrl: Schema.optional(Schema.Array(Schema.String)),
+  castCrew: Schema.optional(CastCrewSchema),
 });
 
 export const PromoCodeSchema = Schema.Struct({

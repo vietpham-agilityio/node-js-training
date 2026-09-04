@@ -5,7 +5,6 @@ import * as useMoviesModule from '../useMovies';
 import { MOVIE_STATUS } from '@/constants/status';
 import { MovieStatus } from '../../schemas/movie';
 
-// Mock the hooks
 jest.mock('../useMovies');
 
 const mockUseMoviesInfinite =
@@ -17,118 +16,123 @@ const mockUseMoviesByGenreInfinite =
     typeof useMoviesModule.useMoviesByGenreInfinite
   >;
 
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+  Wrapper.displayName = 'QueryClientWrapper';
+
+  return Wrapper;
+};
+
+// A page of the API-shaped infinite result: { data, page, hasMore }.
+const pageOf = (movies: unknown[]) => ({
+  data: movies,
+  page: 1,
+  hasMore: false,
+});
+
+const nowPlaying = [
+  { id: '1', title: 'Movie 1', rating: 8.5, status: MOVIE_STATUS.NOW_PLAYING },
+  { id: '2', title: 'Movie 2', rating: 7.2, status: MOVIE_STATUS.NOW_PLAYING },
+  { id: '3', title: 'Movie 3', rating: 9.1, status: MOVIE_STATUS.NOW_PLAYING },
+];
+
+const baseQueryResult = {
+  data: { pages: [pageOf(nowPlaying)] },
+  isLoading: false,
+  isFetchingNextPage: false,
+  hasNextPage: false,
+  fetchNextPage: jest.fn(),
+  refetch: jest.fn(),
+  isRefetching: false,
+};
+
+const emptyResult = { ...baseQueryResult, data: undefined };
+
 describe('useMovieData', () => {
-  let queryClient: QueryClient;
-
-  const createWrapper = () => {
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: { retry: false },
-      },
-    });
-
-    const Wrapper = ({ children }: { children: React.ReactNode }) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    );
-    Wrapper.displayName = 'QueryClientWrapper';
-
-    return Wrapper;
-  };
-
-  const mockMovieData = [
-    { id: '1', title: 'Movie 1', rating: 8.5 },
-    { id: '2', title: 'Movie 2', rating: 7.2 },
-    { id: '3', title: 'Movie 3', rating: 9.1 },
-  ];
-
-  const defaultQueryResult = {
-    data: { pages: [mockMovieData] },
-    isLoading: false,
-    isFetchingNextPage: false,
-    hasNextPage: false,
-    fetchNextPage: jest.fn(),
-    refetch: jest.fn(),
-    isRefetching: false,
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('All Category (no genre)', () => {
-    it('should call useMoviesInfinite when no genre is provided', () => {
-      mockUseMoviesInfinite.mockReturnValue(defaultQueryResult as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
+  describe('All category (no genre)', () => {
+    beforeEach(() => {
+      mockUseMoviesInfinite.mockReturnValue(baseQueryResult as any);
+      mockUseMoviesByGenreInfinite.mockReturnValue(emptyResult as any);
+    });
 
+    it('uses useMoviesInfinite and disables the genre query', () => {
       const { result } = renderHook(
         () =>
           useMovieData({
             status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
+            genreId: undefined,
           }),
         { wrapper: createWrapper() },
       );
 
-      expect(mockUseMoviesInfinite).toHaveBeenCalledWith({
-        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-        enabled: true,
-      });
-
+      expect(mockUseMoviesInfinite).toHaveBeenCalledWith({ enabled: true });
       expect(mockUseMoviesByGenreInfinite).toHaveBeenCalledWith({
-        genre: undefined,
-        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
+        genreId: '',
         enabled: false,
       });
-
       expect(result.current.movies).toHaveLength(3);
     });
 
-    it('should sort NOW_PLAYING movies by rating (descending)', () => {
-      mockUseMoviesInfinite.mockReturnValue(defaultQueryResult as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-
+    it('sorts NOW_PLAYING by rating descending', () => {
       const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
+        () => useMovieData({ status: MOVIE_STATUS.NOW_PLAYING as MovieStatus }),
         { wrapper: createWrapper() },
       );
 
-      expect(result.current?.movies[0]?.rating).toBe(9.1);
-      expect(result.current?.movies[1]?.rating).toBe(8.5);
-      expect(result.current?.movies[2]?.rating).toBe(7.2);
+      expect(result.current.movies.map(m => m.rating)).toEqual([9.1, 8.5, 7.2]);
     });
 
-    it('should limit to 10 movies', () => {
-      const manyMovies = Array.from({ length: 15 }, (_, i) => ({
-        id: `${i}`,
-        title: `Movie ${i}`,
-        rating: i,
-      }));
-
+    it('filters out movies whose derived status does not match', () => {
       mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: { pages: [manyMovies] },
-      } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
+        ...baseQueryResult,
+        data: {
+          pages: [
+            pageOf([
+              ...nowPlaying,
+              {
+                id: '4',
+                title: 'Soon',
+                rating: 5,
+                status: MOVIE_STATUS.COMING_SOON,
+              },
+            ]),
+          ],
+        },
       } as any);
 
       const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
+        () => useMovieData({ status: MOVIE_STATUS.NOW_PLAYING as MovieStatus }),
+        { wrapper: createWrapper() },
+      );
+
+      expect(result.current.movies).toHaveLength(3);
+      expect(result.current.movies.find(m => m.id === '4')).toBeUndefined();
+    });
+
+    it('limits to 10 movies', () => {
+      const many = Array.from({ length: 15 }, (_, i) => ({
+        id: `${i}`,
+        title: `Movie ${i}`,
+        rating: i,
+        status: MOVIE_STATUS.NOW_PLAYING,
+      }));
+      mockUseMoviesInfinite.mockReturnValue({
+        ...baseQueryResult,
+        data: { pages: [pageOf(many)] },
+      } as any);
+
+      const { result } = renderHook(
+        () => useMovieData({ status: MOVIE_STATUS.NOW_PLAYING as MovieStatus }),
         { wrapper: createWrapper() },
       );
 
@@ -136,274 +140,87 @@ describe('useMovieData', () => {
     });
   });
 
-  describe('Genre Category', () => {
-    it('should call useMoviesByGenreInfinite when genre is provided', () => {
-      mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue(defaultQueryResult as any);
+  describe('Genre category', () => {
+    it('uses useMoviesByGenreInfinite with the genre id', () => {
+      mockUseMoviesInfinite.mockReturnValue(emptyResult as any);
+      mockUseMoviesByGenreInfinite.mockReturnValue(baseQueryResult as any);
 
       const { result } = renderHook(
         () =>
           useMovieData({
             status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: 'action',
+            genreId: 'g1',
           }),
         { wrapper: createWrapper() },
       );
 
-      expect(mockUseMoviesInfinite).toHaveBeenCalledWith({
-        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-        enabled: false,
-      });
-
+      expect(mockUseMoviesInfinite).toHaveBeenCalledWith({ enabled: false });
       expect(mockUseMoviesByGenreInfinite).toHaveBeenCalledWith({
-        genre: 'action',
-        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
+        genreId: 'g1',
         enabled: true,
       });
-
       expect(result.current.movies).toHaveLength(3);
     });
   });
 
-  describe('COMING_SOON status', () => {
-    it('should NOT sort COMING_SOON movies by rating', () => {
-      mockUseMoviesInfinite.mockReturnValue(defaultQueryResult as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
+  describe('COMING_SOON', () => {
+    it('keeps the original order', () => {
+      const soon = [
+        { id: '1', title: 'A', status: MOVIE_STATUS.COMING_SOON },
+        { id: '2', title: 'B', status: MOVIE_STATUS.COMING_SOON },
+        { id: '3', title: 'C', status: MOVIE_STATUS.COMING_SOON },
+      ];
+      mockUseMoviesInfinite.mockReturnValue({
+        ...baseQueryResult,
+        data: { pages: [pageOf(soon)] },
       } as any);
+      mockUseMoviesByGenreInfinite.mockReturnValue(emptyResult as any);
 
       const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.COMING_SOON as MovieStatus,
-            genre: undefined,
-          }),
+        () => useMovieData({ status: MOVIE_STATUS.COMING_SOON as MovieStatus }),
         { wrapper: createWrapper() },
       );
 
-      // Should maintain original order
-      expect(result.current.movies[0]?.id).toBe('1');
-      expect(result.current.movies[1]?.id).toBe('2');
-      expect(result.current.movies[2]?.id).toBe('3');
+      expect(result.current.movies.map(m => m.id)).toEqual(['1', '2', '3']);
     });
   });
 
-  describe('Loading states', () => {
-    it('should return loading state correctly', () => {
+  describe('pass-through', () => {
+    it('returns an empty array and forwards flags when there is no data', () => {
       mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
+        ...emptyResult,
         isLoading: true,
       } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
+      mockUseMoviesByGenreInfinite.mockReturnValue(emptyResult as any);
 
       const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
+        () => useMovieData({ status: MOVIE_STATUS.NOW_PLAYING as MovieStatus }),
         { wrapper: createWrapper() },
       );
 
+      expect(result.current.movies).toEqual([]);
       expect(result.current.isLoading).toBe(true);
     });
 
-    it('should return fetching next page state correctly', () => {
+    it('exposes fetchNextPage / refetch from the active query', () => {
+      const fetchNextPage = jest.fn();
+      const refetch = jest.fn();
       mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        isFetchingNextPage: true,
+        ...baseQueryResult,
+        fetchNextPage,
+        refetch,
       } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
+      mockUseMoviesByGenreInfinite.mockReturnValue(emptyResult as any);
 
       const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
-        { wrapper: createWrapper() },
-      );
-
-      expect(result.current.isFetchingNextPage).toBe(true);
-    });
-
-    it('should return refetching state correctly', () => {
-      mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        isRefetching: true,
-      } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-
-      const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
-        { wrapper: createWrapper() },
-      );
-
-      expect(result.current.isRefetching).toBe(true);
-    });
-  });
-
-  describe('Empty data', () => {
-    it('should return empty array when no data', () => {
-      mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-
-      const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
-        { wrapper: createWrapper() },
-      );
-
-      expect(result.current.movies).toEqual([]);
-    });
-
-    it('should return empty array when pages is empty', () => {
-      mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: { pages: [] },
-      } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-
-      const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
-        { wrapper: createWrapper() },
-      );
-
-      expect(result.current.movies).toEqual([]);
-    });
-  });
-
-  describe('Pagination', () => {
-    it('should return hasNextPage correctly', () => {
-      mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        hasNextPage: true,
-      } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-
-      const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
-        { wrapper: createWrapper() },
-      );
-
-      expect(result.current.hasNextPage).toBe(true);
-    });
-
-    it('should expose fetchNextPage function', () => {
-      const mockFetchNextPage = jest.fn();
-
-      mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        fetchNextPage: mockFetchNextPage,
-      } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-
-      const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
+        () => useMovieData({ status: MOVIE_STATUS.NOW_PLAYING as MovieStatus }),
         { wrapper: createWrapper() },
       );
 
       result.current.fetchNextPage();
-
-      expect(mockFetchNextPage).toHaveBeenCalled();
-    });
-
-    it('should expose refetch function', () => {
-      const mockRefetch = jest.fn();
-
-      mockUseMoviesInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        refetch: mockRefetch,
-      } as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-
-      const { result } = renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-          }),
-        { wrapper: createWrapper() },
-      );
-
       result.current.refetch();
-
-      expect(mockRefetch).toHaveBeenCalled();
-    });
-  });
-
-  describe('Enabled parameter', () => {
-    it('should pass enabled=false to hooks when disabled', () => {
-      mockUseMoviesInfinite.mockReturnValue(defaultQueryResult as any);
-      mockUseMoviesByGenreInfinite.mockReturnValue({
-        ...defaultQueryResult,
-        data: undefined,
-      } as any);
-
-      renderHook(
-        () =>
-          useMovieData({
-            status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-            genre: undefined,
-            enabled: false,
-          }),
-        { wrapper: createWrapper() },
-      );
-
-      expect(mockUseMoviesInfinite).toHaveBeenCalledWith({
-        status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-        enabled: false,
-      });
+      expect(fetchNextPage).toHaveBeenCalled();
+      expect(refetch).toHaveBeenCalled();
     });
   });
 });

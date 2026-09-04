@@ -97,13 +97,13 @@ export class ShowtimeMovieDto {
   @ApiProperty()
   durationMinutes!: number;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   posterUrl!: string | null;
 
   @ApiProperty()
   language!: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: Number, nullable: true })
   rating!: number | null;
 }
 

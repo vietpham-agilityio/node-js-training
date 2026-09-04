@@ -19,11 +19,7 @@ import { HorizontalCardSkeleton } from '@/components/Skeletons/HorizontalCardSke
 import { Tabs } from '@/components/Tabs';
 import { Typo } from '@/components/Typo';
 import { ExpandableText } from '@/features/booking/components/ExpandableText';
-import { MovieTrailerCarousel } from '@/features/booking/components/MovieTrailerCarousel';
-import { CastCrewSkeleton } from '@/features/booking/components/Skeletons/CastCrewSkeleton';
 import { MovieContentSkeleton } from '@/features/booking/components/Skeletons/MovieContentSkeleton';
-import { MovieTrailerCarouselSkeleton } from '@/features/booking/components/Skeletons/MovieTrailerCarouselSkeleton';
-import { UserCard } from '@/features/booking/components/UserCard';
 
 // Constants
 import {
@@ -42,32 +38,13 @@ import { useMovie } from '@/features/booking/hooks/useMovies';
 import { useBookingStore } from '@/features/booking/store/booking';
 import { useMovieStore } from '@/stores/movie';
 
-// Types
-
-import { CastMember } from '@/features/booking/schemas/movie';
-
 // Icons
 import { ArrowRightIcon } from '@/icons/ArrowRightIcon';
 
-type ContentItem =
-  | {
-      type: ContentType.SYNOPSIS;
-      data: string;
-    }
-  | {
-      type: ContentType.CAST_CREW;
-      data: CastAndCrewItem[];
-    }
-  | {
-      type: ContentType.TRAILER;
-      data: string[];
-    };
-
-interface CastAndCrewItem {
-  id: string;
-  name: string;
-  imageUrl: string | null;
-}
+type ContentItem = {
+  type: ContentType.SYNOPSIS;
+  data: string;
+};
 
 const StyledImage = withUniwind(Image);
 const StyledSafeAreaView = withUniwind(SafeAreaView);
@@ -98,39 +75,15 @@ const MovieScreen = () => {
     durationMinutes = 0,
     genre = [],
     rating,
-    castCrew,
     synopsis = '',
-    trailerUrl = [],
   } = movie || {};
-
-  const castAndCrew: CastAndCrewItem[] = useMemo(
-    () =>
-      castCrew?.actors.map(({ name, imageUrl }: CastMember) => ({
-        id: name,
-        name: name,
-        imageUrl: imageUrl || '',
-      })) ?? [],
-    [castCrew],
-  );
 
   const contentItems = useMemo<ContentItem[]>(() => {
     if (activeTab === DETAIL_MOVIE_TABS[0]?.id) {
-      const items: ContentItem[] = [
-        { type: ContentType.SYNOPSIS, data: synopsis },
-      ];
-
-      if (castAndCrew?.length > 0) {
-        items.push({ type: ContentType.CAST_CREW, data: castAndCrew });
-      }
-
-      if (trailerUrl?.length > 0) {
-        items.push({ type: ContentType.TRAILER, data: trailerUrl as string[] });
-      }
-
-      return items;
+      return [{ type: ContentType.SYNOPSIS, data: synopsis }];
     }
     return [];
-  }, [activeTab, synopsis, castAndCrew, trailerUrl]);
+  }, [activeTab, synopsis]);
 
   const handleTabChange = useCallback((tabId: string) => {
     setActiveTab(tabId);
@@ -154,25 +107,7 @@ const MovieScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: ContentItem }) => {
       if (isMovieLoading) {
-        // Show skeleton for content sections when loading
-        switch (item.type) {
-          case ContentType.SYNOPSIS:
-            return <MovieContentSkeleton />;
-          case ContentType.CAST_CREW:
-            return (
-              <View className="ml-6">
-                <CastCrewSkeleton count={4} />
-              </View>
-            );
-          case ContentType.TRAILER:
-            return (
-              <View className="ml-6">
-                <MovieTrailerCarouselSkeleton count={2} />
-              </View>
-            );
-          default:
-            return null;
-        }
+        return <MovieContentSkeleton />;
       }
 
       switch (item.type) {
@@ -185,47 +120,6 @@ const MovieScreen = () => {
               <ExpandableText text={synopsis} />
             </View>
           );
-        case ContentType.CAST_CREW:
-          return (
-            <View className="mb-7">
-              <Typo size="lg" weight="medium" className="mb-5 px-6">
-                Cast & Crew
-              </Typo>
-              <FlashList
-                data={item.data}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{
-                  paddingHorizontal: 24,
-                }}
-                ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-                renderItem={({
-                  item: cast,
-                }: {
-                  item: {
-                    id: string;
-                    name: string;
-                    imageUrl: string | null;
-                  };
-                }) => (
-                  <UserCard
-                    imageUrl={cast?.imageUrl ?? ''}
-                    fullName={cast?.name ?? ''}
-                  />
-                )}
-                keyExtractor={cast => cast?.id ?? ''}
-              />
-            </View>
-          );
-        case ContentType.TRAILER:
-          return (
-            <View className="mb-12">
-              <Typo size="lg" weight="semibold" className="px-6 mb-5">
-                Trailer and song
-              </Typo>
-              <MovieTrailerCarousel trailers={item.data} />
-            </View>
-          );
         default:
           return null;
       }
@@ -236,11 +130,7 @@ const MovieScreen = () => {
   // Create skeleton content items for loading state
   const skeletonContentItems = useMemo<ContentItem[]>(() => {
     if (isMovieLoading && activeTab === DETAIL_MOVIE_TABS[0]?.id) {
-      return [
-        { type: ContentType.SYNOPSIS, data: '' },
-        { type: ContentType.CAST_CREW, data: [] },
-        { type: ContentType.TRAILER, data: [] },
-      ];
+      return [{ type: ContentType.SYNOPSIS, data: '' }];
     }
     return [];
   }, [isMovieLoading, activeTab]);

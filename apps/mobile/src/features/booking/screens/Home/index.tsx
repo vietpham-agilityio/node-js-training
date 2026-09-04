@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // Constants
-import { FILTER_GENRE_TABS, ROUTES, TABS_FOOTER_HEIGHT } from '@/constants';
+import { ROUTES, TABS_FOOTER_HEIGHT } from '@/constants';
 
 // Components
 import { SearchInput } from '@/components/SearchInput';
@@ -19,6 +19,7 @@ import { NowPlayingSection } from '@/features/booking/components/NowPlayingSecti
 import { PromotionCard } from '@/features/booking/components/PromotionCard';
 
 // Hooks
+import { useGenres } from '@/features/booking/hooks/useGenres';
 import { useMovieData } from '@/features/booking/hooks/useMovieData';
 
 // Types
@@ -30,23 +31,32 @@ import { MOCK_PROMOTIONS } from '@/mocks';
 
 const StyledSafeAreaView = withUniwind(SafeAreaView);
 
+const ALL_GENRE_ID = 'all';
+
 const HomeScreen = () => {
-  const [activeGenre, setActiveGenre] = useState<string>(
-    FILTER_GENRE_TABS[0]?.id || '',
+  const [activeGenre, setActiveGenre] = useState<string>(ALL_GENRE_ID);
+
+  const { data: genres = [] } = useGenres();
+
+  const genreTabs = useMemo(
+    () => [
+      { id: ALL_GENRE_ID, label: 'All' },
+      ...genres.map(genre => ({ id: genre.id, label: genre.name })),
+    ],
+    [genres],
   );
 
-  const isAllCategory = activeGenre === FILTER_GENRE_TABS[0]?.id;
-  const currentGenre = isAllCategory ? undefined : activeGenre;
+  const currentGenre = activeGenre === ALL_GENRE_ID ? undefined : activeGenre;
 
   // Simplified data fetching with custom hook
   const nowPlaying = useMovieData({
     status: MOVIE_STATUS.NOW_PLAYING as MovieStatus,
-    genre: currentGenre,
+    genreId: currentGenre,
   });
 
   const comingSoon = useMovieData({
     status: MOVIE_STATUS.COMING_SOON as MovieStatus,
-    genre: currentGenre,
+    genreId: currentGenre,
   });
 
   // Handlers
@@ -173,7 +183,7 @@ const HomeScreen = () => {
       {/* Category Tabs */}
       <View className="pl-6 mb-3">
         <Tabs
-          tabs={FILTER_GENRE_TABS}
+          tabs={genreTabs}
           activeTab={activeGenre}
           onTabChange={setActiveGenre}
         />

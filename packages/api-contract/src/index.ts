@@ -40,3 +40,12 @@ export type AuthUser = Schemas['MeResponseDto'];
 export type UserProfile = Schemas['UserResponseDto'];
 /** `PATCH /users/me` request body. */
 export type UpdateUserProfileRequest = Schemas['UpdateProfileDto'];
+
+/** A movie in the public catalogue — `GET /movies` / `GET /movies/:id`. */
+export type Movie = Schemas['MovieResponseDto'];
+/** One page of `GET /movies`. */
+export type PaginatedMovies = Schemas['PaginatedMovieResponseDto'];
+/** A catalogue genre — `GET /genres`. */
+export type Genre = Schemas['GenreResponseDto'];
+/** One page of `GET /genres`. */
+export type PaginatedGenres = Schemas['PaginatedGenreResponseDto'];

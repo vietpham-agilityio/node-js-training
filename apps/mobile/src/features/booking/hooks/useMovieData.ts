@@ -1,31 +1,30 @@
 import { useMemo } from 'react';
-import { GenreMovie, MovieStatus } from '@/features/booking/schemas/movie';
+import { MovieStatus } from '@/features/booking/schemas/movie';
 import { useMoviesByGenreInfinite, useMoviesInfinite } from './useMovies';
 import { MOVIE_STATUS } from '@/constants/status';
 
 interface UseMovieDataParams {
   status: MovieStatus;
-  genre?: string;
+  // A genre id from `GET /genres`; undefined means the "All" tab.
+  genreId?: string;
   enabled?: boolean;
 }
 
 export const useMovieData = ({
   status,
-  genre,
+  genreId,
   enabled = true,
 }: UseMovieDataParams) => {
-  const isAllCategory = !genre;
+  const isAllCategory = !genreId;
 
   // Fetch all movies
   const allMoviesQuery = useMoviesInfinite({
-    status,
     enabled: enabled && isAllCategory,
   });
 
   // Fetch movies by genre
   const genreMoviesQuery = useMoviesByGenreInfinite({
-    genre: genre as GenreMovie,
-    status,
+    genreId: genreId ?? '',
     enabled: enabled && !isAllCategory,
   });
 
@@ -36,7 +35,10 @@ export const useMovieData = ({
   const movies = useMemo(() => {
     if (!activeQuery.data?.pages) return [];
 
-    const flatMovies = activeQuery.data.pages.flat();
+    // The API has no status filter, so partition by the derived status here.
+    const flatMovies = activeQuery.data.pages
+      .flatMap(page => page.data)
+      .filter(movie => movie.status === status);
 
     // Sort by rating for NOW_PLAYING, keep order for COMING_SOON
     if (status === MOVIE_STATUS.NOW_PLAYING) {
