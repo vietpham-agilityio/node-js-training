@@ -1,38 +1,39 @@
 // Effect
 import { Effect, Context } from 'effect';
 
+// Contract
+import type { Genre } from '@movea/api-contract';
+
 // Schema
-import { GenreMovie, Movie, MovieStatus } from '../../schemas/movie';
+import { Movie } from '../../schemas/movie';
 import { MovieError } from '../../error/movie';
 import { ShowTime } from '../../schemas/cinema';
+
+// Service
+import { MoviePage } from '../../services/movies';
 
 export class MoviesService extends Context.Tag('MoviesServiceTag')<
   MoviesService,
   {
-    readonly getMovies: (
-      status?: MovieStatus,
-    ) => Effect.Effect<Movie[], MovieError, never>;
-
     readonly getMovieById: (
       id: string,
     ) => Effect.Effect<Movie, MovieError, never>;
 
+    readonly getMoviesPaginated: (
+      page?: number,
+    ) => Effect.Effect<MoviePage, MovieError, never>;
+
     readonly searchMoviesPaginated: (
       query: string,
       page?: number,
-      limit?: number,
-    ) => Effect.Effect<Movie[], MovieError, never>;
-
-    readonly getMoviesByGenre: (
-      genre: GenreMovie,
-    ) => Effect.Effect<Movie[], MovieError, never>;
+    ) => Effect.Effect<MoviePage, MovieError, never>;
 
     readonly getMoviesByGenrePaginated: (
-      genre: GenreMovie,
-      status?: MovieStatus,
+      genreId: string,
       page?: number,
-      limit?: number,
-    ) => Effect.Effect<Movie[], MovieError, never>;
+    ) => Effect.Effect<MoviePage, MovieError, never>;
+
+    readonly getGenres: () => Effect.Effect<Genre[], MovieError, never>;
 
     readonly getShowtimes: (
       movieId: string,
@@ -42,11 +43,5 @@ export class MoviesService extends Context.Tag('MoviesServiceTag')<
     readonly getShowtimeById: (
       id: string,
     ) => Effect.Effect<ShowTime, MovieError, never>;
-
-    readonly getMoviesPaginated: (
-      status?: MovieStatus,
-      page?: number,
-      limit?: number,
-    ) => Effect.Effect<Movie[], MovieError, never>;
   }
 >() {}

@@ -10,14 +10,20 @@ export const queryKeys = {
   movies: {
     all: ['movies'] as const,
     lists: () => [...queryKeys.movies.all, 'list'] as const,
-    list: (filters?: { status?: string; genre?: string }) =>
+    list: (filters?: { genreId?: string }) =>
       [...queryKeys.movies.lists(), filters] as const,
-    infinite: (filters?: { status?: string; genre?: string }) =>
+    infinite: (filters?: { genreId?: string }) =>
       [...queryKeys.movies.lists(), 'infinite', filters] as const,
     details: () => [...queryKeys.movies.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.movies.details(), id] as const,
     searchInfinite: (query: string) =>
       [...queryKeys.movies.all, 'search', 'infinite', query] as const,
+  },
+
+  // Genres
+  genres: {
+    all: ['genres'] as const,
+    list: () => [...queryKeys.genres.all, 'list'] as const,
   },
 
   // Showtimes
