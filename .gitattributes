@@ -1,0 +1,12 @@
+# Normalise text in the repository, and let each checkout use its platform's
+# line endings — except where a file is consumed by Linux inside a container.
+* text=auto
+
+# Shell scripts run inside the API image. A CRLF here makes the shebang
+# `#!/bin/sh\r`, which the kernel resolves as a missing interpreter, so the
+# container dies with "no such file or directory" on a file that plainly
+# exists. Docker COPY takes the working tree, so core.autocrlf on Windows is
+# enough to break the build. Keep them LF regardless of platform.
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.dockerignore text eol=lf
