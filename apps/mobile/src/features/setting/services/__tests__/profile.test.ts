@@ -1,5 +1,5 @@
+import { apiRequest } from '@/services/api/client';
 import { supabase } from '@/services/supabase/client';
-import { keysToCamel } from '@/utils/convert';
 import { runEffectForQuery } from '@/utils/effect';
 import { decode } from 'base64-arraybuffer';
 import { Effect } from 'effect';
@@ -30,6 +30,10 @@ const mockStorageBuilder = {
   getPublicUrl: jest.fn(),
 };
 
+jest.mock('@/services/api/client', () => ({
+  apiRequest: jest.fn(),
+}));
+
 jest.mock('@/services/supabase/client', () => ({
   supabase: {
     from: jest.fn(() => mockQueryBuilderInstance),
@@ -42,33 +46,32 @@ jest.mock('@/services/supabase/client', () => ({
 
 jest.mock('expo-file-system/legacy');
 jest.mock('base64-arraybuffer');
-jest.unmock('@/utils/convert');
+
+const mockApiRequest = apiRequest as jest.Mock;
+
+// `GET /users/me` payload — the API models the name as firstName/lastName.
+const API_PROFILE = {
+  id: 'user1',
+  email: 'user1@example.com',
+  firstName: 'New',
+  lastName: 'Name',
+  phoneNumber: null,
+  dateOfBirth: null,
+  address: null,
+  avatarUrl: null,
+  role: 'user',
+  isActive: true,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+};
 
 describe('ProfileService', () => {
   let service: ProfileService;
-  const from = supabase.from as jest.Mock;
   const storageFrom = supabase.storage.from as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
     service = ProfileService.getInstance();
-
-    // Reset and configure mockQueryBuilderInstance
-    Object.values(mockQueryBuilderInstance).forEach(mockFn => {
-      if (jest.isMockFunction(mockFn)) {
-        mockFn.mockClear();
-        if (mockFn.mockReturnThis) {
-          mockFn.mockReturnThis();
-        }
-      }
-    });
-    (mockQueryBuilderInstance.then as jest.Mock).mockImplementation(resolve =>
-      resolve({ data: [], error: null }),
-    );
-    (mockQueryBuilderInstance.single as jest.Mock).mockResolvedValue({
-      data: {},
-      error: null,
-    });
 
     // Configure mockStorageBuilder
     mockStorageBuilder.upload.mockResolvedValue({
@@ -89,68 +92,68 @@ describe('ProfileService', () => {
   });
 
   describe('getProfile', () => {
-    it('should fetch a user profile', async () => {
-      const mockProfile = { id: 'user1' };
-      (mockQueryBuilderInstance.single as jest.Mock).mockResolvedValue({
-        data: mockProfile,
-        error: null,
-      });
+    it('fetches the authenticated user profile from /users/me', async () => {
+      mockApiRequest.mockResolvedValue(API_PROFILE);
 
-      const profile = await runEffectForQuery(service.getProfile('user1'));
-      expect(from).toHaveBeenCalledWith('user_profiles');
-      expect(mockQueryBuilderInstance.eq).toHaveBeenCalledWith('id', 'user1');
-      expect(profile).toEqual(keysToCamel(mockProfile));
+      const profile = await runEffectForQuery(service.getProfile());
+
+      expect(mockApiRequest).toHaveBeenCalledWith('/users/me', { auth: true });
+      expect(profile).toEqual({
+        id: 'user1',
+        email: 'user1@example.com',
+        fullName: 'New Name',
+        phoneNumber: undefined,
+        address: undefined,
+        avatarUrl: undefined,
+        createdAt: API_PROFILE.createdAt,
+        updatedAt: API_PROFILE.updatedAt,
+      });
     });
 
-    it('should throw an error if fetching profile fails', async () => {
-      const error = new Error('Fetch profile failed');
-      (mockQueryBuilderInstance.single as jest.Mock).mockResolvedValue({
-        data: null,
-        error,
-      });
+    it('throws a SettingError if the request fails', async () => {
+      mockApiRequest.mockRejectedValue(new Error('Fetch profile failed'));
 
-      await expect(
-        runEffectForQuery(service.getProfile('user1')),
-      ).rejects.toThrow(error);
+      await expect(runEffectForQuery(service.getProfile())).rejects.toThrow(
+        'Fetch profile failed',
+      );
     });
   });
 
   describe('updateProfile', () => {
-    it('should update a user profile', async () => {
-      const updatedProfile = { id: 'user1', full_name: 'New Name' };
-      const updateData = { fullName: 'New Name' };
-      (mockQueryBuilderInstance.single as jest.Mock).mockResolvedValue({
-        data: updatedProfile,
-        error: null,
-      });
+    it('sends only the API-mappable fields to PATCH /users/me', async () => {
+      mockApiRequest.mockResolvedValue({ ...API_PROFILE, address: '1 New St' });
 
       const profile = await runEffectForQuery(
-        service.updateProfile('user1', updateData),
+        service.updateProfile({
+          fullName: 'Ignored',
+          email: 'ignored@example.com',
+          address: '1 New St',
+          phoneNumber: '0123456789',
+        }),
       );
-      expect(from).toHaveBeenCalledWith('user_profiles');
-      expect(mockQueryBuilderInstance.update).toHaveBeenCalledWith(
-        expect.objectContaining({ full_name: 'New Name' }),
-      );
-      expect(profile).toEqual(keysToCamel(updatedProfile));
+
+      expect(mockApiRequest).toHaveBeenCalledWith('/users/me', {
+        method: 'PATCH',
+        body: { address: '1 New St', phoneNumber: '0123456789' },
+        auth: true,
+      });
+      expect(profile.address).toBe('1 New St');
+      expect(profile.fullName).toBe('New Name');
     });
 
-    it('should throw an error if updating profile fails', async () => {
-      const error = new Error('Update failed');
-      (mockQueryBuilderInstance.single as jest.Mock).mockResolvedValue({
-        data: null,
-        error,
-      });
+    it('throws a SettingError if the update fails', async () => {
+      mockApiRequest.mockRejectedValue(new Error('Update failed'));
 
       await expect(
-        runEffectForQuery(service.updateProfile('user1', {})),
-      ).rejects.toThrow(error);
+        runEffectForQuery(service.updateProfile({})),
+      ).rejects.toThrow('Update failed');
     });
   });
 
   describe('uploadAvatar', () => {
     const userId = 'user1';
     const file = { uri: 'file://path/to/avatar.jpg', type: 'image/jpeg' };
-    const publicUrl = 'mock-public-url'; // Updated to match mockStorageBuilder.getPublicUrl
+    const publicUrl = 'mock-public-url'; // Matches mockStorageBuilder.getPublicUrl
     const mockProfile = { id: userId, avatar_url: null };
     const arrayBuffer = new ArrayBuffer(8);
 
@@ -170,7 +173,7 @@ describe('ProfileService', () => {
     it('should upload an avatar and return the public URL', async () => {
       const url = await runEffectForQuery(service.uploadAvatar(userId, file));
 
-      expect(service.getProfile).toHaveBeenCalledWith(userId);
+      expect(service.getProfile).toHaveBeenCalledWith();
       expect(FileSystem.readAsStringAsync).toHaveBeenCalledWith(file.uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
@@ -182,7 +185,7 @@ describe('ProfileService', () => {
         expect.any(Object),
       );
       expect(mockStorageBuilder.getPublicUrl).toHaveBeenCalledWith('mock/path'); // Path returned by upload
-      expect(service.updateProfile).toHaveBeenCalledWith(userId, {
+      expect(service.updateProfile).toHaveBeenCalledWith({
         avatarUrl: publicUrl,
       });
       expect(url).toBe(publicUrl);

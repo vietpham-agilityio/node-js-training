@@ -2,14 +2,60 @@ import { supabase } from '@/services/supabase/client';
 import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system/legacy';
 
+// HTTP
+import { apiRequest } from '@/services/api/client';
+
 // Types
+import type {
+  UserProfile as ApiUserProfile,
+  UpdateUserProfileRequest,
+} from '@movea/api-contract';
 import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
 
 // Utils
-import { keysToCamel } from '@/utils/convert';
 import { Effect } from 'effect';
 import { SettingError } from '../error';
 import { runEffectForQuery } from '@/utils/effect';
+
+const messageOf = (error: unknown): string =>
+  error instanceof Error ? error.message : '';
+
+// TODO(profile-migration): drop once screens read firstName/lastName directly
+// and `UserProfile` is the contract type. Until then this keeps the shape the
+// setting screens already consume.
+const toUserProfile = ({
+  id,
+  email,
+  firstName,
+  lastName,
+  phoneNumber,
+  address,
+  avatarUrl,
+  createdAt,
+  updatedAt,
+}: ApiUserProfile): UserProfile => ({
+  id,
+  email,
+  fullName: [firstName, lastName].filter(Boolean).join(' '),
+  phoneNumber: phoneNumber ?? undefined,
+  address: address ?? undefined,
+  avatarUrl: avatarUrl ?? undefined,
+  createdAt,
+  updatedAt,
+});
+
+// `PATCH /users/me` only accepts the fields below. `fullName` and `email` are
+// intentionally dropped: email is not editable via the API, and name needs the
+// firstName/lastName form split that is a follow-up.
+const toUpdateRequest = ({
+  phoneNumber,
+  address,
+  avatarUrl,
+}: UpdateProfileData): UpdateUserProfileRequest => ({
+  ...(phoneNumber != null && { phoneNumber }),
+  ...(address != null && { address }),
+  ...(avatarUrl != null && { avatarUrl }),
+});
 
 export class ProfileService {
   private static instance: ProfileService;
@@ -24,57 +70,42 @@ export class ProfileService {
   }
 
   /**
-   * Get user profile by user ID
+   * Get the authenticated user's profile — `GET /users/me`.
    */
-  getProfile = (userId: string) =>
+  getProfile = () =>
     Effect.tryPromise({
       try: async () => {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', userId)
-          .single();
-
-        if (error) throw SettingError.getProfileError(error.message);
-        return keysToCamel(data) as UserProfile;
+        const dto = await apiRequest<ApiUserProfile>('/users/me', {
+          auth: true,
+        });
+        return toUserProfile(dto);
       },
-      catch: (error: unknown) =>
-        SettingError.getProfileError(
-          error instanceof Error ? error.message : '',
-        ),
+      catch: (error: unknown) => SettingError.getProfileError(messageOf(error)),
     });
 
   /**
-   * Update user profile
+   * Update the authenticated user's profile — `PATCH /users/me`.
    */
-  updateProfile = (userId: string, data: UpdateProfileData) =>
+  updateProfile = (data: UpdateProfileData) =>
     Effect.tryPromise({
       try: async () => {
-        const { data: profile, error } = await supabase
-          .from('user_profiles')
-          .update({
-            address: data.address,
-            email: data.email,
-            avatar_url: data.avatarUrl,
-            full_name: data.fullName,
-            phone_number: data.phoneNumber,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', userId)
-          .select()
-          .single();
-
-        if (error) throw SettingError.updateProfileError(error.message);
-        return keysToCamel(profile) as UserProfile;
+        const dto = await apiRequest<ApiUserProfile>('/users/me', {
+          method: 'PATCH',
+          body: toUpdateRequest(data),
+          auth: true,
+        });
+        return toUserProfile(dto);
       },
       catch: (error: unknown) =>
-        SettingError.updateProfileError(
-          error instanceof Error ? error.message : '',
-        ),
+        SettingError.updateProfileError(messageOf(error)),
     });
 
   /**
-   * Upload avatar and return URL (doesn't update profile yet)
+   * Upload avatar and return URL (doesn't update profile yet).
+   *
+   * TODO(profile-migration): the binary still goes to Supabase Storage — the
+   * API has no upload endpoint yet. The resulting URL is persisted through
+   * `updateProfile` (`PATCH /users/me`).
    */
   uploadAvatar = (
     userId: string,
@@ -82,7 +113,7 @@ export class ProfileService {
   ) =>
     Effect.tryPromise({
       try: async () => {
-        const profile = await runEffectForQuery(this.getProfile(userId));
+        const profile = await runEffectForQuery(this.getProfile());
 
         if (profile?.avatarUrl) {
           await runEffectForQuery(this.deleteAvatar(profile.avatarUrl));
@@ -115,9 +146,7 @@ export class ProfileService {
           data: { publicUrl },
         } = supabase.storage.from('user-avatar').getPublicUrl(data.path);
 
-        await runEffectForQuery(
-          this.updateProfile(userId, { avatarUrl: publicUrl }),
-        );
+        await runEffectForQuery(this.updateProfile({ avatarUrl: publicUrl }));
 
         return publicUrl;
       },

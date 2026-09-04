@@ -10,12 +10,9 @@ import { UpdateProfileData, UserProfile } from '@/features/auth/types/auth';
 export class ProfileService extends Context.Tag('ProfileServiceTag')<
   ProfileService,
   {
-    readonly getProfile: (
-      userId: string,
-    ) => Effect.Effect<UserProfile, SettingError, never>;
+    readonly getProfile: () => Effect.Effect<UserProfile, SettingError, never>;
 
     readonly updateProfile: (
-      userId: string,
       data: UpdateProfileData,
     ) => Effect.Effect<UserProfile, SettingError, never>;
 

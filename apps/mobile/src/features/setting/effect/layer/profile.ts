@@ -13,10 +13,10 @@ export const ProfileServiceLayer = Layer.effect(
   ProfileService,
   Effect.gen(function* () {
     return {
-      getProfile: (userId: string) => profileService.getProfile(userId),
+      getProfile: () => profileService.getProfile(),
 
-      updateProfile: (userId: string, data: UpdateProfileData) =>
-        profileService.updateProfile(userId, data),
+      updateProfile: (data: UpdateProfileData) =>
+        profileService.updateProfile(data),
 
       uploadAvatar: (
         userId: string,
